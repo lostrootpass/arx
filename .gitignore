@@ -1,0 +1,6 @@
+*.obj
+*.user
+*.pdb
+*.db
+.vs/
+Debug/
