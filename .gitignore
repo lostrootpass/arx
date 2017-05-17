@@ -4,3 +4,11 @@
 *.db
 .vs/
 Debug/
+Release/
+game/
+Log/
+*__Win32_Release/
+
+#Ignore anything in the default lib output directory but include the 3rd party libs
+Sources/lib/*
+!Sources/lib/otherlibs/
