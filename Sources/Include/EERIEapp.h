@@ -257,109 +257,190 @@ extern long EERIEMouseXdep, EERIEMouseYdep, EERIEMouseX, EERIEMouseY, EERIEWheel
 extern long EERIEMouseButton, EERIEMouseGrab;
 extern HWND MSGhwnd;
 
+
+//-----------------------------------------------------------------------------
+// Name: class CRenderApplication
+// Desc:
+//-----------------------------------------------------------------------------
+class CRenderApplication
+{
+public:
+	float			fMouseSensibility;
+
+	virtual HRESULT Render()
+	{
+		return S_OK;
+	}
+	virtual HRESULT InitDeviceObjects()
+	{
+		return S_OK;
+	}
+
+	// Functions to create, run, pause, and clean up the application
+	virtual HRESULT			Create(HINSTANCE, TCHAR *) = 0;
+	virtual INT				Run() = 0;
+	virtual VOID			Pause(BOOL bPause) = 0;
+	virtual LRESULT			SwitchFullScreen() = 0;
+
+	virtual VOID					Cleanup3DEnvironment() = 0;
+	virtual void					EvictManagedTextures() = 0;
+	virtual VOID					OutputText(DWORD x, DWORD y, TCHAR * str) = 0;
+
+	virtual HRESULT	SetClipping(float x1, float y1, float x2, float y2) = 0;
+
+	virtual HRESULT					Change3DEnvironment() = 0;
+	virtual HRESULT					Initialize3DEnvironment() = 0;
+	virtual HRESULT	Render3DEnvironment() = 0;
+
+	virtual void					EERIEMouseUpdate(short x, short y)
+	{
+		//
+	}
+
+	BOOL					m_bFrameMoving;
+	BOOL					m_bActive;
+	BOOL					m_bReady;
+	HWND					m_hWnd;
+
+protected:
+	// Overridable variables for the app
+	TCHAR*			m_strWindowTitle;
+	BOOL			m_bAppUseZBuffer;
+	BOOL			m_bAppUseStereo;
+	BOOL			m_bShowStats;
+
+	// Overridable functions for the 3D scene created by the app
+	virtual HRESULT OneTimeSceneInit()
+	{
+		return S_OK;
+	}
+	virtual HRESULT DeleteDeviceObjects()
+	{
+		return S_OK;
+	}
+	virtual HRESULT FrameMove(FLOAT)
+	{
+		return S_OK;
+	}
+	virtual HRESULT RestoreSurfaces()
+	{
+		return S_OK;
+	}
+	virtual HRESULT FinalCleanup()
+	{
+		return S_OK;
+	}
+
+	// Overridable power management (APM) functions
+	virtual LRESULT OnQuerySuspend(DWORD dwFlags)
+	{
+		return S_OK;
+	}
+
+	virtual LRESULT OnResumeSuspend(DWORD dwData)
+	{
+		return S_OK;
+	}
+
+	virtual HRESULT BeforeRun()
+	{
+		return S_OK;
+	}
+
+	//zbuffer
+	short			w_zdecal;
+	long			dw_zmask;
+	float			f_zmul;
+	long			dw_zXmodulo;
+
+};
+
+//-----------------------------------------------------------------------------
+// Name: class COpenGLApplication
+// Desc:
+//-----------------------------------------------------------------------------
+class COpenGLApplication : public CRenderApplication
+{
+public:
+	COpenGLApplication();
+
+	// Functions to create, run, pause, and clean up the application
+	virtual HRESULT			Create(HINSTANCE, TCHAR *);
+	virtual INT				Run();
+	virtual VOID			Pause(BOOL bPause);
+	virtual LRESULT			SwitchFullScreen();
+
+	virtual VOID					Cleanup3DEnvironment();
+	virtual void					EvictManagedTextures();
+	virtual VOID					OutputText(DWORD x, DWORD y, TCHAR * str);
+
+	virtual HRESULT	SetClipping(float x1, float y1, float x2, float y2);
+
+	virtual HRESULT					Change3DEnvironment();
+	virtual HRESULT					Initialize3DEnvironment();
+	virtual HRESULT Render3DEnvironment();
+
+	virtual void					EERIEMouseUpdate(short x, short y);
+
+};
+
+
 //-----------------------------------------------------------------------------
 // Name: class CD3DApplication
 // Desc:
 //-----------------------------------------------------------------------------
-class CD3DApplication
+class CD3DApplication : public CRenderApplication
 {
 		// Internal variables and member functions
 		BOOL            m_bSingleStep;
 		DWORD           m_dwBaseTime;
 		DWORD           m_dwStopTime;
 
-		HRESULT Render3DEnvironment();
 		VOID    DisplayFrameworkError(HRESULT, DWORD);
 
-public:
-		float			fMouseSensibility;
 protected:
 		// Overridable variables for the app
-		TCHAR*			m_strWindowTitle;
-		BOOL			m_bAppUseZBuffer;
-		BOOL			m_bAppUseStereo;
-		BOOL			m_bShowStats;
 		HRESULT(*m_fnConfirmDevice)(DDCAPS *, D3DDEVICEDESC7 *);
 		HWND				 CreateToolBar(HWND hWndParent, long tbb, HINSTANCE hInst);
-
-		// Overridable functions for the 3D scene created by the app
-		virtual HRESULT OneTimeSceneInit()
-		{
-			return S_OK;
-		}
-		virtual HRESULT DeleteDeviceObjects()
-		{
-			return S_OK;
-		}
-		virtual HRESULT FrameMove(FLOAT)
-		{
-			return S_OK;
-		}
-		virtual HRESULT RestoreSurfaces()
-		{
-			return S_OK;
-		}
-		virtual HRESULT FinalCleanup()
-		{
-			return S_OK;
-		}
 
 		// Overridable power management (APM) functions
 		virtual LRESULT OnQuerySuspend(DWORD dwFlags);
 		virtual LRESULT OnResumeSuspend(DWORD dwData);
-		virtual HRESULT BeforeRun()
-		{
-			return S_OK;
-		}
+		virtual HRESULT Render3DEnvironment();
 
-		//zbuffer
-		short			w_zdecal;
-		long			dw_zmask;
-		float			f_zmul;
-		long			dw_zXmodulo;
-
-	public:
-		LPDIRECTDRAW7			m_pDD;
-		LPDIRECT3DDEVICE7		m_pd3dDevice;
-		LPDIRECTDRAWSURFACE7	m_pddsRenderTarget;
-		LPDIRECTDRAWSURFACE7	m_pddsRenderTargetLeft;	// For stereo modes
-		DDSURFACEDESC2			m_ddsdRenderTarget;
-		int						WinManageMess();
-		VOID					Cleanup3DEnvironment();
-		LPDIRECT3D7				m_pD3D;
-		void					EvictManagedTextures();
-		virtual HRESULT Render()
-		{
-			return S_OK;
-		}
-		virtual HRESULT InitDeviceObjects()
-		{
-			return S_OK;
-		}
-		VOID					OutputText( DWORD x, DWORD y, TCHAR * str );
- 
-		HRESULT	SetClipping( float x1, float y1, float x2, float y2 );
- 
-		BOOL					m_bFrameMoving;
-		BOOL					m_bActive;
-		HRESULT					Change3DEnvironment();
-		HRESULT					Initialize3DEnvironment();
-		BOOL					m_bReady;
-		D3DEnum_DeviceInfo*		m_pDeviceInfo;
-		HWND					m_hWnd;
-		HWND					m_hWndRender;
-		WNDPROC					m_OldProc;
-		HWND					m_dlghWnd;
-		BOOL					b_dlg;
-		long					d_dlgframe;
-		void					EERIEMouseUpdate(short x, short y);
-
+public:
 		// Functions to create, run, pause, and clean up the application
 		virtual HRESULT			Create(HINSTANCE, TCHAR *);
 		virtual INT				Run();
 		virtual LRESULT			MsgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		virtual VOID			Pause(BOOL bPause);
-		LRESULT					SwitchFullScreen() ;
+		virtual LRESULT			SwitchFullScreen();
+
+		virtual int						WinManageMess();
+		virtual VOID					Cleanup3DEnvironment();
+		virtual void					EvictManagedTextures();
+		virtual VOID					OutputText( DWORD x, DWORD y, TCHAR * str );
+ 		
+		virtual HRESULT	SetClipping( float x1, float y1, float x2, float y2 );
+		
+		virtual HRESULT					Change3DEnvironment();
+		virtual HRESULT					Initialize3DEnvironment();
+
+		virtual void					EERIEMouseUpdate(short x, short y);
+
+		LPDIRECTDRAW7			m_pDD;
+		LPDIRECT3DDEVICE7		m_pd3dDevice;
+		LPDIRECTDRAWSURFACE7	m_pddsRenderTarget;
+		LPDIRECTDRAWSURFACE7	m_pddsRenderTargetLeft;	// For stereo modes
+		DDSURFACEDESC2			m_ddsdRenderTarget;
+		LPDIRECT3D7				m_pD3D;
+ 
+		D3DEnum_DeviceInfo*		m_pDeviceInfo;
+		HWND					m_hWndRender;
+		WNDPROC					m_OldProc;
+		HWND					m_dlghWnd;
+		BOOL					b_dlg;
+		long					d_dlgframe;
 
 		CD3DFramework7*			m_pFramework;
 		KEYBOARD_MNG			kbd;
@@ -397,7 +478,7 @@ protected:
 		CD3DApplication();
 };
 
-extern CD3DApplication * g_pD3DApp;
+extern CRenderApplication * g_pRenderApp;
 
 //******************************************************************************
 // MESSAGE BOXES

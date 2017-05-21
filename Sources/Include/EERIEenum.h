@@ -53,20 +53,28 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 // meet the app's desired
 // capabilities
 
-//-----------------------------------------------------------------------------
-// Name: struct D3DEnum_DeviceInfo
-// Desc: Structure to hold info about the enumerated Direct3D devices.
-//-----------------------------------------------------------------------------
-struct D3DEnum_DeviceInfo
+struct RenderEnum_DeviceInfo
 {
-	// D3D Device info
 	TCHAR          strDesc[40];
-	GUID     *     pDeviceGUID;
-	D3DDEVICEDESC7 ddDeviceDesc;
 	BOOL           bHardware;
 	WORD			wNbBlendStage;
 	WORD			wNbTextureSimultaneous;
 	DWORD			dwTextureOpCaps;
+
+
+	BOOL           bWindowed;
+	BOOL           bStereo;
+};
+
+//-----------------------------------------------------------------------------
+// Name: struct D3DEnum_DeviceInfo
+// Desc: Structure to hold info about the enumerated Direct3D devices.
+//-----------------------------------------------------------------------------
+struct D3DEnum_DeviceInfo : RenderEnum_DeviceInfo
+{
+	// D3D Device info
+	GUID     *     pDeviceGUID;
+	D3DDEVICEDESC7 ddDeviceDesc;
 
 	// DDraw Driver info
 	GUID     *     pDriverGUID;
@@ -75,8 +83,6 @@ struct D3DEnum_DeviceInfo
 
 	// DDraw Mode Info
 	DDSURFACEDESC2 ddsdFullscreenMode;
-	BOOL           bWindowed;
-	BOOL           bStereo;
 
 	// For internal use (apps should not need to use these)
 	GUID            guidDevice;

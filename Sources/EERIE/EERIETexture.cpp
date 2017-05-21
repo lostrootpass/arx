@@ -1911,21 +1911,23 @@ void EERIE_ActivateBump(void)
 {
 	EERIE_USES_BUMP_MAP = 0;		//pas de bump
 
-	if (g_pD3DApp)
+	if (g_pRenderApp)
 	{
+		D3DEnum_DeviceInfo* deviceInfo = static_cast<CD3DApplication*>(g_pRenderApp)->m_pDeviceInfo;
+
 		EERIE_USES_BUMP_MAP = 1;	//defaut: bump 2pass
 
-		if (g_pD3DApp->m_pDeviceInfo->wNbBlendStage > 2 && g_pD3DApp->m_pDeviceInfo->wNbTextureSimultaneous > 1)
+		if (deviceInfo->wNbBlendStage > 2 && deviceInfo->wNbTextureSimultaneous > 1)
 		{
 			//bump 1pass
-			if (g_pD3DApp->m_pDeviceInfo->dwTextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)
+			if (deviceInfo->dwTextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)
 			{
 				//dot
 				EERIE_USES_BUMP_MAP = 2;
 			}
 			else
 			{
-				if (g_pD3DApp->m_pDeviceInfo->dwTextureOpCaps & D3DTEXOPCAPS_ADDSIGNED)
+				if (deviceInfo->dwTextureOpCaps & D3DTEXOPCAPS_ADDSIGNED)
 				{
 					//addsigned
 					EERIE_USES_BUMP_MAP = 3;

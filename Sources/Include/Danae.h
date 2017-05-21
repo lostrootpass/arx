@@ -187,6 +187,35 @@ class DANAE : public CD3DApplication
 extern DANAE danaeApp;
 
 //-----------------------------------------------------------------------------
+// Class DANAEGL
+//-----------------------------------------------------------------------------
+class DANAEGL : public COpenGLApplication
+{
+
+protected:
+	HRESULT OneTimeSceneInit();
+	HRESULT DeleteDeviceObjects();
+	HRESULT Render();
+	HRESULT FrameMove(FLOAT fTimeKey);
+	HRESULT FinalCleanup();
+	void ManageKeyMouse();
+	BOOL ManageEditorControls();
+	void ManagePlayerControls();
+	void DrawAllInterface();
+	void DrawAllInterfaceFinish();
+	void GoFor2DFX();
+	HRESULT BeforeRun();
+public:
+	HRESULT InitDeviceObjects();
+
+	DANAEGL();
+	long MustRefresh;
+
+	bool DANAEStartRender();
+	bool DANAEEndRender();
+};
+
+//-----------------------------------------------------------------------------
 void SetEditMode(long ed, const bool stop_sound = true);
 void AddQuakeFX(float intensity, float duration, float period, long flags);
 //-----------------------------------------------------------------------------

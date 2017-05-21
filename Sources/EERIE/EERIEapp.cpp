@@ -74,6 +74,10 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "..\danae\danae_resource.h"
 
+#include <SDL.h>
+#include <gl/GL.h>
+#include <gl/GLU.h>
+
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 
@@ -93,7 +97,7 @@ long LastEERIEMouseButton = 0;
 long EERIEMouseGrab = 0;
 long MouseDragX, MouseDragY;
 
-CD3DApplication		* g_pD3DApp = NULL;
+CRenderApplication	* g_pRenderApp = NULL;
 EERIE_CAMERA		* Kam;
 LPDIRECT3DDEVICE7	GDevice;
 HWND				MSGhwnd = NULL;
@@ -120,6 +124,142 @@ char * MakeDir(char * tex, char * tex2)
 	sprintf(tex, "%s%s", Project.workingdir, tex2);
 	return tex;
 }
+
+
+
+
+//****************************************************************************************
+//										OpenGL											//
+//****************************************************************************************
+
+
+
+
+
+//*************************************************************************************
+// COpenGLApplication()
+// Constructor
+//*************************************************************************************
+COpenGLApplication::COpenGLApplication()
+{
+
+}
+
+// Functions to create, run, pause, and clean up the application
+HRESULT	COpenGLApplication::Create(HINSTANCE, TCHAR *)
+{
+	return S_OK;
+}
+
+INT	 COpenGLApplication::Run()
+{
+	BeforeRun();
+
+	SDL_Init(SDL_INIT_EVERYTHING);
+
+	SDL_Window* sdlWindow = SDL_CreateWindow("Arx SDL Window", 
+			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+			800, 600, SDL_WINDOW_OPENGL);
+
+	SDL_GLContext sdlGlContext = SDL_GL_CreateContext(sdlWindow);
+
+	SDL_Event e;
+	bool bRunning = true;
+
+	m_bActive = true;
+	m_bReady = true;
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	while(bRunning)
+	{
+		while(SDL_PollEvent(&e))
+		{
+			if(e.type == SDL_QUIT)
+			{
+				bRunning = false;
+				break;
+			}
+
+			if(m_bActive && m_bReady)
+			{
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+				if(FAILED(Render3DEnvironment()))
+				{
+					//Shutdown.
+					bRunning = false;
+				}
+			}
+		}
+
+		SDL_GL_SwapWindow(sdlWindow);
+		SDL_Delay(1000 / 60);
+	}
+
+	SDL_GL_DeleteContext(sdlGlContext);
+	SDL_DestroyWindow(sdlWindow);
+	SDL_Quit();
+
+	return 0;
+}
+
+VOID COpenGLApplication::Pause(BOOL bPause)
+{
+
+}
+
+LRESULT COpenGLApplication::SwitchFullScreen()
+{
+	return S_OK;
+}
+
+VOID COpenGLApplication::Cleanup3DEnvironment()
+{
+
+}
+
+void COpenGLApplication::EvictManagedTextures()
+{
+
+}
+
+VOID COpenGLApplication::OutputText(DWORD x, DWORD y, TCHAR * str)
+{
+
+}
+
+HRESULT	COpenGLApplication::SetClipping(float x1, float y1, float x2, float y2)
+{
+	return S_OK;
+}
+
+HRESULT COpenGLApplication::Change3DEnvironment()
+{
+	return S_OK;
+}
+
+HRESULT COpenGLApplication::Initialize3DEnvironment()
+{
+	return S_OK;
+}
+
+HRESULT COpenGLApplication::Render3DEnvironment()
+{
+	return S_OK;
+}
+
+void COpenGLApplication::EERIEMouseUpdate(short x, short y)
+{
+
+}
+
+//****************************************************************************************
+//										D3D												//
+//****************************************************************************************
+
+
+
 
 //*************************************************************************************
 // CD3DApplication()
@@ -445,8 +585,8 @@ int CD3DApplication::WinManageMess()
 //*************************************************************************************
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (g_pD3DApp)
-		return g_pD3DApp->MsgProc(hWnd, uMsg, wParam, lParam);
+	if (g_pRenderApp)
+		return static_cast<CD3DApplication*>(g_pRenderApp)->MsgProc(hWnd, uMsg, wParam, lParam);
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
@@ -1395,9 +1535,9 @@ bool OKBox(char * text, char * title)
 
 {
 	int i;
-	g_pD3DApp->Pause(TRUE);
-	i = MessageBox(g_pD3DApp->m_hWnd, text, title, MB_ICONQUESTION | MB_OKCANCEL);
-	g_pD3DApp->Pause(FALSE);
+	g_pRenderApp->Pause(TRUE);
+	i = MessageBox(g_pRenderApp->m_hWnd, text, title, MB_ICONQUESTION | MB_OKCANCEL);
+	g_pRenderApp->Pause(FALSE);
 
 	if (i == IDCANCEL) return FALSE;
 
@@ -1415,9 +1555,9 @@ void ShowPopup(char * text)
 
 	}
 
-	g_pD3DApp->Pause(TRUE);
-	MessageBox(g_pD3DApp->m_hWnd, text, "GAIA popup", MB_ICONINFORMATION | MB_OK);
-	g_pD3DApp->Pause(FALSE);
+	g_pRenderApp->Pause(TRUE);
+	MessageBox(g_pRenderApp->m_hWnd, text, "GAIA popup", MB_ICONINFORMATION | MB_OK);
+	g_pRenderApp->Pause(FALSE);
 }
 
 extern void ExitProc();
@@ -1429,17 +1569,17 @@ int ShowError(char * funcname, char * message, long fatality)
 	char fatall[64];
 	int re;
 
-	if (!g_pD3DApp) return IDIGNORE;
+	if (!g_pRenderApp) return IDIGNORE;
 
-	g_pD3DApp->Pause(TRUE);
+	g_pRenderApp->Pause(TRUE);
 
 	switch (fatality)
 	{
 		case 0:
 			strcpy(fatall, "Non-Fatal");
 			sprintf(texx, "An ERROR occured in function: %s\n%s\n\nFatality Level: %d - %s\n\nOK to continue, CANCEL to Quit", funcname, message, fatality, fatall);
-			re = MessageBox(g_pD3DApp->m_hWnd, texx, "GAIA Error Message", MB_ICONERROR | MB_OKCANCEL);
-			g_pD3DApp->Pause(FALSE);
+			re = MessageBox(g_pRenderApp->m_hWnd, texx, "GAIA Error Message", MB_ICONERROR | MB_OKCANCEL);
+			g_pRenderApp->Pause(FALSE);
 
 			if (re == IDCANCEL) ExitProc();
 
@@ -1448,8 +1588,8 @@ int ShowError(char * funcname, char * message, long fatality)
 		case 1:
 			strcpy(fatall, "Please Free Some Memory Then Click RETRY");
 			sprintf(texx, "An ERROR occured in function: %s\n%s\nFatality Level: %d - %s", funcname, message, fatality, fatall);
-			re = MessageBox(g_pD3DApp->m_hWnd, texx, "GAIA Error Message", MB_ICONSTOP | MB_ABORTRETRYIGNORE);
-			g_pD3DApp->Pause(FALSE);
+			re = MessageBox(g_pRenderApp->m_hWnd, texx, "GAIA Error Message", MB_ICONSTOP | MB_ABORTRETRYIGNORE);
+			g_pRenderApp->Pause(FALSE);
 
 			if (re == IDABORT) ExitProc();
 
@@ -1458,31 +1598,31 @@ int ShowError(char * funcname, char * message, long fatality)
 		case 2:
 			strcpy(fatall, "Fatal with some recoverable datas");
 			sprintf(texx, "An ERROR occured in function: %s\n%s\nFatality Level: %d - %s", funcname, message, fatality, fatall);
-			re = (MessageBox(g_pD3DApp->m_hWnd, texx, "GAIA Error Message", MB_ICONERROR | MB_OK));
-			g_pD3DApp->Pause(FALSE);
+			re = (MessageBox(g_pRenderApp->m_hWnd, texx, "GAIA Error Message", MB_ICONERROR | MB_OK));
+			g_pRenderApp->Pause(FALSE);
 			return re;
 			break;
 		case 3:
 			strcpy(fatall, "Fatal");
 			sprintf(texx, "An ERROR occured in function: %s\n%s\nFatality Level: %d - %s", funcname, message, fatality, fatall);
-			re = (MessageBox(g_pD3DApp->m_hWnd, texx, "GAIA Error Message", MB_ICONERROR | MB_OK));
-			g_pD3DApp->Pause(FALSE);
+			re = (MessageBox(g_pRenderApp->m_hWnd, texx, "GAIA Error Message", MB_ICONERROR | MB_OK));
+			g_pRenderApp->Pause(FALSE);
 			return re;
 			break;
 		case 4:
-			g_pD3DApp->Pause(FALSE);
+			g_pRenderApp->Pause(FALSE);
 			return IDIGNORE;
 			break;
 		default:
 			strcpy(fatall, "Unknown fatality level");
 			sprintf(texx, "An ERROR occured in function: %s\n%s\nFatality Level: %d - %s", funcname, message, fatality, fatall);
-			re = (MessageBox(g_pD3DApp->m_hWnd, texx, "GAIA Error Message", MB_ICONERROR | MB_OK));
-			g_pD3DApp->Pause(FALSE);
+			re = (MessageBox(g_pRenderApp->m_hWnd, texx, "GAIA Error Message", MB_ICONERROR | MB_OK));
+			g_pRenderApp->Pause(FALSE);
 			return re;
 			break;
 	}
 
-	g_pD3DApp->Pause(FALSE);
+	g_pRenderApp->Pause(FALSE);
 }
 
 void SetZBias(const LPDIRECT3DDEVICE7 _pd3dDevice, int _iZBias)

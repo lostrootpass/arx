@@ -116,6 +116,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_MenuPublic.h"
 #include "ARX_SnapShot.h"
 
+#include <SDL.h>
+
 #ifdef ARX_STEAM
 #include "../steam/steam.h"
 
@@ -262,6 +264,7 @@ extern char pStringMod[];
 //-----------------------------------------------------------------------------
 // Our Main Danae Application.& Instance
 DANAE danaeApp;
+DANAEGL danaeGLApp;
 HINSTANCE hInstance;
 
 //-----------------------------------------------------------------------------
@@ -712,6 +715,8 @@ void Danae_Registry_ReadValue(char * string,long * value,long defaultvalue)
 
 void DanaeSwitchFullScreen()
 {
+	return;
+
 	if (danaeApp.m_pDeviceInfo->bWindowed) // switching to fullscreen
 	{
 		KillInterTreeView();
@@ -1755,7 +1760,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	}
 
 	Dbg_str("Application Creation");
-	g_pD3DApp = &danaeApp;
+	g_pRenderApp = &danaeApp;
 
     if( FAILED( danaeApp.Create( hInstance, strCmdLine ) ) )
 		return 0;
@@ -1867,7 +1872,12 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	sprintf(fic,"%sGraph\\Obj3D\\Interactive\\Player\\G.ASL",Project.workingdir);
 
 	LaunchCDROMCheck(0);
-	HRESULT hr=danaeApp.Run();
+
+#if 1 //def FORCE_OPENGL
+	HRESULT hr=danaeGLApp.Run();
+#else
+	HRESULT hr = danaeApp.Run();
+#endif
 
 #ifdef ARX_STEAM
 	ReleaseSteam();
@@ -1885,7 +1895,11 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 // DANAE()
 //  Application constructor. Sets attributes for the app.
 //*************************************************************************************
+#ifdef FORCE_OPENGL
+DANAE::DANAE() : COpenGLApplication()
+#else
 DANAE::DANAE() : CD3DApplication()
+#endif
 {
 	m_strWindowTitle  = TEXT("ARX Fatalis");
     m_bAppUseZBuffer  = TRUE;
@@ -7646,6 +7660,93 @@ void DANAE::GoFor2DFX()
 
 	SETZWRITE(GDevice, TRUE );
 }
+
+
+//GL
+DANAEGL::DANAEGL()
+{
+
+}
+
+
+HRESULT DANAEGL::OneTimeSceneInit()
+{
+	return S_OK;
+}
+
+HRESULT DANAEGL::DeleteDeviceObjects()
+{
+	return S_OK;
+}
+
+HRESULT DANAEGL::Render()
+{
+	return S_OK;
+}
+
+HRESULT DANAEGL::FrameMove(FLOAT fTimeKey)
+{
+	return S_OK;
+}
+
+HRESULT DANAEGL::FinalCleanup()
+{
+	return S_OK;
+}
+
+void DANAEGL::ManageKeyMouse()
+{
+
+}
+
+BOOL DANAEGL::ManageEditorControls()
+{
+	return TRUE;
+}
+
+void DANAEGL::ManagePlayerControls()
+{
+
+}
+
+void DANAEGL::DrawAllInterface()
+{
+
+}
+
+void DANAEGL::DrawAllInterfaceFinish()
+{
+
+}
+
+void DANAEGL::GoFor2DFX()
+{
+
+}
+
+HRESULT DANAEGL::BeforeRun()
+{
+	return S_OK;
+}
+
+HRESULT DANAEGL::InitDeviceObjects()
+{
+	return S_OK;
+}
+
+
+bool DANAEGL::DANAEStartRender()
+{
+	return true;
+}
+
+bool DANAEGL::DANAEEndRender()
+{
+	return true;
+}
+
+
+
 
 void ShowTestText()
 {
