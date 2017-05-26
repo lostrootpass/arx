@@ -72,11 +72,15 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEUtil.h"
 #include "EERIEJpeg.h"
 #include "EERIEMath.h"
+#include "EERIE_GLshaders.h"
 
 #include "HERMESMain.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
 
 long GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = 0;
 /*-----------------------------------------------------------------------------*/
@@ -656,6 +660,10 @@ TextureContainer::~TextureContainer()
 	if (!TextureContainer_Exist(this))
 		return;
 
+#ifdef ARX_OPENGL
+	glDeleteTextures(1, &textureID);
+#endif
+
 	SAFE_RELEASE(m_pddsSurface);
 	SAFE_RELEASE(m_pddsBumpMap);
 	SAFE_DELETE_TAB(m_pPNGData);
@@ -748,6 +756,35 @@ TextureContainer::~TextureContainer()
 //-----------------------------------------------------------------------------
 HRESULT TextureContainer::LoadImageData()
 {
+#ifdef ARX_OPENGL
+	GLuint texID;
+	glGenTextures(1, &texID);
+
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+	if(!PAK_FileExist(m_strName))
+		return E_FAIL;
+
+	long size = 0;
+	unsigned char* const data = (unsigned char*)PAK_FileLoadMalloc(m_strName, &size);
+
+	if(!data)
+		return E_FAIL;
+
+	int channels;
+	stbi_uc* bytes = stbi_load_from_memory(data, size, (int*)&m_dwWidth, (int*)&m_dwHeight, &channels, STBI_rgb);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_dwWidth, m_dwHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, bytes);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	textureID = texID;
+	
+	STBI_FREE(bytes);
+
+	return S_OK;
+#else
 	TCHAR * strExtension, *strExtension2;
 	TCHAR  strPathname[256];
 	TCHAR  tempstrPathname[256];
@@ -784,6 +821,7 @@ HRESULT TextureContainer::LoadImageData()
 
 	// Can add code here to check for other file formats before failing
 	return DDERR_UNSUPPORTED;
+#endif
 }
 
 //-----------------------------------------------------------------------------

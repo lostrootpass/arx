@@ -4250,7 +4250,9 @@ lasuite:
 	PROGRESS_BAR_COUNT += 1.f;
 	LoadLevelScreen();
 
+#ifndef ARX_OPENGL
 	ComputePortalVertexBuffer();
+#endif
 
 	PROGRESS_BAR_COUNT += 1.f;
 	LoadLevelScreen();
@@ -4902,6 +4904,7 @@ void EERIE_PORTAL_ReleaseOnlyVertexBuffer()
 }
 
 extern DANAE danaeApp;
+extern DANAEGL danaeGLApp;
 
 typedef struct
 {

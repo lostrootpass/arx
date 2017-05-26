@@ -104,6 +104,7 @@ class TextureContainer
 		DWORD   m_dwFlags;
 		BOOL    m_bHasAlpha;
 		DWORD	userflags;
+		UINT	textureID;
 		bool	bColorKey;
 		bool	bColorKey2D;
 

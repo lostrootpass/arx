@@ -214,6 +214,7 @@ public:
 	bool DANAEStartRender();
 	bool DANAEEndRender();
 };
+extern DANAEGL danaeGLApp;
 
 //-----------------------------------------------------------------------------
 void SetEditMode(long ed, const bool stop_sound = true);

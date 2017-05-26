@@ -74,10 +74,18 @@ void ARX_INTERFACE_KillARKANE()
 //-----------------------------------------------------------------------------
 void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool _bRatio = true, float _fFade = 1.f)
 {
+#ifdef ARX_OPENGL
+	EERIEDrawBitmapGL(
+		(DANAESIZX/2) - (tc->m_dwWidth * 0.5f),
+		(DANAESIZY/2) - (tc->m_dwHeight * 0.5f),
+		ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth)),
+		ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight)),
+		0.001f, tc);
+#else
 	DANAESIZX = danaeApp.m_pFramework->m_dwRenderWidth;
 	DANAESIZY = danaeApp.m_pFramework->m_dwRenderHeight;
 
-	if (danaeApp.m_pDeviceInfo->bWindowed)
+	if(danaeApp.m_pDeviceInfo->bWindowed)
 		DANAESIZY -= danaeApp.m_pFramework->Ystart;
 
 	DANAECENTERX = DANAESIZX >> 1;
@@ -102,8 +110,7 @@ void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool
 		                 ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight)),
 		                 0.001f, tc, D3DRGB(_fFade, _fFade, _fFade));
 	}
-
-
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -145,6 +152,25 @@ void ARX_INTERFACE_ShowFISHTANK(LPDIRECT3DDEVICE7 pd3dDevice)
 //-----------------------------------------------------------------------------
 void ARX_INTERFACE_ShowARKANE(LPDIRECT3DDEVICE7 pd3dDevice)
 {
+#ifdef ARX_OPENGL
+	if(danaeGLApp.DANAEStartRender())
+	{
+		if(ARKANE_img == NULL)
+			ARKANE_img = MakeTCFromFile("Graph\\Interface\\misc\\Arkane.bmp");
+
+		if(ARKANE_img != NULL)
+		{
+			EERIEDrawBitmapGL(
+				(800/2) - (ARKANE_img->m_dwWidth * 0.5f),
+				(600/2) - (ARKANE_img->m_dwHeight * 0.5f),
+				ARX_CLEAN_WARN_CAST_FLOAT((int)(ARKANE_img->m_dwWidth)),
+				ARX_CLEAN_WARN_CAST_FLOAT((int)(ARKANE_img->m_dwHeight)),
+				0.001f, ARKANE_img);
+		}
+
+		danaeGLApp.DANAEEndRender();
+	}
+#else
 	if (pd3dDevice)
 	{
 		pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFP_POINT);
@@ -182,6 +208,7 @@ void ARX_INTERFACE_ShowARKANE(LPDIRECT3DDEVICE7 pd3dDevice)
 		pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFP_LINEAR);
 		pd3dDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFP_LINEAR);
 	}
+#endif
 }
 
 static long lastloadednum = -1;
@@ -262,6 +289,87 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 		if (ratio > 1.f) ratio = 1.f;
 		else if (ratio < 0.f) ratio = 0.f;
 
+#ifdef ARX_OPENGL
+		if(danaeGLApp.DANAEStartRender())
+		{
+			long old = GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE;
+			GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = -1;
+
+			if(num == 10)
+				pbar = MakeTCFromFile("Graph\\interface\\menus\\load_full.bmp");
+			else
+				pbar = MakeTCFromFile("Graph\\interface\\menus\\load_full_level.bmp");
+
+			nopbar = 1;
+			GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = old;
+
+			if(num != lastloadednum)
+			{
+				long old = GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE;
+				GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = -1;
+
+				if(tc)
+				{
+					D3DTextr_KillTexture(tc);
+					tc = NULL;
+				}
+
+				lastloadednum = num;
+				char temp[256];
+				char tx[256];
+				GetLevelNameByNum(num, tx);
+				sprintf(temp, "Graph\\Levels\\Level%s\\loading.bmp", tx);
+				tc = MakeTCFromFile(temp);
+				GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = old;
+			}
+
+			if(tc)
+			{
+				DrawCenteredImage(pd3dDevice, tc, true, fFadeColor);
+			}
+
+			if(pbar)
+			{
+				if(num == 10)
+				{
+					float px, py, px2, py2;
+					int ipx = (640 - 200) / 2;
+					int ipy = 461;
+					px = ipx * Xratio;
+					py = ipy * Yratio;
+					px2 = (ratio * pbar->m_dwWidth) * Xratio;
+					py2 = pbar->m_dwHeight * Yratio;
+#ifdef ARX_OPENGL
+					EERIEDrawBitmapGL(px, py, px2, py2, 0.f, pbar);
+#else
+					EERIEDrawBitmap_uv(GDevice, px, py, px2, py2, 0.f, pbar, D3DRGB(fFadeColor, fFadeColor, fFadeColor), pbar->m_hdx, pbar->m_hdy, ratio, 1.f);
+#endif
+				}
+				else
+				{
+					float px, py, px2, py2;
+
+
+					int ipx = ((640 - 320) / 2) + 60;
+					int ipy = ((480 - 390) / 2) + 230;
+
+
+					px = ipx * Xratio;
+					py = ipy * Yratio;
+					px2 = (ratio * pbar->m_dwWidth) * Xratio;
+					py2 = pbar->m_dwHeight * Yratio;
+#ifdef ARX_OPENGL
+					EERIEDrawBitmapGL(px, py, px2, py2, 0.f, pbar);
+#else
+					EERIEDrawBitmap_uv(GDevice, px, py, px2, py2, 0.f, pbar, D3DRGB(fFadeColor, fFadeColor, fFadeColor), pbar->m_hdx, pbar->m_hdy, ratio, 1);
+#endif
+				}
+
+			}
+
+			danaeGLApp.DANAEEndRender();
+		}
+#else
 		if (pd3dDevice)
 		{
 			pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0L);
@@ -351,6 +459,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 				danaeApp.m_pFramework->ShowFrame();
 			}
 		}
+#endif
 
 		if (fFadeSens > 0.f)
 		{

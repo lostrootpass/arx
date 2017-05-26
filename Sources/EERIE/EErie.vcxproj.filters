@@ -71,6 +71,9 @@
     <ClCompile Include="EERIEutil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EERIE_GLshaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\EERIE_AVI.h">
@@ -161,6 +164,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\OtherLibs\zlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EERIE_GLshaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EERIE_GL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

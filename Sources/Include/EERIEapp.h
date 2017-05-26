@@ -292,15 +292,24 @@ public:
 	virtual HRESULT					Initialize3DEnvironment() = 0;
 	virtual HRESULT	Render3DEnvironment() = 0;
 
-	virtual void					EERIEMouseUpdate(short x, short y)
+	virtual void EERIEMouseUpdate(short x, short y)
 	{
 		//
 	}
+
+	KEYBOARD_MNG			kbd;
 
 	BOOL					m_bFrameMoving;
 	BOOL					m_bActive;
 	BOOL					m_bReady;
 	HWND					m_hWnd;
+
+	char					StatusText[512];
+	short					CreationSizeX;
+	short					CreationSizeY;
+	long					CreationFlags;
+	long					CreationMenu;
+	EERIETOOLBAR*			ToolBar;
 
 protected:
 	// Overridable variables for the app
@@ -443,14 +452,7 @@ public:
 		long					d_dlgframe;
 
 		CD3DFramework7*			m_pFramework;
-		KEYBOARD_MNG			kbd;
 
-		char					StatusText[512];
-		short					CreationSizeX;
-		short					CreationSizeY;
-		long					CreationFlags;
-		long					CreationMenu;
-		EERIETOOLBAR*			ToolBar;
 		HWND					owner;
  
 		void*					logical;

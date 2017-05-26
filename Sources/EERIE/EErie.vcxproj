@@ -240,6 +240,7 @@
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BrowseInformation>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="EERIE_GLshaders.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\EERIEAnchors.h" />
@@ -272,6 +273,8 @@
     <ClInclude Include="..\Include\OtherLibs\zconf.h" />
     <ClInclude Include="..\Include\OtherLibs\zlib.h" />
     <ClInclude Include="..\Include\TheoData.h" />
+    <ClInclude Include="EERIE_GL.h" />
+    <ClInclude Include="EERIE_GLshaders.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\lib\OtherLibs\Jpeglib.lib" />

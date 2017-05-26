@@ -81,6 +81,7 @@ extern C_SOUND		TabSound[MAX_SOUND];
 extern long DANAESIZX;
 extern long DANAESIZY;
 extern DANAE danaeApp;
+extern DANAEGL danaeGLApp;
 /*---------------------------------------------------------------*/
 void GetPathDirectory(char * dirfile)
 {

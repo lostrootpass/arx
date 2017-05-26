@@ -61,6 +61,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EerieApp.h"
 #include "EERIEPoly.h"
 #include "EERIEUtil.h"
+#include "EERIE_GL.h"
 
 #include "arx_menu.h"
 #include "../danae/arx_menu2.h"
@@ -153,15 +154,34 @@ HRESULT	COpenGLApplication::Create(HINSTANCE, TCHAR *)
 
 INT	 COpenGLApplication::Run()
 {
+	DANAESIZX = 800;
+	DANAESIZY = 600;
+
+	DANAECENTERX = DANAESIZX >> 1;
+	DANAECENTERY = DANAESIZY >> 1;
+
 	BeforeRun();
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+	//Disable AA for now.
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
 	SDL_Window* sdlWindow = SDL_CreateWindow("Arx SDL Window", 
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-			800, 600, SDL_WINDOW_OPENGL);
+			DANAESIZX, DANAESIZY, SDL_WINDOW_OPENGL);
 
 	SDL_GLContext sdlGlContext = SDL_GL_CreateContext(sdlWindow);
+
+	assert(sdlGlContext);
+
+	glewExperimental = true;
+	glewInit();
 
 	SDL_Event e;
 	bool bRunning = true;
@@ -183,17 +203,16 @@ INT	 COpenGLApplication::Run()
 
 			if(m_bActive && m_bReady)
 			{
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 				if(FAILED(Render3DEnvironment()))
 				{
 					//Shutdown.
 					bRunning = false;
 				}
+
+				SDL_GL_SwapWindow(sdlWindow);
 			}
 		}
 
-		SDL_GL_SwapWindow(sdlWindow);
 		SDL_Delay(1000 / 60);
 	}
 
@@ -246,6 +265,13 @@ HRESULT COpenGLApplication::Initialize3DEnvironment()
 
 HRESULT COpenGLApplication::Render3DEnvironment()
 {
+	HRESULT hr = S_OK;
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if(FAILED(hr = Render()))
+		return hr;
+
 	return S_OK;
 }
 

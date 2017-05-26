@@ -375,5 +375,9 @@ void KillInterfaceTextureContainers();
 #define ARX_MOUSE_OVER_INVENTORY_2	4
 #define ARX_MOUSE_OVER_IO			8
 
+#ifndef ARX_OPENGL
+#define ARX_OPENGL
+#endif
+
 extern long ARX_MOUSE_OVER;
 #endif

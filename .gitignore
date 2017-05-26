@@ -5,10 +5,15 @@
 .vs/
 Debug/
 Release/
-game/
 Log/
 *__Win32_Release/
 
 #Ignore anything in the default lib output directory but include the 3rd party libs
 Sources/lib/*
 !Sources/lib/otherlibs/
+
+#Ignore the default game assets, but not the shaders.
+game/*
+!game/Graph/
+game/Graph/*
+!game/Graph/shaders/

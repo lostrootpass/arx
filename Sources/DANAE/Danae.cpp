@@ -1054,12 +1054,14 @@ void InitializeDanae()
 	}
 	else if (LaunchDemo) 
 	{
+#ifndef ARX_OPENGL
 		if ((FINAL_RELEASE) 
 			&& (pMenuConfig->bFullScreen || AUTO_FULL_SCREEN )
 		   )
 		{
 			DanaeSwitchFullScreen();
 		}
+#endif
 
 		LaunchDemo=0;
 		SPLASH_THINGS_STAGE=11;
@@ -1314,6 +1316,10 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 		AUTO_FULL_SCREEN=0;
 		USE_D3DFOG=1; 
 	}
+
+#ifdef ARX_OPENGL
+	ARX_SOUND_INIT = 0;
+#endif
 
 	CalcFPS(true);
 	HERMES_Memory_Security_On(32000);
@@ -1643,7 +1649,12 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	lastteleport.z=0.f;
 	////////////////////
 
+#ifdef ARX_OPENGL
+	Project.soundmode = 0;// "ARX_SOUND_OFF;"
+#else
 	Project.soundmode = ARX_SOUND_ON;
+#endif
+
 	inter.init=0;
 	InitInter(10);	
 
@@ -1760,14 +1771,43 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	}
 
 	Dbg_str("Application Creation");
-	g_pRenderApp = &danaeApp;
 
-    if( FAILED( danaeApp.Create( hInstance, strCmdLine ) ) )
+#ifdef ARX_OPENGL
+	g_pRenderApp = &danaeGLApp;
+#else
+	g_pRenderApp = &danaeApp;
+#endif
+
+    if( FAILED( g_pRenderApp->Create( hInstance, strCmdLine ) ) )
 		return 0;
 
+
 	Dbg_str("Application Creation Success");
+
+#ifdef ARX_OPENGL
+
+	ARX_MINIMAP_FirstInit();
+
+	//read from cfg file
+	if(strlen(Project.localisationpath) == 0)
+	{
+		strcpy(Project.localisationpath, "english");
+	}
+
+	Project.interfacergb.r = 0.46f;
+	Project.interfacergb.g = 0.46f;
+	Project.interfacergb.b = 1.f;
+
+	Project.torch.r = 1.f;
+	Project.torch.g = 0.8f;
+	Project.torch.b = 0.66666f;
+
+	InitializeDanae();
+
+#else //!ARX_OPENGL
 	ShowWindow(danaeApp.m_hWnd, SW_HIDE);
 	MAIN_PROGRAM_HANDLE=danaeApp.m_hWnd;
+
 	danaeApp.m_pFramework->bitdepth=Project.bits;
 
 	if ((!MOULINEX) && (!FINAL_RELEASE))
@@ -1864,20 +1904,17 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	Project.torch.b = 0.66666f;
 	Dbg_str("InitializeDanae");
 	InitializeDanae();
+#endif //ARX_OPENGL
 
 	Dbg_str("InitializeDanae Success");
 	Dbg_str("DanaeApp RUN");
-	danaeApp.m_bReady = TRUE;
+	g_pRenderApp->m_bReady = TRUE;
 	char fic[256];
 	sprintf(fic,"%sGraph\\Obj3D\\Interactive\\Player\\G.ASL",Project.workingdir);
 
 	LaunchCDROMCheck(0);
 
-#if 1 //def FORCE_OPENGL
-	HRESULT hr=danaeGLApp.Run();
-#else
-	HRESULT hr = danaeApp.Run();
-#endif
+	HRESULT hr = g_pRenderApp->Run();
 
 #ifdef ARX_STEAM
 	ReleaseSteam();
@@ -1895,11 +1932,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 // DANAE()
 //  Application constructor. Sets attributes for the app.
 //*************************************************************************************
-#ifdef FORCE_OPENGL
-DANAE::DANAE() : COpenGLApplication()
-#else
 DANAE::DANAE() : CD3DApplication()
-#endif
 {
 	m_strWindowTitle  = TEXT("ARX Fatalis");
     m_bAppUseZBuffer  = TRUE;
@@ -5147,9 +5180,11 @@ void DANAE_StartNewQuest()
 
 BOOL DANAE_ManageSplashThings()
 {
+#ifndef ARX_OPENGL
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_CLAMP);
 	
 	SetFilteringMode(GDevice,Bilinear);		
+#endif
 
 	if (SPLASH_THINGS_STAGE>10)
 	{
@@ -5243,7 +5278,9 @@ BOOL DANAE_ManageSplashThings()
 				SPLASH_THINGS_STAGE++;
 			}				
 
+#ifndef ARX_OPENGL
 			GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
+#endif
 			return TRUE;
 			
 		}
@@ -5266,7 +5303,9 @@ BOOL DANAE_ManageSplashThings()
 				SPLASH_THINGS_STAGE++;
 			}
 
+#ifndef ARX_OPENGL
 			GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
+#endif
 			return TRUE;
 		}
 
@@ -5299,7 +5338,9 @@ BOOL DANAE_ManageSplashThings()
 			if (bGameNotFirstLaunch == false)
 				bGameNotFirstLaunch = true;
 
+#ifndef ARX_OPENGL
 			GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
+#endif
 			return TRUE;
 			
 		}
@@ -5314,12 +5355,16 @@ BOOL DANAE_ManageSplashThings()
 			if (bGameNotFirstLaunch == false)
 				bGameNotFirstLaunch = true;
 
+#ifndef ARX_OPENGL
 			GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
+#endif
 			return TRUE;
 		}
 	}
 
+#ifndef ARX_OPENGL
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
+#endif
 	return FALSE;
 }
 
@@ -7681,6 +7726,106 @@ HRESULT DANAEGL::DeleteDeviceObjects()
 
 HRESULT DANAEGL::Render()
 {
+	FrameTime = ARX_TIME_Get();
+
+	if(GLOBAL_SLOWDOWN != 1.f)
+	{
+		float ft;
+		ft = FrameTime - LastFrameTime;
+		Original_framedelay = ft*TIMEFACTOR;
+
+		ft *= 1.f - GLOBAL_SLOWDOWN;
+		float minus;
+
+		minus = ft;
+		ARXTotalPausedTime += minus;
+		FrameTime = ARX_TIME_Get();
+
+		if(LastFrameTime>FrameTime)
+		{
+			LastFrameTime = FrameTime;
+		}
+
+		ft = FrameTime - LastFrameTime;
+
+		FrameDiff = ft;
+		float FD;
+		FD = FrameDiff;
+		// Under 10 FPS the whole game slows down to avoid unexpected results...
+		_framedelay = (float)FrameDiff;
+	}
+	else
+	{
+		FrameDiff = FrameTime - LastFrameTime;
+
+		float FD;
+		FD = FrameDiff;
+		// Under 10 FPS the whole game slows down to avoid unexpected results...
+		_framedelay = ((float)(FrameDiff)*TIMEFACTOR);
+		FrameDiff = _framedelay;
+
+		Original_framedelay = _framedelay;
+
+		//	Original_framedelay = 1000/25;
+		ARXTotalPausedTime += FD - FrameDiff;
+	}
+
+	static float _AvgFrameDiff = 150.f;
+	if(FrameDiff > _AvgFrameDiff * 10.f)
+	{
+		FrameDiff = _AvgFrameDiff * 10.f;
+	}
+	else if(FrameDiff > 15.f)
+	{
+		_AvgFrameDiff += (FrameDiff - _AvgFrameDiff)*0.01f;
+	}
+	if(NEED_BENCH)
+	{
+		BENCH_STARTUP = 0;
+		BENCH_PLAYER = 0;
+		BENCH_RENDER = 0;
+		BENCH_PARTICLES = 0;
+		BENCH_SPEECH = 0;
+		BENCH_SCRIPT = 0;
+	}
+
+	StartBench();
+
+	RenderStartTicks = dwARX_TIME_Get();
+
+	if(DANAE_ManageSplashThings())
+		goto norenderend;
+	
+	//--------------NORENDEREND---------------------------------------------------
+norenderend:
+	;
+
+	if((LaunchDemo) && (FirstFrame == 0))
+	{
+		NOCHECKSUM = 1;
+		LaunchDemo = 0;
+		LaunchDummyParticle();
+	}
+
+	StartBench();
+
+	if(ARXmenu.currentmode == AMCM_OFF)
+	{
+		ARX_SCRIPT_AllowInterScriptExec();
+		ARX_SCRIPT_EventStackExecute();
+		// Updates Damages Spheres
+		ARX_DAMAGES_UpdateAll();
+		ARX_MISSILES_Update();
+
+		if(FirstFrame == 0)
+			ARX_PATH_UpdateAllZoneInOutInside();
+	}
+
+	BENCH_SCRIPT = EndBench();
+
+	LastFrameTime = FrameTime;
+	LastMouseClick = EERIEMouseButton;
+
 	return S_OK;
 }
 

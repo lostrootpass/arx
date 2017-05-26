@@ -5,14 +5,15 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(VisualStudioDir)\Libraries\SDL2-2.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VisualStudioDir)\Libraries\SDL2-2.0.5\include;$(VisualStudioDir)\Libraries\glew-2.0.0\include;$(VisualStudioDir)\Libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_VC80_UPGRADE=0x0710;%(PreprocessorDefinitions);ARX_OPENGL</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>OpenGL32.lib;glu32.lib;SDL2.lib;SDL2Main.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(VisualStudioDir)\Libraries\SDL2-2.0.5\lib\msvc15\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;OpenGL32.lib;glu32.lib;SDL2.lib;SDL2Main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VisualStudioDir)\Libraries\glew-2.0.0\lib\Release\Win32;$(VisualStudioDir)\Libraries\SDL2-2.0.5\lib\msvc15\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <Link>
-      <AdditionalLibraryDirectories>$(VisualStudioDir)\Libraries\SDL2-2.0.5\lib\msvc15\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VisualStudioDir)\Libraries\glew-2.0.0\lib\Release\Win32;$(VisualStudioDir)\Libraries\SDL2-2.0.5\lib\msvc15\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

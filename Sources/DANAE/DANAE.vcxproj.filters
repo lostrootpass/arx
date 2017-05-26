@@ -222,9 +222,6 @@
     <ClCompile Include="Arx_Config.cpp">
       <Filter>Localisation\Config popup</Filter>
     </ClCompile>
-    <ClCompile Include="..\Include\EERIEapp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DANAE.rc">
