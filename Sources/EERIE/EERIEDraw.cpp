@@ -47,6 +47,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEPoly.h" 
 #include "EERIE_GL.h"
 #include "EERIE_GLshaders.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "HERMESMain.h"
 #include "HERMES_PAK.h"
@@ -1573,13 +1575,20 @@ void EERIEDrawBitmap2DecalY(LPDIRECT3DDEVICE7 pd3dDevice,float x,float y,float s
 	EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, v, 4, 0  );	
 }
 
+inline float adjust(float f)
+{
+	return f + (-1.0f * (1.0f - f));
+}
+
 void EERIEDrawBitmapGL(float x, float y, float sx, float sy, float z, TextureContainer * tex)
 {
+	//Top-left is (0,0); bottom right is (1,1) - legacy Arx assumptions.
+
 	static const GLfloat uvData[] = {
-		0.0f, 1.0f,	//Top Left
-		1.0f, 1.0f,	//Top Right
-		0.0f, 0.0f,	//Bot Left
-		1.0f, 0.0f	//Bot Right
+		0.0f, 0.0f,	//Top Left
+		1.0f, 0.0f,	//Top Right
+		0.0f, 1.0f,	//Bot Left
+		1.0f, 1.0f	//Bot Right
 	};
 
 	static GLuint vertexbuffer = -1;
@@ -1602,21 +1611,18 @@ void EERIEDrawBitmapGL(float x, float y, float sx, float sy, float z, TextureCon
 	const float dX = (sx / w);
 	const float dY = (sy / h);
 
-	//We've calculated in tangent space so use an offset to bump in to NDC space.
-	const float adjust = -0.5f;
-
 	GLfloat quadData[] = {
 		//Top left
-		startX + adjust, startY + adjust, 0.0f,
+		(startX), (startY), 0.0f,
 
 		//Top right
-		(startX + dX) + adjust, startY + adjust, 0.0f,
+		(startX + dX), (startY), 0.0f,
 
 		//Bot left
-		startX + adjust, (startY + dY) + adjust, 0.0f,
+		(startX), (startY + dY), 0.0f,
 
 		//Bot right
-		(startX + dX) + adjust, (startY + dY) + adjust, 0.0f
+		(startX + dX), (startY + dY), 0.0f
 	};
 
 
@@ -1634,11 +1640,18 @@ void EERIEDrawBitmapGL(float x, float y, float sx, float sy, float z, TextureCon
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+	//TODO: store uniforms instead of looking up every frame
 	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex->textureID);
 	glUniform1i(uniformLocation, 0);
 
+	GLuint projUniform = glGetUniformLocation(program, "proj");
+	glm::mat4 proj = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f);
+	glUniformMatrix4fv(projUniform, 1, GL_FALSE, &proj[0][0]);
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
 	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 }

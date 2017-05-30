@@ -756,17 +756,59 @@ TextureContainer::~TextureContainer()
 //-----------------------------------------------------------------------------
 HRESULT TextureContainer::LoadImageData()
 {
+	TCHAR * strExtension, *strExtension2;
+	TCHAR  strPathname[256];
+	TCHAR  tempstrPathname[256];
+
+	// Check File
+	lstrcpy(strPathname, m_strName);
+
+	if(NULL == (strExtension = _tcsrchr(m_strName, _T('.'))))
+		return DDERR_UNSUPPORTED;
+
+	strExtension2 = _tcsrchr(m_strName, _T('_'));
+
+	HRESULT hres;
+	strcpy(tempstrPathname, strPathname);
+	SetExt(tempstrPathname, ".png");
+
 #ifdef ARX_OPENGL
+
+	//TODO: clean up.
+	std::string realName = "";
+	if(realName == "" && PAK_FileExist(tempstrPathname))
+	{
+		realName = tempstrPathname;
+	}
+
+	SetExt(tempstrPathname, ".jpg");
+	if(realName == "" && PAK_FileExist(tempstrPathname))
+	{
+		realName = tempstrPathname;
+	}
+	
+	SetExt(tempstrPathname, ".jpeg");
+	if(realName == "" && PAK_FileExist(tempstrPathname))
+	{
+		realName = tempstrPathname;
+	}
+
+	SetExt(tempstrPathname, ".bmp");
+	if(realName == "" && PAK_FileExist(tempstrPathname))
+	{
+		realName = tempstrPathname;
+	}
+
+	if(realName == "")
+		return DDERR_UNSUPPORTED;
+
 	GLuint texID;
 	glGenTextures(1, &texID);
 
 	glBindTexture(GL_TEXTURE_2D, texID);
 
-	if(!PAK_FileExist(m_strName))
-		return E_FAIL;
-
 	long size = 0;
-	unsigned char* const data = (unsigned char*)PAK_FileLoadMalloc(m_strName, &size);
+	unsigned char* const data = (unsigned char*)PAK_FileLoadMalloc(const_cast<char*>(realName.c_str()), &size);
 
 	if(!data)
 		return E_FAIL;
@@ -785,21 +827,6 @@ HRESULT TextureContainer::LoadImageData()
 
 	return S_OK;
 #else
-	TCHAR * strExtension, *strExtension2;
-	TCHAR  strPathname[256];
-	TCHAR  tempstrPathname[256];
-
-	// Check File
-	lstrcpy(strPathname, m_strName);
-
-	if (NULL == (strExtension = _tcsrchr(m_strName, _T('.'))))
-		return DDERR_UNSUPPORTED;
-
-	strExtension2 = _tcsrchr(m_strName, _T('_'));
-
-	HRESULT hres;
-	strcpy(tempstrPathname, strPathname);
-	SetExt(tempstrPathname, ".png");
 
 	if ((hres = LoadPNGFile(tempstrPathname)) != E_FAIL) return hres;
 

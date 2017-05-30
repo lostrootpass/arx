@@ -69,6 +69,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 
+#include <SDL.h>
+
 //-----------------------------------------------------------------------------
 #define HIDE_BACKGROUND 1
 #define HIDE_NPC		2
@@ -318,6 +320,10 @@ protected:
 	BOOL			m_bAppUseStereo;
 	BOOL			m_bShowStats;
 
+	BOOL            m_bSingleStep;
+	DWORD           m_dwBaseTime;
+	DWORD           m_dwStopTime;
+
 	// Overridable functions for the 3D scene created by the app
 	virtual HRESULT OneTimeSceneInit()
 	{
@@ -391,6 +397,9 @@ public:
 
 	virtual void					EERIEMouseUpdate(short x, short y);
 
+protected:
+	SDL_Window* _window;
+	SDL_GLContext _glContext;
 };
 
 
@@ -400,11 +409,6 @@ public:
 //-----------------------------------------------------------------------------
 class CD3DApplication : public CRenderApplication
 {
-		// Internal variables and member functions
-		BOOL            m_bSingleStep;
-		DWORD           m_dwBaseTime;
-		DWORD           m_dwStopTime;
-
 		VOID    DisplayFrameworkError(HRESULT, DWORD);
 
 protected:

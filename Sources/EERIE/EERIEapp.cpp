@@ -62,6 +62,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEPoly.h"
 #include "EERIEUtil.h"
 #include "EERIE_GL.h"
+#include "EERIEMath.h"
 
 #include "arx_menu.h"
 #include "../danae/arx_menu2.h"
@@ -159,6 +160,9 @@ INT	 COpenGLApplication::Run()
 
 	DANAECENTERX = DANAESIZX >> 1;
 	DANAECENTERY = DANAESIZY >> 1;
+	
+	Xratio = DANAESIZX * DIV640;
+	Yratio = DANAESIZY * DIV480;
 
 	BeforeRun();
 
@@ -172,13 +176,13 @@ INT	 COpenGLApplication::Run()
 	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
-	SDL_Window* sdlWindow = SDL_CreateWindow("Arx SDL Window", 
+	_window = SDL_CreateWindow("Arx SDL Window", 
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
 			DANAESIZX, DANAESIZY, SDL_WINDOW_OPENGL);
 
-	SDL_GLContext sdlGlContext = SDL_GL_CreateContext(sdlWindow);
+	_glContext = SDL_GL_CreateContext(_window);
 
-	assert(sdlGlContext);
+	assert(_glContext);
 
 	glewExperimental = true;
 	glewInit();
@@ -190,6 +194,8 @@ INT	 COpenGLApplication::Run()
 	m_bReady = true;
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glViewport(0, 0, DANAESIZX, DANAESIZY);
+	glScissor(0, 0, DANAESIZX, DANAESIZY);
 
 	while(bRunning)
 	{
@@ -200,24 +206,26 @@ INT	 COpenGLApplication::Run()
 				bRunning = false;
 				break;
 			}
+		}
 
-			if(m_bActive && m_bReady)
+		if(m_bActive && m_bReady)
+		{
+			if(FAILED(Render3DEnvironment()))
 			{
-				if(FAILED(Render3DEnvironment()))
-				{
-					//Shutdown.
-					bRunning = false;
-				}
-
-				SDL_GL_SwapWindow(sdlWindow);
+				//Shutdown.
+				bRunning = false;
 			}
+
+			//TODO: can't do uniform end-of-frame flips while there is
+			//such a high dependency on DANAEGL::DANAEEndRender()
+			//SDL_GL_SwapWindow(_window);
 		}
 
 		SDL_Delay(1000 / 60);
 	}
 
-	SDL_GL_DeleteContext(sdlGlContext);
-	SDL_DestroyWindow(sdlWindow);
+	SDL_GL_DeleteContext(_glContext);
+	SDL_DestroyWindow(_window);
 	SDL_Quit();
 
 	return 0;
@@ -268,6 +276,15 @@ HRESULT COpenGLApplication::Render3DEnvironment()
 	HRESULT hr = S_OK;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Get the relative time, in seconds
+	if(m_bFrameMoving || m_bSingleStep)
+	{
+		if(FAILED(hr = FrameMove(0.f)))
+			return hr;
+
+		m_bSingleStep = FALSE;
+	}
 
 	if(FAILED(hr = Render()))
 		return hr;

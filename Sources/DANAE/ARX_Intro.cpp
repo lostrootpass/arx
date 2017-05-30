@@ -75,12 +75,24 @@ void ARX_INTERFACE_KillARKANE()
 void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool _bRatio = true, float _fFade = 1.f)
 {
 #ifdef ARX_OPENGL
-	EERIEDrawBitmapGL(
-		(DANAESIZX/2) - (tc->m_dwWidth * 0.5f),
-		(DANAESIZY/2) - (tc->m_dwHeight * 0.5f),
-		ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth)),
-		ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight)),
-		0.001f, tc);
+	if(_bRatio)
+	{
+		EERIEDrawBitmapGL(
+			(DANAESIZX / 2.f) - ((tc->m_dwWidth*Xratio) /2.f),
+			(DANAESIZY / 2.f) - ((tc->m_dwHeight*Yratio) /2.f),
+			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth * Xratio)),
+			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight * Yratio)),
+			0.001f, tc);
+	}
+	else
+	{
+		EERIEDrawBitmapGL(
+			(DANAESIZX / 2) - (tc->m_dwWidth * 0.5f),
+			(DANAESIZY / 2) - (tc->m_dwHeight * 0.5f),
+			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth)),
+			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight)),
+			0.001f, tc);
+	}
 #else
 	DANAESIZX = danaeApp.m_pFramework->m_dwRenderWidth;
 	DANAESIZY = danaeApp.m_pFramework->m_dwRenderHeight;
@@ -116,6 +128,18 @@ void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool
 //-----------------------------------------------------------------------------
 void ARX_INTERFACE_ShowFISHTANK(LPDIRECT3DDEVICE7 pd3dDevice)
 {
+#ifdef ARX_OPENGL
+	if(danaeGLApp.DANAEStartRender())
+	{
+		if(FISHTANK_img == NULL)
+			FISHTANK_img = MakeTCFromFile("misc\\logo.bmp");
+
+		if(FISHTANK_img != NULL)
+			DrawCenteredImage(0, FISHTANK_img, false);
+
+		danaeGLApp.DANAEEndRender();
+	}
+#else
 	if (pd3dDevice)
 	{
 		Project.vsync = 0;
@@ -147,6 +171,7 @@ void ARX_INTERFACE_ShowFISHTANK(LPDIRECT3DDEVICE7 pd3dDevice)
 		pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFP_LINEAR);
 		pd3dDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFP_LINEAR);
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -160,12 +185,7 @@ void ARX_INTERFACE_ShowARKANE(LPDIRECT3DDEVICE7 pd3dDevice)
 
 		if(ARKANE_img != NULL)
 		{
-			EERIEDrawBitmapGL(
-				(800/2) - (ARKANE_img->m_dwWidth * 0.5f),
-				(600/2) - (ARKANE_img->m_dwHeight * 0.5f),
-				ARX_CLEAN_WARN_CAST_FLOAT((int)(ARKANE_img->m_dwWidth)),
-				ARX_CLEAN_WARN_CAST_FLOAT((int)(ARKANE_img->m_dwHeight)),
-				0.001f, ARKANE_img);
+			DrawCenteredImage(0, ARKANE_img, false);
 		}
 
 		danaeGLApp.DANAEEndRender();

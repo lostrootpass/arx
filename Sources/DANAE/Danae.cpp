@@ -1851,6 +1851,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	i = 10;
 	Dbg_str("AInput Init");
 
+	//TODO: FIX: if ARX Input is enabled, debugging becomes impossible.
 	while (!ARX_INPUT_Init(hInstance,danaeApp.m_hWnd))
 	{		
 		Sleep(30);
@@ -7795,7 +7796,7 @@ HRESULT DANAEGL::Render()
 
 	if(DANAE_ManageSplashThings())
 		goto norenderend;
-	
+
 	//--------------NORENDEREND---------------------------------------------------
 norenderend:
 	;
@@ -7831,6 +7832,11 @@ norenderend:
 
 HRESULT DANAEGL::FrameMove(FLOAT fTimeKey)
 {
+	if(WILL_LAUNCH_CINE[0]) // Checks if a cinematic is waiting to be played...
+	{
+		LaunchWaitingCine();
+	}
+
 	return S_OK;
 }
 
@@ -7887,6 +7893,9 @@ bool DANAEGL::DANAEStartRender()
 
 bool DANAEGL::DANAEEndRender()
 {
+	//TODO: remove from here. Done purely to satisfy the whims of the existing codebase.
+	SDL_GL_SwapWindow(_window);
+
 	return true;
 }
 
