@@ -23,6 +23,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 ===========================================================================
 */
 #include "ARX_GlobalMods.h"
+#include "ARX_Interface.h"
 #include "EERIEMath.h"
 #include "arx_menu2.h"
 #include "arx_time.h"
@@ -143,6 +144,7 @@ void ARX_GLOBALMODS_Apply()
 		SetCameraDepth(current.zclip);
 	}
 
+#ifndef ARX_OPENGL
 	if (USE_D3DFOG)
 	{
 		D3DDEVICEDESC7 d3dDeviceDesc;
@@ -194,4 +196,5 @@ void ARX_GLOBALMODS_Apply()
 		GDevice->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE,  D3DFOG_NONE);
 		GDevice->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE);
 	}
+#endif
 }

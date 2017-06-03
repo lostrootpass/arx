@@ -473,6 +473,121 @@ bool GET_FORCE_NO_VB( void )
 }
 
 //------------------------------------------------------------------------------
+HRESULT EERIEDRAWPRIMGL(GLenum type,
+	TextureContainer* tex,
+	DWORD dwVertexTypeDesc,
+	LPVOID lpvVertices,
+	DWORD dwVertexCount,
+	DWORD dwFlags,
+	long flags,
+	EERIE_3DOBJ* eobj,
+	INTERACTIVE_OBJ* io
+)
+{
+	static GLuint vertexbuffer = -1;
+	static GLuint uvbuffer = -1;
+	static GLuint idxbuffer = -1;
+
+	if (vertexbuffer == -1)
+	{
+		//LEAK
+		glGenBuffers(1, &vertexbuffer);
+		glGenBuffers(1, &uvbuffer);
+		glGenBuffers(1, &idxbuffer);
+	}
+
+	//TODO: hack
+	std::vector<GLfloat> vtx;
+	std::vector<GLfloat> uv;
+	uv.resize(dwVertexCount * 2);
+
+	EERIE_VERTEX* vtxArray = static_cast<EERIE_VERTEX*>(lpvVertices);
+
+	for (DWORD i = 0; i < dwVertexCount; ++i)
+	{
+		vtx.push_back(vtxArray[i].v.x);
+		vtx.push_back(vtxArray[i].v.y);
+		vtx.push_back(vtxArray[i].v.z);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLuint program = EERIEGetGLProgramID("poly");
+
+	if (tex)
+	{
+		GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex->textureID);
+		glUniform1i(uniformLocation, 0);
+	}
+
+	if (io)
+	{
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(), glm::vec3(io->pos.x, io->pos.y, io->pos.z));
+		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
+	}
+
+	if (eobj)
+	{
+		std::vector<GLuint> indices;
+
+		for (DWORD i = 0; i < eobj->nbfaces; ++i)
+		{
+			unsigned short v1, v2, v3;
+			EERIE_FACE face = eobj->facelist[i];
+			v1 = face.vid[0];
+			v2 = face.vid[1];
+			v3 = face.vid[2];
+
+			indices.push_back(v1);
+			indices.push_back(v2);
+			indices.push_back(v3);
+
+			uv[v1*2] = face.u[0];
+			uv[v2*2] = face.u[1];
+			uv[v3*2] = face.u[2];
+
+			uv[v1*2 + 1] = face.v[0];
+			uv[v2*2 + 1] = face.v[1];
+			uv[v3*2 + 1] = face.v[2];
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(uv[0]) * uv.size(), uv.data(), GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+		//Here for testing purposes -- always look directly at the thing we're rendering.
+		glm::vec3 eye(eobj->pos.x, eobj->pos.y, eobj->pos.z - 300.0f);
+		glm::vec3 target(eobj->pos.x, eobj->pos.y - 100, eobj->pos.z);
+		glm::vec3 up(0.0f, -1.0f, 0.0f);
+		glm::mat4 view = glm::lookAt(eye, target, up);
+		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxbuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_DYNAMIC_DRAW);
+
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	}
+	else
+	{
+		glDrawArrays(type, 0, dwVertexCount);
+	}
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+	return S_OK;
+}
 
 HRESULT EERIEDRAWPRIM(	LPDIRECT3DDEVICE7 pd3dDevice,
 						D3DPRIMITIVETYPE dptPrimitiveType,  
@@ -1277,7 +1392,9 @@ void EERIEDrawRotatedSprite(LPDIRECT3DDEVICE7 pd3dDevice,D3DTLVERTEX *in,float s
 
 void SETTEXTUREWRAPMODE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD mode)
 {
+#ifndef ARX_OPENGL
 	pd3dDevice->SetTextureStageState( 0,D3DTSS_ADDRESS ,mode);
+#endif
 }
 
 //*************************************************************************************
@@ -1285,14 +1402,18 @@ void SETTEXTUREWRAPMODE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD mode)
 
 void SETCULL(LPDIRECT3DDEVICE7 pd3dDevice,DWORD state)
 {
+#ifndef ARX_OPENGL
 	pd3dDevice->SetRenderState( D3DRENDERSTATE_CULLMODE , state);
+#endif
 }
 
 //*************************************************************************************
 
 void SETZWRITE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD _dwState)
 {
+#ifndef ARX_OPENGL
 		pd3dDevice->SetRenderState( D3DRENDERSTATE_ZWRITEENABLE , _dwState);
+#endif
 }	
 
 //*************************************************************************************
@@ -1300,13 +1421,17 @@ void SETZWRITE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD _dwState)
 
 void SETALPHABLEND(LPDIRECT3DDEVICE7 pd3dDevice,DWORD state)
 {
+#ifndef ARX_OPENGL
 	pd3dDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, state);
+#endif
 }	
 
 void SETBLENDMODE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD srcblend,DWORD destblend)
 {
+#ifndef ARX_OPENGL
 	pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  srcblend  );
 	pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, destblend );
+#endif
 	
 }
 

@@ -72,6 +72,17 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEAnim.h>
 #include <EERIEUtil.h>
 #include <EERIEMath.h>
+#include <EERIE_GL.h>
+#include <EERIE_GLshaders.h>
+
+#include <glm/gtc/matrix_transform.hpp>
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef min
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
 
 #define DIRECTINPUT_VERSION 0x0700
 #include <dinput.h>
@@ -293,12 +304,16 @@ void PopOneTriangleListClipp(D3DTLVERTEX *_pVertex,int *_piNbVertex)
 		}
 		
 		pDynamicVertexBufferTransform->UnLock();
-		
+
+#ifdef ARX_OPENGL
+		EERIEDRAWPRIMGL(GL_TRIANGLES, 0, 0, pDynamicVertexBufferTransform->pVertexBuffer, iOldNbVertex, 0, 0, 0, 0);
+#else
 		GDevice->DrawPrimitiveVB(	D3DPT_TRIANGLELIST,
 									pDynamicVertexBufferTransform->pVertexBuffer,
 									iOldNbVertex,
 									pDynamicVertexBufferTransform->ussNbVertex-iOldNbVertex,
 									0 );
+#endif
 	}
 }
 
@@ -1463,10 +1478,12 @@ void CreateScreenFrustrum(EERIE_FRUSTRUM * frustrum)
 
 	// Set the app view matrix for normal viewing
 	D3DMATRIX matView,matProj;
-	D3DUtil_SetViewMatrix( matView, vEyePt, vLookatPt, vUpVec );
+	D3DUtil_SetViewMatrix(matView, vEyePt, vLookatPt, vUpVec);
+#ifndef ARX_OPENGL
 	GDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &matView );
 
 	GDevice->GetTransform(D3DTRANSFORMSTATE_PROJECTION,&matProj);
+#endif
 	D3DMATRIX matres;
 	MatrixMultiply((EERIEMATRIX *)&matres,(EERIEMATRIX *)&matView,(EERIEMATRIX *)&matProj);
 
@@ -2366,8 +2383,10 @@ void ARX_PORTALS_Frustrum_RenderRooms_TransparencyT()
 void ARX_PORTALS_Frustrum_RenderRoomTCullSoft(long room_num,EERIE_FRUSTRUM_DATA * frustrums,long prec,long tim);
 void ARX_PORTALS_Frustrum_RenderRoomsTCullSoft(long prec,long tim)
 {
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
 	GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR );	
+#endif
 
 	for (long i=0;i<NbRoomDrawList;i++)
 	{
@@ -2769,7 +2788,7 @@ SMY_D3DVERTEX *pMyVertex;
 	
 	if (RoomDraw[room_num].count)
 	{
-		bool bNoModulate2X=(pMenuConfig->bForceMetalTwoPass);
+		bool bNoModulate2X=(pMenuConfig && pMenuConfig->bForceMetalTwoPass);
 
 		if(!portals->room[room_num].pVertexBuffer)
 		{
@@ -3144,6 +3163,7 @@ SMY_D3DVERTEX *pMyVertex;
 		{
 			TextureContainer *pTexCurr=*ppTexCurr;
 
+#ifndef ARX_OPENGL
 			if (ViewMode & VIEWMODE_FLAT) 
 				SETTC(GDevice,NULL);
 			else
@@ -3158,9 +3178,13 @@ SMY_D3DVERTEX *pMyVertex;
 			{
 				GDevice->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_MODULATE);
 			}
+#endif
 			
 			if(pTexCurr->tMatRoom[room_num].uslNbIndiceCull)
 			{
+#ifdef ARX_OPENGL
+				///Draw indexed
+#else
 				GDevice->DrawIndexedPrimitiveVB(	D3DPT_TRIANGLELIST,
 					portals->room[room_num].pVertexBuffer,
 					pTexCurr->tMatRoom[room_num].uslStartVertex,
@@ -3168,6 +3192,7 @@ SMY_D3DVERTEX *pMyVertex;
 					&portals->room[room_num].pussIndice[pTexCurr->tMatRoom[room_num].uslStartCull],
 					pTexCurr->tMatRoom[room_num].uslNbIndiceCull,
 					0 );
+#endif
 				EERIEDrawnPolys+=pTexCurr->tMatRoom[room_num].uslNbIndiceCull;
 				pTexCurr->tMatRoom[room_num].uslNbIndiceCull=0;
 						}
@@ -3177,10 +3202,12 @@ SMY_D3DVERTEX *pMyVertex;
 
 		//////////////////////////////
 		//ZMapp
+#ifndef ARX_OPENGL
 		GDevice->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_MODULATE);
 
 		GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,TRUE);
 		GDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,FALSE);
+#endif
 
 		iNbTex=portals->room[room_num].usNbTextures;
 		ppTexCurr=portals->room[room_num].ppTextureContainer;
@@ -3257,7 +3284,11 @@ SMY_D3DVERTEX *pMyVertex;
 						}
 
 						//Draw current prim
+#ifdef ARX_OPENGL
+						///draw
+#else
 						EERIEDRAWPRIM(GDevice, D3DPT_TRIANGLELIST, FVF_D3DVERTEX3, pVertex, (iNbVertex&4)?6:3,  0, EERIE_NOCOUNT );
+#endif
 					}
 
 					//---------------------------------------------------------------------------
@@ -3310,6 +3341,9 @@ SMY_D3DVERTEX *pMyVertex;
 						
 						if(pDynamicVertexBuffer->ussNbIndice)
 						{
+#ifdef ARX_OPENGL
+							//draw indexes
+#else
 							GDevice->DrawIndexedPrimitiveVB(	D3DPT_TRIANGLELIST,
 																pDynamicVertexBuffer->pVertexBuffer,
 																iOldNbVertex,
@@ -3317,6 +3351,7 @@ SMY_D3DVERTEX *pMyVertex;
 																pDynamicVertexBuffer->pussIndice,
 																pDynamicVertexBuffer->ussNbIndice,
 																0 );
+#endif
 						}
 						
 							//INIT --------------------------------------------------------------
@@ -3396,6 +3431,9 @@ SMY_D3DVERTEX *pMyVertex;
 
 				if(pDynamicVertexBuffer->ussNbIndice)
 				{
+#ifdef ARX_OPENGL
+					//draw indexed
+#else
 					GDevice->DrawIndexedPrimitiveVB(	D3DPT_TRIANGLELIST,
 						pDynamicVertexBuffer->pVertexBuffer,
 						iOldNbVertex,
@@ -3403,6 +3441,7 @@ SMY_D3DVERTEX *pMyVertex;
 						pDynamicVertexBuffer->pussIndice,
 						pDynamicVertexBuffer->ussNbIndice,
 						0 );
+#endif
 				}	
 			}
 				//MAJ POINTER -------------------------------------------------------------------
@@ -3411,7 +3450,11 @@ SMY_D3DVERTEX *pMyVertex;
 		}
 
 		//METAL(Voodoo grand gourou)
+#ifdef ARX_OPENGL
+		if(0)
+#else
 		if(vPolyVoodooMetal.size())
+#endif
 		{
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
 
@@ -4221,6 +4264,11 @@ long MAX_FRAME_COUNT=0;
 ///////////////////////////////////////////////////////////
 void ARX_SCENE_Render(LPDIRECT3DDEVICE7 pd3dDevice, long flag, long param) 
 {
+#ifdef ARX_OPENGL
+	//disable until ComputePortalVertexBuffer() works
+	return;
+#endif
+
 	FrameCount++;
 
 	FRAME_COUNT++;
@@ -4699,8 +4747,10 @@ else
 	if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_J))
 		bOLD_CLIPP=!bOLD_CLIPP;
 
+#ifndef ARX_OPENGL
 	if ((SHOWSHADOWS) && (!Project.improve))
 		ARXDRAW_DrawInterShadows(pd3dDevice);
+#endif
 
 	FRAME_COUNT=LAST_FC;
 
@@ -4730,7 +4780,7 @@ else
 
 	PopAllTriangleList(true);
 	
-					}
+	}
 					
 	
 	if (EXTERNALVIEW)
@@ -4756,6 +4806,7 @@ else
 		if (INTERTRANSPOLYSPOS&&(!bRenderInterList))
 			ARXDRAW_DrawAllInterTransPolyPos(pd3dDevice);
 
+#ifndef ARX_OPENGL
 		PopAllTriangleListTransparency();
 		
 		if(	(USE_PORTALS>2)&&
@@ -4768,8 +4819,10 @@ else
 			if (TRANSPOLYSPOS)
 				ARXDRAW_DrawAllTransPolysPos(pd3dDevice,MODIF);
 		}
+#endif
 	}
 
+#ifndef ARX_OPENGL
 if (HALOCUR>0)
 {
 	SETTC(pd3dDevice,NULL);
@@ -4809,5 +4862,10 @@ if (HALOCUR>0)
 
 	if (LIGHTTHREAD)
 		ResumeThread(LIGHTTHREAD);
+#endif
 }
 
+void ARX_Scene_RenderGL()
+{
+
+}

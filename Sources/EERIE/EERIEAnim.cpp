@@ -657,6 +657,64 @@ suite:
 }
 INTERACTIVE_OBJ * DESTROYED_DURING_RENDERING=NULL;							
 extern long USE_CEDRIC_ANIM;
+
+void EERIEDrawAnimQuatGL(EERIE_3DOBJ * eobj,
+	ANIM_USE * eanim,
+	EERIE_3D * angle,
+	EERIE_3D  * pos,
+	unsigned long time,
+	INTERACTIVE_OBJ * io,
+	D3DCOLOR col,
+	long typ
+)
+{
+	if((io)
+		&& (io != inter.iobj[0]))
+	{
+		float speedfactor = io->basespeed + io->speed_modif;
+
+		if(speedfactor < 0) speedfactor = 0;
+
+		float tim = (float)time*(speedfactor);
+
+		if(tim <= 0.f) time = 0;
+		else time = (unsigned long)tim;
+
+		io->frameloss += tim - time;
+
+		if(io->frameloss>1.f) // recover lost time...
+		{
+			long tt;
+			F2L(io->frameloss, &tt);
+			io->frameloss -= tt;
+			time += tt;
+		}
+	}
+
+	if(time <= 0) goto suite;
+
+	if(time>200) time = 200; // TO REMOVE !!!!!!!!!
+
+	PrepareAnim(eobj, eanim, time, io);
+
+	if(io)
+		for(long count = 1; count<MAX_ANIM_LAYERS; count++)
+		{
+			ANIM_USE * animuse = &io->animlayer[count];
+
+			if(animuse->cur_anim)
+				PrepareAnim(eobj, animuse, time, io);
+		}
+
+suite:
+	;
+
+	DESTROYED_DURING_RENDERING = NULL;
+
+	if(USE_CEDRIC_ANIM)
+		Cedric_AnimateDrawEntityGL(eobj, eanim, angle, pos, io, col, typ);
+}
+
 //-----------------------------------------------------------------------------
 void EERIEDrawAnimQuat(		LPDIRECT3DDEVICE7 pd3dDevice,
 							EERIE_3DOBJ * eobj,
@@ -939,6 +997,34 @@ extern float GLOBAL_MIPMAP_BIAS;
 //-----------------------------------------------------------------------------
 void PopOneTriangleList(TextureContainer *_pTex,bool _bUpdate)
 {
+#ifdef ARX_OPENGL
+	if (!(_pTex->ulNbVertexListCull) &&
+		!(_pTex->ulNbVertexListCullH))
+	{
+		return;
+	}
+
+	float val;
+
+	if (_pTex->userflags & POLY_LATE_MIP)
+	{
+		val = GLOBAL_NPC_MIPMAP_BIAS;
+	}
+	else
+	{
+		val = GLOBAL_MIPMAP_BIAS;
+	}
+
+	if (_pTex->ulNbVertexListCull)
+	{
+		EERIEDRAWPRIMGL(GL_TRIANGLES, _pTex, 0, _pTex->pVertexListCull, _pTex->ulNbVertexListCull, 0, 0, 0, 0);
+
+		if (_bUpdate) _pTex->ulNbVertexListCull = 0;
+	}
+
+	PopOneTriangleListClipp(_pTex->pVertexListCullH, (int*)&_pTex->ulNbVertexListCullH);
+	val = GLOBAL_MIPMAP_BIAS;
+#else
 	if(	!(_pTex->ulNbVertexListCull)&&
 		!(_pTex->ulNbVertexListCullH) )
 	{
@@ -975,6 +1061,7 @@ void PopOneTriangleList(TextureContainer *_pTex,bool _bUpdate)
  	PopOneTriangleListClipp(_pTex->pVertexListCullH,(int*)&_pTex->ulNbVertexListCullH);
 	val=GLOBAL_MIPMAP_BIAS;
 	GDevice->SetTextureStageState( 0, D3DTSS_MIPMAPLODBIAS, *((LPDWORD) (&val))  );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1099,6 +1186,15 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 //-----------------------------------------------------------------------------
 void PopAllTriangleList(bool _bUpdate)
 {
+#ifdef ARX_OPENGL
+	TextureContainer *pTex = GetTextureList();
+
+	while (pTex)
+	{
+		PopOneTriangleList(pTex, _bUpdate);
+		pTex = pTex->m_pNext;
+	}
+#else
 	D3DMATRIX matbase;
 
 	if(bGATI8500)
@@ -1121,6 +1217,7 @@ TextureContainer *pTex=GetTextureList();
 	{
 		GDevice->SetTransform(D3DTRANSFORMSTATE_PROJECTION,&matbase);
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------

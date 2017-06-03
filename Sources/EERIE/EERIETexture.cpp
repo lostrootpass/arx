@@ -816,11 +816,19 @@ HRESULT TextureContainer::LoadImageData()
 	int channels;
 	stbi_uc* bytes = stbi_load_from_memory(data, size, (int*)&m_dwWidth, (int*)&m_dwHeight, &channels, STBI_rgb);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_dwWidth, m_dwHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, bytes);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+
+	//Adjust unpack params to account for NPOT textures - stbi doesn't pad BMPs
+	//GLuint rowLength = (m_dwWidth + 4 - 1) & ~(4 - 1);
+	//glPixelStorei(GL_UNPACK_ROW_LENGTH, rowLength * 3);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_dwWidth, m_dwHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, bytes);
+	
 	textureID = texID;
 	
 	STBI_FREE(bytes);

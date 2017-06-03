@@ -164,13 +164,12 @@ INT	 COpenGLApplication::Run()
 	Xratio = DANAESIZX * DIV640;
 	Yratio = DANAESIZY * DIV480;
 
-	BeforeRun();
-
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
 	//Disable AA for now.
 	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -184,7 +183,8 @@ INT	 COpenGLApplication::Run()
 
 	assert(_glContext);
 
-	glewExperimental = true;
+	SDL_GL_SetSwapInterval(0);
+
 	glewInit();
 
 	SDL_Event e;
@@ -193,9 +193,18 @@ INT	 COpenGLApplication::Run()
 	m_bActive = true;
 	m_bReady = true;
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
 	glViewport(0, 0, DANAESIZX, DANAESIZY);
 	glScissor(0, 0, DANAESIZX, DANAESIZY);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CW);
+
+	BeforeRun();
 
 	while(bRunning)
 	{

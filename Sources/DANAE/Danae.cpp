@@ -1064,7 +1064,12 @@ void InitializeDanae()
 #endif
 
 		LaunchDemo=0;
+#ifdef ARX_OPENGL
+		//For testing, jump straight to the loading screen.
+		SPLASH_THINGS_STAGE = 13;
+#else
 		SPLASH_THINGS_STAGE=11;
+#endif
 	}
 	else if (temp2[0]!=0)
 	{
@@ -1802,7 +1807,8 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	Project.torch.g = 0.8f;
 	Project.torch.b = 0.66666f;
 
-	InitializeDanae();
+	//Need to wait to do this until AFTER gl context creation.
+	//InitializeDanae();
 
 #else //!ARX_OPENGL
 	ShowWindow(danaeApp.m_hWnd, SW_HIDE);
@@ -1852,7 +1858,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	Dbg_str("AInput Init");
 
 	//TODO: FIX: if ARX Input is enabled, debugging becomes impossible.
-	while (!ARX_INPUT_Init(hInstance,danaeApp.m_hWnd))
+	if(0) //while (!ARX_INPUT_Init(hInstance,danaeApp.m_hWnd))
 	{		
 		Sleep(30);
 		i--;
@@ -5754,74 +5760,652 @@ extern long NEED_INTRO_LAUNCH;
 
 //-----------------------------------------------------------------------------
 
-HRESULT DANAE::Render()
+HRESULT DANAE_NoRenderEnd()
 {
-	FrameTime = ARX_TIME_Get();
-
-	if (GLOBAL_SLOWDOWN!=1.f)
+	if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_F10))
 	{
-		float ft;
-		ft=FrameTime-LastFrameTime;
-		Original_framedelay=ft*TIMEFACTOR;
-			
-		ft*=1.f-GLOBAL_SLOWDOWN;
-		float minus;
-
-		minus = ft;
-		ARXTotalPausedTime+=minus;
-		FrameTime = ARX_TIME_Get();
-
-		if (LastFrameTime>FrameTime)
-		{
-			LastFrameTime=FrameTime;
-		}
-
-		ft=FrameTime-LastFrameTime;
-	
-		FrameDiff = ft;
-		float FD;
-		FD=FrameDiff;
-		// Under 10 FPS the whole game slows down to avoid unexpected results...
-		_framedelay=(float)FrameDiff;
-	}
-	else
-	{
-		FrameDiff = FrameTime-LastFrameTime;
-
-		float FD;
-		FD=FrameDiff;
-		// Under 10 FPS the whole game slows down to avoid unexpected results...
-		_framedelay=((float)(FrameDiff)*TIMEFACTOR);
-		FrameDiff = _framedelay;
-
-		Original_framedelay=_framedelay;
-
-//	Original_framedelay = 1000/25;
-		ARXTotalPausedTime+=FD-FrameDiff;
+		GetSnapShot();
 	}
 
-static float _AvgFrameDiff = 150.f;
-	if( FrameDiff > _AvgFrameDiff * 10.f )
+	if((LaunchDemo) && (FirstFrame == 0))
 	{
-		FrameDiff = _AvgFrameDiff * 10.f;
-	}
-	else if ( FrameDiff > 15.f )
-	{
-		_AvgFrameDiff+= (FrameDiff - _AvgFrameDiff )*0.01f;
-	}
-	if (NEED_BENCH)
-	{
-		BENCH_STARTUP=0;
-		BENCH_PLAYER=0;
-		BENCH_RENDER=0;
-		BENCH_PARTICLES=0;
-		BENCH_SPEECH=0;
-		BENCH_SCRIPT=0;
+		NOCHECKSUM = 1;
+		LaunchDemo = 0;
+		LaunchDummyParticle();
 	}
 
 	StartBench();
 
-	RenderStartTicks	=	dwARX_TIME_Get();
+	if(ARXmenu.currentmode == AMCM_OFF)
+	{
+		ARX_SCRIPT_AllowInterScriptExec();
+		ARX_SCRIPT_EventStackExecute();
+		// Updates Damages Spheres
+		ARX_DAMAGES_UpdateAll();
+		ARX_MISSILES_Update();
+
+		if(FirstFrame == 0)
+			ARX_PATH_UpdateAllZoneInOutInside();
+	}
+
+	BENCH_SCRIPT = EndBench();
+
+	LastFrameTime = FrameTime;
+	LastMouseClick = EERIEMouseButton;
+
+	if(DEBUGCODE) ForceSendConsole("RenderEnd_____________________________", 1, 0, (HWND)1);
+
+	DANAE_DEBUGGER_Update();
+
+	if(NEED_BENCH)
+	{
+#ifdef ARX_OPENGL
+		if(danaeGLApp.DANAEStartRender())
+#else
+		if(danaeApp.DANAEStartRender())
+#endif
+		{
+#ifndef ARX_OPENGL
+			SETZWRITE(GDevice, TRUE);
+			SETALPHABLEND(GDevice, FALSE);
+#endif
+			iVPOS = 0;
+			ShowValue(&oBENCH_STARTUP, &BENCH_STARTUP, "Startup");
+			ShowValue(&oBENCH_PLAYER, &BENCH_PLAYER, "Player");
+			ShowValue(&oBENCH_RENDER, &BENCH_RENDER, "Render");
+			ShowValue(&oBENCH_PARTICLES, &BENCH_PARTICLES, "Particles");
+			ShowValue(&oBENCH_SPEECH, &BENCH_SPEECH, "Speech");
+			ShowValue(&oBENCH_SCRIPT, &BENCH_SCRIPT, "Script");
+			ShowValue(&oBENCH_PATHFINDER, &BENCH_PATHFINDER, "Pathfinder");
+			BENCH_PATHFINDER = 0;
+			ShowValue(&oBENCH_SOUND, &BENCH_SOUND, "Sound Thread");
+			BENCH_SOUND = 0;
+
+#ifdef ARX_OPENGL
+			danaeGLApp.DANAEEndRender();
+#else
+			danaeApp.DANAEEndRender();
+#endif
+		}
+	}
+
+	return S_OK;
+}
+
+void DANAE_RenderStartTime()
+{
+	FrameTime = ARX_TIME_Get();
+
+	if(GLOBAL_SLOWDOWN != 1.f)
+	{
+		float ft;
+		ft = FrameTime - LastFrameTime;
+		Original_framedelay = ft*TIMEFACTOR;
+
+		ft *= 1.f - GLOBAL_SLOWDOWN;
+		float minus;
+
+		minus = ft;
+		ARXTotalPausedTime += minus;
+		FrameTime = ARX_TIME_Get();
+
+		if(LastFrameTime>FrameTime)
+		{
+			LastFrameTime = FrameTime;
+		}
+
+		ft = FrameTime - LastFrameTime;
+
+		FrameDiff = ft;
+		float FD;
+		FD = FrameDiff;
+		// Under 10 FPS the whole game slows down to avoid unexpected results...
+		_framedelay = (float)FrameDiff;
+	}
+	else
+	{
+		FrameDiff = FrameTime - LastFrameTime;
+
+		float FD;
+		FD = FrameDiff;
+		// Under 10 FPS the whole game slows down to avoid unexpected results...
+		_framedelay = ((float)(FrameDiff)*TIMEFACTOR);
+		FrameDiff = _framedelay;
+
+		Original_framedelay = _framedelay;
+
+		//	Original_framedelay = 1000/25;
+		ARXTotalPausedTime += FD - FrameDiff;
+	}
+
+	static float _AvgFrameDiff = 150.f;
+	if(FrameDiff > _AvgFrameDiff * 10.f)
+	{
+		FrameDiff = _AvgFrameDiff * 10.f;
+	}
+	else if(FrameDiff > 15.f)
+	{
+		_AvgFrameDiff += (FrameDiff - _AvgFrameDiff)*0.01f;
+	}
+	if(NEED_BENCH)
+	{
+		BENCH_STARTUP = 0;
+		BENCH_PLAYER = 0;
+		BENCH_RENDER = 0;
+		BENCH_PARTICLES = 0;
+		BENCH_SPEECH = 0;
+		BENCH_SCRIPT = 0;
+	}
+
+	StartBench();
+
+	RenderStartTicks = dwARX_TIME_Get();
+}
+
+void DANAE_RenderCheckSpeechControlledCinematic()
+{
+	long valid = -1;
+
+	for(long i = 0; i<MAX_ASPEECH; i++)
+	{
+		if((aspeech[i].exist) && (aspeech[i].cine.type>0))
+		{
+			valid = i;
+			break;
+		}
+	}
+
+	if(valid >= 0)
+	{
+		ARX_CINEMATIC_SPEECH * acs = &aspeech[valid].cine;
+		INTERACTIVE_OBJ * io = aspeech[valid].io;
+		float rtime = (float)(ARX_TIME_Get() - aspeech[valid].time_creation) / (float)aspeech[valid].duration;
+
+		if(rtime<0) rtime = 0;
+
+		if(rtime>1) rtime = 1;
+
+		float itime = 1.f - rtime;
+
+		if((rtime >= 0.f) && (rtime <= 1.f) && io)
+		{
+			float alpha, beta, distance, dist;
+
+			switch(acs->type)
+			{
+			case ARX_CINE_SPEECH_KEEP:
+				subj.pos.x = acs->pos1.x;
+				subj.pos.y = acs->pos1.y;
+				subj.pos.z = acs->pos1.z;
+				subj.angle.a = acs->pos2.a;
+				subj.angle.b = acs->pos2.b;
+				subj.angle.g = acs->pos2.g;
+				EXTERNALVIEW = 1;
+				break;
+			case ARX_CINE_SPEECH_ZOOM:
+				//need to compute current values
+				alpha = acs->startangle.a*itime + acs->endangle.a*rtime;
+				beta = acs->startangle.b*itime + acs->endangle.b*rtime;
+				distance = acs->startpos*itime + acs->endpos*rtime;
+				EERIE_3D targetpos;
+				targetpos.x = acs->pos1.x;
+				targetpos.y = acs->pos1.y;
+				targetpos.z = acs->pos1.z;
+				conversationcamera.pos.x = -EEsin(DEG2RAD(MAKEANGLE(io->angle.b + beta)))*distance + targetpos.x;
+				conversationcamera.pos.y = EEsin(DEG2RAD(MAKEANGLE(io->angle.a + alpha)))*distance + targetpos.y;
+				conversationcamera.pos.z = EEcos(DEG2RAD(MAKEANGLE(io->angle.b + beta)))*distance + targetpos.z;
+				SetTargetCamera(&conversationcamera, targetpos.x, targetpos.y, targetpos.z);
+				subj.pos.x = conversationcamera.pos.x;
+				subj.pos.y = conversationcamera.pos.y;
+				subj.pos.z = conversationcamera.pos.z;
+				subj.angle.a = MAKEANGLE(-conversationcamera.angle.a);
+				subj.angle.b = MAKEANGLE(conversationcamera.angle.b - 180.f);
+				subj.angle.g = 0.f;
+				EXTERNALVIEW = 1;
+				break;
+			case ARX_CINE_SPEECH_SIDE_LEFT:
+			case ARX_CINE_SPEECH_SIDE:
+
+				if(ValidIONum(acs->ionum))
+				{
+
+					EERIE_3D from, to, vect, vect2;
+					from.x = acs->pos1.x;
+					from.y = acs->pos1.y;
+					from.z = acs->pos1.z;
+					to.x = acs->pos2.x;
+					to.y = acs->pos2.y;
+					to.z = acs->pos2.z;
+
+					vect.x = to.x - from.x;
+					vect.y = to.y - from.y;
+					vect.z = to.z - from.z;
+					TRUEVector_Normalize(&vect);
+
+					if(acs->type == ARX_CINE_SPEECH_SIDE_LEFT)
+					{
+						Vector_RotateY(&vect2, &vect, -90);
+					}
+					else
+					{
+						Vector_RotateY(&vect2, &vect, 90);
+					}
+
+					distance = acs->f0*itime + acs->f1*rtime;
+					vect2.x *= distance;
+					vect2.y *= distance;
+					vect2.z *= distance;
+					dist = TRUEEEDistance3D(&from, &to);
+					EERIE_3D tfrom, tto;
+					tfrom.x = from.x + vect.x*acs->startpos*DIV100*dist;
+					tfrom.y = from.y + vect.y*acs->startpos*DIV100*dist;
+					tfrom.z = from.z + vect.z*acs->startpos*DIV100*dist;
+					tto.x = from.x + vect.x*acs->endpos*DIV100*dist;
+					tto.y = from.y + vect.y*acs->endpos*DIV100*dist;
+					tto.z = from.z + vect.z*acs->endpos*DIV100*dist;
+					targetpos.x = tfrom.x*itime + tto.x*rtime;
+					targetpos.y = tfrom.y*itime + tto.y*rtime + acs->f2;
+					targetpos.z = tfrom.z*itime + tto.z*rtime;
+					conversationcamera.pos.x = targetpos.x + vect2.x;
+					conversationcamera.pos.y = targetpos.y + vect2.y + acs->f2;
+					conversationcamera.pos.z = targetpos.z + vect2.z;
+					SetTargetCamera(&conversationcamera, targetpos.x, targetpos.y, targetpos.z);
+					subj.pos.x = conversationcamera.pos.x;
+					subj.pos.y = conversationcamera.pos.y;
+					subj.pos.z = conversationcamera.pos.z;
+					subj.angle.a = MAKEANGLE(-conversationcamera.angle.a);
+					subj.angle.b = MAKEANGLE(conversationcamera.angle.b - 180.f);
+					subj.angle.g = 0.f;
+					EXTERNALVIEW = 1;
+				}
+
+				break;
+			case ARX_CINE_SPEECH_CCCLISTENER_R:
+			case ARX_CINE_SPEECH_CCCLISTENER_L:
+			case ARX_CINE_SPEECH_CCCTALKER_R:
+			case ARX_CINE_SPEECH_CCCTALKER_L:
+
+				//need to compute current values
+				if(ValidIONum(acs->ionum))
+				{
+					INTERACTIVE_OBJ * ioo = inter.iobj[acs->ionum];
+					INTERACTIVE_OBJ * o1 = io;
+					INTERACTIVE_OBJ * o2 = ioo;
+
+					if((acs->type == ARX_CINE_SPEECH_CCCLISTENER_L)
+						|| (acs->type == ARX_CINE_SPEECH_CCCLISTENER_R))
+					{
+						o1 = ioo;
+						o2 = io;
+						conversationcamera.pos.x = acs->pos2.x;
+						conversationcamera.pos.y = acs->pos2.y;
+						conversationcamera.pos.z = acs->pos2.z;
+						targetpos.x = acs->pos1.x;
+						targetpos.y = acs->pos1.y;
+						targetpos.z = acs->pos1.z;
+					}
+					else
+					{
+						conversationcamera.pos.x = acs->pos1.x;
+						conversationcamera.pos.y = acs->pos1.y;
+						conversationcamera.pos.z = acs->pos1.z;
+						targetpos.x = acs->pos2.x;
+						targetpos.y = acs->pos2.y;
+						targetpos.z = acs->pos2.z;
+					}
+
+					distance = (acs->startpos*itime + acs->endpos*rtime)*DIV100;
+
+					EERIE_3D vect, vect3;
+					vect.x = conversationcamera.pos.x - targetpos.x;
+					vect.y = conversationcamera.pos.y - targetpos.y;
+					vect.z = conversationcamera.pos.z - targetpos.z;
+					EERIE_3D vect2;
+					Vector_RotateY(&vect2, &vect, 90);
+					TRUEVector_Normalize(&vect2);
+					Vector_Copy(&vect3, &vect);
+					TRUEVector_Normalize(&vect3);
+
+					vect.x = vect.x*(distance)+vect3.x*80.f;
+					vect.y = vect.y*(distance)+vect3.y*80.f;
+					vect.z = vect.z*(distance)+vect3.z*80.f;
+					vect2.x *= 45.f;
+					vect2.y *= 45.f;
+					vect2.z *= 45.f;
+
+					if((acs->type == ARX_CINE_SPEECH_CCCLISTENER_R)
+						|| (acs->type == ARX_CINE_SPEECH_CCCTALKER_R))
+					{
+						vect2.x = -vect2.x;
+						vect2.y = -vect2.y;
+						vect2.z = -vect2.z;
+					}
+
+					conversationcamera.pos.x = vect.x + targetpos.x + vect2.x;
+					conversationcamera.pos.y = vect.y + targetpos.y + vect2.y;
+					conversationcamera.pos.z = vect.z + targetpos.z + vect2.z;
+					SetTargetCamera(&conversationcamera, targetpos.x, targetpos.y, targetpos.z);
+					subj.pos.x = conversationcamera.pos.x;
+					subj.pos.y = conversationcamera.pos.y;
+					subj.pos.z = conversationcamera.pos.z;
+					subj.angle.a = MAKEANGLE(-conversationcamera.angle.a);
+					subj.angle.b = MAKEANGLE(conversationcamera.angle.b - 180.f);
+					subj.angle.g = 0.f;
+					EXTERNALVIEW = 1;
+				}
+
+				break;
+			}
+
+			LASTCAMPOS.x = subj.pos.x;
+			LASTCAMPOS.y = subj.pos.y;
+			LASTCAMPOS.z = subj.pos.z;
+			LASTCAMANGLE.a = subj.angle.a;
+			LASTCAMANGLE.b = subj.angle.b;
+			LASTCAMANGLE.g = subj.angle.g;
+		}
+	}
+}
+
+void DANAE_RenderCheckPlayerDead()
+{
+	if(player.life <= 0)
+	{
+		DeadTime += ARX_CLEAN_WARN_CAST_LONG(FrameDiff);
+		float mdist = EEfabs(player.physics.cyl.height) - 60;
+		DeadCameraDistance += (float)FrameDiff*DIV80*((mdist - DeadCameraDistance) / mdist)*2.f;
+
+		if(DeadCameraDistance>mdist) DeadCameraDistance = mdist;
+
+		EERIE_3D targetpos;
+
+		targetpos.x = player.pos.x;
+		targetpos.y = player.pos.y;
+		targetpos.z = player.pos.z;
+
+		long id = inter.iobj[0]->obj->fastaccess.view_attach;
+		long id2 = GetActionPointIdx(inter.iobj[0]->obj, "Chest2Leggings");
+
+		if(id != -1)
+		{
+			targetpos.x = inter.iobj[0]->obj->vertexlist3[id].v.x;
+			targetpos.y = inter.iobj[0]->obj->vertexlist3[id].v.y;
+			targetpos.z = inter.iobj[0]->obj->vertexlist3[id].v.z;
+		}
+
+		conversationcamera.pos.x = targetpos.x;
+		conversationcamera.pos.y = targetpos.y - DeadCameraDistance;
+		conversationcamera.pos.z = targetpos.z;
+
+		if(id2 != -1)
+		{
+			conversationcamera.pos.x = inter.iobj[0]->obj->vertexlist3[id2].v.x;
+			conversationcamera.pos.y = inter.iobj[0]->obj->vertexlist3[id2].v.y - DeadCameraDistance;
+			conversationcamera.pos.z = inter.iobj[0]->obj->vertexlist3[id2].v.z;
+		}
+
+		SetTargetCamera(&conversationcamera, targetpos.x, targetpos.y, targetpos.z);
+		subj.pos.x = conversationcamera.pos.x;
+		subj.pos.y = conversationcamera.pos.y;
+		subj.pos.z = conversationcamera.pos.z;
+		subj.angle.a = MAKEANGLE(-conversationcamera.angle.a);
+		subj.angle.b = MAKEANGLE(conversationcamera.angle.b - 180.f);
+		subj.angle.g = 0;
+		EXTERNALVIEW = 1;
+
+		if(!GAME_EDITOR)
+			BLOCK_PLAYER_CONTROLS = 1;
+	}
+	else
+	{
+		DeadCameraDistance = 0;
+
+	}
+}
+
+void DANAE_RenderManageCameras()
+{
+	if(CAMERACONTROLLER != NULL)
+	{
+		if(lastCAMERACONTROLLER != CAMERACONTROLLER)
+		{
+			currentbeta = CAMERACONTROLLER->angle.b;
+		}
+
+		EERIE_3D targetpos;
+
+		targetpos.x = CAMERACONTROLLER->pos.x;
+		targetpos.y = CAMERACONTROLLER->pos.y + PLAYER_BASE_HEIGHT;
+		targetpos.z = CAMERACONTROLLER->pos.z;
+
+		float delta_angle = AngleDifference(currentbeta, CAMERACONTROLLER->angle.b);
+		float delta_angle_t = delta_angle * FrameDiff * DIV1000;
+
+		if(EEfabs(delta_angle_t) > EEfabs(delta_angle)) delta_angle_t = delta_angle;
+
+		currentbeta += delta_angle_t;
+		float t = DEG2RAD(MAKEANGLE(currentbeta));
+		conversationcamera.pos.x = targetpos.x + (float)EEsin(t)*160.f;
+		conversationcamera.pos.y = targetpos.y + 40.f;
+		conversationcamera.pos.z = targetpos.z - (float)EEcos(t)*160.f;
+
+		SetTargetCamera(&conversationcamera, targetpos.x, targetpos.y, targetpos.z);
+		subj.pos.x = conversationcamera.pos.x;
+		subj.pos.y = conversationcamera.pos.y;
+		subj.pos.z = conversationcamera.pos.z;
+		subj.angle.a = MAKEANGLE(-conversationcamera.angle.a);
+		subj.angle.b = MAKEANGLE(conversationcamera.angle.b - 180.f);
+		subj.angle.g = 0.f;
+		EXTERNALVIEW = 1;
+	}
+
+	lastCAMERACONTROLLER = CAMERACONTROLLER;
+
+	if((USE_CINEMATICS_CAMERA) && (USE_CINEMATICS_PATH.path != NULL))
+	{
+		EERIE_3D pos, pos2;
+		USE_CINEMATICS_PATH._curtime = ARX_TIME_Get();
+
+		USE_CINEMATICS_PATH._curtime += 50;
+		long pouet2 = ARX_PATHS_Interpolate(&USE_CINEMATICS_PATH, &pos);
+		USE_CINEMATICS_PATH._curtime -= 50;
+		long pouet = ARX_PATHS_Interpolate(&USE_CINEMATICS_PATH, &pos2);
+
+		if((pouet != -1) && (pouet2 != -1))
+		{
+			if(USE_CINEMATICS_CAMERA == 2)
+			{
+				subj.pos.x = pos.x;
+				subj.pos.y = pos.y;
+				subj.pos.z = pos.z;
+
+				subj.d_angle.a = subj.angle.a;
+				subj.d_angle.b = subj.angle.b;
+				subj.d_angle.g = subj.angle.g;
+				pos2.x = (pos2.x + pos.x)*DIV2;
+				pos2.y = (pos2.y + pos.y)*DIV2;
+				pos2.z = (pos2.z + pos.z)*DIV2;
+				SetTargetCamera(&subj, pos2.x, pos2.y, pos2.z);
+
+			}
+			else DebugSphere(pos.x, pos.y, pos.z, 2, 50, 0xFFFF0000);
+
+			if(USE_CINEMATICS_PATH.path->flags & ARX_USEPATH_FLAG_FINISHED)
+			{
+				USE_CINEMATICS_CAMERA = 0;
+				USE_CINEMATICS_PATH.path = NULL;
+			}
+		}
+		else
+		{
+			USE_CINEMATICS_CAMERA = 0;
+			USE_CINEMATICS_PATH.path = NULL;
+		}
+	}
+
+	UpdateCameras();
+
+	///////////////////////////////////////////
+	ARX_PLAYER_FrameCheck(Original_framedelay);
+
+	if(MasterCamera.exist)
+	{
+		if(MasterCamera.exist & 2)
+		{
+			MasterCamera.exist &= ~2;
+			MasterCamera.exist |= 1;
+			MasterCamera.io = MasterCamera.want_io;
+			MasterCamera.aup = MasterCamera.want_aup;
+			MasterCamera.cam = MasterCamera.want_cam;
+		}
+
+		if(MasterCamera.cam->focal<100.f) MasterCamera.cam->focal = 350.f;
+
+		SetActiveCamera(MasterCamera.cam);
+		EXTERNALVIEW = 1;
+	}
+	else
+	{
+		// Set active camera for this viewport
+		SetActiveCamera(&subj);
+	}
+}
+
+void DANAE_RenderManageConversation()
+{
+	if((ARX_CONVERSATION) && (main_conversation.actors_nb))
+	{
+		// Decides who speaks !!
+		if(main_conversation.current<0)
+			for(long j = 0; j<main_conversation.actors_nb; j++)
+			{
+				if(main_conversation.actors[j] >= 0)
+				{
+					for(long k = 0; k<MAX_ASPEECH; k++)
+					{
+						if(aspeech[k].exist)
+							if(aspeech[k].io == inter.iobj[main_conversation.actors[j]])
+							{
+								main_conversation.current = k;
+								j = main_conversation.actors_nb + 1;
+								k = MAX_ASPEECH + 1;
+							}
+					}
+				}
+			}
+
+		long is = main_conversation.current;
+
+		if(ARX_CONVERSATION_LASTIS != is) ARX_CONVERSATION_MODE = -1;
+
+		ARX_CONVERSATION_LASTIS = is;
+
+		if(ARX_CONVERSATION_MODE == -1)
+		{
+			ARX_CONVERSATION_MODE = (long)(float)(rnd()*3.f + 1.f);
+			conversationcamera.size.a = rnd()*50.f;
+			conversationcamera.size.b = 0.f;
+			conversationcamera.size.g = rnd()*50.f;
+			conversationcamera.d_angle.a = 0.f;
+			conversationcamera.d_angle.b = 0.f;
+			conversationcamera.d_angle.g = 0.f;
+
+			if(rnd()>0.4f) conversationcamera.d_angle.a = (1.f - rnd()*2.f)*DIV30;
+
+			if(rnd()>0.4f) conversationcamera.d_angle.b = (1.f - rnd()*1.2f)*DIV5;
+
+			if(rnd()>0.4f) conversationcamera.d_angle.g = (1.f - rnd()*2.f)*DIV40;
+
+			if(rnd()>0.5f)
+			{
+				conversationcamera.size.a = MAKEANGLE(180.f + rnd()*20.f - 10.f);
+				conversationcamera.size.g = 0.f;
+				conversationcamera.d_angle.g = 0.08f;
+				conversationcamera.d_angle.b = 0.f;
+				conversationcamera.d_angle.a = 0.f;
+				conversationcamera.size.b = 0.f;
+			}
+		}
+		else
+		{
+			conversationcamera.size.a += conversationcamera.d_angle.a*FrameDiff;
+			conversationcamera.size.b += conversationcamera.d_angle.b*FrameDiff;
+			conversationcamera.size.g += conversationcamera.d_angle.g*FrameDiff;
+		}
+
+		EERIE_3D sourcepos, targetpos;
+
+		if(ApplySpeechPos(&conversationcamera, is))
+		{
+			targetpos.x = conversationcamera.d_pos.x;
+			targetpos.y = conversationcamera.d_pos.y;
+			targetpos.z = conversationcamera.d_pos.z;
+			sourcepos.x = conversationcamera.pos.x;
+			sourcepos.y = conversationcamera.pos.y;
+			sourcepos.z = conversationcamera.pos.z;
+		}
+		else
+		{
+			targetpos.x = player.pos.x;
+			targetpos.y = player.pos.y;
+			targetpos.z = player.pos.z;
+			float t = DEG2RAD(player.angle.b);
+			sourcepos.x = targetpos.x + (float)EEsin(t)*100.f;
+			sourcepos.y = targetpos.y;
+			sourcepos.z = targetpos.z - (float)EEcos(t)*100.f;
+		}
+
+		EERIE_3D vect, vec2;
+		vect.x = targetpos.x - sourcepos.x;
+		vect.y = targetpos.y - sourcepos.y;
+		vect.z = targetpos.z - sourcepos.z;
+		float mag = 1.f / Vector_Magnitude(&vect);
+		vect.x *= mag;
+		vect.y *= mag;
+		vect.z *= mag;
+		float dist = 250.f - conversationcamera.size.g;
+
+		if(dist<0.f) dist = (90.f - (dist*DIV20));
+		else if(dist<90.f) dist = 90.f;
+
+		_YRotatePoint(&vect, &vec2, EEcos(DEG2RAD(conversationcamera.size.a)), EEsin(DEG2RAD(conversationcamera.size.a)));
+
+		sourcepos.x = targetpos.x - vec2.x*dist;
+		sourcepos.y = targetpos.y - vec2.y*dist;
+		sourcepos.z = targetpos.z - vec2.z*dist;
+
+		if(conversationcamera.size.b != 0.f)
+			sourcepos.y += 120.f - conversationcamera.size.b*DIV10;
+
+		conversationcamera.pos.x = sourcepos.x;
+		conversationcamera.pos.y = sourcepos.y;
+		conversationcamera.pos.z = sourcepos.z;
+		SetTargetCamera(&conversationcamera, targetpos.x, targetpos.y, targetpos.z);
+		subj.pos.x = conversationcamera.pos.x;
+		subj.pos.y = conversationcamera.pos.y;
+		subj.pos.z = conversationcamera.pos.z;
+		subj.angle.a = MAKEANGLE(-conversationcamera.angle.a);
+		subj.angle.b = MAKEANGLE(conversationcamera.angle.b - 180.f);
+		subj.angle.g = 0.f;
+		EXTERNALVIEW = 1;
+	}
+	else
+	{
+		ARX_CONVERSATION_MODE = -1;
+		ARX_CONVERSATION_LASTIS = -1;
+
+		if(LAST_CONVERSATION)
+		{
+			AcquireLastAnim(inter.iobj[0]);
+			ANIM_Set(&inter.iobj[0]->animlayer[1], inter.iobj[0]->anims[ANIM_WAIT]);
+			inter.iobj[0]->animlayer[1].flags |= EA_LOOP;
+		}
+	}
+}
+
+HRESULT DANAE::Render()
+{
+	DANAE_RenderStartTime();
 
 	if(bForceGDI)
 	{
@@ -5903,7 +6487,7 @@ static float _AvgFrameDiff = 150.f;
 
 	// Manages Splash Screens if needed
 	if (DANAE_ManageSplashThings())
-		goto norenderend;
+		return DANAE_NoRenderEnd();
 
 	// Clicked on New Quest ? (TODO:need certainly to be moved somewhere else...)
 	if (START_NEW_QUEST)
@@ -6121,7 +6705,7 @@ static float _AvgFrameDiff = 150.f;
 
 		if (ffh== FFH_S_OK) return S_OK;
 
-		if (ffh== FFH_GOTO_FINISH) goto norenderend;
+		if (ffh== FFH_GOTO_FINISH) return DANAE_NoRenderEnd();
 	}
 
 	if (CheckInPolyPrecis(player.pos.x,player.pos.y,player.pos.z))
@@ -6163,7 +6747,7 @@ static float _AvgFrameDiff = 150.f;
 
 	if (ARX_Menu_Render(m_pd3dDevice)) 
 	{
-		goto norenderend;
+		return DANAE_NoRenderEnd();
 	}
 
 	if (WILL_QUICKSAVE)
@@ -6193,7 +6777,7 @@ static float _AvgFrameDiff = 150.f;
 	if (NEED_SPECIAL_RENDEREND)
 	{
 		NEED_SPECIAL_RENDEREND=0;
-		goto norenderend;
+		return DANAE_NoRenderEnd();
 	}
 
 	GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, true);
@@ -6204,8 +6788,8 @@ static float _AvgFrameDiff = 150.f;
 		&&	ControlCinematique
 	        &&	ControlCinematique->projectload)
 	{
-		if (DANAE_Manage_Cinematic()==1)
-			goto norenderend;		
+		if(DANAE_Manage_Cinematic() == 1)
+			return DANAE_NoRenderEnd();
 
 		goto renderend;
 	}
@@ -6475,134 +7059,7 @@ static float _AvgFrameDiff = 150.f;
 		subj.angle.g=InterpolateAngle(subj.angle.g,subj.d_angle.g,0.1f);
 	}
 				
-	if ((ARX_CONVERSATION) && (main_conversation.actors_nb))
-	{
-		// Decides who speaks !!
-		if (main_conversation.current<0)		
-		for (long j=0;j<main_conversation.actors_nb;j++)
-		{
-			if (main_conversation.actors[j]>=0)
-			{
-				for (long k=0;k<MAX_ASPEECH;k++)
-				{
-					if (aspeech[k].exist)
-						if (aspeech[k].io==inter.iobj[main_conversation.actors[j]])
-						{
-							main_conversation.current=k;
-							j=main_conversation.actors_nb+1;
-							k=MAX_ASPEECH+1;
-						}
-				}
-			}
-		}
-
-		long is=main_conversation.current;
-		
-		if (ARX_CONVERSATION_LASTIS!=is) ARX_CONVERSATION_MODE=-1;
-
-		ARX_CONVERSATION_LASTIS=is;
-
-		if (ARX_CONVERSATION_MODE==-1)
-		{
-			ARX_CONVERSATION_MODE=(long)(float)(rnd()*3.f+1.f);
-			conversationcamera.size.a=rnd()*50.f;
-			conversationcamera.size.b=0.f;
-			conversationcamera.size.g=rnd()*50.f;
-			conversationcamera.d_angle.a=0.f;
-			conversationcamera.d_angle.b=0.f;
-			conversationcamera.d_angle.g=0.f;
-
-			if (rnd()>0.4f) conversationcamera.d_angle.a=(1.f-rnd()*2.f)*DIV30;
-
-			if (rnd()>0.4f) conversationcamera.d_angle.b=(1.f-rnd()*1.2f)*DIV5;
-
-			if (rnd()>0.4f) conversationcamera.d_angle.g=(1.f-rnd()*2.f)*DIV40;
-
-			if (rnd()>0.5f) 
-			{
-				conversationcamera.size.a=MAKEANGLE(180.f+rnd()*20.f-10.f);
-				conversationcamera.size.g=0.f;
-				conversationcamera.d_angle.g=0.08f;
-				conversationcamera.d_angle.b=0.f;
-					conversationcamera.d_angle.a = 0.f;
-				conversationcamera.size.b=0.f;
-			}
-		}
-		else 
-		{
-			conversationcamera.size.a+=conversationcamera.d_angle.a*FrameDiff;
-			conversationcamera.size.b+=conversationcamera.d_angle.b*FrameDiff;
-			conversationcamera.size.g+=conversationcamera.d_angle.g*FrameDiff;
-		}
-
-		EERIE_3D sourcepos,targetpos;
-
-		if (ApplySpeechPos(&conversationcamera,is))
-		{
-			targetpos.x=conversationcamera.d_pos.x;
-			targetpos.y=conversationcamera.d_pos.y;
-			targetpos.z=conversationcamera.d_pos.z;
-			sourcepos.x=conversationcamera.pos.x;
-			sourcepos.y=conversationcamera.pos.y;
-			sourcepos.z=conversationcamera.pos.z;
-		}
-		else 
-		{			
-			targetpos.x=player.pos.x;
-			targetpos.y=player.pos.y;
-			targetpos.z=player.pos.z;
-			float t=DEG2RAD(player.angle.b);
-			sourcepos.x=targetpos.x+(float)EEsin(t)*100.f;
-			sourcepos.y=targetpos.y;
-			sourcepos.z=targetpos.z-(float)EEcos(t)*100.f;
-			}
-	
-		EERIE_3D vect,vec2;
-		vect.x=targetpos.x-sourcepos.x;
-		vect.y=targetpos.y-sourcepos.y;
-		vect.z=targetpos.z-sourcepos.z;
-		float mag=1.f/Vector_Magnitude(&vect);
-		vect.x*=mag;
-		vect.y*=mag;
-		vect.z*=mag;
-		float dist=250.f-conversationcamera.size.g;
-
-		if (dist<0.f) dist=(90.f-(dist*DIV20));
-		else if (dist<90.f) dist=90.f;
-
-		_YRotatePoint(&vect,&vec2,EEcos(DEG2RAD(conversationcamera.size.a)),EEsin(DEG2RAD(conversationcamera.size.a)));
-		
-		sourcepos.x=targetpos.x-vec2.x*dist;
-		sourcepos.y=targetpos.y-vec2.y*dist;
-		sourcepos.z=targetpos.z-vec2.z*dist;
-
-		if (conversationcamera.size.b!=0.f)
-			sourcepos.y+=120.f-conversationcamera.size.b*DIV10;
-
-		conversationcamera.pos.x=sourcepos.x;
-		conversationcamera.pos.y=sourcepos.y;
-		conversationcamera.pos.z=sourcepos.z;
-		SetTargetCamera(&conversationcamera,targetpos.x,targetpos.y,targetpos.z);
-		subj.pos.x=conversationcamera.pos.x;
-		subj.pos.y=conversationcamera.pos.y;
-		subj.pos.z=conversationcamera.pos.z;
-		subj.angle.a=MAKEANGLE(-conversationcamera.angle.a);
-		subj.angle.b=MAKEANGLE(conversationcamera.angle.b-180.f);
-		subj.angle.g=0.f;
-		EXTERNALVIEW=1;
-	}
-	else 
-	{
-		ARX_CONVERSATION_MODE=-1;
-		ARX_CONVERSATION_LASTIS=-1;
-			
-		if (LAST_CONVERSATION) 
-		{
-			AcquireLastAnim(inter.iobj[0]);
-			ANIM_Set(&inter.iobj[0]->animlayer[1],inter.iobj[0]->anims[ANIM_WAIT]);
-			inter.iobj[0]->animlayer[1].flags|=EA_LOOP;
-		}
-	}
+	DANAE_RenderManageConversation();
 
 		////////////////////////
 	// Checks SCRIPT TIMERS.
@@ -6611,382 +7068,26 @@ static float _AvgFrameDiff = 150.f;
 
 	/////////////////////////////////////////////
 	// Now checks for speech controlled cinematic
-	{
-		long valid=-1;
+	DANAE_RenderCheckSpeechControlledCinematic();
 
-		for (long i=0;i<MAX_ASPEECH;i++)
-		{
-			if ((aspeech[i].exist) && (aspeech[i].cine.type>0))
-			{
-				valid=i;
-				break;
-			}
-		}
-
-		if (valid>=0)
-		{
-			ARX_CINEMATIC_SPEECH * acs=&aspeech[valid].cine;
-			INTERACTIVE_OBJ * io=aspeech[valid].io;
-			float rtime=(float)(ARX_TIME_Get()-aspeech[valid].time_creation)/(float)aspeech[valid].duration;
-
-			if (rtime<0) rtime=0;
-
-			if (rtime>1) rtime=1;
-
-			float itime=1.f-rtime;			
-
-			if ((rtime>=0.f) && (rtime<=1.f) && io)
-			{
-				float alpha,beta,distance,dist;
-
-				switch (acs->type)
-				{
-					case ARX_CINE_SPEECH_KEEP:
-						subj.pos.x=acs->pos1.x;
-						subj.pos.y=acs->pos1.y;
-						subj.pos.z=acs->pos1.z;
-						subj.angle.a=acs->pos2.a;
-						subj.angle.b=acs->pos2.b;
-						subj.angle.g=acs->pos2.g;
-						EXTERNALVIEW=1;	
-					break;
-					case ARX_CINE_SPEECH_ZOOM:
-						//need to compute current values
-						alpha=acs->startangle.a*itime+acs->endangle.a*rtime;
-						beta=acs->startangle.b*itime+acs->endangle.b*rtime;
-						distance=acs->startpos*itime+acs->endpos*rtime;
-						EERIE_3D targetpos;
-						targetpos.x=acs->pos1.x;
-						targetpos.y=acs->pos1.y;
-						targetpos.z=acs->pos1.z;
-						conversationcamera.pos.x=-EEsin(DEG2RAD(MAKEANGLE(io->angle.b+beta)))*distance+targetpos.x;
-						conversationcamera.pos.y= EEsin(DEG2RAD(MAKEANGLE(io->angle.a+alpha)))*distance+targetpos.y;
-						conversationcamera.pos.z= EEcos(DEG2RAD(MAKEANGLE(io->angle.b+beta)))*distance+targetpos.z;						
-						SetTargetCamera(&conversationcamera,targetpos.x,targetpos.y,targetpos.z);
-						subj.pos.x=conversationcamera.pos.x;
-						subj.pos.y=conversationcamera.pos.y;
-						subj.pos.z=conversationcamera.pos.z;
-						subj.angle.a=MAKEANGLE(-conversationcamera.angle.a);
-						subj.angle.b=MAKEANGLE(conversationcamera.angle.b-180.f);
-						subj.angle.g=0.f;
-						EXTERNALVIEW=1;	
-					break;
-					case ARX_CINE_SPEECH_SIDE_LEFT:
-					case ARX_CINE_SPEECH_SIDE:
-
-						if (ValidIONum(acs->ionum))
-						{
-
-							EERIE_3D from,to,vect,vect2;
-							from.x=acs->pos1.x;
-							from.y=acs->pos1.y;
-							from.z=acs->pos1.z;
-							to.x=acs->pos2.x;
-							to.y=acs->pos2.y;
-							to.z=acs->pos2.z;
-							
-							vect.x=to.x-from.x;
-							vect.y=to.y-from.y;
-							vect.z=to.z-from.z;
-							TRUEVector_Normalize(&vect);
-
-							if (acs->type==ARX_CINE_SPEECH_SIDE_LEFT)
-							{
-								Vector_RotateY(&vect2,&vect,-90);
-							}
-							else
-							{
-								Vector_RotateY(&vect2,&vect,90);
-							}
-
-							distance=acs->f0*itime+acs->f1*rtime;
-							vect2.x*=distance;
-							vect2.y*=distance;
-							vect2.z*=distance;
-							dist=TRUEEEDistance3D(&from,&to);
-							EERIE_3D tfrom,tto;
-							tfrom.x=from.x+vect.x*acs->startpos*DIV100*dist;
-							tfrom.y=from.y+vect.y*acs->startpos*DIV100*dist;
-							tfrom.z=from.z+vect.z*acs->startpos*DIV100*dist;
-							tto.x=from.x+vect.x*acs->endpos*DIV100*dist;
-							tto.y=from.y+vect.y*acs->endpos*DIV100*dist;
-							tto.z=from.z+vect.z*acs->endpos*DIV100*dist;
-							targetpos.x=tfrom.x*itime+tto.x*rtime;
-							targetpos.y=tfrom.y*itime+tto.y*rtime+acs->f2;
-							targetpos.z=tfrom.z*itime+tto.z*rtime;
-							conversationcamera.pos.x=targetpos.x+vect2.x;
-							conversationcamera.pos.y=targetpos.y+vect2.y+acs->f2;
-							conversationcamera.pos.z=targetpos.z+vect2.z;
-							SetTargetCamera(&conversationcamera,targetpos.x,targetpos.y,targetpos.z);
-							subj.pos.x=conversationcamera.pos.x;
-							subj.pos.y=conversationcamera.pos.y;
-							subj.pos.z=conversationcamera.pos.z;
-							subj.angle.a=MAKEANGLE(-conversationcamera.angle.a);
-							subj.angle.b=MAKEANGLE(conversationcamera.angle.b-180.f);
-							subj.angle.g=0.f;
-							EXTERNALVIEW=1;	
-						}
-
-					break;
-					case ARX_CINE_SPEECH_CCCLISTENER_R:
-					case ARX_CINE_SPEECH_CCCLISTENER_L:
-					case ARX_CINE_SPEECH_CCCTALKER_R:
-					case ARX_CINE_SPEECH_CCCTALKER_L:
-
-						//need to compute current values
-						if (ValidIONum(acs->ionum))
-						{
-							INTERACTIVE_OBJ * ioo=inter.iobj[acs->ionum];
-							INTERACTIVE_OBJ * o1=io;
-							INTERACTIVE_OBJ * o2=ioo;
-
-							if ((acs->type==ARX_CINE_SPEECH_CCCLISTENER_L)
-								|| (acs->type==ARX_CINE_SPEECH_CCCLISTENER_R))
-							{
-								o1=ioo;
-								o2=io;								
-								conversationcamera.pos.x=acs->pos2.x;
-								conversationcamera.pos.y=acs->pos2.y;
-								conversationcamera.pos.z=acs->pos2.z;
-								targetpos.x=acs->pos1.x;
-								targetpos.y=acs->pos1.y;
-								targetpos.z=acs->pos1.z;
-							}
-							else
-							{
-								conversationcamera.pos.x=acs->pos1.x;
-								conversationcamera.pos.y=acs->pos1.y;
-								conversationcamera.pos.z=acs->pos1.z;
-								targetpos.x=acs->pos2.x;
-								targetpos.y=acs->pos2.y;
-								targetpos.z=acs->pos2.z;
-							}
-							
-							distance=(acs->startpos*itime+acs->endpos*rtime)*DIV100;						
-							
-							EERIE_3D vect,vect3;
-							vect.x=conversationcamera.pos.x-targetpos.x;
-							vect.y=conversationcamera.pos.y-targetpos.y;
-							vect.z=conversationcamera.pos.z-targetpos.z;
-							EERIE_3D vect2;
-							Vector_RotateY(&vect2,&vect,90);
-							TRUEVector_Normalize(&vect2);
-							Vector_Copy(&vect3,&vect);
-							TRUEVector_Normalize(&vect3);
-
-							vect.x=vect.x*(distance)+vect3.x*80.f;
-							vect.y=vect.y*(distance)+vect3.y*80.f;
-							vect.z=vect.z*(distance)+vect3.z*80.f;
-							vect2.x*=45.f;
-							vect2.y*=45.f;
-							vect2.z*=45.f;
-
-							if ((acs->type==ARX_CINE_SPEECH_CCCLISTENER_R)
-								|| (acs->type==ARX_CINE_SPEECH_CCCTALKER_R))
-							{
-								vect2.x=-vect2.x;
-								vect2.y=-vect2.y;
-								vect2.z=-vect2.z;
-							}
-
-							conversationcamera.pos.x=vect.x+targetpos.x+vect2.x;
-							conversationcamera.pos.y=vect.y+targetpos.y+vect2.y;
-							conversationcamera.pos.z=vect.z+targetpos.z+vect2.z; 
-							SetTargetCamera(&conversationcamera,targetpos.x,targetpos.y,targetpos.z);
-							subj.pos.x=conversationcamera.pos.x;
-							subj.pos.y=conversationcamera.pos.y;
-							subj.pos.z=conversationcamera.pos.z;
-							subj.angle.a=MAKEANGLE(-conversationcamera.angle.a);
-							subj.angle.b=MAKEANGLE(conversationcamera.angle.b-180.f);
-							subj.angle.g=0.f;
-							EXTERNALVIEW=1;	
-						}
-
-					break;
-				}
-
-				LASTCAMPOS.x=subj.pos.x;
-				LASTCAMPOS.y=subj.pos.y;
-				LASTCAMPOS.z=subj.pos.z;
-				LASTCAMANGLE.a=subj.angle.a;
-				LASTCAMANGLE.b=subj.angle.b;
-				LASTCAMANGLE.g=subj.angle.g;
-			}
-		}
-	}
-
-	if (player.life<=0)
-	{
-			DeadTime	+=	ARX_CLEAN_WARN_CAST_LONG(FrameDiff);
-		float mdist	=	EEfabs(player.physics.cyl.height)-60;
-		DeadCameraDistance+=(float)FrameDiff*DIV80*((mdist-DeadCameraDistance)/mdist)*2.f;
-
-		if (DeadCameraDistance>mdist) DeadCameraDistance=mdist;
-
-		EERIE_3D targetpos;
-
-		targetpos.x = player.pos.x;
-			targetpos.y = player.pos.y;
-			targetpos.z = player.pos.z;
-
-			long id	 = inter.iobj[0]->obj->fastaccess.view_attach;
-		long id2 = GetActionPointIdx( inter.iobj[0]->obj, "Chest2Leggings" );
-		
-		if (id!=-1)
-		{
-			targetpos.x = inter.iobj[0]->obj->vertexlist3[id].v.x;
-			targetpos.y = inter.iobj[0]->obj->vertexlist3[id].v.y;
-			targetpos.z = inter.iobj[0]->obj->vertexlist3[id].v.z;
-		}
-
-		conversationcamera.pos.x = targetpos.x;
-		conversationcamera.pos.y = targetpos.y - DeadCameraDistance;
-		conversationcamera.pos.z = targetpos.z;
-
-		if (id2!=-1)
-		{
-				conversationcamera.pos.x=inter.iobj[0]->obj->vertexlist3[id2].v.x;
-				conversationcamera.pos.y=inter.iobj[0]->obj->vertexlist3[id2].v.y-DeadCameraDistance;
-				conversationcamera.pos.z=inter.iobj[0]->obj->vertexlist3[id2].v.z;
-		}
-		
-		SetTargetCamera(&conversationcamera,targetpos.x,targetpos.y,targetpos.z);
-		subj.pos.x=conversationcamera.pos.x;
-		subj.pos.y=conversationcamera.pos.y;
-		subj.pos.z=conversationcamera.pos.z;
-		subj.angle.a=MAKEANGLE(-conversationcamera.angle.a);
-		subj.angle.b=MAKEANGLE(conversationcamera.angle.b-180.f);
-			subj.angle.g = 0;
-		EXTERNALVIEW=1;
-
-		if (!GAME_EDITOR)
-			BLOCK_PLAYER_CONTROLS=1;
-	}
-	else 
-	{
-		DeadCameraDistance=0;
-		
-	}
+	DANAE_RenderCheckPlayerDead();
 
 		/////////////////////////////////////
 	LAST_CONVERSATION=ARX_CONVERSATION;
 
-	if ((this->kbd.inkey[INKEY_SPACE]) && (CAMERACONTROLLER!=NULL))
+	if((this->kbd.inkey[INKEY_SPACE]) && (CAMERACONTROLLER != NULL))
 	{
-		CAMERACONTROLLER=NULL;
-		this->kbd.inkey[INKEY_SPACE]=0;
-	}
-	
-	if (CAMERACONTROLLER!=NULL)
-	{
-		if (lastCAMERACONTROLLER!=CAMERACONTROLLER)
-		{
-			currentbeta=CAMERACONTROLLER->angle.b;
-		}
-
-			EERIE_3D targetpos;
-
-		targetpos.x=CAMERACONTROLLER->pos.x;
-		targetpos.y=CAMERACONTROLLER->pos.y+PLAYER_BASE_HEIGHT;
-		targetpos.z=CAMERACONTROLLER->pos.z;
-
-			float delta_angle = AngleDifference(currentbeta, CAMERACONTROLLER->angle.b);
-			float delta_angle_t = delta_angle * FrameDiff * DIV1000;
-
-			if (EEfabs(delta_angle_t) > EEfabs(delta_angle)) delta_angle_t = delta_angle;
-
-			currentbeta += delta_angle_t;
-		float t=DEG2RAD(MAKEANGLE(currentbeta));
-		conversationcamera.pos.x=targetpos.x+(float)EEsin(t)*160.f;
-		conversationcamera.pos.y=targetpos.y+40.f;
-		conversationcamera.pos.z=targetpos.z-(float)EEcos(t)*160.f;
-	
-		SetTargetCamera(&conversationcamera,targetpos.x,targetpos.y,targetpos.z);		
-		subj.pos.x=conversationcamera.pos.x;
-		subj.pos.y=conversationcamera.pos.y;
-		subj.pos.z=conversationcamera.pos.z;
-		subj.angle.a=MAKEANGLE(-conversationcamera.angle.a);
-		subj.angle.b=MAKEANGLE(conversationcamera.angle.b-180.f);
-		subj.angle.g=0.f;
-		EXTERNALVIEW=1;		
+		CAMERACONTROLLER = NULL;
+		this->kbd.inkey[INKEY_SPACE] = 0;
 	}
 
-	lastCAMERACONTROLLER=CAMERACONTROLLER;
-
-	if ((USE_CINEMATICS_CAMERA) && (USE_CINEMATICS_PATH.path!=NULL))
-	{
-		EERIE_3D pos,pos2;
-			USE_CINEMATICS_PATH._curtime = ARX_TIME_Get();
-
-		USE_CINEMATICS_PATH._curtime+=50;
-		long pouet2=ARX_PATHS_Interpolate(&USE_CINEMATICS_PATH,&pos);
-		USE_CINEMATICS_PATH._curtime-=50;
-		long pouet=ARX_PATHS_Interpolate(&USE_CINEMATICS_PATH,&pos2);
-
-		if ((pouet!=-1) && (pouet2!=-1))
-		{
-		if (USE_CINEMATICS_CAMERA==2)
-		{
-			subj.pos.x=pos.x;
-			subj.pos.y=pos.y;
-			subj.pos.z=pos.z;		
-
-			subj.d_angle.a=subj.angle.a;
-			subj.d_angle.b=subj.angle.b;
-			subj.d_angle.g=subj.angle.g;
-			pos2.x=(pos2.x+pos.x)*DIV2;
-			pos2.y=(pos2.y+pos.y)*DIV2;
-			pos2.z=(pos2.z+pos.z)*DIV2;
-			SetTargetCamera(&subj,pos2.x,pos2.y,pos2.z);
-
-		}
-		else DebugSphere(pos.x,pos.y,pos.z,2,50,0xFFFF0000);
-
-		if (USE_CINEMATICS_PATH.path->flags & ARX_USEPATH_FLAG_FINISHED)
-		{
-			USE_CINEMATICS_CAMERA=0;
-			USE_CINEMATICS_PATH.path=NULL;
-		}		
-		}
-		else
-		{
-			USE_CINEMATICS_CAMERA=0;
-			USE_CINEMATICS_PATH.path=NULL;		
-		}
-	}
-
-	UpdateCameras();
-		
-		///////////////////////////////////////////
-	ARX_PLAYER_FrameCheck(Original_framedelay);
-
-	if (MasterCamera.exist)
-	{
-		if (MasterCamera.exist & 2)
-		{
-			MasterCamera.exist&=~2;
-			MasterCamera.exist|=1;
-			MasterCamera.io=MasterCamera.want_io;
-			MasterCamera.aup=MasterCamera.want_aup;
-			MasterCamera.cam=MasterCamera.want_cam;
-		}
-
-		if (MasterCamera.cam->focal<100.f) MasterCamera.cam->focal=350.f;
-
-		SetActiveCamera(MasterCamera.cam);
-		EXTERNALVIEW=1;
-	}
-	else
-	{
-		// Set active camera for this viewport
-		SetActiveCamera(&subj);
-	}
+	DANAE_RenderManageCameras();
 
 	ARX_GLOBALMODS_Apply();
 
 	if (EDITMODE) GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false );
 
-		ManageQuakeFX();
+	ManageQuakeFX();
 	
 	// Prepare ActiveCamera
 	PrepareCamera(ACTIVECAM);
@@ -7450,68 +7551,9 @@ m_pd3dDevice->Clear( 0, NULL, D3DCLEAR_ZBUFFER,0, 1.0f, 0L );
 
 	danaeApp.DANAEEndRender();
 
-	//--------------NORENDEREND---------------------------------------------------
-	norenderend:
-		;
-
-	if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_F10))
-	{
-		GetSnapShot();
 	}
-
-	if ((LaunchDemo) && (FirstFrame == 0)) 
-	{
-		NOCHECKSUM=1;
-		LaunchDemo=0;		
-		LaunchDummyParticle();		
-	}
-	}
-	StartBench();
-
-	if (ARXmenu.currentmode == AMCM_OFF)
-	{
-		ARX_SCRIPT_AllowInterScriptExec();
-		ARX_SCRIPT_EventStackExecute();
-		// Updates Damages Spheres
-		ARX_DAMAGES_UpdateAll();
-		ARX_MISSILES_Update();
-		
-		if (FirstFrame==0)
-			ARX_PATH_UpdateAllZoneInOutInside();
-	}
-
-	BENCH_SCRIPT=EndBench();
-
-	LastFrameTime=FrameTime;
-	LastMouseClick=EERIEMouseButton;
-
-	if (DEBUGCODE) ForceSendConsole("RenderEnd_____________________________", 1, 0, (HWND)1);
-
-		DANAE_DEBUGGER_Update();
-
-	if (NEED_BENCH)
-	{
-		if(danaeApp.DANAEStartRender()) 
-		{
-			SETZWRITE(m_pd3dDevice, TRUE );
-			SETALPHABLEND(m_pd3dDevice,FALSE);
-			iVPOS=0;
-			ShowValue(&oBENCH_STARTUP,&BENCH_STARTUP,"Startup");
-			ShowValue(&oBENCH_PLAYER,&BENCH_PLAYER,"Player");
-			ShowValue(&oBENCH_RENDER,&BENCH_RENDER,"Render");
-			ShowValue(&oBENCH_PARTICLES,&BENCH_PARTICLES,"Particles");
-			ShowValue(&oBENCH_SPEECH,&BENCH_SPEECH,"Speech");
-			ShowValue(&oBENCH_SCRIPT,&BENCH_SCRIPT,"Script");
-			ShowValue(&oBENCH_PATHFINDER,&BENCH_PATHFINDER,"Pathfinder");
-			BENCH_PATHFINDER=0;
-			ShowValue(&oBENCH_SOUND,&BENCH_SOUND,"Sound Thread");
-			BENCH_SOUND=0;
-			
-			danaeApp.DANAEEndRender();
-		}
-	}
-
-    return S_OK;
+	
+	return DANAE_NoRenderEnd();
 }
 
 INTERACTIVE_OBJ * GetFirstInterAtPos(EERIE_S2D * pos,long flag=0, EERIE_3D* _pRef=NULL, INTERACTIVE_OBJ** _pTable = NULL, int* _pnNbInTable=NULL );
@@ -7727,107 +7769,875 @@ HRESULT DANAEGL::DeleteDeviceObjects()
 
 HRESULT DANAEGL::Render()
 {
-	FrameTime = ARX_TIME_Get();
-
-	if(GLOBAL_SLOWDOWN != 1.f)
-	{
-		float ft;
-		ft = FrameTime - LastFrameTime;
-		Original_framedelay = ft*TIMEFACTOR;
-
-		ft *= 1.f - GLOBAL_SLOWDOWN;
-		float minus;
-
-		minus = ft;
-		ARXTotalPausedTime += minus;
-		FrameTime = ARX_TIME_Get();
-
-		if(LastFrameTime>FrameTime)
-		{
-			LastFrameTime = FrameTime;
-		}
-
-		ft = FrameTime - LastFrameTime;
-
-		FrameDiff = ft;
-		float FD;
-		FD = FrameDiff;
-		// Under 10 FPS the whole game slows down to avoid unexpected results...
-		_framedelay = (float)FrameDiff;
-	}
-	else
-	{
-		FrameDiff = FrameTime - LastFrameTime;
-
-		float FD;
-		FD = FrameDiff;
-		// Under 10 FPS the whole game slows down to avoid unexpected results...
-		_framedelay = ((float)(FrameDiff)*TIMEFACTOR);
-		FrameDiff = _framedelay;
-
-		Original_framedelay = _framedelay;
-
-		//	Original_framedelay = 1000/25;
-		ARXTotalPausedTime += FD - FrameDiff;
-	}
-
-	static float _AvgFrameDiff = 150.f;
-	if(FrameDiff > _AvgFrameDiff * 10.f)
-	{
-		FrameDiff = _AvgFrameDiff * 10.f;
-	}
-	else if(FrameDiff > 15.f)
-	{
-		_AvgFrameDiff += (FrameDiff - _AvgFrameDiff)*0.01f;
-	}
-	if(NEED_BENCH)
-	{
-		BENCH_STARTUP = 0;
-		BENCH_PLAYER = 0;
-		BENCH_RENDER = 0;
-		BENCH_PARTICLES = 0;
-		BENCH_SPEECH = 0;
-		BENCH_SCRIPT = 0;
-	}
-
-	StartBench();
-
-	RenderStartTicks = dwARX_TIME_Get();
+	DANAE_RenderStartTime();
 
 	if(DANAE_ManageSplashThings())
-		goto norenderend;
+		return DANAE_NoRenderEnd();
 
-	//--------------NORENDEREND---------------------------------------------------
-norenderend:
-	;
-
-	if((LaunchDemo) && (FirstFrame == 0))
+	//Clicked on New Quest ? (TODO:need certainly to be moved somewhere else...)
+	if(START_NEW_QUEST)
 	{
-		NOCHECKSUM = 1;
-		LaunchDemo = 0;
-		LaunchDummyParticle();
+		DANAE_StartNewQuest();
+	}
+	
+	// Update Various Player Infos for this frame.
+	if(FirstFrame == 0)
+		ARX_PLAYER_Frame_Update();
+	
+	// Project need to reload all textures ???
+	if(WILL_RELOAD_ALL_TEXTURES)
+	{
+		ReloadAllTextures(GDevice);
+	
+		if(ControlCinematique)
+		{
+			ActiveAllTexture(0);
+		}
+	
+		WILL_RELOAD_ALL_TEXTURES = 0;
+	}
+	
+	// Are we being teleported ?
+	if((TELEPORT_TO_LEVEL[0]) && (CHANGE_LEVEL_ICON == 200))
+	{
+		CHANGE_LEVEL_ICON = -1;
+		LaunchCDROMCheck(0);
+		ARX_CHANGELEVEL_Change(TELEPORT_TO_LEVEL, TELEPORT_TO_POSITION, TELEPORT_TO_ANGLE, 0);
+		memset(TELEPORT_TO_LEVEL, 0, 64);
+		memset(TELEPORT_TO_POSITION, 0, 64);
+	}
+	
+	if(NEED_INTRO_LAUNCH)
+	{
+		SetEditMode(0);
+		BLOCK_PLAYER_CONTROLS = 1;
+		ARX_INTERFACE_PlayerInterfaceModify(0, 0);
+		ARX_Menu_Resources_Release();
+		ARXmenu.currentmode = AMCM_OFF;
+		ARX_TIME_UnPause();
+		SPLASH_THINGS_STAGE = 14;
+		NEED_INTRO_LAUNCH = 0;
+		char loadfrom[256];
+		REFUSE_GAME_RETURN = 1;
+		sprintf(loadfrom, "%sGraph\\Levels\\Level10\\level10.dlf", Project.workingdir);
+		OLD_PROGRESS_BAR_COUNT = PROGRESS_BAR_COUNT = 0;
+		PROGRESS_BAR_TOTAL = 108;
+		LoadLevelScreen(GDevice, 10);
+		DanaeLoadLevel(GDevice, loadfrom);
+		FORBID_SAVE = 0;
+		FirstFrame = 1;
+		SPLASH_THINGS_STAGE = 0;
+		INTRO_NOT_LOADED = 0;
+		//GDevice->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
+		return FALSE;
 	}
 
+	// Finally computes current focal
+	BASE_FOCAL = (float)CURRENT_BASE_FOCAL + (float)FOKMOD + (BOW_FOCAL*DIV4);
+
+	// SPECIFIC code for Snapshot MODE... to insure constant capture framerate
+	if((SnapShotMode)
+		&& (!ARXPausedTime))
+	{
+		ARXTotalPausedTime += ARXTime - (LastFrameTime + (1000 / snapshotdata.imgsec));
+	}
+
+	PULSATE = EEsin(FrameTime*DIV800);
+	METALdecal = EEsin(FrameTime*DIV50)*DIV200;
+	PULSS = EEsin(FrameTime*DIV200)*DIVPI*DIV4 + 0.25f;
+	EERIEDrawnPolys = 0;
+
+	// EditMode Specific code
+	if(EDITMODE)
+	{
+		TOTIOPDL = 0;
+		BLOCK_PLAYER_CONTROLS = 0;
+	}
+
+	if(FirstFrame == 0) // Checks for Keyboard & Moulinex
+	{
+		ARX_MOUSE_OVER = 0;
+
+		if(!EDITMODE && (ARXmenu.currentmode == AMCM_OFF)) // Playing Game
+		{
+			// Checks Clicks in Book Interface
+			if(ARX_INTERFACE_MouseInBook())
+			{
+				ARX_MOUSE_OVER |= ARX_MOUSE_OVER_BOOK;
+				LASTBOOKBUTTON = BOOKBUTTON;
+				BOOKBUTTON = EERIEMouseButton;
+
+				if(((EERIEMouseButton & 1) && !(LastMouseClick & 1))
+					|| ((EERIEMouseButton & 2) && !(LastMouseClick & 2)))
+				{
+					bookclick.x = DANAEMouse.x;
+					bookclick.y = DANAEMouse.y;
+				}
+			}
+			else if(InSecondaryInventoryPos(&DANAEMouse))
+				ARX_MOUSE_OVER |= ARX_MOUSE_OVER_INVENTORY_2;
+			else if(InPlayerInventoryPos(&DANAEMouse))
+				ARX_MOUSE_OVER |= ARX_MOUSE_OVER_INVENTORY;
+		}
+
+		if((player.Interface & INTER_COMBATMODE)
+			|| (PLAYER_MOUSELOOK_ON))
+		{
+			FlyingOverIO = NULL; // Avoid to check with those modes
+		}
+		else
+		{
+			if((DRAGINTER == NULL) && (FRAME_COUNT <= 0))
+			{
+				if(!BLOCK_PLAYER_CONTROLS && !TRUE_PLAYER_MOUSELOOK_ON && !(ARX_MOUSE_OVER & ARX_MOUSE_OVER_BOOK)
+					&& (eMouseState != MOUSE_IN_NOTE)
+					)
+					FlyingOverIO = FlyingOverObject(&DANAEMouse);
+				else
+					FlyingOverIO = NULL;
+			}
+		}
+
+		if((!PLAYER_PARALYSED)
+			|| (ARXmenu.currentmode != AMCM_OFF))
+
+		{
+			if(!STOP_KEYBOARD_INPUT)
+				ManageKeyMouse();
+			else
+			{
+				STOP_KEYBOARD_INPUT++;
+
+				if(STOP_KEYBOARD_INPUT>2) STOP_KEYBOARD_INPUT = 0;
+			}
+		}
+
+		if(MOULINEX)
+			LaunchMoulinex();
+	}
+	else // Manages our first frameS
+	{
+		ARX_TIME_Get();
+		long ffh = FirstFrameHandling(0);
+
+		if(ffh == FFH_S_OK) return S_OK;
+
+		if(ffh == FFH_GOTO_FINISH) return DANAE_NoRenderEnd();
+	}
+
+	if(CheckInPolyPrecis(player.pos.x, player.pos.y, player.pos.z))
+	{
+		LastValidPlayerPos.x = player.pos.x;
+		LastValidPlayerPos.y = player.pos.y;
+		LastValidPlayerPos.z = player.pos.z;
+	}
+
+	if((!FINAL_RELEASE) && (ARXmenu.currentmode == AMCM_OFF))
+	{
+		if(this->kbd.inkey[INKEY_M])
+		{
+			USE_PORTALS++;
+
+			if(USE_PORTALS>4) USE_PORTALS = 0;
+
+			if(USE_PORTALS == 1) USE_PORTALS = 2;
+
+			this->kbd.inkey[INKEY_M] = 0;
+		}
+
+		if(this->kbd.inkey[INKEY_P])
+		{
+			if(INTERPOLATE_BETWEEN_BONES)
+				INTERPOLATE_BETWEEN_BONES = 0;
+			else
+				INTERPOLATE_BETWEEN_BONES = 1;
+
+			this->kbd.inkey[INKEY_P] = 0;
+		}
+	}
+
+	// Updates Externalview 
+	if(EXTERNALVIEWING) EXTERNALVIEW = 1;
+	else EXTERNALVIEW = 0;
+
+	if(ARX_Menu_Render(0))
+	{
+		return DANAE_NoRenderEnd();
+	}
+
+	if(WILL_QUICKSAVE)
+	{
+		::SnapShot *pSnapShot = new ::SnapShot(NULL, "sct", true);
+		pSnapShot->GetSnapShotDim(160, 100);
+		delete pSnapShot;
+
+		if(WILL_QUICKSAVE >= 2)
+		{
+			LaunchCDROMCheck(0);
+			ARX_QuickSave();
+			WILL_QUICKSAVE = 0;
+		}
+		else WILL_QUICKSAVE++;
+	}
+
+	if(WILL_QUICKLOAD)
+	{
+		WILL_QUICKLOAD = 0;
+		LaunchCDROMCheck(0);
+
+		if(ARX_QuickLoad())
+			NEED_SPECIAL_RENDEREND = 1;
+	}
+
+	if(NEED_SPECIAL_RENDEREND)
+	{
+		NEED_SPECIAL_RENDEREND = 0;
+		return DANAE_NoRenderEnd();
+	}
+
+	// Are we displaying a 2D cinematic ? Yes = manage it
+	if(PLAY_LOADED_CINEMATIC
+		&&	ControlCinematique
+		&&	ControlCinematique->projectload)
+	{
+		if(DANAE_Manage_Cinematic() == 1)
+			return DANAE_NoRenderEnd();
+
+		//goto renderend;
+		return S_OK;
+	}
+
+	BENCH_STARTUP = EndBench();
 	StartBench();
 
 	if(ARXmenu.currentmode == AMCM_OFF)
 	{
-		ARX_SCRIPT_AllowInterScriptExec();
-		ARX_SCRIPT_EventStackExecute();
-		// Updates Damages Spheres
-		ARX_DAMAGES_UpdateAll();
-		ARX_MISSILES_Update();
+		if(!PLAYER_PARALYSED)
+		{
+			//if(ManageEditorControls()) goto finish;
+		}
 
-		if(FirstFrame == 0)
-			ARX_PATH_UpdateAllZoneInOutInside();
+		if((!BLOCK_PLAYER_CONTROLS) && (!PLAYER_PARALYSED))
+		{
+			ManagePlayerControls();
+		}
 	}
 
-	BENCH_SCRIPT = EndBench();
+	ARX_PLAYER_Manage_Movement();
 
-	LastFrameTime = FrameTime;
-	LastMouseClick = EERIEMouseButton;
+	ARX_PLAYER_Manage_Visual();
 
-	return S_OK;
+	if(FRAME_COUNT <= 0)
+		ARX_MINIMAP_ValidatePlayerPos();
+
+	BENCH_PLAYER = EndBench();
+
+
+	///Subjective view start
+	if((inter.iobj[0]) && (inter.iobj[0]->animlayer[0].cur_anim))
+	{
+		ManageNONCombatModeAnimations();
+		long old = USEINTERNORM;
+		USEINTERNORM = 0;
+		float speedfactor;
+		speedfactor = inter.iobj[0]->basespeed + inter.iobj[0]->speed_modif;
+
+		if(cur_mr == 3) speedfactor += 0.5f;
+
+		if(cur_rf == 3) speedfactor += 1.5f;
+
+		if(speedfactor < 0) speedfactor = 0;
+
+		long tFrameDiff;
+		F2L(Original_framedelay, &tFrameDiff);
+
+		if((player.Interface & INTER_COMBATMODE) && (STRIKE_TIME))// need some precision for weapon...
+		{
+			float restore = ACTIVECAM->use_focal;
+
+			if((!EXTERNALVIEW) && (!BOW_FOCAL))
+			{
+				ACTIVECAM->use_focal = PLAYER_ARMS_FOCAL*Xratio;
+			}
+
+			float cur = 0;
+
+			while((cur<tFrameDiff) && (!(inter.iobj[0]->ioflags & IO_FREEZESCRIPT)))
+			{
+				long step = __min(50, tFrameDiff);
+
+				if(inter.iobj[0]->ioflags & IO_FREEZESCRIPT) step = 0;
+
+
+				float iCalc = step*speedfactor;
+				ARX_CHECK_ULONG(iCalc);
+
+				EERIEDrawAnimQuatGL(inter.iobj[0]->obj,
+					&inter.iobj[0]->animlayer[0],
+					&inter.iobj[0]->angle, &inter.iobj[0]->pos,
+					ARX_CLEAN_WARN_CAST_ULONG(iCalc),
+					inter.iobj[0], 0, 4);
+
+				if((player.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
+					ManageCombatModeAnimations();
+
+				if(inter.iobj[0]->animlayer[1].cur_anim != NULL)
+					ManageCombatModeAnimationsEND();
+
+				cur += step*speedfactor;
+			}
+
+			ACTIVECAM->use_focal = restore;
+		}
+		else
+		{
+			float restore = ACTIVECAM->use_focal;
+
+			if((!EXTERNALVIEW) && (!BOW_FOCAL))
+			{
+				ACTIVECAM->use_focal = PLAYER_ARMS_FOCAL*Xratio;
+			}
+
+
+			float val = (float)tFrameDiff*speedfactor;
+			ARX_CHECK_LONG(val);
+
+			if(inter.iobj[0]->ioflags & IO_FREEZESCRIPT) val = 0;
+
+			EERIEDrawAnimQuatGL(inter.iobj[0]->obj,
+				&inter.iobj[0]->animlayer[0],
+				&inter.iobj[0]->angle,
+				&inter.iobj[0]->pos,
+				ARX_CLEAN_WARN_CAST_ULONG(val),
+				inter.iobj[0],
+				0, 4);
+
+
+			if((player.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
+				ManageCombatModeAnimations();
+
+			if(inter.iobj[0]->animlayer[1].cur_anim != NULL)
+				ManageCombatModeAnimationsEND();
+
+			ACTIVECAM->use_focal = restore;
+		}
+
+		USEINTERNORM = old;
+	}
+
+
+	INTERACTIVE_OBJ * io;
+	io = inter.iobj[0];
+	ANIM_USE * useanim;
+	useanim = &io->animlayer[1];
+	ANIM_HANDLE ** alist;
+	alist = io->anims;
+
+	if(BOW_FOCAL
+		&& (useanim->cur_anim != alist[ANIM_MISSILE_STRIKE_PART_1])
+		&& (useanim->cur_anim != alist[ANIM_MISSILE_STRIKE_PART_2])
+		&& (useanim->cur_anim != alist[ANIM_MISSILE_STRIKE_CYCLE]))
+	{
+		BOW_FOCAL -= Original_framedelay;
+
+		if(BOW_FOCAL<0) BOW_FOCAL = 0;
+	}
+
+	if(eyeball.exist == 2)
+	{
+		subj.d_pos.x = eyeball.pos.x;
+		subj.d_pos.y = eyeball.pos.y;
+		subj.d_pos.z = eyeball.pos.z;
+		subj.d_angle.a = eyeball.angle.a;
+		subj.d_angle.b = eyeball.angle.b;
+		subj.d_angle.g = eyeball.angle.g;
+		EXTERNALVIEW = 1;
+	}
+	else if(EXTERNALVIEW)
+	{
+		float t = DEG2RAD(player.angle.b);
+		EERIE_3D tt;
+
+		for(long l = 0; l<250; l += 10)
+		{
+			tt.x = player.pos.x + (float)EEsin(t)*(float)l;
+			tt.y = player.pos.y - 50.f;
+			tt.z = player.pos.z - (float)EEcos(t)*(float)l;
+			EERIEPOLY * ep = EECheckInPoly(&tt);
+
+			if(ep)
+			{
+				subj.d_pos.x = tt.x;
+				subj.d_pos.y = tt.y;
+				subj.d_pos.z = tt.z;
+			}
+			else break;
+		}
+
+		subj.d_angle.a = player.angle.a + 30.f;
+		subj.d_angle.b = player.angle.b;
+		subj.d_angle.g = player.angle.g;
+		EXTERNALVIEW = 1;
+	}
+	else
+	{
+		subj.angle.a = player.angle.a;
+		subj.angle.b = player.angle.b;
+		subj.angle.g = player.angle.g;
+		EXTERNALVIEW = 0;
+		long id;
+
+		if(inter.iobj[0])
+		{
+			id = inter.iobj[0]->obj->fastaccess.view_attach;
+
+			if(id != -1)
+			{
+				subj.pos.x = inter.iobj[0]->obj->vertexlist3[id].v.x;
+				subj.pos.y = inter.iobj[0]->obj->vertexlist3[id].v.y;
+				subj.pos.z = inter.iobj[0]->obj->vertexlist3[id].v.z;
+
+				EERIE_3D vect;
+				vect.x = subj.pos.x - player.pos.x;
+				vect.y = 0;
+				vect.z = subj.pos.z - player.pos.z;
+				float len = Vector_Magnitude(&vect);
+
+				if(len>46.f)
+				{
+					float div = 46.f / len;
+					vect.x *= div;
+					vect.z *= div;
+					subj.pos.x = player.pos.x + vect.x;
+					subj.pos.z = player.pos.z + vect.z;
+				}
+			}
+			else
+			{
+				subj.pos.x = player.pos.x;
+				subj.pos.y = player.pos.y;
+				subj.pos.z = player.pos.z;
+				subj.pos.y += PLAYER_BASE_HEIGHT;
+			}
+		}
+	}
+
+	if(EXTERNALVIEW)
+	{
+		subj.pos.x = (subj.pos.x + subj.d_pos.x)*DIV2;
+		subj.pos.y = (subj.pos.y + subj.d_pos.y)*DIV2;
+		subj.pos.z = (subj.pos.z + subj.d_pos.z)*DIV2;
+
+		subj.angle.a = InterpolateAngle(subj.angle.a, subj.d_angle.a, 0.1f);
+		subj.angle.b = InterpolateAngle(subj.angle.b, subj.d_angle.b, 0.1f);
+		subj.angle.g = InterpolateAngle(subj.angle.g, subj.d_angle.g, 0.1f);
+	}
+
+	DANAE_RenderManageConversation();
+
+	////////////////////////
+	// Checks SCRIPT TIMERS.
+	if(FirstFrame == 0)
+		ARX_SCRIPT_Timer_Check();
+
+	/////////////////////////////////////////////
+	// Now checks for speech controlled cinematic
+	DANAE_RenderCheckSpeechControlledCinematic();
+
+	DANAE_RenderCheckPlayerDead();
+
+	/////////////////////////////////////
+	LAST_CONVERSATION = ARX_CONVERSATION;
+
+	if((this->kbd.inkey[INKEY_SPACE]) && (CAMERACONTROLLER != NULL))
+	{
+		CAMERACONTROLLER = NULL;
+		this->kbd.inkey[INKEY_SPACE] = 0;
+	}
+
+	DANAE_RenderManageCameras();
+
+	ARX_GLOBALMODS_Apply();
+
+	ManageQuakeFX();
+
+	// Prepare ActiveCamera
+	PrepareCamera(ACTIVECAM);
+	// Recenter Viewport depending on Resolution
+
+	// setting long from long
+	ACTIVECAM->centerx = DANAECENTERX;
+	ACTIVECAM->centery = DANAECENTERY;
+	// casting long to float
+	ACTIVECAM->posleft = ACTIVECAM->transform.xmod = ARX_CLEAN_WARN_CAST_FLOAT(DANAECENTERX);
+	ACTIVECAM->postop = ACTIVECAM->transform.ymod = ARX_CLEAN_WARN_CAST_FLOAT(DANAECENTERY);
+
+
+	// Set Listener Position
+	EERIE_3D front, up;
+	float t;
+	t = DEG2RAD(MAKEANGLE(ACTIVECAM->angle.b));
+	front.x = -EEsin(t);
+	front.y = 0.f;
+	front.z = EEcos(t);
+	TRUEVector_Normalize(&front);
+	up.x = 0.f;
+	up.y = 1.f;
+	up.z = 0.f;
+	ARX_SOUND_SetListener(&ACTIVECAM->pos, &front, &up);
+
+	// Reset Transparent Polys Idx
+	INTERTRANSPOLYSPOS = TRANSPOLYSPOS = 0;
+
+	// Check For Hiding/unHiding Player Gore
+	if((EXTERNALVIEW) || (player.life <= 0))
+	{
+		ARX_INTERACTIVE_Show_Hide_1st(inter.iobj[0], 0);
+	}
+
+	if(!EXTERNALVIEW)
+	{
+		ARX_INTERACTIVE_Show_Hide_1st(inter.iobj[0], 1);
+	}
+
+	LASTEXTERNALVIEW = EXTERNALVIEW;
+
+	// NOW DRAW the player (Really...)
+	if((inter.iobj[0])
+		&& (inter.iobj[0]->animlayer[0].cur_anim))
+	{
+		float restore = ACTIVECAM->use_focal;
+
+		if((!EXTERNALVIEW) && (!BOW_FOCAL))
+		{
+			ACTIVECAM->use_focal = PLAYER_ARMS_FOCAL*Xratio;
+		}
+
+		if((!EXTERNALVIEW) && GLOBAL_FORCE_PLAYER_IN_FRONT)
+			FORCE_FRONT_DRAW = 1;
+
+		if(inter.iobj[0]->invisibility>0.9f) inter.iobj[0]->invisibility = 0.9f;
+
+		EERIEDrawAnimQuatGL(inter.iobj[0]->obj,
+			&inter.iobj[0]->animlayer[0],
+			&inter.iobj[0]->angle, &inter.iobj[0]->pos, 0, inter.iobj[0], 0, 8);
+		ACTIVECAM->use_focal = restore;
+		FORCE_FRONT_DRAW = 0;
+	}
+
+	// SUBJECTIVE VIEW UPDATE START  *********************************************************
+	//SetFilteringMode(m_pd3dDevice, Bilinear);
+	//SETZWRITE(m_pd3dDevice, TRUE);
+	//danaeGLApp.EnableZBuffer();
+
+	if (FirstFrame == 0)
+	{
+		StartBench();
+		PrepareIOTreatZone();
+		ARX_PHYSICS_Apply();
+
+		if (FRAME_COUNT <= 0)
+			PrecalcIOLighting(&ACTIVECAM->pos, ACTIVECAM->cdepth * 0.6f);
+
+		ACTIVECAM->fadecolor.r = current.depthcolor.r;
+		ACTIVECAM->fadecolor.g = current.depthcolor.g;
+		ACTIVECAM->fadecolor.b = current.depthcolor.b;
+
+		if (uw_mode)
+		{
+			float val = 10.f;
+			//m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, *((LPDWORD)(&val)));
+			ARX_SCENE_Render(0, 1);
+			val = -0.3f;
+			//m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, *((LPDWORD)(&val)));
+		}
+		else
+		{
+			ARX_SCENE_Render(0, 1);
+		}
+
+		BENCH_RENDER = EndBench();
+
+	}
+
+	if (EDITION == EDITION_PATHWAYS)
+	{
+		ARX_PATHS_RedrawAll(0);
+	}
+
+	if (!EDITMODE) // Playing Game
+	{
+		// Checks Magic Flares Drawing
+		if (!PLAYER_PARALYSED)
+		{
+			if (EERIEMouseButton & 1)
+			{
+				if ((ARX_FLARES_Block == 0) && (CurrSlot<MAX_SLOT))
+					ARX_SPELLS_AddPoint(&DANAEMouse);
+				else
+				{
+					CurrPoint = 0;
+					ARX_FLARES_Block = 0;
+					CurrSlot = 1;
+					LastSlot = 0;
+				}
+			}
+			else if (ARX_FLARES_Block == 0)
+				ARX_FLARES_Block = 1;
+		}
+
+		ARX_SPELLS_Precast_Check();
+		ARX_SPELLS_ManageMagic();
+		ARX_SPELLS_UpdateSymbolDraw(0);
+
+		ManageTorch();
+
+		// Renders Magical Flares
+		if (!((player.Interface & INTER_MAP)
+			&& (!(player.Interface & INTER_COMBATMODE)))
+			&& flarenum
+			)
+		{
+			ARX_MAGICAL_FLARES_Draw(0, FRAMETICKS);
+			FRAMETICKS = ARXTimeUL();
+		}
+	}
+	else  // EDITMODE == TRUE
+	{
+		if (!(Project.hide & HIDE_NODES))
+			RenderAllNodes(0);
+
+		_TCHAR texx[80];
+		_stprintf(texx, _T("EDIT MODE - Selected %d"), NbIOSelected);
+		ARX_TEXT_Draw(0, InBookFont, 100, 2, 0, 0, texx, EERIECOLOR_YELLOW);
+
+		if (EDITION == EDITION_FOGS)
+			ARX_FOGS_RenderAll(0);
+	}
+
+	// To remove for Final Release but needed until then !
+	if (ItemToBeAdded[0] != 0)
+		DanaeItemAdd();
+
+	//SETALPHABLEND(danaeGLApp.m_pd3dDevice, TRUE);
+	//SETZWRITE(danaeGLApp.m_pd3dDevice, FALSE);
+
+	// Checks some specific spell FX
+	CheckMr();
+
+	if (Project.improve)
+		DrawImproveVisionInterface(0);
+	else
+	{
+		if ((subj.focal<BASE_FOCAL + FOKMOD))
+		{
+			subj.focal += INC_FOCAL;
+
+			if (subj.focal>BASE_FOCAL + FOKMOD) subj.focal = BASE_FOCAL + FOKMOD;
+		}
+		else if (subj.focal>BASE_FOCAL + FOKMOD) subj.focal = BASE_FOCAL + FOKMOD;
+	}
+
+	if (eyeball.exist != 0)
+	{
+		DrawMagicSightInterface(0);
+	}
+
+	// Reset Last Key
+	danaeGLApp.kbd.lastkey = -1;
+
+	// Red screen fade for damages.
+	ARX_DAMAGE_Show_Hit_Blood(0);
+
+	// Manage Notes/Books opened on screen
+	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
+	ARX_INTERFACE_NoteManage();
+
+finish:; //----------------------------------------------------------------
+		 // Update spells
+	ARX_SPELLS_Update(0);
+	//SETCULL(GDevice, D3DCULL_NONE);
+	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, true);
+
+	// Manage Death visual & Launch menu...
+	if (DeadTime>2000)
+		ARX_PLAYER_Manage_Death();
+
+	//-------------------------------------------------------------------------
+
+	// INTERFACE
+	// Remove the Alphablend State if needed : NO Z Clear
+	//SETALPHABLEND(m_pd3dDevice, FALSE);
+	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
+
+	// Draw game interface if needed
+	if (ARXmenu.currentmode == AMCM_OFF)
+		if (!(Project.hide & HIDE_INTERFACE) && !CINEMASCOPE)
+		{
+			//SETTEXTUREWRAPMODE(GDevice, D3DTADDRESS_CLAMP);
+			DrawAllInterface();
+			DrawAllInterfaceFinish();
+
+			if ((player.Interface & INTER_MAP)
+				&& (!(player.Interface & INTER_COMBATMODE))
+				&& flarenum
+				)
+			{
+				//GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
+				ARX_MAGICAL_FLARES_Draw(0, FRAMETICKS);
+				//EnableZBuffer();
+				FRAMETICKS = ARXTimeUL();
+			}
+		}
+
+	//SETTEXTUREWRAPMODE(GDevice, D3DTADDRESS_WRAP);
+
+	if (bRenderInterList)
+	{
+		//SETALPHABLEND(GDevice, FALSE);
+		PopAllTriangleList(true);
+		//SETALPHABLEND(GDevice, TRUE);
+		//PopAllTriangleListTransparency();
+		//SETALPHABLEND(GDevice, FALSE);
+	}
+
+	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, true);
+	this->GoFor2DFX();
+	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
+	//m_pd3dDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0, 1.0f, 0L);
+
+	// Speech Management
+	if (!EDITMODE)
+	{
+		StartBench();
+		ARX_SPEECH_Check(0);
+		ARX_SPEECH_Update(0);
+		BENCH_SPEECH = EndBench();
+	}
+
+	//SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_WRAP);
+
+	if (pTextManage && pTextManage->vText.size())
+	{
+		danaeGLApp.DANAEEndRender();
+
+		pTextManage->Update(FrameDiff);
+		pTextManage->Render();
+		danaeGLApp.DANAEStartRender();
+	}
+
+	if (SHOW_INGAME_MINIMAP && ((PLAY_LOADED_CINEMATIC == 0) && (!CINEMASCOPE) && (!BLOCK_PLAYER_CONTROLS) && (ARXmenu.currentmode == AMCM_OFF))
+		&& (!(player.Interface & INTER_MAP)))
+	{
+		long	SHOWLEVEL = ARX_LEVELS_GetRealNum(CURRENTLEVEL);
+
+		if ((SHOWLEVEL >= 0) && (SHOWLEVEL<32))
+			ARX_MINIMAP_Show(GDevice, SHOWLEVEL, 1, 1);
+	}
+
+	//----------------RENDEREND------------------------------------------------
+renderend:
+	;
+
+	if (sp_max_start)
+		Manage_sp_max();
+
+	// Some Visual Debug/Info Text
+	CalcFPS();
+
+	if (!FINAL_COMMERCIAL_DEMO)
+	{
+		if ((NEED_TEST_TEXT) && (!FINAL_COMMERCIAL_DEMO))
+		{
+			danaeGLApp.DANAEEndRender();
+			ShowTestText();
+			danaeGLApp.DANAEStartRender();
+		}
+
+		if (!NO_TEXT_AT_ALL)
+		{
+			if (ViewMode & VIEWMODE_INFOTEXT)
+			{
+				ShowInfoText(0);
+			}
+			else if ((FORCE_SHOW_FPS) || CYRIL_VERSION)
+			{
+				ShowFPS();
+			}
+		}
+
+		if ((USE_PORTALS) && (NEED_TEST_TEXT) && (!FOR_EXTERNAL_PEOPLE))
+		{
+			char tex[250];
+
+			switch (USE_PORTALS)
+			{
+			case 1:
+				sprintf(tex, "2DPortals_ROOM: %d", LAST_ROOM);
+				break;
+			case 2:
+				sprintf(tex, "3DPortals_ROOM: %d - Vis %d", LAST_ROOM, LAST_PORTALS_COUNT);
+				break;
+			case 3:
+				sprintf(tex, "3DPortals_ROOM(Transform): %d - Vis %d", LAST_ROOM, LAST_PORTALS_COUNT);
+				break;
+			case 4:
+				sprintf(tex, "3DPortals_ROOM(TransformSC): %d - Vis %d", LAST_ROOM, LAST_PORTALS_COUNT);
+				break;
+			}
+
+			danaeGLApp.OutputText(320, 240, tex);
+
+			if (bRenderInterList)
+			{
+				danaeGLApp.OutputText(320, 257, "Seb");
+			}
+
+			if (bGMergeVertex)
+			{
+				danaeGLApp.OutputText(0, 284, "Portal MergeVertex");
+			}
+			else
+			{
+				danaeGLApp.OutputText(0, 284, "Portal Non MergeVertex");
+			}
+		}
+
+		if ((NEED_TEST_TEXT) && (!FOR_EXTERNAL_PEOPLE))
+		{
+			if (bOLD_CLIPP)
+			{
+				danaeGLApp.OutputText(0, 240, "New Clipp");
+			}
+			else
+			{
+				danaeGLApp.OutputText(0, 274, "New Clipp");
+			}
+		}
+	}
+
+	//----------------------------------------------------------------------------
+	// Begin 2D Pass for Lense Flares
+
+	if ((PLAY_LOADED_CINEMATIC == 0) && (!CINEMASCOPE) && (!BLOCK_PLAYER_CONTROLS) && (ARXmenu.currentmode == AMCM_OFF))
+	{
+		if (ARX_IMPULSE_NowPressed(CONTROLS_CUST_QUICKLOAD) && !WILL_QUICKLOAD)
+		{
+			WILL_QUICKLOAD = 1;
+		}
+
+		if (ARX_IMPULSE_NowPressed(CONTROLS_CUST_QUICKSAVE) && !WILL_QUICKSAVE)
+		{
+			iTimeToDrawD7 = 2000;
+			WILL_QUICKSAVE = 1;
+		}
+
+		ARX_DrawAfterQuickLoad();
+	}
+
+	danaeGLApp.DANAEEndRender();
+
+	return DANAE_NoRenderEnd();
 }
 
 HRESULT DANAEGL::FrameMove(FLOAT fTimeKey)
@@ -7877,6 +8687,117 @@ void DANAEGL::GoFor2DFX()
 
 HRESULT DANAEGL::BeforeRun()
 {
+	//Do this here - GL context now initialised by parent
+	InitializeDanae();
+
+	DANAESIZX = 800;
+	DANAESIZY = 600;
+
+	DANAECENTERX = DANAESIZX >> 1;
+	DANAECENTERY = DANAESIZY >> 1;
+
+	Xratio = DANAESIZX * DIV640;
+	Yratio = DANAESIZY * DIV480;
+
+	long i;
+
+	ControlCinematique = new CINEMATIQUE(0, DANAESIZX, DANAESIZY);
+	memset(&necklace, 0, sizeof(ARX_NECKLACE));
+	long old = GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE;
+	GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = -1;
+	necklace.lacet = _LoadTheObj("Graph\\Interface\\book\\runes\\lacet.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_AAM] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_aam.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_CETRIUS] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_citrius.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_COMUNICATUM] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_comunicatum.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_COSUM] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_cosum.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_FOLGORA] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_folgora.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_FRIDD] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_fridd.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_KAOM] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_kaom.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_MEGA] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_mega.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_MORTE] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_morte.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_MOVIS] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_movis.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_NHI] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_nhi.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_RHAA] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_rhaa.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_SPACIUM] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_spacium.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_STREGUM] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_stregum.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_TAAR] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_taar.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_TEMPUS] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_tempus.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_TERA] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_tera.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_VISTA] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_vista.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_VITAE] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_vitae.teo", "..\\..\\..\\Obj3D\\textures\\");
+	necklace.runes[RUNE_YOK] = _LoadTheObj("Graph\\Interface\\book\\runes\\runes_yok.teo", "..\\..\\..\\Obj3D\\textures\\");
+
+	necklace.pTexTab[RUNE_AAM] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_Aam[icon].BMP");
+	necklace.pTexTab[RUNE_CETRIUS] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_cetrius[icon].BMP");
+	necklace.pTexTab[RUNE_COMUNICATUM] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_comunicatum[icon].BMP");
+	necklace.pTexTab[RUNE_COSUM] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_cosum[icon].BMP");
+	necklace.pTexTab[RUNE_FOLGORA] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_folgora[icon].BMP");
+	necklace.pTexTab[RUNE_FRIDD] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_fridd[icon].BMP");
+	necklace.pTexTab[RUNE_KAOM] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_kaom[icon].BMP");
+	necklace.pTexTab[RUNE_MEGA] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_mega[icon].BMP");
+	necklace.pTexTab[RUNE_MORTE] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_morte[icon].BMP");
+	necklace.pTexTab[RUNE_MOVIS] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_movis[icon].BMP");
+	necklace.pTexTab[RUNE_NHI] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_nhi[icon].BMP");
+	necklace.pTexTab[RUNE_RHAA] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_rhaa[icon].BMP");
+	necklace.pTexTab[RUNE_SPACIUM] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_spacium[icon].BMP");
+	necklace.pTexTab[RUNE_STREGUM] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_stregum[icon].BMP");
+	necklace.pTexTab[RUNE_TAAR] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_taar[icon].BMP");
+	necklace.pTexTab[RUNE_TEMPUS] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_tempus[icon].BMP");
+	necklace.pTexTab[RUNE_TERA] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_tera[icon].BMP");
+	necklace.pTexTab[RUNE_VISTA] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_vista[icon].BMP");
+	necklace.pTexTab[RUNE_VITAE] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_vitae[icon].BMP");
+	necklace.pTexTab[RUNE_YOK] = MakeTCFromFile_NoRefinement("\\Graph\\Obj3D\\Interactive\\Items\\Magic\\Rune_aam\\rune_yok[icon].BMP");
+
+	for(i = 0; i<NB_RUNES - 1; i++)
+	{
+		if(necklace.pTexTab[i])
+			necklace.pTexTab[i]->CreateHalo(GDevice);
+	}
+
+	EERIE_3DOBJ * _fogobj;
+	_fogobj = _LoadTheObj("Editor\\Obj3D\\fog_generator.teo", "node_TEO MAPS\\");
+	ARX_FOGS_Set_Object(_fogobj);
+
+	eyeballobj = _LoadTheObj("Editor\\Obj3D\\eyeball.teo", "eyeball_TEO MAPS\\");
+	cabal = _LoadTheObj("Editor\\Obj3D\\cabal.teo", "cabal_TEO MAPS\\");
+	nodeobj = _LoadTheObj("Editor\\Obj3D\\node.teo", "node_TEO MAPS\\");
+	cameraobj = _LoadTheObj("Graph\\Obj3D\\Interactive\\System\\Camera\\Camera.teo", "..\\..\\..\\textures\\");
+	markerobj = _LoadTheObj("Graph\\Obj3D\\Interactive\\System\\Marker\\Marker.teo", "..\\..\\..\\textures\\");
+	arrowobj = _LoadTheObj("Graph\\Obj3D\\Interactive\\Items\\Weapons\\arrow\\arrow.teo", "..\\..\\..\\..\\textures\\");
+
+	for(i = 0; i<MAX_GOLD_COINS_VISUALS; i++)
+	{
+		char temp[256];
+
+		if(i == 0)
+			strcpy(temp, "Graph\\Obj3D\\Interactive\\Items\\Jewelry\\Gold_coin\\Gold_coin.teo");
+		else
+			sprintf(temp, "Graph\\Obj3D\\Interactive\\Items\\Jewelry\\Gold_coin\\Gold_coin%d.teo", i + 1);
+
+		GoldCoinsObj[i] = _LoadTheObj(temp, "..\\..\\..\\..\\textures\\");
+
+		if(i == 0)
+			strcpy(temp, "Graph\\Obj3D\\Interactive\\Items\\Jewelry\\Gold_coin\\Gold_coin[icon].bmp");
+		else
+			sprintf(temp, "Graph\\Obj3D\\Interactive\\Items\\Jewelry\\Gold_coin\\Gold_coin%d[icon].bmp", i + 1);
+
+		GoldCoinsTC[i] = MakeTCFromFile_NoRefinement(temp);
+	}
+
+	Movable = MakeTCFromFile_NoRefinement("Graph\\Interface\\Cursors\\wrong.bmp");
+	ChangeLevel = MakeTCFromFile_NoRefinement("Graph\\Interface\\Icons\\change_lvl.bmp");
+
+	ARX_PLAYER_LoadHeroAnimsAndMesh();
+
+	GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = old;
+
+	// Need to create Map
+	if(iCreateMap)
+		DANAE_Manage_CreateMap();
+
+	ARX_HWTransform_Init(0);
+
+	ARX_Localisation_Init();
 	return S_OK;
 }
 

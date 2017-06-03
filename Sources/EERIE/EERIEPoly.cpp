@@ -68,6 +68,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEAnim.h"
 #include "EERIEAnchors.h"
 #include "EERIEPathfinder.h"
+#include "EERIE_GL.h"
+#include "EERIE_GLshaders.h"
 #include "Arx_Particles.h"
 #include "Arx_Time.h"
 #include "Arx_Scene.h"
@@ -78,6 +80,9 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 
 void ComputeFastBkgData(EERIE_BACKGROUND * eb);
@@ -177,29 +182,73 @@ void EERIE_CreateMatriceProj(float _fWidth, float _fHeight, float _fFOV, float _
 	ProjectionMatrix._43 = (-Q * fNearPlane);
 	ProjectionMatrix._34 = 1.f;
 
+	D3DMATRIX mat;
+	mat._11 = 1.f;
+	mat._12 = 0.f;
+	mat._13 = 0.f;
+	mat._14 = 0.f;
+	mat._21 = 0.f;
+	mat._22 = 1.f;
+	mat._23 = 0.f;
+	mat._24 = 0.f;
+	mat._31 = 0.f;
+	mat._32 = 0.f;
+	mat._33 = 1.f;
+	mat._34 = 0.f;
+	mat._41 = 0.f;
+	mat._42 = 0.f;
+	mat._43 = 0.f;
+	mat._44 = 1.f;
+
 	if (GDevice)
 	{
-		D3DMATRIX mat;
-		mat._11 = 1.f;
-		mat._12 = 0.f;
-		mat._13 = 0.f;
-		mat._14 = 0.f;
-		mat._21 = 0.f;
-		mat._22 = 1.f;
-		mat._23 = 0.f;
-		mat._24 = 0.f;
-		mat._31 = 0.f;
-		mat._32 = 0.f;
-		mat._33 = 1.f;
-		mat._34 = 0.f;
-		mat._41 = 0.f;
-		mat._42 = 0.f;
-		mat._43 = 0.f;
-		mat._44 = 1.f;
 		GDevice->SetTransform(D3DTRANSFORMSTATE_WORLD, &mat);
 		GDevice->SetTransform(D3DTRANSFORMSTATE_VIEW, &mat);
 		GDevice->SetTransform(D3DTRANSFORMSTATE_PROJECTION, &ProjectionMatrix);
 	}
+
+
+	D3DVECTOR vEyePt = D3DVECTOR(ACTIVECAM->pos.x, -ACTIVECAM->pos.y, ACTIVECAM->pos.z);
+
+	EERIE_3D target, tout;
+	tout.x = 0.f;
+	tout.y = 0.f;
+	tout.z = 10000.f;
+	target.y = -(tout.z*ACTIVECAM->Xsin);
+	target.z = -(tout.z*ACTIVECAM->Xcos);
+	target.x = (target.z*ACTIVECAM->Ysin);
+	target.z = -(target.z*ACTIVECAM->Ycos);
+	target.x += ACTIVECAM->pos.x;
+	target.y -= ACTIVECAM->pos.y;
+	target.z += ACTIVECAM->pos.z;
+
+	D3DVECTOR vLookatPt = D3DVECTOR(target.x, target.y, target.z);
+	D3DVECTOR vUpVec = D3DVECTOR(0.f, 1.f, 0.f);
+
+	// Set the app view matrix for normal viewing
+	D3DMATRIX matView, matProj;
+	D3DUtil_SetViewMatrix(matView, vEyePt, vLookatPt, vUpVec);
+
+#ifdef ARX_OPENGL
+	GLuint program = EERIEGetGLProgramID("poly");
+	glUseProgram(program);
+
+	glm::mat4 worldView;
+	memcpy(&worldView, &matView._11, sizeof(glm::mat4)); //urgh
+
+	//glm::vec3 eye(ACTIVECAM->pos.x, -ACTIVECAM->pos.y, ACTIVECAM->pos.z);
+	//glm::vec3 targetLookAt(target.x, target.y, target.z);
+	//glm::vec3 up(0.0f, 1.0f, 0.0f);
+	//glm::mat4 view = glm::lookAt(eye, targetLookAt, up);
+	//glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
+
+	glm::mat4 proj = glm::mat4();
+	//memcpy(&proj, &ProjectionMatrix._11, sizeof(glm::mat4)); //it isn't any less ugly the second time.
+	proj = glm::perspectiveFov(_fFOV, _fWidth, _fHeight, fNearPlane, fFarPlane);
+
+	//glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &worldView[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
+#endif
 
 	ProjectionMatrix._11 *= _fWidth * .5f;
 	ProjectionMatrix._22 *= _fHeight * .5f;
@@ -213,7 +262,7 @@ void EERIE_CreateMatriceProj(float _fWidth, float _fHeight, float _fFOV, float _
 	vp.dwHeight	=	ARX_CLEAN_WARN_CAST_DWORD(_fHeight);
 	vp.dvMinZ = 0.f;
 	vp.dvMaxZ = 1.f;
-	GDevice->SetViewport(&vp);
+	if(GDevice) GDevice->SetViewport(&vp);
 }
 
 void specialEE_RTP(D3DTLVERTEX * in, D3DTLVERTEX * out)

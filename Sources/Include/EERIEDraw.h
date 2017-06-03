@@ -55,6 +55,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIETexture.h"
 #include "EERIEMath.h"
 #include "EERIEApp.h"
+#include "EERIE_GL.h"
 
 extern long ARX_ALTERNATE_3D;
 extern EERIE_3D SPRmins;
@@ -66,6 +67,17 @@ void MDL_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice);
 
 void Delayed_EERIEDRAWPRIM(EERIEPOLY * ep);
 void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice);
+
+HRESULT EERIEDRAWPRIMGL(GLenum type,
+	TextureContainer* tex,
+	DWORD dwVertexTypeDesc,
+	LPVOID lpvVertices,
+	DWORD dwVertexCount,
+	DWORD dwFlags,
+	long flags,
+	EERIE_3DOBJ* eobj,
+	INTERACTIVE_OBJ* io
+);
 
 HRESULT EERIEDRAWPRIM(LPDIRECT3DDEVICE7 pd3dDevice,
                       D3DPRIMITIVETYPE dptPrimitiveType,
@@ -104,6 +116,10 @@ void SETTEXTURE0(LPDIRECT3DDEVICE7 pd3dDevice, IDirectDrawSurface7 * tex);
 
 __forceinline void SETTC(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc)
 {
+#ifdef ARX_OPENGL
+	return;
+#endif
+
 	if ( (!tc) || (!tc->m_pddsSurface) )
 	{
 		pd3dDevice->SetTexture( 0, NULL );

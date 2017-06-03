@@ -989,6 +989,8 @@ void * temp;
 /*-------------------------------------------------------------*/
 BOOL DXI_KeyPressed(int id,int dikkey)
 {
+	return FALSE;
+
 	if(DI_KeyBoardBuffer[id]->bufferstate[dikkey]&0x80) return TRUE;
 	return FALSE;
 }
@@ -1001,6 +1003,8 @@ BOOL DXI_OldKeyPressed(int id,int dikkey)
 /*-------------------------------------------------------------*/
 int DXI_GetKeyIDPressed(int id)
 {
+	return -1;
+
 int		nb;
 char	*buf;
 
@@ -1022,6 +1026,8 @@ void DXI_ClearKeys(int id)
 /*-------------------------------------------------------------*/
 BOOL DXI_GetAxeMouseXY(int id,int *mx,int *my)
 {
+	return FALSE;
+
 DIDEVICEOBJECTDATA	*od;
 int					nb,flg=0;
 
@@ -1051,6 +1057,8 @@ int					nb,flg=0;
 /*-------------------------------------------------------------*/
 BOOL DXI_GetAxeMouseXYZ(int id,int *mx,int *my,int *mz)
 {
+	return FALSE;
+
 DIDEVICEOBJECTDATA	*od;
 int					nb,flg=0;
 
@@ -1087,6 +1095,8 @@ int					nb,flg=0;
 /*-------------------------------------------------------------*/
 BOOL DXI_MouseButtonImage(int id,int numb)
 {
+	return FALSE;
+
 DIDEVICEOBJECTDATA	*od;
 int					state,nb;
 static FILE *fTemp=NULL;
@@ -1158,6 +1168,8 @@ static FILE *fTemp=NULL;
 /*-------------------------------------------------------------*/
 void DXI_MouseButtonCountClick(int id,int numb,int *_iNumClick,int *_iNumUnClick)
 {
+	return;
+
 DIDEVICEOBJECTDATA	*od;
 int					state,nb;
 
@@ -1295,6 +1307,8 @@ int					state,nb;
 /*-------------------------------------------------------------*/
 BOOL DXI_MouseButtonPressed(int id,int numb,int *_iDeltaTime)
 {
+	return FALSE;
+
 DIDEVICEOBJECTDATA	*od;
 int					state,iTime1,iTime2,nb;
 BOOL				bResult;
@@ -1422,6 +1436,8 @@ BOOL				bResult;
 /*-------------------------------------------------------------*/
 BOOL DXI_MouseButtonUnPressed(int id,int numb)
 {
+	return FALSE;
+
 DIDEVICEOBJECTDATA	*od;
 int					state,nb;
 
@@ -1724,6 +1740,8 @@ int					nb;
 /*-------------------------------------------------------------*/
 int DXI_GetIDButtonPressed(int id)
 {
+	return -1;
+
 DIDEVICEOBJECTDATA	*od;
 int					nb;
 
