@@ -305,9 +305,7 @@ void PopOneTriangleListClipp(D3DTLVERTEX *_pVertex,int *_piNbVertex)
 		
 		pDynamicVertexBufferTransform->UnLock();
 
-#ifdef ARX_OPENGL
-		EERIEDRAWPRIMGL(GL_TRIANGLES, 0, pDynamicVertexBufferTransform->pVertexBuffer, iOldNbVertex, 0, 0);
-#else
+#ifndef ARX_OPENGL
 		GDevice->DrawPrimitiveVB(	D3DPT_TRIANGLELIST,
 									pDynamicVertexBufferTransform->pVertexBuffer,
 									iOldNbVertex,

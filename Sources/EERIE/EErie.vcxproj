@@ -222,6 +222,7 @@
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BrowseInformation>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="EERIERenderer.cpp" />
     <ClCompile Include="EERIETexture.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EnableFastChecks</BasicRuntimeChecks>
@@ -261,6 +262,7 @@
     <ClInclude Include="..\Include\EERIEPhysicsBox.h" />
     <ClInclude Include="..\Include\EERIEPoly.h" />
     <ClInclude Include="..\Include\EERIEProgressive.h" />
+    <ClInclude Include="..\Include\EERIERenderer.h" />
     <ClInclude Include="..\Include\EERIEres.h" />
     <ClInclude Include="..\Include\EERIETexture.h" />
     <ClInclude Include="..\Include\EERIETypes.h" />

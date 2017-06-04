@@ -31,6 +31,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEDraw.h"
 #include "EERIEMath.h"
 #include "EERIETexture.h"
+#include "EERIERenderer.h"
 
 //-----------------------------------------------------------------------------
 extern float	PROGRESS_BAR_TOTAL;
@@ -75,24 +76,25 @@ void ARX_INTERFACE_KillARKANE()
 void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool _bRatio = true, float _fFade = 1.f)
 {
 #ifdef ARX_OPENGL
-	if(_bRatio)
+	if (_bRatio)
 	{
-		EERIEDrawBitmapGL(
-			(DANAESIZX / 2.f) - ((tc->m_dwWidth*Xratio) /2.f),
-			(DANAESIZY / 2.f) - ((tc->m_dwHeight*Yratio) /2.f),
+		g_pRenderApp->renderer->DrawBitmap(
+			(DANAESIZX / 2.f) - ((tc->m_dwWidth*Xratio) / 2.f),
+			(DANAESIZY / 2.f) - ((tc->m_dwHeight*Yratio) / 2.f),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth * Xratio)),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight * Yratio)),
 			0.001f, tc);
 	}
 	else
 	{
-		EERIEDrawBitmapGL(
+		g_pRenderApp->renderer->DrawBitmap(
 			(DANAESIZX / 2) - (tc->m_dwWidth * 0.5f),
 			(DANAESIZY / 2) - (tc->m_dwHeight * 0.5f),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth)),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight)),
 			0.001f, tc);
 	}
+
 #else
 	DANAESIZX = danaeApp.m_pFramework->m_dwRenderWidth;
 	DANAESIZY = danaeApp.m_pFramework->m_dwRenderHeight;
@@ -360,7 +362,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 					px2 = (ratio * pbar->m_dwWidth) * Xratio;
 					py2 = pbar->m_dwHeight * Yratio;
 #ifdef ARX_OPENGL
-					EERIEDrawBitmapGL(px, py, px2, py2, 0.f, pbar);
+					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar);
 #else
 					EERIEDrawBitmap_uv(GDevice, px, py, px2, py2, 0.f, pbar, D3DRGB(fFadeColor, fFadeColor, fFadeColor), pbar->m_hdx, pbar->m_hdy, ratio, 1.f);
 #endif
@@ -379,7 +381,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 					px2 = (ratio * pbar->m_dwWidth) * Xratio;
 					py2 = pbar->m_dwHeight * Yratio;
 #ifdef ARX_OPENGL
-					EERIEDrawBitmapGL(px, py, px2, py2, 0.f, pbar);
+					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar);
 #else
 					EERIEDrawBitmap_uv(GDevice, px, py, px2, py2, 0.f, pbar, D3DRGB(fFadeColor, fFadeColor, fFadeColor), pbar->m_hdx, pbar->m_hdy, ratio, 1);
 #endif

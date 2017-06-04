@@ -37,7 +37,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #if CEDRIC
 extern	void	Cedric_AnimateDrawEntityGL(EERIE_3DOBJ * eobj,
 	ANIM_USE * animuse, EERIE_3D * angle, EERIE_3D * pos,
-	INTERACTIVE_OBJ * io, D3DCOLOR col, long typ);
+	INTERACTIVE_OBJ * io, long typ);
 extern	void	Cedric_AnimateDrawEntity(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj,
         ANIM_USE * animuse, EERIE_3D * angle, EERIE_3D * pos,
         INTERACTIVE_OBJ * io, D3DCOLOR col, long typ);

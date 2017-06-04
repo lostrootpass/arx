@@ -79,6 +79,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEPhysicsBox.h>
 #include <EERIEObject.h>
 #include <EERIEPoly.h>
+#include <EERIERenderer.h>
 #include "EERIELinkedObj.h"
 
 #include <ARX_C_Cinematique.h>
@@ -8071,11 +8072,11 @@ HRESULT DANAEGL::Render()
 				float iCalc = step*speedfactor;
 				ARX_CHECK_ULONG(iCalc);
 
-				EERIEDrawAnimQuatGL(inter.iobj[0]->obj,
+				g_pRenderApp->renderer->DrawAnimQuat(inter.iobj[0]->obj,
 					&inter.iobj[0]->animlayer[0],
 					&inter.iobj[0]->angle, &inter.iobj[0]->pos,
 					ARX_CLEAN_WARN_CAST_ULONG(iCalc),
-					inter.iobj[0], 0, 4);
+					inter.iobj[0], 4);
 
 				if((player.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
 					ManageCombatModeAnimations();
@@ -8103,13 +8104,13 @@ HRESULT DANAEGL::Render()
 
 			if(inter.iobj[0]->ioflags & IO_FREEZESCRIPT) val = 0;
 
-			EERIEDrawAnimQuatGL(inter.iobj[0]->obj,
+			g_pRenderApp->renderer->DrawAnimQuat(inter.iobj[0]->obj,
 				&inter.iobj[0]->animlayer[0],
 				&inter.iobj[0]->angle,
 				&inter.iobj[0]->pos,
 				ARX_CLEAN_WARN_CAST_ULONG(val),
 				inter.iobj[0],
-				0, 4);
+				4);
 
 
 			if((player.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
@@ -8317,9 +8318,9 @@ HRESULT DANAEGL::Render()
 
 		if(inter.iobj[0]->invisibility>0.9f) inter.iobj[0]->invisibility = 0.9f;
 
-		EERIEDrawAnimQuatGL(inter.iobj[0]->obj,
+		g_pRenderApp->renderer->DrawAnimQuat(inter.iobj[0]->obj,
 			&inter.iobj[0]->animlayer[0],
-			&inter.iobj[0]->angle, &inter.iobj[0]->pos, 0, inter.iobj[0], 0, 8);
+			&inter.iobj[0]->angle, &inter.iobj[0]->pos, 0, inter.iobj[0], 8);
 		ACTIVECAM->use_focal = restore;
 		FORCE_FRONT_DRAW = 0;
 	}

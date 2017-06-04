@@ -658,63 +658,6 @@ suite:
 INTERACTIVE_OBJ * DESTROYED_DURING_RENDERING=NULL;							
 extern long USE_CEDRIC_ANIM;
 
-void EERIEDrawAnimQuatGL(EERIE_3DOBJ * eobj,
-	ANIM_USE * eanim,
-	EERIE_3D * angle,
-	EERIE_3D  * pos,
-	unsigned long time,
-	INTERACTIVE_OBJ * io,
-	D3DCOLOR col,
-	long typ
-)
-{
-	if((io)
-		&& (io != inter.iobj[0]))
-	{
-		float speedfactor = io->basespeed + io->speed_modif;
-
-		if(speedfactor < 0) speedfactor = 0;
-
-		float tim = (float)time*(speedfactor);
-
-		if(tim <= 0.f) time = 0;
-		else time = (unsigned long)tim;
-
-		io->frameloss += tim - time;
-
-		if(io->frameloss>1.f) // recover lost time...
-		{
-			long tt;
-			F2L(io->frameloss, &tt);
-			io->frameloss -= tt;
-			time += tt;
-		}
-	}
-
-	if(time <= 0) goto suite;
-
-	if(time>200) time = 200; // TO REMOVE !!!!!!!!!
-
-	PrepareAnim(eobj, eanim, time, io);
-
-	if(io)
-		for(long count = 1; count<MAX_ANIM_LAYERS; count++)
-		{
-			ANIM_USE * animuse = &io->animlayer[count];
-
-			if(animuse->cur_anim)
-				PrepareAnim(eobj, animuse, time, io);
-		}
-
-suite:
-	;
-
-	DESTROYED_DURING_RENDERING = NULL;
-
-	if(USE_CEDRIC_ANIM)
-		Cedric_AnimateDrawEntityGL(eobj, eanim, angle, pos, io, col, typ);
-}
-
 //-----------------------------------------------------------------------------
 void EERIEDrawAnimQuat(		LPDIRECT3DDEVICE7 pd3dDevice,
 							EERIE_3DOBJ * eobj,

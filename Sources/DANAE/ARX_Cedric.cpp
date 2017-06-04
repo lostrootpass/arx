@@ -31,8 +31,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIELight.h"
 #include "EERIEPoly.h"
 #include "EERIEDraw.h"
-#include "EERIE_GL.h"
-#include "EERIE_GLshaders.h"
+#include "EERIERenderer.h"
 #include <Arx_Sound.h>
 #include <Arx_Scene.h>
 #include <Arx_Equipment.h>
@@ -3303,7 +3302,6 @@ void	Cedric_AnimateDrawEntityGL(EERIE_3DOBJ * eobj,
 	EERIE_3D * angle,
 	EERIE_3D * pos,
 	INTERACTIVE_OBJ * io,
-	D3DCOLOR col,
 	long typ)
 {
 	float 				invisibility;
@@ -3339,7 +3337,7 @@ void	Cedric_AnimateDrawEntityGL(EERIE_3DOBJ * eobj,
 	Cedric_AnimCalcTranslation(io, animuse, scale, typ, ftr, ftr2);
 
 	//////TEST TEST TEST
-	EERIEDRAWPRIMGL(GL_TRIANGLES, eobj->texturecontainer[eobj->facelist[0].texid], eobj->vertexlist, eobj->nbvertex, eobj, io);
+	g_pRenderApp->renderer->DrawPrim(eobj->texturecontainer[eobj->facelist[0].texid], eobj->vertexlist, eobj->nbvertex, eobj, io);
 	//return;
 	//////
 

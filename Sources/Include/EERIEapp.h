@@ -259,6 +259,8 @@ extern long EERIEMouseXdep, EERIEMouseYdep, EERIEMouseX, EERIEMouseY, EERIEWheel
 extern long EERIEMouseButton, EERIEMouseGrab;
 extern HWND MSGhwnd;
 
+class EERIERenderer;
+
 
 //-----------------------------------------------------------------------------
 // Name: class CRenderApplication
@@ -312,6 +314,8 @@ public:
 	long					CreationFlags;
 	long					CreationMenu;
 	EERIETOOLBAR*			ToolBar;
+
+	EERIERenderer*			renderer;
 
 protected:
 	// Overridable variables for the app

@@ -89,6 +89,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEClothes.h"
 #include "EERIEDRAW.h"
 #include "EERIEMeshTweak.h"
+#include "EERIERenderer.h"
 
 #include <stdlib.h>
 #define _CRTDBG_MAP_ALLOC
@@ -4834,7 +4835,7 @@ void RenderInterGL(float from, float to, long flags)
 					flgs = 4;
 				else flgs = 0;
 
-				EERIEDrawAnimQuatGL(io->obj,
+				g_pRenderApp->renderer->DrawAnimQuat(io->obj,
 					&io->animlayer[0],
 					&temp, &pos, diff, io, flgs);
 				LOOK_AT_TARGET = 0;

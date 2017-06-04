@@ -63,6 +63,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEUtil.h"
 #include "EERIE_GL.h"
 #include "EERIEMath.h"
+#include "EERIERenderer.h"
 
 #include "arx_menu.h"
 #include "../danae/arx_menu2.h"
@@ -204,6 +205,8 @@ INT	 COpenGLApplication::Run()
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
 
+	renderer = new EERIERendererGL();
+
 	BeforeRun();
 
 	while(bRunning)
@@ -232,6 +235,8 @@ INT	 COpenGLApplication::Run()
 
 		SDL_Delay(1000 / 60);
 	}
+
+	delete renderer;
 
 	SDL_GL_DeleteContext(_glContext);
 	SDL_DestroyWindow(_window);

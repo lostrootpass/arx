@@ -68,14 +68,6 @@ void MDL_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice);
 void Delayed_EERIEDRAWPRIM(EERIEPOLY * ep);
 void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice);
 
-HRESULT EERIEDRAWPRIMGL(GLenum type,
-	TextureContainer* tex,
-	LPVOID lpvVertices,
-	DWORD dwVertexCount,
-	EERIE_3DOBJ* eobj,
-	INTERACTIVE_OBJ* io
-);
-
 HRESULT EERIEDRAWPRIM(LPDIRECT3DDEVICE7 pd3dDevice,
                       D3DPRIMITIVETYPE dptPrimitiveType,
                       DWORD  dwVertexTypeDesc,
@@ -160,8 +152,6 @@ void EERIEDrawBitmapUVs(LPDIRECT3DDEVICE7 pd3dDevice, float x, float y, float sx
                         , float u2, float v2
                         , float u3, float v3
                        );
-
-void EERIEDrawBitmapGL(float x, float y, float sx, float sy, float z, TextureContainer * tex);
 
 void SET_FORCE_NO_VB( const bool& _NoVB );
 bool GET_FORCE_NO_VB( );
