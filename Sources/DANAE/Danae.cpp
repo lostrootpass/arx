@@ -8003,8 +8003,7 @@ HRESULT DANAEGL::Render()
 		if(DANAE_Manage_Cinematic() == 1)
 			return DANAE_NoRenderEnd();
 
-		//goto renderend;
-		return S_OK;
+		goto renderend;
 	}
 
 	BENCH_STARTUP = EndBench();

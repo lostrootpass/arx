@@ -475,11 +475,8 @@ bool GET_FORCE_NO_VB( void )
 //------------------------------------------------------------------------------
 HRESULT EERIEDRAWPRIMGL(GLenum type,
 	TextureContainer* tex,
-	DWORD dwVertexTypeDesc,
 	LPVOID lpvVertices,
 	DWORD dwVertexCount,
-	DWORD dwFlags,
-	long flags,
 	EERIE_3DOBJ* eobj,
 	INTERACTIVE_OBJ* io
 )
@@ -529,7 +526,11 @@ HRESULT EERIEDRAWPRIMGL(GLenum type,
 
 	if (io)
 	{
-		glm::mat4 modelMatrix = glm::translate(glm::mat4(), glm::vec3(io->pos.x, io->pos.y, io->pos.z));
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(), glm::vec3(io->pos.x, -io->pos.y, io->pos.z));
+		modelMatrix = glm::rotate(modelMatrix, io->angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, io->angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, io->angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
+		
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	}
 
@@ -565,18 +566,10 @@ HRESULT EERIEDRAWPRIMGL(GLenum type,
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-
-		//Here for testing purposes -- always look directly at the thing we're rendering.
-		glm::vec3 eye(eobj->pos.x, eobj->pos.y, eobj->pos.z - 300.0f);
-		glm::vec3 target(eobj->pos.x, eobj->pos.y - 100, eobj->pos.z);
-		glm::vec3 up(0.0f, -1.0f, 0.0f);
-		glm::mat4 view = glm::lookAt(eye, target, up);
-		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_DYNAMIC_DRAW);
 
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(type, indices.size(), GL_UNSIGNED_INT, 0);
 	}
 	else
 	{

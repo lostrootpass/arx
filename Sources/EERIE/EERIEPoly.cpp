@@ -83,6 +83,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 
 void ComputeFastBkgData(EERIE_BACKGROUND * eb);
@@ -233,21 +235,8 @@ void EERIE_CreateMatriceProj(float _fWidth, float _fHeight, float _fFOV, float _
 	GLuint program = EERIEGetGLProgramID("poly");
 	glUseProgram(program);
 
-	glm::mat4 worldView;
-	memcpy(&worldView, &matView._11, sizeof(glm::mat4)); //urgh
-
-	//glm::vec3 eye(ACTIVECAM->pos.x, -ACTIVECAM->pos.y, ACTIVECAM->pos.z);
-	//glm::vec3 targetLookAt(target.x, target.y, target.z);
-	//glm::vec3 up(0.0f, 1.0f, 0.0f);
-	//glm::mat4 view = glm::lookAt(eye, targetLookAt, up);
-	//glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
-
-	glm::mat4 proj = glm::mat4();
-	//memcpy(&proj, &ProjectionMatrix._11, sizeof(glm::mat4)); //it isn't any less ugly the second time.
-	proj = glm::perspectiveFov(_fFOV, _fWidth, _fHeight, fNearPlane, fFarPlane);
-
-	//glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &worldView[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &matView.m[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &ProjectionMatrix.m[0][0]);
 #endif
 
 	ProjectionMatrix._11 *= _fWidth * .5f;

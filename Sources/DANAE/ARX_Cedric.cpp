@@ -3312,13 +3312,6 @@ void	Cedric_AnimateDrawEntityGL(EERIE_3DOBJ * eobj,
 	EERIE_3D			ftr, ftr2;
 	EERIE_C_DATA	*	obj;
 
-
-	//////TEST TEST TEST
-	EERIEDRAWPRIMGL(GL_TRIANGLES, eobj->texturecontainer[eobj->facelist[0].texid], 0, eobj->vertexlist, eobj->nbvertex, 0, 0, eobj, io);
-	return;
-	//////
-
-
 	// Init some data
 	Cedric_ResetBoundingBox(io);
 
@@ -3344,6 +3337,11 @@ void	Cedric_AnimateDrawEntityGL(EERIE_3DOBJ * eobj,
 
 
 	Cedric_AnimCalcTranslation(io, animuse, scale, typ, ftr, ftr2);
+
+	//////TEST TEST TEST
+	EERIEDRAWPRIMGL(GL_TRIANGLES, eobj->texturecontainer[eobj->facelist[0].texid], eobj->vertexlist, eobj->nbvertex, eobj, io);
+	//return;
+	//////
 
 	if(Cedric_IO_Visible(io, typ))
 	{

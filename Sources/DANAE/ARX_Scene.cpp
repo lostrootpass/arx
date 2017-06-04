@@ -306,7 +306,7 @@ void PopOneTriangleListClipp(D3DTLVERTEX *_pVertex,int *_piNbVertex)
 		pDynamicVertexBufferTransform->UnLock();
 
 #ifdef ARX_OPENGL
-		EERIEDRAWPRIMGL(GL_TRIANGLES, 0, 0, pDynamicVertexBufferTransform->pVertexBuffer, iOldNbVertex, 0, 0, 0, 0);
+		EERIEDRAWPRIMGL(GL_TRIANGLES, 0, pDynamicVertexBufferTransform->pVertexBuffer, iOldNbVertex, 0, 0);
 #else
 		GDevice->DrawPrimitiveVB(	D3DPT_TRIANGLELIST,
 									pDynamicVertexBufferTransform->pVertexBuffer,
@@ -2790,6 +2790,7 @@ SMY_D3DVERTEX *pMyVertex;
 	{
 		bool bNoModulate2X=(pMenuConfig && pMenuConfig->bForceMetalTwoPass);
 
+#ifndef ARX_OPENGL
 		if(!portals->room[room_num].pVertexBuffer)
 		{
 			char tTxt[256];
@@ -2808,6 +2809,7 @@ SMY_D3DVERTEX *pMyVertex;
 			ARX_LOG_ERROR("ARX_PORTALS_Frustrum_RenderRoomTCullSoft Render Error : Cannot Lock Buffer.");
 			return;
 		}
+#endif
 		
 		unsigned short *pIndices=portals->room[room_num].pussIndice;
 
@@ -3152,7 +3154,9 @@ SMY_D3DVERTEX *pMyVertex;
 			}
 		}
 
+#ifndef ARX_OPENGL
 		portals->room[room_num].pVertexBuffer->Unlock();
+#endif
 	
 		//render opaque
 		SETCULL(GDevice,D3DCULL_NONE);
@@ -3563,8 +3567,10 @@ SMY_D3DVERTEX *pMyVertex;
 			vPolyVoodooMetal.clear();
 		}
 
+#ifndef ARX_OPENGL
 		GDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,TRUE);
 		GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,FALSE);
+#endif
 	}
 }
 
@@ -4264,10 +4270,6 @@ long MAX_FRAME_COUNT=0;
 ///////////////////////////////////////////////////////////
 void ARX_SCENE_Render(LPDIRECT3DDEVICE7 pd3dDevice, long flag, long param) 
 {
-#ifdef ARX_OPENGL
-	//disable until ComputePortalVertexBuffer() works
-	return;
-#endif
 
 	FrameCount++;
 
@@ -4762,7 +4764,12 @@ else
 		ARX_THROWN_OBJECT_Manage(ARX_CLEAN_WARN_CAST_ULONG(FrameDiff));
 		
 		VF_CLIP_IO=1;
+
+#ifdef ARX_OPENGL
+		RenderInterGL(0.f, 3200.0f, 0);
+#else
 		RenderInter(pd3dDevice, 0.f, 3200.f);
+#endif
 		
 		VF_CLIP_IO=0;
 		

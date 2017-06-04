@@ -1017,7 +1017,7 @@ void PopOneTriangleList(TextureContainer *_pTex,bool _bUpdate)
 
 	if (_pTex->ulNbVertexListCull)
 	{
-		EERIEDRAWPRIMGL(GL_TRIANGLES, _pTex, 0, _pTex->pVertexListCull, _pTex->ulNbVertexListCull, 0, 0, 0, 0);
+		//EERIEDRAWPRIMGL(GL_TRIANGLES, _pTex, _pTex->pVertexListCull, _pTex->ulNbVertexListCull, 0, 0);
 
 		if (_bUpdate) _pTex->ulNbVertexListCull = 0;
 	}

@@ -70,11 +70,8 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice);
 
 HRESULT EERIEDRAWPRIMGL(GLenum type,
 	TextureContainer* tex,
-	DWORD dwVertexTypeDesc,
 	LPVOID lpvVertices,
 	DWORD dwVertexCount,
-	DWORD dwFlags,
-	long flags,
 	EERIE_3DOBJ* eobj,
 	INTERACTIVE_OBJ* io
 );
