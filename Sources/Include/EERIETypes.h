@@ -583,6 +583,11 @@ typedef struct
 	long				nbaction;
 	long				nbselections;
 	unsigned long		drawflags;
+
+	unsigned int glVtxBuffer;
+	unsigned int glIdxBuffer;
+	unsigned int glUvBuffer;
+
 	EERIE_3DPAD 	*	vertexlocal;
 	EERIE_VERTEX 	*	vertexlist;
 	EERIE_VERTEX 	*	vertexlist3;

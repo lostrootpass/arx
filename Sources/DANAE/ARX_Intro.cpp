@@ -361,11 +361,9 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 					py = ipy * Yratio;
 					px2 = (ratio * pbar->m_dwWidth) * Xratio;
 					py2 = pbar->m_dwHeight * Yratio;
-#ifdef ARX_OPENGL
+
 					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar);
-#else
-					EERIEDrawBitmap_uv(GDevice, px, py, px2, py2, 0.f, pbar, D3DRGB(fFadeColor, fFadeColor, fFadeColor), pbar->m_hdx, pbar->m_hdy, ratio, 1.f);
-#endif
+
 				}
 				else
 				{
@@ -380,11 +378,8 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 					py = ipy * Yratio;
 					px2 = (ratio * pbar->m_dwWidth) * Xratio;
 					py2 = pbar->m_dwHeight * Yratio;
-#ifdef ARX_OPENGL
+
 					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar);
-#else
-					EERIEDrawBitmap_uv(GDevice, px, py, px2, py2, 0.f, pbar, D3DRGB(fFadeColor, fFadeColor, fFadeColor), pbar->m_hdx, pbar->m_hdy, ratio, 1);
-#endif
 				}
 
 			}

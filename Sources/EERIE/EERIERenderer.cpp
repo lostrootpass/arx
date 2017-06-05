@@ -161,40 +161,28 @@ void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, 
 
 void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
-	static GLuint vertexbuffer = -1;
-	static GLuint uvbuffer = -1;
-	static GLuint idxbuffer = -1;
-
 	GLenum type = GL_TRIANGLES;
 
-	if (vertexbuffer == -1)
+	//TODO: update vertex buffers for animations
+	if (eobj->glVtxBuffer == 0)
 	{
 		//LEAK
-		glGenBuffers(1, &vertexbuffer);
-		glGenBuffers(1, &uvbuffer);
-		glGenBuffers(1, &idxbuffer);
+		glGenBuffers(1, &eobj->glVtxBuffer);
+		std::vector<GLfloat> vtx;
+
+		//HACK. Can be sped up.
+		EERIE_VERTEX* vtxArray = static_cast<EERIE_VERTEX*>(lpvVertices);
+
+		for (DWORD i = 0; i < dwVertexCount; ++i)
+		{
+			vtx.push_back(vtxArray[i].v.x);
+			vtx.push_back(vtxArray[i].v.y);
+			vtx.push_back(vtxArray[i].v.z);
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
 	}
-
-	//TODO: hack
-	std::vector<GLfloat> vtx;
-	std::vector<GLfloat> uv;
-	uv.resize(dwVertexCount * 2);
-
-	EERIE_VERTEX* vtxArray = static_cast<EERIE_VERTEX*>(lpvVertices);
-
-	for (DWORD i = 0; i < dwVertexCount; ++i)
-	{
-		vtx.push_back(vtxArray[i].v.x);
-		vtx.push_back(vtxArray[i].v.y);
-		vtx.push_back(vtxArray[i].v.z);
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	GLuint program = EERIEGetGLProgramID("poly");
 
@@ -216,10 +204,27 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	}
 
-	if (eobj)
-	{
-		std::vector<GLuint> indices;
+	std::vector<GLuint> indices;
+	std::vector<GLfloat> uv;
 
+	const bool genUVs = (eobj->glUvBuffer == 0);
+	const bool genIdx = (eobj->glIdxBuffer == 0);
+
+	
+	if (eobj->glUvBuffer == 0)
+	{
+		glGenBuffers(1, &eobj->glUvBuffer);
+
+		uv.resize(dwVertexCount * 2);
+	}
+
+	if (eobj->glIdxBuffer == 0)
+	{
+		glGenBuffers(1, &eobj->glIdxBuffer);
+	}
+
+	if (genUVs || genIdx)
+	{
 		for (long i = 0; i < eobj->nbfaces; ++i)
 		{
 			unsigned short v1, v2, v3;
@@ -228,35 +233,52 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 			v2 = face.vid[1];
 			v3 = face.vid[2];
 
-			indices.push_back(v1);
-			indices.push_back(v2);
-			indices.push_back(v3);
+			if (genIdx)
+			{
+				indices.push_back(v1);
+				indices.push_back(v2);
+				indices.push_back(v3);
+			}
 
-			uv[v1 * 2] = face.u[0];
-			uv[v2 * 2] = face.u[1];
-			uv[v3 * 2] = face.u[2];
 
-			uv[v1 * 2 + 1] = face.v[0];
-			uv[v2 * 2 + 1] = face.v[1];
-			uv[v3 * 2 + 1] = face.v[2];
+			if (genUVs)
+			{
+				uv[v1 * 2] = face.u[0];
+				uv[v2 * 2] = face.u[1];
+				uv[v3 * 2] = face.u[2];
+
+				uv[v1 * 2 + 1] = face.v[0];
+				uv[v2 * 2 + 1] = face.v[1];
+				uv[v3 * 2 + 1] = face.v[2];
+			}
 		}
 
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(uv[0]) * uv.size(), uv.data(), GL_DYNAMIC_DRAW);
+		if (genUVs)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, eobj->glUvBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(uv[0]) * uv.size(), uv.data(), GL_STATIC_DRAW);
+		}
 
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxbuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_DYNAMIC_DRAW);
-
-		glDrawElements(type, indices.size(), GL_UNSIGNED_INT, 0);
+		if (genIdx)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_STATIC_DRAW);
+		}
 	}
-	else
-	{
-		glDrawArrays(type, 0, dwVertexCount);
-	}
+
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, eobj->glUvBuffer);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
+
+	glDrawElements(type, eobj->nbfaces * 3, GL_UNSIGNED_INT, 0);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
