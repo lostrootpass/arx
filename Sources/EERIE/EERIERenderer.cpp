@@ -24,7 +24,7 @@ void EERIERenderer::DrawBitmap(float x, float y, float sx, float sy, float z, Te
 
 }
 
-void EERIERenderer::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
+void EERIERenderer::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 
 }
@@ -159,7 +159,7 @@ void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, 
 	glDisableVertexAttribArray(1);
 }
 
-void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
+void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 	GLenum type = GL_TRIANGLES;
 
@@ -335,7 +335,7 @@ void EERIERendererD3D7::DrawBitmap(float x, float y, float sx, float sy, float z
 
 }
 
-void EERIERendererD3D7::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
+void EERIERendererD3D7::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 
 }

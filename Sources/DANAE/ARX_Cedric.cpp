@@ -3337,7 +3337,7 @@ void	Cedric_AnimateDrawEntityGL(EERIE_3DOBJ * eobj,
 	Cedric_AnimCalcTranslation(io, animuse, scale, typ, ftr, ftr2);
 
 	//////TEST TEST TEST
-	g_pRenderApp->renderer->DrawPrim(eobj->texturecontainer[eobj->facelist[0].texid], eobj->vertexlist, eobj->nbvertex, eobj, io);
+	g_pRenderApp->renderer->DrawPrim(eobj->vertexlist, eobj->nbvertex, eobj, io);
 	//return;
 	//////
 
