@@ -167,7 +167,9 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 	if (eobj->glVtxBuffer == 0)
 	{
 		//LEAK
-		glGenBuffers(1, &eobj->glVtxBuffer);
+		if(eobj->glVtxBuffer == 0)
+			glGenBuffers(1, &eobj->glVtxBuffer);
+
 		std::vector<GLfloat> vtx;
 
 		//HACK. Can be sped up.
@@ -186,14 +188,6 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 
 	GLuint program = EERIEGetGLProgramID("poly");
 
-	if (tex)
-	{
-		GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex->textureID);
-		glUniform1i(uniformLocation, 0);
-	}
-
 	if (io)
 	{
 		glm::mat4 modelMatrix = glm::translate(glm::mat4(), glm::vec3(io->pos.x, -io->pos.y, io->pos.z));
@@ -206,6 +200,10 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 
 	std::vector<GLuint> indices;
 	std::vector<GLfloat> uv;
+	std::vector<GLint> vtxTexIds;
+	vtxTexIds.resize(dwVertexCount);
+
+	std::unordered_map<short, short>& texMapBindings = _texMapBindings[eobj];
 
 	const bool genUVs = (eobj->glUvBuffer == 0);
 	const bool genIdx = (eobj->glIdxBuffer == 0);
@@ -225,6 +223,9 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 
 	if (genUVs || genIdx)
 	{
+		
+		short binding = 0;
+
 		for (long i = 0; i < eobj->nbfaces; ++i)
 		{
 			unsigned short v1, v2, v3;
@@ -251,6 +252,15 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 				uv[v2 * 2 + 1] = face.v[1];
 				uv[v3 * 2 + 1] = face.v[2];
 			}
+
+			if (face.texid != -1 && texMapBindings.find(face.texid) == texMapBindings.end())
+			{
+				texMapBindings[face.texid] = binding;
+				binding++;
+			}
+
+			short b = (face.texid == -1) ? -1 : texMapBindings[face.texid];
+			vtxTexIds[v1] = vtxTexIds[v2] = vtxTexIds[v3] = b;
 		}
 
 		if (genUVs)
@@ -264,17 +274,41 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_STATIC_DRAW);
 		}
+
+		if (eobj->glTexIdBuffer == 0)
+		{
+			glGenBuffers(1, &eobj->glTexIdBuffer);
+
+			glBindBuffer(GL_ARRAY_BUFFER, eobj->glTexIdBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vtxTexIds[0]) * vtxTexIds.size(), vtxTexIds.data(), GL_STATIC_DRAW);
+		}
 	}
 
+	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+	for (auto& pair : texMapBindings)
+	{
+		if (pair.first == -1) continue;
+
+		char buf[32] = { '\0' };
+		snprintf(buf, 32, "texsampler[%d]", pair.second);
+
+		GLuint uniformLocation = glGetUniformLocation(program, buf);
+		glActiveTexture(GL_TEXTURE0 + pair.second);
+		glBindTexture(GL_TEXTURE_2D, eobj->texturecontainer[pair.first]->textureID);
+		glUniform1i(uniformLocation, 0 + pair.second);
+	}
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, eobj->glUvBuffer);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, eobj->glTexIdBuffer);
+	glVertexAttribIPointer(2, 1, GL_INT, 0, 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
 
@@ -282,6 +316,7 @@ void EERIERendererGL::DrawPrim(TextureContainer* tex, LPVOID lpvVertices, DWORD 
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 }
 
 

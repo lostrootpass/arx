@@ -587,6 +587,7 @@ typedef struct
 	unsigned int glVtxBuffer;
 	unsigned int glIdxBuffer;
 	unsigned int glUvBuffer;
+	unsigned int glTexIdBuffer;
 
 	EERIE_3DPAD 	*	vertexlocal;
 	EERIE_VERTEX 	*	vertexlist;
