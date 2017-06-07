@@ -5391,15 +5391,22 @@ long DANAE_Manage_Cinematic()
 
 	PlayTrack(ControlCinematique);
 	ControlCinematique->InitDeviceObjects();
+
+#ifndef ARX_OPENGL
 	danaeApp.m_pd3dDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
+#endif
 
 	if(ControlCinematique->Render(FrameTicks-LastFrameTicks)==E_FAIL) 
 		return 1;
 
 	//fin de l'anim
+#ifdef ARX_OPENGL
+	if(!ControlCinematique->key)
+#else
 	if ((!ControlCinematique->key)
 		|| (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
 		|| (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE)))
+#endif
 	{			
 		ControlCinematique->projectload=FALSE;
 		StopSoundKeyFramer();

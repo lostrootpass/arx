@@ -799,6 +799,12 @@ HRESULT TextureContainer::LoadImageData()
 		realName = tempstrPathname;
 	}
 
+	SetExt(tempstrPathname, ".tga");
+	if (realName == "" && PAK_FileExist(tempstrPathname))
+	{
+		realName = tempstrPathname;
+	}
+
 	if(realName == "")
 		return DDERR_UNSUPPORTED;
 

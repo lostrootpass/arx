@@ -23,9 +23,11 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 ===========================================================================
 */
 #include <stdlib.h>
+#include "ARX_Interface.h"
 #include "danae.h"
 #include "arx_c_cinematique.h"
 #include "Resource.h"
+#include "EERIERenderer.h"
 
 #include "EERIEUtil.h"
 #define _CRTDBG_MAP_ALLOC
@@ -258,7 +260,9 @@ HRESULT CINEMATIQUE::OneTimeSceneReInit()
 
 	LeftButton = RightButton = FALSE;
 
+#ifndef ARX_OPENGL
 	DeleteAllBitmap(GDevice);
+#endif
 	DeleteAllSound();
 
 	InitMapLoad(this);
@@ -320,6 +324,10 @@ HRESULT CINEMATIQUE::New()
 //*************************************************************************************
 HRESULT CINEMATIQUE::InitDeviceObjects()
 {
+#ifdef ARX_OPENGL
+	return S_OK;
+#endif
+
 	m_pd3dDevice = GDevice;
 
 	D3DMATERIAL7 mtrl;
@@ -399,6 +407,10 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 
 HRESULT CINEMATIQUE::DeleteDeviceObjects()
 {
+#ifdef ARX_OPENGL
+	return S_OK;
+#endif
+
 	m_pd3dDevice = GDevice;		
 
 	// Setup Base Material
@@ -533,6 +545,8 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 	LocalSin = (float)sin(DEG2RAD(angzgrille));
 	LocalCos = (float)cos(DEG2RAD(angzgrille));
 
+	float x0 = 0.0f, x1 = 0.0f, y0 = 0.0f, y1 = 0.0f;
+
 	if ((fx & 0x0000FF00) == FX_DREAM)
 	{
 		if (light)
@@ -551,6 +565,13 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 				d3dv->color = CalculLight(light, d3dv->sx, d3dv->sy, col);
 				d3dv->sx = ADJUSTX(d3dv->sx);
 				d3dv->sy = ADJUSTY(d3dv->sy);
+
+				if (d3dv->sx < x0) x0 = d3dv->sx;
+				if (d3dv->sx > x1) x1 = d3dv->sx;
+
+				if (d3dv->sy < y0) y0 = d3dv->sy;
+				if (d3dv->sy > y1) y1 = d3dv->sy;
+
 				v++;
 				d3dv++;
 			}
@@ -571,6 +592,13 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 				d3dv->sx = ADJUSTX(d3dv->sx);
 				d3dv->sy = ADJUSTY(d3dv->sy);
 				d3dv->color = col;
+
+				if (d3dv->sx < x0) x0 = d3dv->sx;
+				if (d3dv->sx > x1) x1 = d3dv->sx;
+
+				if (d3dv->sy < y0) y0 = d3dv->sy;
+				if (d3dv->sy > y1) y1 = d3dv->sy;
+
 				v++;
 				d3dv++;
 			}
@@ -588,6 +616,13 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 				d3dv->color = CalculLight(light, d3dv->sx, d3dv->sy, col);
 				d3dv->sx = ADJUSTX(d3dv->sx);
 				d3dv->sy = ADJUSTY(d3dv->sy);
+
+				if (d3dv->sx < x0) x0 = d3dv->sx;
+				if (d3dv->sx > x1) x1 = d3dv->sx;
+
+				if (d3dv->sy < y0) y0 = d3dv->sy;
+				if (d3dv->sy > y1) y1 = d3dv->sy;
+
 				v++;
 				d3dv++;
 			}
@@ -602,6 +637,13 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 				d3dv->sx = ADJUSTX(d3dv->sx);
 				d3dv->sy = ADJUSTY(d3dv->sy);
 				d3dv->color = col;
+
+				if (d3dv->sx < x0) x0 = d3dv->sx;
+				if (d3dv->sx > x1) x1 = d3dv->sx;
+
+				if (d3dv->sy < y0) y0 = d3dv->sy;
+				if (d3dv->sy > y1) y1 = d3dv->sy;
+
 				v++;
 				d3dv++;
 			}
@@ -611,6 +653,14 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 	C_INDEXED	* mat = grille->mats;
 	C_UV	*	uvs = grille->uvs;
 	nb = grille->nbmat;
+
+
+#ifdef ARX_OPENGL
+	//TODO: pre-calculate the bounds another way?
+	//TODO: what if we need more than one material? Does this always work?
+	g_pRenderApp->renderer->DrawBitmap(x0, y0, x1 - x0, y1 - y0, 0.0f, grille->mats[0].tex);
+	return;
+#endif
 
 	while (nb--)
 	{
@@ -670,8 +720,12 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 
 	if (projectload)
 	{
+#ifdef ARX_OPENGL
+		danaeGLApp.DANAEStartRender();
+#else
 		m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L);
 		danaeApp.DANAEStartRender();
+#endif
 		InRender = TRUE;
 
 		if (InsertKey && NbBitmap)
@@ -693,6 +747,7 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 			}
 		}
 
+#ifndef ARX_OPENGL
 		//draw
 		m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
 		m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA);
@@ -704,6 +759,7 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 		m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 		m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 		m_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+#endif
 
 		//image key
 		tb = &TabBitmap[numbitmap];

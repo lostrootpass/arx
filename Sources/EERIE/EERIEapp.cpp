@@ -145,7 +145,7 @@ char * MakeDir(char * tex, char * tex2)
 //*************************************************************************************
 COpenGLApplication::COpenGLApplication()
 {
-
+	m_bFrameMoving = TRUE;
 }
 
 // Functions to create, run, pause, and clean up the application

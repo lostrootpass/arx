@@ -4287,10 +4287,7 @@ lasuite:
 	EERIE_PORTAL_Blend_Portals_And_Rooms();
 	PROGRESS_BAR_COUNT += 1.f;
 	LoadLevelScreen();
-
-#ifndef ARX_OPENGL
 	ComputePortalVertexBuffer();
-#endif
 
 	PROGRESS_BAR_COUNT += 1.f;
 	LoadLevelScreen();
@@ -5184,6 +5181,7 @@ void ComputePortalVertexBuffer()
 			pRoom->pussIndice = (unsigned short *)malloc(2 * iNbIndiceForRoom);
 			int iFlag = D3DVBCAPS_WRITEONLY;
 
+#ifndef ARX_OPENGL
 			if (!(danaeApp.m_pDeviceInfo->ddDeviceDesc.dwDevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT))
 			{
 				iFlag |= D3DVBCAPS_SYSTEMMEMORY;
@@ -5215,10 +5213,11 @@ void ComputePortalVertexBuffer()
 				           MB_OK | MB_ICONERROR);
 				return;
 			}
-
+#endif
 
 			SMY_D3DVERTEX * pVertex;
 
+#ifndef ARX_OPENGL
 			if (FAILED(pRoom->pVertexBuffer->Lock(DDLOCK_WRITEONLY | DDLOCK_NOOVERWRITE,
 			                                      (void **)&pVertex,
 			                                      NULL)))
@@ -5234,6 +5233,7 @@ void ComputePortalVertexBuffer()
 
 				return;
 			}
+#endif
 
 			int iStartVertex = 0;
 			int iStartCull = 0;
@@ -5259,6 +5259,7 @@ void ComputePortalVertexBuffer()
 
 					if (pPoly->tex == pTextureContainer)
 					{
+#ifndef ARX_OPENGL
 						pVertex->x = pPoly->v[0].sx;
 						pVertex->y = -(pPoly->v[0].sy);
 						pVertex->z = pPoly->v[0].sz;
@@ -5282,6 +5283,7 @@ void ComputePortalVertexBuffer()
 						pVertex->tu = pPoly->v[2].tu + pTextureContainer->m_hdx;
 						pVertex->tv = pPoly->v[2].tv + pTextureContainer->m_hdy;
 						pVertex++;
+#endif
 
 						pPoly->uslInd[0] = iIndiceInVertex++;
 						pPoly->uslInd[1] = iIndiceInVertex++;
@@ -5289,6 +5291,7 @@ void ComputePortalVertexBuffer()
 
 						if (pPoly->type & POLY_QUAD)
 						{
+#ifndef ARX_OPENGL
 							pVertex->x = pPoly->v[3].sx;
 							pVertex->y = -(pPoly->v[3].sy);
 							pVertex->z = pPoly->v[3].sz;
@@ -5296,6 +5299,7 @@ void ComputePortalVertexBuffer()
 							pVertex->tu = pPoly->v[3].tu + pTextureContainer->m_hdx;
 							pVertex->tv = pPoly->v[3].tv + pTextureContainer->m_hdy;
 							pVertex++;
+#endif
 
 							pPoly->uslInd[3] = iIndiceInVertex++;
 						}
@@ -5370,6 +5374,7 @@ void ComputePortalVertexBuffer()
 				free((void *)(*it));
 			}
 
+#ifndef ARX_OPENGL
 			if (FAILED(pRoom->pVertexBuffer->Unlock()))
 			{
 				pRoom->pVertexBuffer->Release();
@@ -5381,6 +5386,7 @@ void ComputePortalVertexBuffer()
 					pRoom->pussIndice = NULL;
 				}
 			}
+#endif
 		}
 
 		vTextureVertex.clear();

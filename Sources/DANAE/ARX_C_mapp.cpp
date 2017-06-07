@@ -26,6 +26,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "resource.h"
 #include "HERMESMain.h"
 #include "HERMES_PAK.h"
+#include "ARX_Interface.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -671,6 +672,9 @@ int CreateAllMapsForBitmap(char * dir, char * name, CINEMATIQUE * c, int n, int 
 	strcpy(AllTxt, dir);
 	strcat(AllTxt, name);
 	ClearAbsDirectory(AllTxt, "arx\\");
+
+	TextureContainer* rawTex = GetTextureFile(AllTxt);
+
 	AddDirectory(AllTxt, DirectoryAbs);
 	SetExt(AllTxt, ".BMP");
 
@@ -766,7 +770,7 @@ int CreateAllMapsForBitmap(char * dir, char * name, CINEMATIQUE * c, int n, int 
 				MessageBox(NULL, AllTxt, "Erreur", 0);
 			}
 
-			TextureContainer * t = FindTexture(AllTxt);
+			TextureContainer* t = rawTex ? rawTex : FindTexture(AllTxt);
 			AddQuadUVs(&bi->grille, bi->nbx - nbxx, bi->nby - nby, 1, 1, bi->w - w, bi->h - h, w2, h2, t);
 
 			dx += (float)w2;
@@ -850,7 +854,17 @@ BOOL ReCreateAllMapsForBitmap(int id, int nmax, CINEMATIQUE * c, LPDIRECT3DDEVIC
 			sprintf(AllTxt, "%s_%4d", bi->name, num);
 			MakeUpcase(AllTxt);
 
+#ifdef ARX_OPENGL
+			char buf[260] = { '\0' };
+			strcpy(buf, bi->dir);
+			strcat(buf, bi->name);
+			ClearAbsDirectory(buf, "arx\\");
+			MakeUpcase(buf);
+
+			TextureContainer* t = GetTextureFile(buf);
+#else
 			TextureContainer * t = FindTexture(AllTxt);
+#endif
 			AddQuadUVs(&bi->grille, (bi->nbx - nbxx)*nmax, (bi->nby - nby)*nmax, nmax, nmax, bi->w - w, bi->h - h, w2, h2, t);
 
 			dx += (float)w2;

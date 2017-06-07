@@ -24,6 +24,11 @@ void EERIERenderer::DrawBitmap(float x, float y, float sx, float sy, float z, Te
 
 }
 
+void EERIERenderer::DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex)
+{
+
+}
+
 void EERIERenderer::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 
@@ -154,6 +159,70 @@ void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, 
 	glUniformMatrix4fv(projUniform, 1, GL_FALSE, &proj[0][0]);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+}
+
+void EERIERendererGL::DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex)
+{
+	D3DTLVERTEX* vertices = static_cast<D3DTLVERTEX*>(lpvVertices);
+
+	static GLuint vertexbuffer = -1;
+	static GLuint uvbuffer = -1;
+	static GLuint glIdxBuffer = -1;
+
+	if (vertexbuffer == -1)
+	{
+		//LEAK
+		glGenBuffers(1, &vertexbuffer);
+		glGenBuffers(1, &uvbuffer);
+		glGenBuffers(1, &glIdxBuffer);
+	}
+
+	std::vector<GLfloat> vertexData;
+	vertexData.resize(dwVertexCount * 3);
+	
+	std::vector<GLfloat> uvData;
+	uvData.resize(dwVertexCount * 2);
+
+	for (DWORD i = 0; i < dwVertexCount; ++i)
+	{
+		vertexData[(i * 3) + 0] = vertices[i].sx;
+		vertexData[(i * 3) + 1] = vertices[i].sy;
+		vertexData[(i * 3) + 2] = vertices[i].sz;
+
+		uvData[(i * 2) + 0] = vertices[i].tu;
+		uvData[(i * 2) + 1] = vertices[i].tv;
+	}
+
+	GLuint program = EERIEGetGLProgramID("bitmap");
+	glUseProgram(program);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData[0]) * vertexData.size(), vertexData.data(), GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uvData[0]) * uvData.size(), uvData.data(), GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	//TODO: store uniforms instead of looking up every frame
+	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex->textureID);
+	glUniform1i(uniformLocation, 0);
+
+	GLuint projUniform = glGetUniformLocation(program, "proj");
+	glm::mat4 proj = glm::ortho(0.0f, (float)DANAESIZX, (float)DANAESIZY, 0.0f, -1.0f, 1.0f);
+	glUniformMatrix4fv(projUniform, 1, GL_FALSE, &proj[0][0]);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glIdxBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * idxCount, indices, GL_DYNAMIC_DRAW);
+
+	glDrawElements(GL_TRIANGLE_STRIP, idxCount, GL_UNSIGNED_SHORT, 0);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);

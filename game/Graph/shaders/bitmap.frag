@@ -1,6 +1,7 @@
 #version 330 core
+#extension GL_ARB_separate_shader_objects : enable
 
-in vec2 uv;
+layout(location = 0) in vec2 uv;
 
 out vec3 color;
 
