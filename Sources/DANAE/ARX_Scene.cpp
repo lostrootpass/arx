@@ -74,6 +74,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEMath.h>
 #include <EERIE_GL.h>
 #include <EERIE_GLshaders.h>
+#include <EERIERenderer.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #ifndef max
@@ -1477,7 +1478,10 @@ void CreateScreenFrustrum(EERIE_FRUSTRUM * frustrum)
 	// Set the app view matrix for normal viewing
 	D3DMATRIX matView,matProj;
 	D3DUtil_SetViewMatrix(matView, vEyePt, vLookatPt, vUpVec);
-#ifndef ARX_OPENGL
+#ifdef ARX_OPENGL
+	glm::mat4 proj = g_pRenderApp->renderer->proj();
+	memcpy(&matProj, &proj, sizeof(glm::mat4));
+#else
 	GDevice->SetTransform( D3DTRANSFORMSTATE_VIEW, &matView );
 
 	GDevice->GetTransform(D3DTRANSFORMSTATE_PROJECTION,&matProj);
@@ -2960,6 +2964,7 @@ SMY_D3DVERTEX *pMyVertex;
 				}
 			}
 
+#ifndef ARX_OPENGL
 			SMY_D3DVERTEX *pMyVertexCurr;
 
 				*pIndicesCurr++=ep->uslInd[0];
@@ -3142,6 +3147,7 @@ SMY_D3DVERTEX *pMyVertex;
 					}
 				}
 			}
+#endif
 
 			if( bALLOW_BUMP )
 			{
@@ -3301,7 +3307,11 @@ SMY_D3DVERTEX *pMyVertex;
 				ppTexCurr++;
 			}//END  while ( iNbTex-- ) ----------------------------------------------------------
 		}
+#ifdef ARX_OPENGL
+		else if(0)
+#else
 		else
+#endif
 		{
 			while ( iNbTex-- ) //For each tex in portals->room[room_num]
 			{

@@ -169,13 +169,13 @@
     <ClInclude Include="..\Include\OtherLibs\zlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EERIE_GLshaders.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EERIE_GL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\EERIERenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EERIE_GL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\EERIE_GLshaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

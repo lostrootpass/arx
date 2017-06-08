@@ -232,8 +232,7 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 {
 	GLenum type = GL_TRIANGLES;
 
-	//TODO: update vertex buffers for animations
-	if (eobj->glVtxBuffer == 0)
+	//TODO: only update vertex buffers when necessary, not every tick.
 	{
 		//LEAK
 		if(eobj->glVtxBuffer == 0)
@@ -259,11 +258,13 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 
 	if (io)
 	{
-		glm::mat4 modelMatrix = glm::translate(glm::mat4(), glm::vec3(io->pos.x, -io->pos.y, io->pos.z));
-		modelMatrix = glm::rotate(modelMatrix, io->angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, io->angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, io->angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
+		//glm::mat4 modelMatrix = glm::translate(glm::mat4(), glm::vec3(io->pos.x, -io->pos.y, io->pos.z));
+		//modelMatrix = glm::rotate(modelMatrix, io->angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		//modelMatrix = glm::rotate(modelMatrix, io->angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		//modelMatrix = glm::rotate(modelMatrix, io->angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
+		//vertexlist3 has already been put in to world space for us, so just pass in an identity matrix.
+		glm::mat4 modelMatrix = glm::mat4();
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	}
 

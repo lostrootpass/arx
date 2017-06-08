@@ -268,6 +268,8 @@
     <ClInclude Include="..\Include\EERIETypes.h" />
     <ClInclude Include="..\Include\EERIEutil.h" />
     <ClInclude Include="..\Include\EERIE_AVI.h" />
+    <ClInclude Include="..\Include\EERIE_GL.h" />
+    <ClInclude Include="..\Include\EERIE_GLshaders.h" />
     <ClInclude Include="..\Include\OtherLibs\Jconfig.h" />
     <ClInclude Include="..\Include\OtherLibs\Jerror.h" />
     <ClInclude Include="..\Include\OtherLibs\Jmorecfg.h" />
@@ -275,8 +277,6 @@
     <ClInclude Include="..\Include\OtherLibs\zconf.h" />
     <ClInclude Include="..\Include\OtherLibs\zlib.h" />
     <ClInclude Include="..\Include\TheoData.h" />
-    <ClInclude Include="EERIE_GL.h" />
-    <ClInclude Include="EERIE_GLshaders.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\lib\OtherLibs\Jpeglib.lib" />

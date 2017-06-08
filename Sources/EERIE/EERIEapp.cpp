@@ -201,9 +201,10 @@ INT	 COpenGLApplication::Run()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CW);
+	//TODO: handle the changes in winding order throughout render passes.
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	//glFrontFace(GL_CW);
 
 	renderer = new EERIERendererGL();
 

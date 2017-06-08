@@ -673,7 +673,11 @@ int CreateAllMapsForBitmap(char * dir, char * name, CINEMATIQUE * c, int n, int 
 	strcat(AllTxt, name);
 	ClearAbsDirectory(AllTxt, "arx\\");
 
-	TextureContainer* rawTex = GetTextureFile(AllTxt);
+	TextureContainer* rawTex = nullptr;
+	
+#ifdef ARX_OPENGL
+	rawTex = GetTextureFile(AllTxt);
+#endif
 
 	AddDirectory(AllTxt, DirectoryAbs);
 	SetExt(AllTxt, ".BMP");

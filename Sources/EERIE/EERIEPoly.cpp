@@ -70,6 +70,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEPathfinder.h"
 #include "EERIE_GL.h"
 #include "EERIE_GLshaders.h"
+#include "EERIERenderer.h"
 #include "Arx_Particles.h"
 #include "Arx_Time.h"
 #include "Arx_Scene.h"
@@ -208,6 +209,10 @@ void EERIE_CreateMatriceProj(float _fWidth, float _fHeight, float _fFOV, float _
 		GDevice->SetTransform(D3DTRANSFORMSTATE_VIEW, &mat);
 		GDevice->SetTransform(D3DTRANSFORMSTATE_PROJECTION, &ProjectionMatrix);
 	}
+
+#ifdef ARX_OPENGL
+	g_pRenderApp->renderer->setProj((const glm::mat4&)ProjectionMatrix);
+#endif
 
 
 	D3DVECTOR vEyePt = D3DVECTOR(ACTIVECAM->pos.x, -ACTIVECAM->pos.y, ACTIVECAM->pos.z);

@@ -2430,14 +2430,17 @@ void	Cedric_RenderObjectGL(EERIE_3DOBJ * eobj, EERIE_C_DATA * obj, INTERACTIVE_O
 {
 	if (bRenderInterList)
 	{
-		Cedric_RenderObject2(0,
-			eobj,
-			obj,
-			io,
-			pos,
-			ftr,
-			invisibility);
+		g_pRenderApp->renderer->DrawPrim(eobj->vertexlist3, eobj->nbvertex, eobj, io);
 		return;
+		
+		//Cedric_RenderObject2(0,
+		//	eobj,
+		//	obj,
+		//	io,
+		//	pos,
+		//	ftr,
+		//	invisibility);
+		//return;
 	}
 
 	int			i;
@@ -3336,10 +3339,6 @@ void	Cedric_AnimateDrawEntityGL(EERIE_3DOBJ * eobj,
 
 	Cedric_AnimCalcTranslation(io, animuse, scale, typ, ftr, ftr2);
 
-	//////TEST TEST TEST
-	g_pRenderApp->renderer->DrawPrim(eobj->vertexlist, eobj->nbvertex, eobj, io);
-	//return;
-	//////
 
 	if(Cedric_IO_Visible(io, typ))
 	{

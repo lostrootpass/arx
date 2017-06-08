@@ -3,16 +3,31 @@
 
 #include "EERIEAnim.h"
 #include "EERIEobject.h"
+#include "EERIE_GL.h"
+
+#include <glm/glm.hpp>
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef min
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
 
 #include <unordered_map>
 
 class EERIERenderer
 {
+	glm::mat4 _projection;
+
 public:
 	virtual void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ);
 	virtual void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex);
 	virtual void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex);
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
+
+	inline glm::mat4 proj() const { return _projection; }
+	inline void setProj(const glm::mat4& proj) { _projection = proj; }
 };
 
 

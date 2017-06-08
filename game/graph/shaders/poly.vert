@@ -17,5 +17,5 @@ void main()
     uv = inUV;
     texId = inTexId;
 
-    gl_Position = proj * view * model * vec4(-pos.x, -pos.y, pos.z, 1.0);
+    gl_Position = proj * view * model * vec4(pos.x, -pos.y, pos.z, 1.0);
 }
