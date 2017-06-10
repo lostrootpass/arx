@@ -16,6 +16,8 @@
 
 #include <unordered_map>
 
+const unsigned short EERIE_PRIM_RESTART_IDX = 65534;
+
 class EERIERenderer
 {
 	glm::mat4 _projection;
@@ -25,6 +27,7 @@ public:
 	virtual void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex);
 	virtual void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex);
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
+	virtual void DrawRoom(EERIE_ROOM_DATA* room) {};
 
 	inline glm::mat4 proj() const { return _projection; }
 	inline void setProj(const glm::mat4& proj) { _projection = proj; }
@@ -41,11 +44,12 @@ public:
 	void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex) override;
 	void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
+	void DrawRoom(EERIE_ROOM_DATA* room) override;
 
 private:
 
 	//TODO: move/remove
-	std::unordered_map<EERIE_3DOBJ*, std::unordered_map<short, short> > _texMapBindings;
+	std::unordered_map<void*, std::unordered_map<short, short> > _texMapBindings;
 };
 
 

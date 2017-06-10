@@ -5222,7 +5222,14 @@ void ComputePortalVertexBuffer()
 
 			SMY_D3DVERTEX * pVertex;
 
-#ifndef ARX_OPENGL
+#ifdef ARX_OPENGL
+			if (!pRoom->pVtxBuffer)
+				pRoom->pVtxBuffer = new SMY_D3DVERTEX[iNbVertexForRoom]{ 0 };
+
+			pVertex = pRoom->pVtxBuffer;
+			pRoom->nb_vertices = iNbVertexForRoom;
+			pRoom->nb_indices = iNbIndiceForRoom*2;
+#else
 			if (FAILED(pRoom->pVertexBuffer->Lock(DDLOCK_WRITEONLY | DDLOCK_NOOVERWRITE,
 			                                      (void **)&pVertex,
 			                                      NULL)))
@@ -5264,13 +5271,16 @@ void ComputePortalVertexBuffer()
 
 					if (pPoly->tex == pTextureContainer)
 					{
-#ifndef ARX_OPENGL
 						pVertex->x = pPoly->v[0].sx;
 						pVertex->y = -(pPoly->v[0].sy);
 						pVertex->z = pPoly->v[0].sz;
 						pVertex->color = pPoly->v[0].color;
 						pVertex->tu = pPoly->v[0].tu + pTextureContainer->m_hdx;
 						pVertex->tv = pPoly->v[0].tv + pTextureContainer->m_hdy;
+#ifdef ARX_OPENGL
+						//TODO: track texture ID properly for vertices separately from colour.
+						pVertex->color = pPoly->tex->textureID;
+#endif
 						pVertex++;
 
 						pVertex->x = pPoly->v[1].sx;
@@ -5279,6 +5289,9 @@ void ComputePortalVertexBuffer()
 						pVertex->color = pPoly->v[1].color;
 						pVertex->tu = pPoly->v[1].tu + pTextureContainer->m_hdx;
 						pVertex->tv = pPoly->v[1].tv + pTextureContainer->m_hdy;
+#ifdef ARX_OPENGL
+						pVertex->color = pPoly->tex->textureID;
+#endif
 						pVertex++;
 
 						pVertex->x = pPoly->v[2].sx;
@@ -5287,16 +5300,23 @@ void ComputePortalVertexBuffer()
 						pVertex->color = pPoly->v[2].color;
 						pVertex->tu = pPoly->v[2].tu + pTextureContainer->m_hdx;
 						pVertex->tv = pPoly->v[2].tv + pTextureContainer->m_hdy;
-						pVertex++;
+#ifdef ARX_OPENGL
+						pVertex->color = pPoly->tex->textureID;
 #endif
+						pVertex++;
 
+#ifdef ARX_OPENGL
+						pPoly->uslInd[0] = iStartVertex + iIndiceInVertex++;
+						pPoly->uslInd[1] = iStartVertex + iIndiceInVertex++;
+						pPoly->uslInd[2] = iStartVertex + iIndiceInVertex++;
+#else
 						pPoly->uslInd[0] = iIndiceInVertex++;
 						pPoly->uslInd[1] = iIndiceInVertex++;
 						pPoly->uslInd[2] = iIndiceInVertex++;
+#endif
 
 						if (pPoly->type & POLY_QUAD)
 						{
-#ifndef ARX_OPENGL
 							pVertex->x = pPoly->v[3].sx;
 							pVertex->y = -(pPoly->v[3].sy);
 							pVertex->z = pPoly->v[3].sz;
@@ -5304,9 +5324,12 @@ void ComputePortalVertexBuffer()
 							pVertex->tu = pPoly->v[3].tu + pTextureContainer->m_hdx;
 							pVertex->tv = pPoly->v[3].tv + pTextureContainer->m_hdy;
 							pVertex++;
-#endif
 
+#ifdef ARX_OPENGL
+							pPoly->uslInd[3] = iStartVertex + iIndiceInVertex++;
+#else
 							pPoly->uslInd[3] = iIndiceInVertex++;
+#endif
 						}
 					}
 				}

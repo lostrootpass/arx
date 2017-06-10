@@ -255,6 +255,7 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	}
 
 	GLuint program = EERIEGetGLProgramID("poly");
+	glUseProgram(program);
 
 	if (io)
 	{
@@ -265,6 +266,7 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 
 		//vertexlist3 has already been put in to world space for us, so just pass in an identity matrix.
 		glm::mat4 modelMatrix = glm::mat4();
+		modelMatrix[1][1] *= -1; //flip the Y-axis for characters
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	}
 
@@ -390,6 +392,142 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 }
 
 
+void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
+{
+	GLenum type = GL_TRIANGLES;
+
+	DWORD dwVertexCount = room->nb_vertices;
+
+	GLuint program = EERIEGetGLProgramID("poly");
+	glUseProgram(program);
+
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(EERIE_PRIM_RESTART_IDX);
+
+	std::unordered_map<short, short>& texMapBindings = _texMapBindings[room];
+
+	if (room->glVtxBuffer == 0)
+	{
+		glGenBuffers(1, &room->glVtxBuffer);
+
+		std::vector<GLfloat> vtx;
+
+		//HACK. Can be sped up.
+
+		for (DWORD i = 0; i < dwVertexCount; ++i)
+		{
+			vtx.push_back(room->pVtxBuffer[i].x);
+			vtx.push_back(room->pVtxBuffer[i].y);
+			vtx.push_back(room->pVtxBuffer[i].z);
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, room->glVtxBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_STATIC_DRAW);
+	}
+
+	glm::mat4 modelMatrix = glm::mat4();
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
+
+	std::vector<GLuint> indices;
+	std::vector<GLfloat> uv;
+	std::vector<GLint> vtxTexIds;
+	vtxTexIds.resize(dwVertexCount);
+	
+	const bool genUVs = (room->glUvBuffer == 0);
+
+
+	//TODO: update the index buffer if it has changed.
+	const bool genIdx = (room->glIdxBuffer == 0);
+
+
+	if (room->glUvBuffer == 0)
+	{
+		glGenBuffers(1, &room->glUvBuffer);
+
+		uv.resize(dwVertexCount * 2);
+	}
+
+	if (room->glIdxBuffer == 0)
+	{
+		glGenBuffers(1, &room->glIdxBuffer);
+	}
+
+	if (genUVs || genIdx)
+	{
+
+		short binding = 0;
+
+		for (long i = 0; i < dwVertexCount; ++i)
+		{
+			uv[i * 2] = room->pVtxBuffer[i].tu;
+			uv[i * 2 + 1] = room->pVtxBuffer[i].tv;
+
+			if (room->pVtxBuffer[i].color != -1 && texMapBindings.find(room->pVtxBuffer[i].color) == texMapBindings.end())
+			{
+				texMapBindings[room->pVtxBuffer[i].color] = binding;
+				binding++;
+			}
+
+			short b = (room->pVtxBuffer[i].color == -1) ? -1 : texMapBindings[room->pVtxBuffer[i].color];
+			vtxTexIds[i] = b;
+		}
+
+		if (genUVs)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, room->glUvBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(uv[0]) * uv.size(), uv.data(), GL_STATIC_DRAW);
+		}
+
+		if (genIdx)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, room->glIdxBuffer);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * room->nb_indices, room->pussIndice, GL_STATIC_DRAW);
+		}
+
+		if (room->glTexIdBuffer == 0)
+		{
+			glGenBuffers(1, &room->glTexIdBuffer);
+
+			glBindBuffer(GL_ARRAY_BUFFER, room->glTexIdBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vtxTexIds[0]) * vtxTexIds.size(), vtxTexIds.data(), GL_STATIC_DRAW);
+		}
+	}
+
+	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+	for (DWORD i = 0; i < room->usNbTextures; ++i)
+	{
+
+		char buf[32] = { '\0' };
+		snprintf(buf, 32, "texsampler[%d]", i);
+
+		GLuint uniformLocation = glGetUniformLocation(program, buf);
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, room->ppTextureContainer[i]->textureID);
+		glUniform1i(uniformLocation, i);
+	}
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, room->glVtxBuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, room->glUvBuffer);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, room->glTexIdBuffer);
+	glVertexAttribIPointer(2, 1, GL_INT, 0, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, room->glIdxBuffer);
+
+	glDrawElements(type, room->nb_indices, GL_UNSIGNED_SHORT, 0);
+	
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+
+	glUseProgram(0);
+}
 
 /************************************************************/
 /*							D3D								*/

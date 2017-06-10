@@ -739,6 +739,13 @@ typedef struct
 
 typedef struct
 {
+	float	x, y, z;
+	int		color;
+	float	tu, tv;
+} SMY_D3DVERTEX;
+
+typedef struct
+{
 	long nb_portals;
 	long * portals;
 	long nb_polys;
@@ -747,8 +754,15 @@ typedef struct
 	float		radius;
 	unsigned short		*		pussIndice;
 	LPDIRECT3DVERTEXBUFFER7		pVertexBuffer;
+	SMY_D3DVERTEX*				pVtxBuffer;
 	unsigned long				usNbTextures;
 	TextureContainer		**	ppTextureContainer;
+	unsigned int	glVtxBuffer;
+	unsigned int	glUvBuffer;
+	unsigned int	glIdxBuffer;
+	unsigned int	glTexIdBuffer;
+	int	nb_vertices;
+	int nb_indices;
 } EERIE_ROOM_DATA;
 
 typedef struct
@@ -768,14 +782,6 @@ typedef struct
 
 
 #define ARX_D3DVERTEX D3DTLVERTEX
-
-
-typedef struct
-{
-	float	x, y, z;
-	int		color;
-	float	tu, tv;
-} SMY_D3DVERTEX;
 
 typedef struct
 {

@@ -1615,6 +1615,7 @@ void ARX_PORTALS_Frustrum_RenderRoom_TransparencyT(long room_num);
 void ARX_PORTALS_Frustrum_RenderRoom_TransparencyTSoftCull(long room_num);
 void ARX_PORTALS_Frustrum_RenderRooms_TransparencyT()
 {
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,TRUE);
@@ -1633,8 +1634,15 @@ void ARX_PORTALS_Frustrum_RenderRooms_TransparencyT()
 			ARX_PORTALS_Frustrum_RenderRoom_TransparencyT(RoomDrawList[i]);
 		}
 	}
+#endif
 
 	NbRoomDrawList=0;
+
+
+#ifdef ARX_OPENGL
+	//Stop here for now.
+	return;
+#endif
 
 
 	SetZBias(GDevice,8);
@@ -2792,7 +2800,19 @@ SMY_D3DVERTEX *pMyVertex;
 	{
 		bool bNoModulate2X=(pMenuConfig && pMenuConfig->bForceMetalTwoPass);
 
-#ifndef ARX_OPENGL
+#ifdef ARX_OPENGL
+		pMyVertex = portals->room[room_num].pVtxBuffer;
+
+
+		//TODO: fix this to properly track indices between frames.
+		int _idxCount = 0;
+		int* idxCount = &_idxCount;
+		if (!portals->room[room_num].glIdxBuffer)
+		{
+			portals->room[room_num].nb_indices = 0;
+			idxCount = &portals->room[room_num].nb_indices;
+		}
+#else
 		if(!portals->room[room_num].pVertexBuffer)
 		{
 			char tTxt[256];
@@ -2869,7 +2889,10 @@ SMY_D3DVERTEX *pMyVertex;
 			
 			if (FrustrumsClipPoly(frustrums,ep))
 			{
+#ifndef ARX_OPENGL
+				//Avoid culling here for now.
 				continue;
+#endif
 			}
 
 			//Clipp ZNear + Distance pour les ZMapps et Bump!!!
@@ -2877,7 +2900,9 @@ SMY_D3DVERTEX *pMyVertex;
 
 			if(ep->v[0].rhw<-fDist)
 			{
+#ifndef ARX_OPENGL
 				continue;
+#endif
 			}
 
 			fDist-=ep->v[0].rhw;
@@ -2895,7 +2920,9 @@ SMY_D3DVERTEX *pMyVertex;
 					(DOTPRODUCT( ep->norm , nrm )>0.f)&&
 					(DOTPRODUCT( ep->norm2 , nrm )>0.f) )
 				{
+#ifndef ARX_OPENGL
 					continue;
+#endif
 				}
 
 				to=4;
@@ -2905,7 +2932,9 @@ SMY_D3DVERTEX *pMyVertex;
 				if(	(!(ep->type&POLY_DOUBLESIDED))&&
 					(DOTPRODUCT( ep->norm , nrm )>0.f) )
 				{
+#ifndef ARX_OPENGL
 					continue;
+#endif
 				}
 
 				to=3;
@@ -2964,7 +2993,20 @@ SMY_D3DVERTEX *pMyVertex;
 				}
 			}
 
-#ifndef ARX_OPENGL
+#ifdef ARX_OPENGL
+			*pIndices++ = ep->uslInd[0];
+			*pIndices++ = ep->uslInd[1];
+			*pIndices++ = ep->uslInd[2];
+			*idxCount += 3;
+
+			if (to & 4)
+			{
+				*pIndices++ = ep->uslInd[3];
+				*pIndices++ = ep->uslInd[2];
+				*pIndices++ = ep->uslInd[1];
+				*idxCount += 3;
+			}
+#else
 			SMY_D3DVERTEX *pMyVertexCurr;
 
 				*pIndicesCurr++=ep->uslInd[0];
@@ -3158,7 +3200,9 @@ SMY_D3DVERTEX *pMyVertex;
 			}
 		}
 
-#ifndef ARX_OPENGL
+#ifdef ARX_OPENGL
+		g_pRenderApp->renderer->DrawRoom(&portals->room[room_num]);
+#else
 		portals->room[room_num].pVertexBuffer->Unlock();
 #endif
 	
@@ -3190,9 +3234,7 @@ SMY_D3DVERTEX *pMyVertex;
 			
 			if(pTexCurr->tMatRoom[room_num].uslNbIndiceCull)
 			{
-#ifdef ARX_OPENGL
-				///Draw indexed
-#else
+#ifndef ARX_OPENGL
 				GDevice->DrawIndexedPrimitiveVB(	D3DPT_TRIANGLELIST,
 					portals->room[room_num].pVertexBuffer,
 					pTexCurr->tMatRoom[room_num].uslStartVertex,
@@ -4821,7 +4863,6 @@ else
 		if (INTERTRANSPOLYSPOS&&(!bRenderInterList))
 			ARXDRAW_DrawAllInterTransPolyPos(pd3dDevice);
 
-#ifndef ARX_OPENGL
 		PopAllTriangleListTransparency();
 		
 		if(	(USE_PORTALS>2)&&
@@ -4834,7 +4875,6 @@ else
 			if (TRANSPOLYSPOS)
 				ARXDRAW_DrawAllTransPolysPos(pd3dDevice,MODIF);
 		}
-#endif
 	}
 
 #ifndef ARX_OPENGL
