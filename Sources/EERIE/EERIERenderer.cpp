@@ -232,38 +232,24 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 {
 	GLenum type = GL_TRIANGLES;
 
+	EERIE_VERTEX* vtxArray = static_cast<EERIE_VERTEX*>(lpvVertices);
+	std::vector<GLfloat> vtx;
+
 	//TODO: only update vertex buffers when necessary, not every tick.
 	{
 		//LEAK
 		if(eobj->glVtxBuffer == 0)
 			glGenBuffers(1, &eobj->glVtxBuffer);
-
-		std::vector<GLfloat> vtx;
-
-		//HACK. Can be sped up.
-		EERIE_VERTEX* vtxArray = static_cast<EERIE_VERTEX*>(lpvVertices);
-
-		for (DWORD i = 0; i < dwVertexCount; ++i)
-		{
-			vtx.push_back(vtxArray[i].v.x);
-			vtx.push_back(vtxArray[i].v.y);
-			vtx.push_back(vtxArray[i].v.z);
-		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
 	}
 
 	GLuint program = EERIEGetGLProgramID("poly");
 	glUseProgram(program);
 
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(EERIE_PRIM_RESTART_IDX);
+
 	if (io)
 	{
-		//glm::mat4 modelMatrix = glm::translate(glm::mat4(), glm::vec3(io->pos.x, -io->pos.y, io->pos.z));
-		//modelMatrix = glm::rotate(modelMatrix, io->angle.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		//modelMatrix = glm::rotate(modelMatrix, io->angle.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		//modelMatrix = glm::rotate(modelMatrix, io->angle.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
 		//vertexlist3 has already been put in to world space for us, so just pass in an identity matrix.
 		glm::mat4 modelMatrix = glm::mat4();
 		modelMatrix[1][1] *= -1; //flip the Y-axis for characters
@@ -273,19 +259,17 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	std::vector<GLuint> indices;
 	std::vector<GLfloat> uv;
 	std::vector<GLint> vtxTexIds;
-	vtxTexIds.resize(dwVertexCount);
 
 	std::unordered_map<short, short>& texMapBindings = _texMapBindings[eobj];
 
 	const bool genUVs = (eobj->glUvBuffer == 0);
 	const bool genIdx = (eobj->glIdxBuffer == 0);
+	const bool genTexIds = (eobj->glTexIdBuffer == 0);
 
 	
 	if (eobj->glUvBuffer == 0)
 	{
 		glGenBuffers(1, &eobj->glUvBuffer);
-
-		uv.resize(dwVertexCount * 2);
 	}
 
 	if (eobj->glIdxBuffer == 0)
@@ -293,46 +277,49 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 		glGenBuffers(1, &eobj->glIdxBuffer);
 	}
 
-	if (genUVs || genIdx)
+	//if (genUVs || genIdx)
 	{
 		
 		short binding = 0;
 
+
+		//TODO: huge amount of data duplication here caused by how facelist handles UVs
 		for (long i = 0; i < eobj->nbfaces; ++i)
 		{
-			unsigned short v1, v2, v3;
 			EERIE_FACE face = eobj->facelist[i];
-			v1 = face.vid[0];
-			v2 = face.vid[1];
-			v3 = face.vid[2];
 
-			if (genIdx)
+			unsigned short fv;
+			for (int i = 0; i < 3; ++i)
 			{
-				indices.push_back(v1);
-				indices.push_back(v2);
-				indices.push_back(v3);
+				fv = face.vid[i];
+
+				if(genIdx)
+					indices.push_back(fv);
+
+				if (genUVs)
+				{
+					uv.push_back(face.u[i]);
+					uv.push_back(face.v[i]);
+				}
+
+				vtx.push_back(vtxArray[fv].v.x);
+				vtx.push_back(vtxArray[fv].v.y);
+				vtx.push_back(vtxArray[fv].v.z);
 			}
 
-
-			if (genUVs)
+			if (genTexIds)
 			{
-				uv[v1 * 2] = face.u[0];
-				uv[v2 * 2] = face.u[1];
-				uv[v3 * 2] = face.u[2];
+				if (face.texid != -1 && texMapBindings.find(face.texid) == texMapBindings.end())
+				{
+					texMapBindings[face.texid] = binding;
+					binding++;
+				}
 
-				uv[v1 * 2 + 1] = face.v[0];
-				uv[v2 * 2 + 1] = face.v[1];
-				uv[v3 * 2 + 1] = face.v[2];
+				short b = (face.texid == -1) ? -1 : texMapBindings[face.texid];
+				vtxTexIds.push_back(b);
+				vtxTexIds.push_back(b);
+				vtxTexIds.push_back(b);
 			}
-
-			if (face.texid != -1 && texMapBindings.find(face.texid) == texMapBindings.end())
-			{
-				texMapBindings[face.texid] = binding;
-				binding++;
-			}
-
-			short b = (face.texid == -1) ? -1 : texMapBindings[face.texid];
-			vtxTexIds[v1] = vtxTexIds[v2] = vtxTexIds[v3] = b;
 		}
 
 		if (genUVs)
@@ -370,6 +357,9 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 		glUniform1i(uniformLocation, 0 + pair.second);
 	}
 
+	glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
+
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -382,9 +372,10 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	glBindBuffer(GL_ARRAY_BUFFER, eobj->glTexIdBuffer);
 	glVertexAttribIPointer(2, 1, GL_INT, 0, 0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
+	//glDrawElements(type, eobj->nbfaces * 3, GL_UNSIGNED_INT, 0);
 
-	glDrawElements(type, eobj->nbfaces * 3, GL_UNSIGNED_INT, 0);
+	glDrawArrays(type, 0, eobj->nbfaces * 3);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
@@ -394,6 +385,8 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 
 void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 {
+	//TODO: a lot of code here shared with DrawPrim, can be refactored out.
+
 	GLenum type = GL_TRIANGLES;
 
 	DWORD dwVertexCount = room->nb_vertices;
