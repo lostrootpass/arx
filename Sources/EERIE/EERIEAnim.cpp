@@ -61,6 +61,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIELight.h"
 #include "EERIEPoly.h"
 #include "EERIEDraw.h"
+#include "EERIEapp.h"
+#include "EERIERenderer.h"
 
 #include <Arx_Sound.h>
 #include <Arx_Damages.h>
@@ -2844,6 +2846,10 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 							poss,
 							io,
 							modinfo);
+#ifdef ARX_OPENGL
+		g_pRenderApp->renderer->DrawPrim(io->obj->vertexlist3, io->obj->nbvertex, io->obj, io);
+		return;
+#endif
 	 return;
 	}
 

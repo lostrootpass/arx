@@ -6,7 +6,7 @@ layout(location = 1) flat in int texId;
 
 out vec3 color;
 
-uniform sampler2D texsampler[16];
+uniform sampler2D texsampler[24];
 
 void main()
 {

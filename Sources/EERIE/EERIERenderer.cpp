@@ -513,6 +513,7 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, room->glIdxBuffer);
 
+	//TODO: break up the draw command in to smaller commands? Some rooms use a lot of textures.
 	glDrawElements(type, room->nb_indices, GL_UNSIGNED_SHORT, 0);
 	
 	glDisableVertexAttribArray(0);
