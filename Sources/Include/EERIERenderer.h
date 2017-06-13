@@ -29,6 +29,8 @@ public:
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
 	virtual void DrawRoom(EERIE_ROOM_DATA* room) {};
 
+	virtual void UpdateLights() {};
+
 	inline glm::mat4 proj() const { return _projection; }
 	inline void setProj(const glm::mat4& proj) { _projection = proj; }
 };
@@ -45,6 +47,8 @@ public:
 	void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 	void DrawRoom(EERIE_ROOM_DATA* room) override;
+
+	void UpdateLights() override;
 
 private:
 

@@ -5221,12 +5221,17 @@ void ComputePortalVertexBuffer()
 #endif
 
 			SMY_D3DVERTEX * pVertex;
+			EERIE_3D* pNormal = nullptr;
 
 #ifdef ARX_OPENGL
 			if (!pRoom->pVtxBuffer)
 				pRoom->pVtxBuffer = new SMY_D3DVERTEX[iNbVertexForRoom]{ 0 };
 
+			if (!pRoom->pNormals)
+				pRoom->pNormals = new EERIE_3D[iNbVertexForRoom]{ 0 };
+
 			pVertex = pRoom->pVtxBuffer;
+			pNormal = pRoom->pNormals;
 			pRoom->nb_vertices = iNbVertexForRoom;
 			pRoom->nb_indices = iNbIndiceForRoom*2;
 #else
@@ -5280,6 +5285,8 @@ void ComputePortalVertexBuffer()
 #ifdef ARX_OPENGL
 						//TODO: track texture ID properly for vertices separately from colour.
 						pVertex->color = pPoly->tex->textureID;
+						memcpy(pNormal, &pPoly->nrml[0], sizeof(EERIE_3D));
+						pNormal++;
 #endif
 						pVertex++;
 
@@ -5291,6 +5298,8 @@ void ComputePortalVertexBuffer()
 						pVertex->tv = pPoly->v[1].tv + pTextureContainer->m_hdy;
 #ifdef ARX_OPENGL
 						pVertex->color = pPoly->tex->textureID;
+						memcpy(pNormal, &pPoly->nrml[1], sizeof(EERIE_3D));
+						pNormal++;
 #endif
 						pVertex++;
 
@@ -5302,6 +5311,8 @@ void ComputePortalVertexBuffer()
 						pVertex->tv = pPoly->v[2].tv + pTextureContainer->m_hdy;
 #ifdef ARX_OPENGL
 						pVertex->color = pPoly->tex->textureID;
+						memcpy(pNormal, &pPoly->nrml[2], sizeof(EERIE_3D));
+						pNormal++;
 #endif
 						pVertex++;
 
@@ -5323,6 +5334,10 @@ void ComputePortalVertexBuffer()
 							pVertex->color = pPoly->v[3].color;
 							pVertex->tu = pPoly->v[3].tu + pTextureContainer->m_hdx;
 							pVertex->tv = pPoly->v[3].tv + pTextureContainer->m_hdy;
+#ifdef ARX_OPENGL
+							memcpy(pNormal, &pPoly->nrml[3], sizeof(EERIE_3D));
+							pNormal++;
+#endif
 							pVertex++;
 
 #ifdef ARX_OPENGL

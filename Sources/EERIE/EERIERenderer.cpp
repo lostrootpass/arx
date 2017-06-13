@@ -3,6 +3,7 @@
 #include "EERIE_GL.h"
 #include "EERIE_GLshaders.h"
 #include "EERIEmath.h"
+#include "EERIEAnim.h"
 
 #include "Danae.h"
 #include "ARX_Cedric.h"
@@ -13,6 +14,14 @@ extern INTERACTIVE_OBJ * DESTROYED_DURING_RENDERING;
 extern long USE_CEDRIC_ANIM;
 
 void PrepareAnim(EERIE_3DOBJ * eobj, ANIM_USE * eanim, unsigned long time, INTERACTIVE_OBJ * io);
+
+struct VtxAttrib
+{
+	glm::vec3 normal;
+	glm::vec2 uv;
+	GLint texId;
+};
+
 
 void EERIERenderer::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
 {
@@ -257,19 +266,17 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	}
 
 	std::vector<GLuint> indices;
-	std::vector<GLfloat> uv;
-	std::vector<GLint> vtxTexIds;
+	std::vector<VtxAttrib> vtxAttribs;
 
 	std::unordered_map<short, short>& texMapBindings = _texMapBindings[eobj];
 
-	const bool genUVs = (eobj->glUvBuffer == 0);
+	const bool genAttribs = (eobj->glAttribBuffer == 0);
 	const bool genIdx = (eobj->glIdxBuffer == 0);
-	const bool genTexIds = (eobj->glTexIdBuffer == 0);
 
 	
-	if (eobj->glUvBuffer == 0)
+	if (eobj->glAttribBuffer == 0)
 	{
-		glGenBuffers(1, &eobj->glUvBuffer);
+		glGenBuffers(1, &eobj->glAttribBuffer);
 	}
 
 	if (eobj->glIdxBuffer == 0)
@@ -288,6 +295,19 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 		{
 			EERIE_FACE face = eobj->facelist[i];
 
+			short b = -1;
+			if (genAttribs)
+			{
+				if (face.texid != -1 && texMapBindings.find(face.texid) == texMapBindings.end())
+				{
+					texMapBindings[face.texid] = binding;
+					binding++;
+				}
+
+				b = (face.texid == -1) ? -1 : texMapBindings[face.texid];
+
+			}
+
 			unsigned short fv;
 			for (int i = 0; i < 3; ++i)
 			{
@@ -296,36 +316,29 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 				if(genIdx)
 					indices.push_back(fv);
 
-				if (genUVs)
+				VtxAttrib attrib;
+
+				if (genAttribs)
 				{
-					uv.push_back(face.u[i]);
-					uv.push_back(face.v[i]);
+					attrib.uv.x = face.u[i];
+					attrib.uv.y = face.v[i];
 				}
 
 				vtx.push_back(vtxArray[fv].v.x);
 				vtx.push_back(vtxArray[fv].v.y);
 				vtx.push_back(vtxArray[fv].v.z);
-			}
 
-			if (genTexIds)
-			{
-				if (face.texid != -1 && texMapBindings.find(face.texid) == texMapBindings.end())
-				{
-					texMapBindings[face.texid] = binding;
-					binding++;
-				}
+				attrib.texId = b;
+				attrib.normal = glm::vec3(face.norm.x, face.norm.y, face.norm.z);
 
-				short b = (face.texid == -1) ? -1 : texMapBindings[face.texid];
-				vtxTexIds.push_back(b);
-				vtxTexIds.push_back(b);
-				vtxTexIds.push_back(b);
+				vtxAttribs.push_back(attrib);
 			}
 		}
 
-		if (genUVs)
+		if (genAttribs)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, eobj->glUvBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(uv[0]) * uv.size(), uv.data(), GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, eobj->glAttribBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vtxAttribs[0]) * vtxAttribs.size(), vtxAttribs.data(), GL_STATIC_DRAW);
 		}
 
 		if (genIdx)
@@ -333,17 +346,10 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_STATIC_DRAW);
 		}
-
-		if (eobj->glTexIdBuffer == 0)
-		{
-			glGenBuffers(1, &eobj->glTexIdBuffer);
-
-			glBindBuffer(GL_ARRAY_BUFFER, eobj->glTexIdBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vtxTexIds[0]) * vtxTexIds.size(), vtxTexIds.data(), GL_STATIC_DRAW);
-		}
 	}
 
-	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+	UpdateLights();
+
 	for (auto& pair : texMapBindings)
 	{
 		if (pair.first == -1) continue;
@@ -364,22 +370,24 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+	glBindBuffer(GL_ARRAY_BUFFER, eobj->glAttribBuffer);
+
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, eobj->glUvBuffer);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, uv));
+	
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, eobj->glTexIdBuffer);
-	glVertexAttribIPointer(2, 1, GL_INT, 0, 0);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, texId));
 
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, normal));
+
 	//glDrawElements(type, eobj->nbfaces * 3, GL_UNSIGNED_INT, 0);
-
 	glDrawArrays(type, 0, eobj->nbfaces * 3);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 }
 
 
@@ -422,22 +430,18 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 
 	std::vector<GLuint> indices;
-	std::vector<GLfloat> uv;
-	std::vector<GLint> vtxTexIds;
-	vtxTexIds.resize(dwVertexCount);
+	std::vector<VtxAttrib> vtxAttribs;
 	
-	const bool genUVs = (room->glUvBuffer == 0);
+	const bool genAttribs = (room->glAttribBuffer == 0);
 
 
 	//TODO: update the index buffer if it has changed.
 	const bool genIdx = (room->glIdxBuffer == 0);
 
 
-	if (room->glUvBuffer == 0)
+	if (room->glAttribBuffer == 0)
 	{
-		glGenBuffers(1, &room->glUvBuffer);
-
-		uv.resize(dwVertexCount * 2);
+		glGenBuffers(1, &room->glAttribBuffer);
 	}
 
 	if (room->glIdxBuffer == 0)
@@ -445,15 +449,17 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 		glGenBuffers(1, &room->glIdxBuffer);
 	}
 
-	if (genUVs || genIdx)
+	if (genAttribs || genIdx)
 	{
 
 		short binding = 0;
 
 		for (long i = 0; i < dwVertexCount; ++i)
 		{
-			uv[i * 2] = room->pVtxBuffer[i].tu;
-			uv[i * 2 + 1] = room->pVtxBuffer[i].tv;
+			VtxAttrib attrib;
+
+			attrib.uv.x = room->pVtxBuffer[i].tu;
+			attrib.uv.y = room->pVtxBuffer[i].tv;
 
 			if (room->pVtxBuffer[i].color != -1 && texMapBindings.find(room->pVtxBuffer[i].color) == texMapBindings.end())
 			{
@@ -462,13 +468,17 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 			}
 
 			short b = (room->pVtxBuffer[i].color == -1) ? -1 : texMapBindings[room->pVtxBuffer[i].color];
-			vtxTexIds[i] = b;
+			attrib.texId = b;
+
+			attrib.normal = glm::vec3(room->pNormals[i].x, room->pNormals[i].y, room->pNormals[i].z);
+
+			vtxAttribs.push_back(attrib);
 		}
 
-		if (genUVs)
+		if (genAttribs)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, room->glUvBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(uv[0]) * uv.size(), uv.data(), GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, room->glAttribBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vtxAttribs[0]) * vtxAttribs.size(), vtxAttribs.data(), GL_STATIC_DRAW);
 		}
 
 		if (genIdx)
@@ -476,15 +486,9 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, room->glIdxBuffer);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * room->nb_indices, room->pussIndice, GL_STATIC_DRAW);
 		}
-
-		if (room->glTexIdBuffer == 0)
-		{
-			glGenBuffers(1, &room->glTexIdBuffer);
-
-			glBindBuffer(GL_ARRAY_BUFFER, room->glTexIdBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vtxTexIds[0]) * vtxTexIds.size(), vtxTexIds.data(), GL_STATIC_DRAW);
-		}
 	}
+
+	UpdateLights();
 
 	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
 	for (DWORD i = 0; i < room->usNbTextures; ++i)
@@ -503,13 +507,16 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 	glBindBuffer(GL_ARRAY_BUFFER, room->glVtxBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+	glBindBuffer(GL_ARRAY_BUFFER, room->glAttribBuffer);
+
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, room->glUvBuffer);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, uv));
 
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, room->glTexIdBuffer);
-	glVertexAttribIPointer(2, 1, GL_INT, 0, 0);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, texId));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, normal));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, room->glIdxBuffer);
 
@@ -519,8 +526,82 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 
 	glUseProgram(0);
+}
+
+void EERIERendererGL::UpdateLights()
+{
+	GLuint program = EERIEGetGLProgramID("poly");
+	//glUseProgram(program);
+
+
+	//TODO: don't call this for every object.
+	//Has to be done this way for now because legacy Arx updates lights between objects
+	{
+		struct LightData
+		{
+			glm::vec4 pos;
+			glm::vec4 color;
+			float fallstart;
+			float ___pad1[3];
+			float fallend;
+			float ___pad2[3];
+		};
+
+		std::vector<LightData> lightData;
+		for (int i = 0; i < MAX_LLIGHTS; ++i)
+		{
+			EERIE_LIGHT* light = PDL[i];
+			LightData ld;
+
+			if (!light || !light->exist || !light->treat)
+			{
+				continue;
+			}
+
+			ld.pos = glm::vec4(light->pos.x, -light->pos.y, light->pos.z, 0.0f);
+			ld.color = glm::vec4(light->rgb.r, light->rgb.g, light->rgb.b, light->intensity);
+			ld.fallstart = light->fallstart;
+			ld.fallend = light->fallend;
+
+			lightData.push_back(ld);
+		}
+
+		for (int i = 0; i < MAX_LLIGHTS; ++i)
+		{
+			EERIE_LIGHT* light = IO_PDL[i];
+			LightData ld;
+
+			if (!light || !light->exist || !light->treat)
+			{
+
+				continue;
+			}
+
+			ld.pos = glm::vec4(light->pos.x, -light->pos.y, light->pos.z, 0.0f);
+			ld.color = glm::vec4(light->rgb.r, light->rgb.g, light->rgb.b, light->intensity);
+			ld.fallstart = light->fallstart;
+			ld.fallend = light->fallend;
+
+			lightData.push_back(ld);
+		}
+
+		static GLuint lightBuffer = -1;
+		if (lightBuffer == -1)
+			glGenBuffers(1, &lightBuffer);
+
+		if (lightData.size())
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, lightBuffer);
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData) * lightData.size(), lightData.data(), GL_DYNAMIC_DRAW);
+
+			GLuint block = glGetUniformBlockIndex(program, "LightData");
+			glUniformBlockBinding(program, block, 1);
+			glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightBuffer);
+		}
+	}
 }
 
 /************************************************************/

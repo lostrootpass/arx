@@ -586,8 +586,7 @@ typedef struct
 
 	unsigned int glVtxBuffer;
 	unsigned int glIdxBuffer;
-	unsigned int glUvBuffer;
-	unsigned int glTexIdBuffer;
+	unsigned int glAttribBuffer;
 
 	EERIE_3DPAD 	*	vertexlocal;
 	EERIE_VERTEX 	*	vertexlist;
@@ -755,12 +754,12 @@ typedef struct
 	unsigned short		*		pussIndice;
 	LPDIRECT3DVERTEXBUFFER7		pVertexBuffer;
 	SMY_D3DVERTEX*				pVtxBuffer;
+	EERIE_3D*					pNormals;
 	unsigned long				usNbTextures;
 	TextureContainer		**	ppTextureContainer;
 	unsigned int	glVtxBuffer;
-	unsigned int	glUvBuffer;
+	unsigned int	glAttribBuffer;
 	unsigned int	glIdxBuffer;
-	unsigned int	glTexIdBuffer;
 	int	nb_vertices;
 	int nb_indices;
 } EERIE_ROOM_DATA;

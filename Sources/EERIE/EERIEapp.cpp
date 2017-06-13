@@ -194,7 +194,7 @@ INT	 COpenGLApplication::Run()
 	m_bActive = true;
 	m_bReady = true;
 
-	glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glViewport(0, 0, DANAESIZX, DANAESIZY);
 	glScissor(0, 0, DANAESIZX, DANAESIZY);
 
