@@ -531,6 +531,93 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 	glUseProgram(0);
 }
 
+void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex)
+{
+	GLenum type = GL_TRIANGLE_FAN;
+
+	D3DTLVERTEX* vtxArray = static_cast<D3DTLVERTEX*>(lpvVertices);
+	std::vector<GLfloat> vtx;
+
+	static GLuint glVtxBuffer = -1;
+	static GLuint glAttribBuffer = -1;
+
+	//TODO: only update vertex buffers when necessary, not every tick.
+	{
+		//LEAK
+		if (glVtxBuffer == -1)
+			glGenBuffers(1, &glVtxBuffer);
+	}
+
+	GLint oldProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+	GLuint program = EERIEGetGLProgramID("particle");
+	glUseProgram(program);
+
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(EERIE_PRIM_RESTART_IDX);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glm::mat4 modelMatrix = glm::mat4();
+	modelMatrix[1][1] *= -1; //flip the Y-axis for characters
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
+
+	glm::mat4 p = glm::mat4();
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &p[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &_projection[0][0]);
+
+	std::vector<VtxAttrib> vtxAttribs;
+
+	if (glAttribBuffer == -1)
+	{
+		glGenBuffers(1, &glAttribBuffer);
+	}
+
+	for (int i = 0; i < dwVertexCount; ++i)
+	{
+		VtxAttrib attrib;
+
+		attrib.uv.x = vtxArray[i].tu;
+		attrib.uv.y = vtxArray[i].tv;
+
+		vtx.push_back(vtxArray[i].sx);
+		vtx.push_back(vtxArray[i].sy);
+		vtx.push_back(vtxArray[i].sz);
+		vtx.push_back(vtxArray[i].rhw);
+
+		vtxAttribs.push_back(attrib);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, glAttribBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxAttribs[0]) * vtxAttribs.size(), vtxAttribs.data(), GL_DYNAMIC_DRAW);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex->textureID);
+	glUniform1i(glGetUniformLocation(program, "texsampler"), 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glVtxBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, glVtxBuffer);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glAttribBuffer);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, uv));
+
+	glDrawArrays(type, 0, dwVertexCount);
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+	glUseProgram(oldProgram);
+
+	glDisable(GL_BLEND);
+}
+
 void EERIERendererGL::UpdateLights()
 {
 	GLuint program = EERIEGetGLProgramID("poly");

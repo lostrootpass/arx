@@ -47,6 +47,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEPoly.h" 
 #include "EERIE_GL.h"
 #include "EERIE_GLshaders.h"
+#include "EERIERenderer.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -1226,7 +1227,11 @@ void EERIEDrawRotatedSprite(LPDIRECT3DDEVICE7 pd3dDevice,D3DTLVERTEX *in,float s
 	{
 		float use_focal=BASICFOCAL*Xratio;
 	
+#ifdef ARX_OPENGL
+		float t = siz * (((out.sz/in->sz) + 1.f) * use_focal * 0.01f);
+#else
 		float t = siz * ((out.rhw - 1.f) * use_focal * 0.001f); 
+#endif
 
 		if (t<=0.f) t=0.00000001f;
 
@@ -1260,13 +1265,24 @@ void EERIEDrawRotatedSprite(LPDIRECT3DDEVICE7 pd3dDevice,D3DTLVERTEX *in,float s
 		for (long i=0;i<4;i++)
 		{
 			tt=DEG2RAD(MAKEANGLE(rot+90.f*i+45+90));
-			v[i].sx=EEsin(tt)*t+out.sx;
-			v[i].sy=EEcos(tt)*t+out.sy;
+#ifdef ARX_OPENGL
+			v[i].sx = EEsin(tt)*t + in->sx;
+			v[i].sy = EEcos(tt)*t + in->sy;
+			v[i].sz = in->sz;
+			v[i].rhw = in->rhw;
+#else
+			v[i].sx = EEsin(tt)*t + out.sx;
+			v[i].sy = EEcos(tt)*t + out.sy;
+#endif
 		}		
 
 		SETTC(pd3dDevice,tex);
+#ifdef ARX_OPENGL
+		g_pRenderApp->renderer->DrawRotatedSprite((LPVOID)&v, 4, tex);
+#else
 		EERIEDRAWPRIM(pd3dDevice, D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE , 
 				 v, 4,  0  );		
+#endif
 	}
 	else SPRmaxs.x=-1;
 }

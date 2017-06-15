@@ -2087,7 +2087,9 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 	
 	SETCULL(pd3dDevice,D3DCULL_NONE);
 
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
+#endif
 
 	TextureContainer * tc=NULL;
 	long pcc=ParticleCount;
@@ -2262,6 +2264,7 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 				in.sy=inn.sy;
 			}
 			
+#ifndef ARX_OPENGL
 			if (part->special & PARTICLE_NOZBUFFER) 
 			{
 				GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,FALSE);
@@ -2270,6 +2273,7 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 			{
 				GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,TRUE);
 			}
+#endif
 
 			if (part->special & FADE_IN_AND_OUT) 
 			{
@@ -2417,6 +2421,7 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 
 			if (r>0.f) 
 			{
+#ifndef ARX_OPENGL
 				if (part->special & NO_TRANS)
 				{
 					SETALPHABLEND(pd3dDevice,FALSE);
@@ -2436,6 +2441,7 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
 					}
 				}
+#endif
 				
 				EERIE_3D op=part->oldpos;
 
@@ -2576,14 +2582,18 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 
 			if (pcc<=0)
 			{
+#ifndef ARX_OPENGL
 				GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);
+#endif
 				return;
 			}
 		}	
 	}
 
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);
 	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,TRUE);
+#endif
 }
 
 //-----------------------------------------------------------------------------

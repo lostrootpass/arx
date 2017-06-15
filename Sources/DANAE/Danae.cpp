@@ -8372,6 +8372,30 @@ HRESULT DANAEGL::Render()
 		ARX_PATHS_RedrawAll(0);
 	}
 
+	// Begin Particles ***************************************************************************
+	if (!(Project.hide & HIDE_PARTICLES))
+	{
+		StartBench();
+
+		if (pParticleManager)
+		{
+			pParticleManager->Update(ARX_CLEAN_WARN_CAST_LONG(FrameDiff));
+			pParticleManager->Render(0);
+		}
+
+		ARX_FOGS_Render(0);
+
+		ARX_PARTICLES_Render(0, &subj);
+
+		//TODO
+		//UpdateObjFx(0, &subj);
+
+		BENCH_PARTICLES = EndBench();
+
+	}
+
+	// End Particles ***************************************************************************
+
 	if (!EDITMODE) // Playing Game
 	{
 		// Checks Magic Flares Drawing

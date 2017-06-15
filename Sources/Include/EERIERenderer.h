@@ -20,6 +20,7 @@ const unsigned short EERIE_PRIM_RESTART_IDX = 65534;
 
 class EERIERenderer
 {
+protected:
 	glm::mat4 _projection;
 
 public:
@@ -28,6 +29,7 @@ public:
 	virtual void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex);
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
 	virtual void DrawRoom(EERIE_ROOM_DATA* room) {};
+	virtual void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) {};
 
 	virtual void UpdateLights() {};
 
@@ -47,6 +49,7 @@ public:
 	void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 	void DrawRoom(EERIE_ROOM_DATA* room) override;
+	void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) override;
 
 	void UpdateLights() override;
 
