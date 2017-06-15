@@ -4745,7 +4745,7 @@ void ManageCombatModeAnimationsEND()
 }
 
 float LAST_FADEVALUE=1.f;
-void ManageFade(LPDIRECT3DDEVICE7 m_pd3dDevice)
+void ManageFade()
 { 	
 	float tim=((float)ARX_TIME_Get()-(float)FADESTART);
 
@@ -4765,21 +4765,8 @@ void ManageFade(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	LAST_FADEVALUE=Visibility;
-	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
-	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR );										
-	SETZWRITE(m_pd3dDevice, FALSE );
-	SETALPHABLEND(m_pd3dDevice,TRUE);
-	
-	EERIEDrawBitmap(m_pd3dDevice,0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
-			NULL,_EERIERGB(Visibility));		
 
-	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);	
-	float col=Visibility;
-	EERIEDrawBitmap(m_pd3dDevice,0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
-			NULL,EERIERGB(col*FADECOLOR.r,col*FADECOLOR.g,col*FADECOLOR.b));		
-	SETALPHABLEND(m_pd3dDevice,FALSE);
-	SETZWRITE(m_pd3dDevice, TRUE );
+	g_pRenderApp->renderer->DrawFade(FADECOLOR, Visibility);
 }
 
 extern long cur_mr;
@@ -7331,7 +7318,7 @@ HRESULT DANAE::Render()
 
 	if (FADEDIR)
 	{
-		ManageFade(danaeApp.m_pd3dDevice);
+		ManageFade();
 	}
 
 	SETALPHABLEND(danaeApp.m_pd3dDevice,FALSE);
@@ -8472,6 +8459,11 @@ HRESULT DANAEGL::Render()
 	if (eyeball.exist != 0)
 	{
 		DrawMagicSightInterface(0);
+	}
+
+	if (FADEDIR)
+	{
+		ManageFade();
 	}
 
 	// Reset Last Key

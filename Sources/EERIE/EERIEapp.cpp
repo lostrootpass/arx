@@ -562,6 +562,8 @@ HWND CD3DApplication::CreateToolBar(HWND hWndParent, long tbb, HINSTANCE hInst)
 INT CD3DApplication::Run()
 {
 	BeforeRun();
+
+	renderer = new EERIERendererD3D7();
 	
 	// Load keyboard accelerators
 	HACCEL hAccel = NULL;
@@ -599,6 +601,8 @@ INT CD3DApplication::Run()
 			}
 		}
 	}
+
+	delete renderer;
 
 	return msg.wParam;
 

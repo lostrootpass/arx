@@ -4,6 +4,7 @@
 #include "EERIE_GLshaders.h"
 #include "EERIEmath.h"
 #include "EERIEAnim.h"
+#include "EERIEDraw.h"
 
 #include "Danae.h"
 #include "ARX_Cedric.h"
@@ -100,28 +101,6 @@ suite:
 
 void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex)
 {
-	//Top-left is (0,0); bottom right is (1,1) - legacy Arx assumptions.
-
-	static const GLfloat uvData[] = {
-		0.0f, 0.0f,	//Top Left
-		1.0f, 0.0f,	//Top Right
-		0.0f, 1.0f,	//Bot Left
-		1.0f, 1.0f	//Bot Right
-	};
-
-	static GLuint vertexbuffer = -1;
-	static GLuint uvbuffer = -1;
-
-	if (vertexbuffer == -1)
-	{
-		//LEAK
-		glGenBuffers(1, &vertexbuffer);
-
-		glGenBuffers(1, &uvbuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(uvData), uvData, GL_STATIC_DRAW);
-	}
-
 	const float w = (float)DANAESIZX, h = (float)DANAESIZY;
 
 	const float startX = (x / w);
@@ -129,34 +108,8 @@ void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, 
 	const float dX = (sx / w);
 	const float dY = (sy / h);
 
-	GLfloat quadData[] = {
-		//Top left
-		(startX), (startY), 0.0f,
-
-		//Top right
-		(startX + dX), (startY), 0.0f,
-
-		//Bot left
-		(startX), (startY + dY), 0.0f,
-
-		//Bot right
-		(startX + dX), (startY + dY), 0.0f
-	};
-
-
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadData), quadData, GL_DYNAMIC_DRAW);
-
 	GLuint program = EERIEGetGLProgramID("bitmap");
 	glUseProgram(program);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	//TODO: store uniforms instead of looking up every frame
 	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
@@ -164,14 +117,23 @@ void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, 
 	glBindTexture(GL_TEXTURE_2D, tex->textureID);
 	glUniform1i(uniformLocation, 0);
 
-	GLuint projUniform = glGetUniformLocation(program, "proj");
-	glm::mat4 proj = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f);
-	glUniformMatrix4fv(projUniform, 1, GL_FALSE, &proj[0][0]);
+	_drawQuad(program, startX, startY, dX, dY);
+}
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
+	GLuint program = EERIEGetGLProgramID("fade");
+	glUseProgram(program);
+
+	glm::vec4 colorUniform = glm::vec4(color.r, color.g, color.b, visibility);
+	glUniform4fv(glGetUniformLocation(program, "colorUniform"), 1, &colorUniform[0]);
+
+	_drawQuad(program, 0.0f, 0.0f, 1.0f, 1.0f);
+
+	glDisable(GL_BLEND);
 }
 
 void EERIERendererGL::DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex)
@@ -709,6 +671,65 @@ void EERIERendererGL::UpdateLights()
 	}
 }
 
+void EERIERendererGL::_drawQuad(GLuint program, float startX, float startY, float dX, float dY)
+{
+	//Top-left is (0,0); bottom right is (1,1) - legacy Arx assumptions.
+
+	static const GLfloat uvData[] = {
+		0.0f, 0.0f,	//Top Left
+		1.0f, 0.0f,	//Top Right
+		0.0f, 1.0f,	//Bot Left
+		1.0f, 1.0f	//Bot Right
+	};
+
+	static GLuint vertexbuffer = -1;
+	static GLuint uvbuffer = -1;
+
+	if (vertexbuffer == -1)
+	{
+		//LEAK
+		glGenBuffers(1, &vertexbuffer);
+
+		glGenBuffers(1, &uvbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(uvData), uvData, GL_STATIC_DRAW);
+	}
+
+	const GLfloat quadData[] = {
+		//Top left
+		(startX), (startY), 0.0f,
+
+		//Top right
+		(startX + dX), (startY), 0.0f,
+
+		//Bot left
+		(startX), (startY + dY), 0.0f,
+
+		//Bot right
+		(startX + dX), (startY + dY), 0.0f
+	};
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadData), quadData, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glm::mat4 proj = glm::ortho(0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+}
+
 /************************************************************/
 /*							D3D								*/
 /************************************************************/
@@ -721,6 +742,25 @@ void EERIERendererD3D7::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE
 void EERIERendererD3D7::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex)
 {
 
+}
+
+void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
+{
+	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
+	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+	SETZWRITE(GDevice, FALSE);
+	SETALPHABLEND(GDevice, TRUE);
+
+	EERIEDrawBitmap(GDevice, 0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
+		NULL, _EERIERGB(visibility));
+
+	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
+	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	float col = visibility;
+	EERIEDrawBitmap(GDevice, 0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
+		NULL, EERIERGB(col*FADECOLOR.r, col*FADECOLOR.g, col*FADECOLOR.b));
+	SETALPHABLEND(GDevice, FALSE);
+	SETZWRITE(GDevice, TRUE);
 }
 
 void EERIERendererD3D7::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)

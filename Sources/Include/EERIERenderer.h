@@ -27,6 +27,7 @@ protected:
 public:
 	virtual void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ);
 	virtual void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex);
+	virtual void DrawFade(const EERIE_RGB& color, float visibility) {};
 	virtual void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex);
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
 	virtual void DrawRoom(EERIE_ROOM_DATA* room) {};
@@ -50,6 +51,7 @@ class EERIERendererGL : public EERIERenderer
 public:
 	void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) override;
 	void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex) override;
+	void DrawFade(const EERIE_RGB& color, float visibility) override;
 	void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 	void DrawRoom(EERIE_ROOM_DATA* room) override;
@@ -61,6 +63,8 @@ private:
 
 	//TODO: move/remove
 	std::unordered_map<void*, std::unordered_map<short, short> > _texMapBindings;
+
+	void _drawQuad(GLuint program, float x, float y, float sx, float sy);
 };
 
 
@@ -72,7 +76,7 @@ class EERIERendererD3D7 : public EERIERenderer
 public:
 	void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) override;
 	void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex) override;
-	void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex) override;
+	void DrawFade(const EERIE_RGB& color, float visibility) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 };
 
