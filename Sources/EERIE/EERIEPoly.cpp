@@ -242,6 +242,8 @@ void EERIE_CreateMatriceProj(float _fWidth, float _fHeight, float _fFOV, float _
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &matView.m[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &ProjectionMatrix.m[0][0]);
+
+	g_pRenderApp->renderer->setView((const glm::mat4&)matView);
 #endif
 
 	ProjectionMatrix._11 *= _fWidth * .5f;
@@ -1090,7 +1092,12 @@ void EE_RT(D3DTLVERTEX * in, EERIE_3D * out)
 
 void EE_RT2(D3DTLVERTEX * in, D3DTLVERTEX * out)
 {
-
+#ifdef ARX_OPENGL
+	out->sx = in->sx;
+	out->sy = in->sy;
+	out->sz = in->sz;
+	return;
+#endif
 	out->sx = in->sx - ACTIVECAM->pos.x;
 	out->sy = in->sy - ACTIVECAM->pos.y;
 	out->sz = in->sz - ACTIVECAM->pos.z;
@@ -1110,6 +1117,12 @@ void EE_RT2(D3DTLVERTEX * in, D3DTLVERTEX * out)
 
 void EE_P(EERIE_3D * in, D3DTLVERTEX * out)
 {
+#ifdef ARX_OPENGL
+	out->sx = in->x;
+	out->sy = in->y;
+	out->sz = in->z;
+	return;
+#endif
 	float fZTemp;
 	fZTemp = 1.f / in->z;
 	out->sz = fZTemp * ProjectionMatrix._33 + ProjectionMatrix._43; //HYPERBOLIC

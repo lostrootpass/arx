@@ -22,6 +22,7 @@ class EERIERenderer
 {
 protected:
 	glm::mat4 _projection;
+	glm::mat4 _view;
 
 public:
 	virtual void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ);
@@ -35,6 +36,9 @@ public:
 
 	inline glm::mat4 proj() const { return _projection; }
 	inline void setProj(const glm::mat4& proj) { _projection = proj; }
+
+	inline glm::mat4 view() const { return _view; }
+	inline void setView(const glm::mat4& view) { _view = view; }
 };
 
 

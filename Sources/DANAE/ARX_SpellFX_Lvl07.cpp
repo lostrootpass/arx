@@ -587,11 +587,12 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	cnodetab[0].fy = frand2() * 1.5f * fMySize; //5
 	cnodetab[0].fz = frand2() * 1.5f * fMySize; //5
 
-
+#ifndef ARX_OPENGL
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 	SETTC(m_pd3dDevice, NULL);
+#endif
 
 	v2[0].color = v2[1].color = v2[2].color = v2[3].color = D3DRGB(1, 1, 1);
 

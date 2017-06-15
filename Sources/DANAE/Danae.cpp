@@ -8388,7 +8388,7 @@ HRESULT DANAEGL::Render()
 		ARX_PARTICLES_Render(0, &subj);
 
 		//TODO
-		//UpdateObjFx(0, &subj);
+		UpdateObjFx(0, &subj);
 
 		BENCH_PARTICLES = EndBench();
 

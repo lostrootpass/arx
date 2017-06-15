@@ -1526,11 +1526,13 @@ void UpdateObjFx(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_CAMERA * cam)
 	v[1]= D3DTLVERTEX( D3DVECTOR( 0, 0, 0.001f ), 1.f, D3DRGB(1.f,1.f,1.f), 1, 1.f, 0.f);
 	v[2]= D3DTLVERTEX( D3DVECTOR( 0, 0, 0.001f ), 1.f, D3DRGB(1.f,1.f,1.f), 1, 1.f, 1.f);
 	
+#ifndef ARX_OPENGL
 	pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,   D3DBLEND_ONE );
 	pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE );
 	SETALPHABLEND(pd3dDevice,TRUE);
 
 	SETZWRITE(pd3dDevice, FALSE );
+#endif
 	
 
 	for (long i=0;i<MAX_OBJFX;i++)

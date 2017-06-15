@@ -7609,7 +7609,9 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	for (i=0;i<MAX_SPELLS;i++)
 	{
+#ifndef ARX_OPENGL
 		if (!m_pd3dDevice) spells[i].exist=0;
+#endif
 
 		if (!GLOBAL_MAGIC_MODE) spells[i].tolive=0;
 

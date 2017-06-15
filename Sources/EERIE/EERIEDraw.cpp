@@ -1221,6 +1221,9 @@ void EERIEDrawRotatedSprite(LPDIRECT3DDEVICE7 pd3dDevice,D3DTLVERTEX *in,float s
 	register D3DTLVERTEX out;
 	register float tt;
 		
+	D3DTLVERTEX incopy;
+	memcpy(&incopy, in, sizeof(D3DTLVERTEX));
+
 	EERIETreatPoint2(in, &out);
 	
 	if ((out.sz>0.f) && (out.sz<1000.f))
@@ -1266,10 +1269,10 @@ void EERIEDrawRotatedSprite(LPDIRECT3DDEVICE7 pd3dDevice,D3DTLVERTEX *in,float s
 		{
 			tt=DEG2RAD(MAKEANGLE(rot+90.f*i+45+90));
 #ifdef ARX_OPENGL
-			v[i].sx = EEsin(tt)*t + in->sx;
-			v[i].sy = EEcos(tt)*t + in->sy;
-			v[i].sz = in->sz;
-			v[i].rhw = in->rhw;
+			v[i].sx = EEsin(tt)*t + incopy.sx;
+			v[i].sy = EEcos(tt)*t + incopy.sy;
+			v[i].sz = incopy.sz;
+			v[i].rhw = incopy.rhw;
 #else
 			v[i].sx = EEsin(tt)*t + out.sx;
 			v[i].sy = EEcos(tt)*t + out.sy;

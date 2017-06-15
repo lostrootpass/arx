@@ -18,6 +18,7 @@ void PrepareAnim(EERIE_3DOBJ * eobj, ANIM_USE * eanim, unsigned long time, INTER
 struct VtxAttrib
 {
 	glm::vec3 normal;
+	glm::vec3 color;
 	glm::vec2 uv;
 	GLint texId;
 };
@@ -533,7 +534,7 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 
 void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex)
 {
-	GLenum type = GL_TRIANGLE_FAN;
+	GLenum type = tex? GL_TRIANGLE_FAN : GL_TRIANGLES;
 
 	D3DTLVERTEX* vtxArray = static_cast<D3DTLVERTEX*>(lpvVertices);
 	std::vector<GLfloat> vtx;
@@ -564,7 +565,7 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 
 	glm::mat4 p = glm::mat4();
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &p[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &_view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &_projection[0][0]);
 
 	std::vector<VtxAttrib> vtxAttribs;
@@ -586,15 +587,24 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 		vtx.push_back(vtxArray[i].sz);
 		vtx.push_back(vtxArray[i].rhw);
 
+		attrib.texId = (tex ? 0 : -1);
+
+		attrib.color.r = (vtxArray[i].color >> 24 & 0xFF);
+		attrib.color.g = (vtxArray[i].color >> 16 & 0xFF);
+		attrib.color.b = (vtxArray[i].color >> 8 & 0xFF);
+
 		vtxAttribs.push_back(attrib);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, glAttribBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxAttribs[0]) * vtxAttribs.size(), vtxAttribs.data(), GL_DYNAMIC_DRAW);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex->textureID);
-	glUniform1i(glGetUniformLocation(program, "texsampler"), 0);
+	if (tex)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex->textureID);
+		glUniform1i(glGetUniformLocation(program, "texsampler"), 0);
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, glVtxBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
@@ -608,10 +618,18 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, uv));
 
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, texId));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
+
 	glDrawArrays(type, 0, dwVertexCount);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 
 	glUseProgram(oldProgram);
 
