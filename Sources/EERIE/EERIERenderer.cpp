@@ -195,7 +195,6 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	{
 		//vertexlist3 has already been put in to world space for us, so just pass in an identity matrix.
 		glm::mat4 modelMatrix = glm::mat4();
-		modelMatrix[1][1] *= -1; //flip the Y-axis for characters
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	}
 
@@ -259,7 +258,7 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 				}
 
 				vtx.push_back(vtxArray[fv].v.x);
-				vtx.push_back(vtxArray[fv].v.y);
+				vtx.push_back(-vtxArray[fv].v.y);
 				vtx.push_back(vtxArray[fv].v.z);
 
 				attrib.texId = b;
@@ -508,7 +507,7 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glm::mat4 modelMatrix = glm::mat4();
-	modelMatrix[1][1] *= -1; //flip the Y-axis for characters
+	modelMatrix[1][1] *= -1; //flip the Y-axis
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 
 	glm::mat4 p = glm::mat4();
