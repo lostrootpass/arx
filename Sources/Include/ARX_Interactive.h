@@ -249,7 +249,6 @@ void PlayObjectSound(INTERACTIVE_OBJ * io);
 INTERACTIVE_OBJ * InterClick(EERIE_S2D * pos, long flag = 0);
  
 void RenderInter(LPDIRECT3DDEVICE7 pd3dDevice, float from, float to, long flags = 0);
-void RenderInterGL(float from, float to, long flags = 0);
 INTERACTIVE_OBJ * FlyingOverObject(EERIE_S2D * pos, long flag = 0);
 void MakeIOIdent(INTERACTIVE_OBJ * io);
 void SelectIO(INTERACTIVE_OBJ * io);

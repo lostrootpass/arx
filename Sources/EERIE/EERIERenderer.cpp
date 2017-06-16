@@ -35,11 +35,6 @@ void EERIERenderer::DrawBitmap(float x, float y, float sx, float sy, float z, Te
 
 }
 
-void EERIERenderer::DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex)
-{
-
-}
-
 void EERIERenderer::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 
@@ -52,51 +47,8 @@ void EERIERenderer::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOB
 
 void EERIERendererGL::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
 {
-	if ((io)
-		&& (io != inter.iobj[0]))
-	{
-		float speedfactor = io->basespeed + io->speed_modif;
-
-		if (speedfactor < 0) speedfactor = 0;
-
-		float tim = (float)time*(speedfactor);
-
-		if (tim <= 0.f) time = 0;
-		else time = (unsigned long)tim;
-
-		io->frameloss += tim - time;
-
-		if (io->frameloss > 1.f) // recover lost time...
-		{
-			long tt;
-			F2L(io->frameloss, &tt);
-			io->frameloss -= tt;
-			time += tt;
-		}
-	}
-
-	if (time <= 0) goto suite;
-
-	if (time > 200) time = 200; // TO REMOVE !!!!!!!!!
-
-	PrepareAnim(eobj, eanim, time, io);
-
-	if (io)
-		for (long count = 1; count < MAX_ANIM_LAYERS; count++)
-		{
-			ANIM_USE * animuse = &io->animlayer[count];
-
-			if (animuse->cur_anim)
-				PrepareAnim(eobj, animuse, time, io);
-		}
-
-suite:
-	;
-
-	DESTROYED_DURING_RENDERING = NULL;
-
-	if (USE_CEDRIC_ANIM)
-		Cedric_AnimateDrawEntityGL(eobj, eanim, angle, pos, io, typ);
+	D3DCOLOR color = 0L;
+	EERIEDrawAnimQuat(0, eobj, eanim, angle, pos, time, io, color, typ);
 }
 
 void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex)
@@ -134,70 +86,6 @@ void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
 	_drawQuad(program, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	glDisable(GL_BLEND);
-}
-
-void EERIERendererGL::DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex)
-{
-	D3DTLVERTEX* vertices = static_cast<D3DTLVERTEX*>(lpvVertices);
-
-	static GLuint vertexbuffer = -1;
-	static GLuint uvbuffer = -1;
-	static GLuint glIdxBuffer = -1;
-
-	if (vertexbuffer == -1)
-	{
-		//LEAK
-		glGenBuffers(1, &vertexbuffer);
-		glGenBuffers(1, &uvbuffer);
-		glGenBuffers(1, &glIdxBuffer);
-	}
-
-	std::vector<GLfloat> vertexData;
-	vertexData.resize(dwVertexCount * 3);
-	
-	std::vector<GLfloat> uvData;
-	uvData.resize(dwVertexCount * 2);
-
-	for (DWORD i = 0; i < dwVertexCount; ++i)
-	{
-		vertexData[(i * 3) + 0] = vertices[i].sx;
-		vertexData[(i * 3) + 1] = vertices[i].sy;
-		vertexData[(i * 3) + 2] = vertices[i].sz;
-
-		uvData[(i * 2) + 0] = vertices[i].tu;
-		uvData[(i * 2) + 1] = vertices[i].tv;
-	}
-
-	GLuint program = EERIEGetGLProgramID("bitmap");
-	glUseProgram(program);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData[0]) * vertexData.size(), vertexData.data(), GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(uvData[0]) * uvData.size(), uvData.data(), GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-	//TODO: store uniforms instead of looking up every frame
-	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex->textureID);
-	glUniform1i(uniformLocation, 0);
-
-	GLuint projUniform = glGetUniformLocation(program, "proj");
-	glm::mat4 proj = glm::ortho(0.0f, (float)DANAESIZX, (float)DANAESIZY, 0.0f, -1.0f, 1.0f);
-	glUniformMatrix4fv(projUniform, 1, GL_FALSE, &proj[0][0]);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glIdxBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * idxCount, indices, GL_DYNAMIC_DRAW);
-
-	glDrawElements(GL_TRIANGLE_STRIP, idxCount, GL_UNSIGNED_SHORT, 0);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
 }
 
 void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
@@ -729,6 +617,9 @@ void EERIERendererGL::_drawQuad(GLuint program, float startX, float startY, floa
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 }
+
+
+
 
 /************************************************************/
 /*							D3D								*/

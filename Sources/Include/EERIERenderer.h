@@ -28,7 +28,6 @@ public:
 	virtual void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ);
 	virtual void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex);
 	virtual void DrawFade(const EERIE_RGB& color, float visibility) {};
-	virtual void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex);
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
 	virtual void DrawRoom(EERIE_ROOM_DATA* room) {};
 	virtual void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) {};
@@ -52,7 +51,6 @@ public:
 	void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) override;
 	void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex) override;
 	void DrawFade(const EERIE_RGB& color, float visibility) override;
-	void DrawIndexedPrim(LPVOID lpvVertices, DWORD dwVertexCount, unsigned short* indices, DWORD idxCount, TextureContainer* tex) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 	void DrawRoom(EERIE_ROOM_DATA* room) override;
 	void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) override;

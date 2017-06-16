@@ -942,34 +942,6 @@ extern float GLOBAL_MIPMAP_BIAS;
 //-----------------------------------------------------------------------------
 void PopOneTriangleList(TextureContainer *_pTex,bool _bUpdate)
 {
-#ifdef ARX_OPENGL
-	if (!(_pTex->ulNbVertexListCull) &&
-		!(_pTex->ulNbVertexListCullH))
-	{
-		return;
-	}
-
-	float val;
-
-	if (_pTex->userflags & POLY_LATE_MIP)
-	{
-		val = GLOBAL_NPC_MIPMAP_BIAS;
-	}
-	else
-	{
-		val = GLOBAL_MIPMAP_BIAS;
-	}
-
-	if (_pTex->ulNbVertexListCull)
-	{
-		//EERIEDRAWPRIMGL(GL_TRIANGLES, _pTex, _pTex->pVertexListCull, _pTex->ulNbVertexListCull, 0, 0);
-
-		if (_bUpdate) _pTex->ulNbVertexListCull = 0;
-	}
-
-	PopOneTriangleListClipp(_pTex->pVertexListCullH, (int*)&_pTex->ulNbVertexListCullH);
-	val = GLOBAL_MIPMAP_BIAS;
-#else
 	if(	!(_pTex->ulNbVertexListCull)&&
 		!(_pTex->ulNbVertexListCullH) )
 	{
@@ -1006,7 +978,6 @@ void PopOneTriangleList(TextureContainer *_pTex,bool _bUpdate)
  	PopOneTriangleListClipp(_pTex->pVertexListCullH,(int*)&_pTex->ulNbVertexListCullH);
 	val=GLOBAL_MIPMAP_BIAS;
 	GDevice->SetTextureStageState( 0, D3DTSS_MIPMAPLODBIAS, *((LPDWORD) (&val))  );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1132,14 +1103,9 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 void PopAllTriangleList(bool _bUpdate)
 {
 #ifdef ARX_OPENGL
-	TextureContainer *pTex = GetTextureList();
+	return;
+#endif
 
-	while (pTex)
-	{
-		PopOneTriangleList(pTex, _bUpdate);
-		pTex = pTex->m_pNext;
-	}
-#else
 	D3DMATRIX matbase;
 
 	if(bGATI8500)
@@ -1162,7 +1128,6 @@ TextureContainer *pTex=GetTextureList();
 	{
 		GDevice->SetTransform(D3DTRANSFORMSTATE_PROJECTION,&matbase);
 	}
-#endif
 }
 
 //-----------------------------------------------------------------------------

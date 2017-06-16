@@ -4815,11 +4815,7 @@ else
 		
 		VF_CLIP_IO=1;
 
-#ifdef ARX_OPENGL
-		RenderInterGL(0.f, 3200.0f, 0);
-#else
 		RenderInter(pd3dDevice, 0.f, 3200.f);
-#endif
 		
 		VF_CLIP_IO=0;
 		
@@ -4918,9 +4914,4 @@ if (HALOCUR>0)
 	if (LIGHTTHREAD)
 		ResumeThread(LIGHTTHREAD);
 #endif
-}
-
-void ARX_Scene_RenderGL()
-{
-
 }
