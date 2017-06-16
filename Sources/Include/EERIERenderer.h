@@ -18,6 +18,8 @@
 
 const unsigned short EERIE_PRIM_RESTART_IDX = 65534;
 
+class C_LIGHT;
+
 class EERIERenderer
 {
 protected:
@@ -27,6 +29,7 @@ protected:
 public:
 	virtual void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ);
 	virtual void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex);
+	virtual void DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND) {};
 	virtual void DrawFade(const EERIE_RGB& color, float visibility) {};
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
 	virtual void DrawRoom(EERIE_ROOM_DATA* room) {};
@@ -50,6 +53,7 @@ class EERIERendererGL : public EERIERenderer
 public:
 	void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) override;
 	void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex) override;
+	void DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND) override;
 	void DrawFade(const EERIE_RGB& color, float visibility) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 	void DrawRoom(EERIE_ROOM_DATA* room) override;

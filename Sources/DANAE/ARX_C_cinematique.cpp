@@ -658,7 +658,7 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 #ifdef ARX_OPENGL
 	//TODO: pre-calculate the bounds another way?
 	//TODO: what if we need more than one material? Does this always work?
-	g_pRenderApp->renderer->DrawBitmap(x0, y0, x1 - x0, y1 - y0, 0.0f, grille->mats[0].tex);
+	g_pRenderApp->renderer->DrawCinematic(x0, y0, x1 - x0, y1 - y0, 0.0f, grille->mats[0].tex, light, LightRND);
 	return;
 #endif
 

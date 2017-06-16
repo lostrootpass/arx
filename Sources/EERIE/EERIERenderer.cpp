@@ -8,6 +8,7 @@
 
 #include "Danae.h"
 #include "ARX_Cedric.h"
+#include "ARX_C_cinematique.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -22,6 +23,17 @@ struct VtxAttrib
 	glm::vec3 color;
 	glm::vec2 uv;
 	GLint texId;
+};
+
+struct LightData
+{
+	glm::vec4 pos;
+	glm::vec4 color;
+	float fallstart;
+	//float ___pad1[3];
+	float fallend;
+	//float ___pad2[3];
+	float ___pad[2];
 };
 
 
@@ -70,6 +82,47 @@ void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, 
 	glUniform1i(uniformLocation, 0);
 
 	_drawQuad(program, startX, startY, dX, dY);
+}
+
+void EERIERendererGL::DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND)
+{
+	const float w = (float)DANAESIZX, h = (float)DANAESIZY;
+
+	const float startX = (x / w);
+	const float startY = (y / h);
+	const float dX = (sx / w);
+	const float dY = (sy / h);
+
+	GLint oldProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+	
+	GLuint program = EERIEGetGLProgramID("cinematic");
+	glUseProgram(program);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex->textureID);
+	glUniform1i(glGetUniformLocation(program, "texsampler"), 0);
+
+	LightData lightData;
+	lightData.pos = glm::vec4(light->pos.x / (float)DANAESIZX, light->pos.y / (float)DANAESIZY, light->pos.z, light->intensite);
+	lightData.color = glm::vec4(light->r / 255.0f, light->g / 255.0f, light->b / 255.0f, LightRND);
+	lightData.fallstart = light->fallin / (float)DANAESIZX;
+	lightData.fallend = light->fallout / (float)DANAESIZX;
+
+	static GLuint lightBuffer = -1;
+	if (lightBuffer == -1)
+		glGenBuffers(1, &lightBuffer);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, lightBuffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData), &lightData, GL_DYNAMIC_DRAW);
+
+	GLuint block = glGetUniformBlockIndex(program, "LightData");
+	glUniformBlockBinding(program, block, 1);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightBuffer);
+
+	_drawQuad(program, startX, startY, dX, dY);
+
+	glUseProgram(oldProgram);
 }
 
 void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
@@ -495,16 +548,6 @@ void EERIERendererGL::UpdateLights()
 	//TODO: don't call this for every object.
 	//Has to be done this way for now because legacy Arx updates lights between objects
 	{
-		struct LightData
-		{
-			glm::vec4 pos;
-			glm::vec4 color;
-			float fallstart;
-			float ___pad1[3];
-			float fallend;
-			float ___pad2[3];
-		};
-
 		std::vector<LightData> lightData;
 		for (int i = 0; i < MAX_LLIGHTS; ++i)
 		{

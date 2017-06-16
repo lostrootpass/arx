@@ -15,9 +15,7 @@ struct Light
     vec4 pos;
     vec4 lightColor;
     float fallstart;
-    float _pad1[3];
     float fallend;
-    float _pad2[3];
 };
 
 layout(std140) uniform LightData
