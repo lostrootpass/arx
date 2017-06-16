@@ -30,11 +30,13 @@ struct LightData
 	glm::vec4 pos;
 	glm::vec4 color;
 	float fallstart;
-	//float ___pad1[3];
 	float fallend;
-	//float ___pad2[3];
 	float ___pad[2];
 };
+
+//TODO: move/improve
+GLuint quadVAO = -1;
+GLuint ioVAO = -1;
 
 
 void EERIERenderer::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
@@ -72,6 +74,13 @@ void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, 
 	const float dX = (sx / w);
 	const float dY = (sy / h);
 
+	if (quadVAO == -1)
+	{
+		glGenVertexArrays(1, &quadVAO);
+	}
+
+	glBindVertexArray(quadVAO);
+
 	GLuint program = EERIEGetGLProgramID("bitmap");
 	glUseProgram(program);
 
@@ -95,6 +104,13 @@ void EERIERendererGL::DrawCinematic(float x, float y, float sx, float sy, float 
 
 	GLint oldProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
+
+	if (quadVAO == -1)
+	{
+		glGenVertexArrays(1, &quadVAO);
+	}
+
+	glBindVertexArray(quadVAO);
 	
 	GLuint program = EERIEGetGLProgramID("cinematic");
 	glUseProgram(program);
@@ -130,6 +146,13 @@ void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	if (quadVAO == -1)
+	{
+		glGenVertexArrays(1, &quadVAO);
+	}
+
+	glBindVertexArray(quadVAO);
+
 	GLuint program = EERIEGetGLProgramID("fade");
 	glUseProgram(program);
 
@@ -147,6 +170,13 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 
 	EERIE_VERTEX* vtxArray = static_cast<EERIE_VERTEX*>(lpvVertices);
 	std::vector<GLfloat> vtx;
+
+	if (ioVAO == -1)
+	{
+		glGenVertexArrays(1, &ioVAO);
+	}
+
+	glBindVertexArray(ioVAO);
 
 	//TODO: only update vertex buffers when necessary, not every tick.
 	{
@@ -303,6 +333,13 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 
 	DWORD dwVertexCount = room->nb_vertices;
 
+	if (ioVAO == -1)
+	{
+		glGenVertexArrays(1, &ioVAO);
+	}
+
+	glBindVertexArray(ioVAO);
+
 	GLuint program = EERIEGetGLProgramID("poly");
 	glUseProgram(program);
 
@@ -444,6 +481,13 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 
 	static GLuint glVtxBuffer = -1;
 	static GLuint glAttribBuffer = -1;
+
+	if (quadVAO == -1)
+	{
+		glGenVertexArrays(1, &quadVAO);
+	}
+
+	glBindVertexArray(quadVAO);
 
 	//TODO: only update vertex buffers when necessary, not every tick.
 	{
@@ -620,7 +664,10 @@ void EERIERendererGL::_drawQuad(GLuint program, float startX, float startY, floa
 	{
 		//LEAK
 		glGenBuffers(1, &vertexbuffer);
+	}
 
+	if (uvbuffer == -1)
+	{
 		glGenBuffers(1, &uvbuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(uvData), uvData, GL_STATIC_DRAW);

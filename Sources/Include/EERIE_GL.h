@@ -8,4 +8,12 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 
+#include <cassert>
+
+inline void glCheckError()
+{
+	GLuint error = glGetError();
+	assert(error == GL_NO_ERROR);
+}
+
 #endif
