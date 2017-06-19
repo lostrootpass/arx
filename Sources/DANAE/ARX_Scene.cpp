@@ -3006,6 +3006,15 @@ SMY_D3DVERTEX *pMyVertex;
 				*pIndices++ = ep->uslInd[1];
 				*idxCount += 3;
 			}
+
+			portals->room[room_num].pVtxBuffer[ep->uslInd[0]].color = ep->v[0].color;
+			portals->room[room_num].pVtxBuffer[ep->uslInd[1]].color = ep->v[1].color;
+			portals->room[room_num].pVtxBuffer[ep->uslInd[2]].color = ep->v[2].color;
+
+			if (to & 4)
+			{
+				portals->room[room_num].pVtxBuffer[ep->uslInd[3]].color = ep->v[3].color;
+			}
 #else
 			SMY_D3DVERTEX *pMyVertexCurr;
 

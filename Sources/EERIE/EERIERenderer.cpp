@@ -19,24 +19,39 @@ void PrepareAnim(EERIE_3DOBJ * eobj, ANIM_USE * eanim, unsigned long time, INTER
 
 struct VtxAttrib
 {
+	glm::vec4 color;
 	glm::vec3 normal;
-	glm::vec3 color;
 	glm::vec2 uv;
 	GLint texId;
-};
-
-struct LightData
-{
-	glm::vec4 pos;
-	glm::vec4 color;
-	float fallstart;
-	float fallend;
-	float ___pad[2];
 };
 
 //TODO: move/improve
 GLuint quadVAO = -1;
 GLuint ioVAO = -1;
+
+extern TILE_LIGHTS tilelights[MAX_BKGX][MAX_BKGZ];
+
+void addLights(std::vector<LightData>& data, EERIE_LIGHT** sources, size_t count)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		EERIE_LIGHT* light = sources[i];
+		LightData ld;
+
+		if (!light || !light->exist || !light->treat)
+		{
+			continue;
+		}
+
+		ld.pos = glm::vec4(light->pos.x, -light->pos.y, light->pos.z, 0.0f);
+		ld.color = glm::vec4(light->rgb.r, light->rgb.g, light->rgb.b, light->intensity);
+		ld.fallstart = light->fallstart;
+		ld.fallend = light->fallend;
+		ld.precalc = light->precalc;
+
+		data.push_back(ld);
+	}
+}
 
 
 void EERIERenderer::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
@@ -262,7 +277,12 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 				vtx.push_back(vtxArray[fv].v.z);
 
 				attrib.texId = b;
-				attrib.normal = glm::vec3(face.norm.x, face.norm.y, face.norm.z);
+				attrib.normal = glm::vec3(vtxArray[fv].norm.x, vtxArray[fv].norm.y, -vtxArray[fv].norm.z);
+
+				attrib.color.a = (vtxArray[fv].vert.color >> 24 & 0xFF) / 255.0f;
+				attrib.color.r = (vtxArray[fv].vert.color >> 16 & 0xFF) / 255.0f;
+				attrib.color.g = (vtxArray[fv].vert.color >> 8 & 0xFF) / 255.0f;
+				attrib.color.b = (vtxArray[fv].vert.color >> 0 & 0xFF) / 255.0f;
 
 				vtxAttribs.push_back(attrib);
 			}
@@ -281,7 +301,13 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 		}
 	}
 
-	UpdateLights();
+	{
+		std::vector<LightData> lightData;
+		addLights(lightData, llights, MAX_LLIGHTS);
+		addLights(lightData, IO_PDL, MAX_LLIGHTS);
+		
+		UpdateLights(lightData);
+	}
 
 	for (auto& pair : texMapBindings)
 	{
@@ -314,6 +340,9 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, normal));
 
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
+
 	//glDrawElements(type, eobj->nbfaces * 3, GL_UNSIGNED_INT, 0);
 	glDrawArrays(type, 0, eobj->nbfaces * 3);
 
@@ -321,14 +350,17 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(3);
+	glDisableVertexAttribArray(4);
 }
-
 
 void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 {
 	//TODO: a lot of code here shared with DrawPrim, can be refactored out.
 
 	GLenum type = GL_TRIANGLES;
+
+	int px = room->epdata->px;
+	int py = room->epdata->py;
 
 	DWORD dwVertexCount = room->nb_vertices;
 
@@ -401,16 +433,21 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 			attrib.uv.x = room->pVtxBuffer[i].tu;
 			attrib.uv.y = room->pVtxBuffer[i].tv;
 
-			if (room->pVtxBuffer[i].color != -1 && texMapBindings.find(room->pVtxBuffer[i].color) == texMapBindings.end())
+			if (room->pTexIdBuffer[i] != -1 && texMapBindings.find(room->pTexIdBuffer[i]) == texMapBindings.end())
 			{
-				texMapBindings[room->pVtxBuffer[i].color] = binding;
+				texMapBindings[room->pTexIdBuffer[i]] = binding;
 				binding++;
 			}
 
-			short b = (room->pVtxBuffer[i].color == -1) ? -1 : texMapBindings[room->pVtxBuffer[i].color];
+			short b = (room->pTexIdBuffer[i] == -1) ? -1 : texMapBindings[room->pTexIdBuffer[i]];
 			attrib.texId = b;
 
-			attrib.normal = glm::vec3(room->pNormals[i].x, room->pNormals[i].y, room->pNormals[i].z);
+			attrib.color.a = (room->pVtxBuffer[i].color >> 24 & 0xFF) / 255.0f;
+			attrib.color.r = (room->pVtxBuffer[i].color >> 16 & 0xFF) / 255.0f;
+			attrib.color.g = (room->pVtxBuffer[i].color >> 8 & 0xFF) / 255.0f;
+			attrib.color.b = (room->pVtxBuffer[i].color >> 0 & 0xFF) / 255.0f;
+
+			attrib.normal = glm::vec3(room->pNormals[i].x, -room->pNormals[i].y, room->pNormals[i].z);
 
 			vtxAttribs.push_back(attrib);
 		}
@@ -428,7 +465,19 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 		}
 	}
 
-	UpdateLights();
+	{
+		std::vector<LightData> lightData;
+		addLights(lightData, PDL, MAX_LLIGHTS);
+		
+		if (px != -1 && py != -1)
+		{
+			TILE_LIGHTS * tls = &tilelights[px][py];
+			if(tls->num)
+				addLights(lightData, tls->el, tls->num);
+		}
+
+		UpdateLights(lightData);
+	}
 
 	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
 	for (DWORD i = 0; i < room->usNbTextures; ++i)
@@ -458,6 +507,9 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, normal));
 
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, room->glIdxBuffer);
 
 	//TODO: break up the draw command in to smaller commands? Some rooms use a lot of textures.
@@ -467,6 +519,7 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(3);
+	glDisableVertexAttribArray(4);
 
 	glUseProgram(0);
 }
@@ -535,9 +588,10 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 
 		attrib.texId = (tex ? 0 : -1);
 
-		attrib.color.r = (vtxArray[i].color >> 24 & 0xFF);
-		attrib.color.g = (vtxArray[i].color >> 16 & 0xFF);
-		attrib.color.b = (vtxArray[i].color >> 8 & 0xFF);
+		attrib.color.a = (vtxArray[i].color >> 24 & 0xFF);
+		attrib.color.r = (vtxArray[i].color >> 16 & 0xFF);
+		attrib.color.g = (vtxArray[i].color >> 8 & 0xFF);
+		attrib.color.b = (vtxArray[i].color >> 0 & 0xFF);
 
 		vtxAttribs.push_back(attrib);
 	}
@@ -568,7 +622,7 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, texId));
 
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
 
 	glDrawArrays(type, 0, dwVertexCount);
 
@@ -582,53 +636,14 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glDisable(GL_BLEND);
 }
 
-void EERIERendererGL::UpdateLights()
+void EERIERendererGL::UpdateLights(const std::vector<LightData>& lightData)
 {
 	GLuint program = EERIEGetGLProgramID("poly");
-	//glUseProgram(program);
-
-
+	
 	//TODO: don't call this for every object.
 	//Has to be done this way for now because legacy Arx updates lights between objects
 	{
-		std::vector<LightData> lightData;
-		for (int i = 0; i < MAX_LLIGHTS; ++i)
-		{
-			EERIE_LIGHT* light = PDL[i];
-			LightData ld;
-
-			if (!light || !light->exist || !light->treat)
-			{
-				continue;
-			}
-
-			ld.pos = glm::vec4(light->pos.x, -light->pos.y, light->pos.z, 0.0f);
-			ld.color = glm::vec4(light->rgb.r, light->rgb.g, light->rgb.b, light->intensity);
-			ld.fallstart = light->fallstart;
-			ld.fallend = light->fallend;
-
-			lightData.push_back(ld);
-		}
-
-		for (int i = 0; i < MAX_LLIGHTS; ++i)
-		{
-			EERIE_LIGHT* light = IO_PDL[i];
-			LightData ld;
-
-			if (!light || !light->exist || !light->treat)
-			{
-
-				continue;
-			}
-
-			ld.pos = glm::vec4(light->pos.x, -light->pos.y, light->pos.z, 0.0f);
-			ld.color = glm::vec4(light->rgb.r, light->rgb.g, light->rgb.b, light->intensity);
-			ld.fallstart = light->fallstart;
-			ld.fallend = light->fallend;
-
-			lightData.push_back(ld);
-		}
-
+		
 		static GLuint lightBuffer = -1;
 		if (lightBuffer == -1)
 			glGenBuffers(1, &lightBuffer);
@@ -642,6 +657,8 @@ void EERIERendererGL::UpdateLights()
 			glUniformBlockBinding(program, block, 1);
 			glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightBuffer);
 		}
+
+		glUniform1i(glGetUniformLocation(program, "numLights"), lightData.size());
 	}
 }
 

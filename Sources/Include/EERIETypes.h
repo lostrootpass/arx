@@ -754,6 +754,7 @@ typedef struct
 	unsigned short		*		pussIndice;
 	LPDIRECT3DVERTEXBUFFER7		pVertexBuffer;
 	SMY_D3DVERTEX*				pVtxBuffer;
+	unsigned int *				pTexIdBuffer;
 	EERIE_3D*					pNormals;
 	unsigned long				usNbTextures;
 	TextureContainer		**	ppTextureContainer;

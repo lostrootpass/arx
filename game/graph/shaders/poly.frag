@@ -5,8 +5,9 @@ layout(location = 0) in vec3 fragPos;
 layout(location = 1) in vec2 uv;
 layout(location = 2) flat in int texId;
 layout(location = 3) in vec3 normal;
+layout(location = 4) in vec4 inColor;
 
-out vec3 color;
+out vec4 color;
 
 uniform sampler2D texsampler[24];
 
@@ -16,6 +17,7 @@ struct Light
     vec4 lightColor;
     float fallstart;
     float fallend;
+    float precalc;
 };
 
 layout(std140) uniform LightData
@@ -23,9 +25,11 @@ layout(std140) uniform LightData
     Light lights[18];
 };
 
+uniform int numLights;
+
 void main()
 {
-    vec3 fragColor = vec3(1.0, 0.0, 1.0);
+      vec3 fragColor = vec3(1.0, 0.0, 1.0);
     
     if(texId >= 0)
     {
@@ -39,35 +43,44 @@ void main()
     }
 
     vec3 base = fragColor;
+	
+	vec3 lightContribution = inColor.rgb;
 
     int lightCount = 0;
     const int MAX_LIGHTS = 4;
-    for(int i = 0; i < 18; ++i)
+	for(int i = 0; i < numLights; ++i)
     {
         Light l = lights[i];
         float lightDist = distance(l.pos.xyz, fragPos);
         if(lightDist < l.fallend)
         {
-            float d = dot(normalize(l.pos.xyz - fragPos), normal);
-            d = abs(d); //TODO: fix.
+            float d = dot((l.pos.xyz - fragPos), normal) * 0.5/lightDist;
+
             if(d >= 0.0)
             {
-                float delta = ((lightDist - l.fallstart) / (l.fallend - l.fallstart));
-                delta = max(0.0, delta);
-                
-                fragColor *= ((l.lightColor.rgb * (1.0 - delta)) * d);
-                
-                if(++lightCount >= MAX_LIGHTS)
-                {
-                    break;
-                }
+                float adj;
+				if(lightDist <= l.fallstart)
+				{
+					adj = d * l.precalc;
+				}
+				else
+				{
+					float falldiff = l.fallend - l.fallstart;
+					float falldiffmul = 1.0 / falldiff;
+					
+					adj = lightDist - l.fallstart;
+					adj = (falldiff - adj) * falldiffmul * l.precalc * d;
+				}
+
+                adj = min(1.0, adj);
+                lightContribution += (l.lightColor.rgb * adj);
             }
         }
     }
 
-    //If unlit, default to ambient.
-    if(lightCount == 0)
-        fragColor *= 0.0;
-
-    color = fragColor + (base * 0.2);
+    lightContribution.r = min(1.0, lightContribution.r);
+    lightContribution.g = min(1.0, lightContribution.g);
+    lightContribution.b = min(1.0, lightContribution.b);
+    
+    color = vec4(lightContribution * fragColor, inColor.a);
 }

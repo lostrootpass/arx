@@ -15,10 +15,21 @@
 #endif
 
 #include <unordered_map>
+#include <vector>
 
 const unsigned short EERIE_PRIM_RESTART_IDX = 65534;
 
 class C_LIGHT;
+
+struct LightData
+{
+	glm::vec4 pos;
+	glm::vec4 color;
+	float fallstart;
+	float fallend;
+	float precalc;
+	float ___pad[1];
+};
 
 class EERIERenderer
 {
@@ -35,7 +46,7 @@ public:
 	virtual void DrawRoom(EERIE_ROOM_DATA* room) {};
 	virtual void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) {};
 
-	virtual void UpdateLights() {};
+	virtual void UpdateLights(const std::vector<LightData>& lightData) {};
 
 	inline glm::mat4 proj() const { return _projection; }
 	inline void setProj(const glm::mat4& proj) { _projection = proj; }
@@ -59,7 +70,7 @@ public:
 	void DrawRoom(EERIE_ROOM_DATA* room) override;
 	void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) override;
 
-	void UpdateLights() override;
+	void UpdateLights(const std::vector<LightData>& lightData) override;
 
 private:
 
