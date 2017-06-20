@@ -59,7 +59,7 @@ void EERIERenderer::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D 
 
 }
 
-void EERIERenderer::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex)
+void EERIERenderer::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs)
 {
 
 }
@@ -80,7 +80,7 @@ void EERIERendererGL::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3
 	EERIEDrawAnimQuat(0, eobj, eanim, angle, pos, time, io, color, typ);
 }
 
-void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex)
+void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs)
 {
 	const float w = (float)DANAESIZX, h = (float)DANAESIZY;
 
@@ -105,7 +105,7 @@ void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, 
 	glBindTexture(GL_TEXTURE_2D, tex->textureID);
 	glUniform1i(uniformLocation, 0);
 
-	_drawQuad(program, startX, startY, dX, dY);
+	_drawQuad(program, startX, startY, dX, dY, uvs);
 }
 
 void EERIERendererGL::DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND)
@@ -701,7 +701,7 @@ void EERIERendererGL::UpdateLights(const std::vector<LightData>& lightData)
 	}
 }
 
-void EERIERendererGL::_drawQuad(GLuint program, float startX, float startY, float dX, float dY)
+void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, float sy, const float* uvs)
 {
 	//Top-left is (0,0); bottom right is (1,1) - legacy Arx assumptions.
 
@@ -724,22 +724,28 @@ void EERIERendererGL::_drawQuad(GLuint program, float startX, float startY, floa
 	if (uvbuffer == -1)
 	{
 		glGenBuffers(1, &uvbuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(uvData), uvData, GL_STATIC_DRAW);
 	}
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+
+	if(uvs)
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 8, uvs, GL_DYNAMIC_DRAW);
+	else
+		glBufferData(GL_ARRAY_BUFFER, sizeof(uvData), uvData, GL_DYNAMIC_DRAW);
 
 	const GLfloat quadData[] = {
 		//Top left
-		(startX), (startY), 0.0f,
+		(x), (y), 0.0f,
 
 		//Top right
-		(startX + dX), (startY), 0.0f,
+		(x + sx), (y), 0.0f,
 
 		//Bot left
-		(startX), (startY + dY), 0.0f,
+		(x), (y + sy), 0.0f,
 
 		//Bot right
-		(startX + dX), (startY + dY), 0.0f
+		(x + sx), (y + sy), 0.0f
 	};
 
 
@@ -771,11 +777,6 @@ void EERIERendererGL::_drawQuad(GLuint program, float startX, float startY, floa
 /************************************************************/
 
 void EERIERendererD3D7::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
-{
-
-}
-
-void EERIERendererD3D7::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex)
 {
 
 }

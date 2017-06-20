@@ -362,7 +362,13 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 					px2 = (ratio * pbar->m_dwWidth) * Xratio;
 					py2 = pbar->m_dwHeight * Yratio;
 
-					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar);
+					const float uvs[] = {
+						0.0f, 0.0f,
+						ratio, 0.0f,
+						0.0f, 1.0f,
+						ratio, 1.0f
+					};
+					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar, uvs);
 
 				}
 				else
@@ -379,7 +385,13 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 					px2 = (ratio * pbar->m_dwWidth) * Xratio;
 					py2 = pbar->m_dwHeight * Yratio;
 
-					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar);
+					const float uvs[] = {
+						0.0f, 0.0f,
+						ratio, 0.0f,
+						0.0f, 1.0f,
+						ratio, 1.0f
+					};
+					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar, uvs);
 				}
 
 			}

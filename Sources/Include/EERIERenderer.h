@@ -39,7 +39,7 @@ protected:
 
 public:
 	virtual void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ);
-	virtual void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex);
+	virtual void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs = 0);
 	virtual void DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND) {};
 	virtual void DrawFade(const EERIE_RGB& color, float visibility) {};
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
@@ -64,7 +64,7 @@ class EERIERendererGL : public EERIERenderer
 {
 public:
 	void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) override;
-	void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex) override;
+	void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs = 0) override;
 	void DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND) override;
 	void DrawFade(const EERIE_RGB& color, float visibility) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
@@ -79,7 +79,7 @@ private:
 	//TODO: move/remove
 	std::unordered_map<void*, std::unordered_map<short, short> > _texMapBindings;
 
-	void _drawQuad(GLuint program, float x, float y, float sx, float sy);
+	void _drawQuad(GLuint program, float x, float y, float sx, float sy, const float* uvs = 0);
 };
 
 
@@ -90,7 +90,6 @@ class EERIERendererD3D7 : public EERIERenderer
 {
 public:
 	void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) override;
-	void DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex) override;
 	void DrawFade(const EERIE_RGB& color, float visibility) override;
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 };
