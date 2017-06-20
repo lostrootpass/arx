@@ -588,10 +588,10 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 
 		attrib.texId = (tex ? 0 : -1);
 
-		attrib.color.a = (vtxArray[i].color >> 24 & 0xFF);
-		attrib.color.r = (vtxArray[i].color >> 16 & 0xFF);
-		attrib.color.g = (vtxArray[i].color >> 8 & 0xFF);
-		attrib.color.b = (vtxArray[i].color >> 0 & 0xFF);
+		attrib.color.a = (vtxArray[i].color >> 24 & 0xFF) / 255.0f;
+		attrib.color.r = (vtxArray[i].color >> 16 & 0xFF) / 255.0f;
+		attrib.color.g = (vtxArray[i].color >> 8 & 0xFF) / 255.0f;
+		attrib.color.b = (vtxArray[i].color >> 0 & 0xFF) / 255.0f;
 
 		vtxAttribs.push_back(attrib);
 	}
@@ -632,6 +632,45 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glDisableVertexAttribArray(3);
 
 	glUseProgram(oldProgram);
+
+	glDisable(GL_BLEND);
+}
+
+void EERIERendererGL::DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer * tex)
+{
+	const float w = (float)DANAESIZX, h = (float)DANAESIZY;
+
+	const float startX = (x / w);
+	const float startY = (y / h);
+	const float dX = (sx / w);
+	const float dY = (sy / h);
+
+	if (quadVAO == -1)
+	{
+		glGenVertexArrays(1, &quadVAO);
+	}
+
+	glBindVertexArray(quadVAO);
+
+	glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	GLuint program = EERIEGetGLProgramID("screenfx");
+	glUseProgram(program);
+
+	glm::vec4 color;
+	color.a = (col >> 24 & 0xFF) / 255.0f;
+	color.r = (col >> 16 & 0xFF) / 255.0f;
+	color.g = (col >> 8 & 0xFF) / 255.0f;
+	color.b = (col >> 0 & 0xFF) / 255.0f;
+	glUniform4fv(glGetUniformLocation(program, "color"), 1, &color[0]);
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex->textureID);
+	glUniform1i(glGetUniformLocation(program, "texsampler"), 0);
+
+	_drawQuad(program, startX, startY, dX, dY);
 
 	glDisable(GL_BLEND);
 }

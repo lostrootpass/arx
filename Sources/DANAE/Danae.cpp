@@ -8705,7 +8705,179 @@ void DANAEGL::DrawAllInterfaceFinish()
 
 void DANAEGL::GoFor2DFX()
 {
+	D3DTLVERTEX lv, ltvv;
 
+	long needed = 0;
+
+	for (long i = 0; i < TOTPDL; i++)
+	{
+		EERIE_LIGHT * el = PDL[i];
+
+		if (el->extras & EXTRAS_FLARE)
+		{
+			if ((EEDistance3D(&ACTIVECAM->pos, &el->pos) < 2200))
+			{
+				needed = 1;
+				break;
+			}
+		}
+	}
+
+	if (!needed) return;
+
+	{
+		INTERACTIVE_OBJ* pTableIO[256];
+		int nNbInTableIO = 0;
+
+		LAST_LOCK_SUCCESSFULL = 1;
+		float temp_increase = _framedelay*DIV1000*4.f;
+		DURING_LOCK = 1;
+		{
+			bool bComputeIO = false;
+
+			for (int i = 0; i < TOTPDL; i++)
+			{
+				EERIE_LIGHT * el = PDL[i];
+
+				long lPosx = (long)(float)(el->pos.x*ACTIVEBKG->Xmul);
+				long lPosz = (long)(float)(el->pos.z*ACTIVEBKG->Zmul);
+
+				if ((lPosx < 0) ||
+					(lPosx >= ACTIVEBKG->Xsize) ||
+					(lPosz < 0) ||
+					(lPosz >= ACTIVEBKG->Zsize) ||
+					(!ACTIVEBKG->fastdata[lPosx][lPosz].treat))
+				{
+					el->treat = 0;
+					continue;
+				}
+
+				if (el->extras & EXTRAS_FLARE)
+				{
+					lv.sx = el->pos.x;
+					lv.sy = el->pos.y;
+					lv.sz = el->pos.z;
+					specialEE_RTP(&lv, &ltvv);
+					el->temp -= temp_increase;
+
+					if (!(player.Interface & INTER_COMBATMODE)
+						&& (player.Interface & INTER_MAP))
+						continue;
+
+					LAST_ZVAL = ltvv.sz;
+
+					if ((ltvv.rhw > 0.f) &&
+						(ltvv.sx > 0.f) &&
+						(ltvv.sy > (CINEMA_DECAL*Yratio)) &&
+						(ltvv.sx < DANAESIZX) &&
+						(ltvv.sy < (DANAESIZY - (CINEMA_DECAL*Yratio)))
+						)
+					{
+						EERIE_3D vector;
+						vector.x = lv.sx - ACTIVECAM->pos.x;
+						vector.y = lv.sy - ACTIVECAM->pos.y;
+						vector.z = lv.sz - ACTIVECAM->pos.z;
+						float fNorm = 50.f / sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+						vector.x *= fNorm;
+						vector.y *= fNorm;
+						vector.z *= fNorm;
+						D3DTLVERTEX ltvv2;
+						lv.sx -= vector.x;
+						lv.sy -= vector.y;
+						lv.sz -= vector.z;
+						specialEE_RTP(&lv, &ltvv2);
+
+						float fZFire = ltvv2.sz*(float)danaeApp.zbuffer_max;
+						float fZFar = ProjectionMatrix._33*(1.f / (ACTIVECAM->cdepth*fZFogEnd)) + ProjectionMatrix._43;
+
+						EERIE_3D	hit;
+						EERIEPOLY	*tp = NULL;
+						EERIE_S2D ees2dlv;
+						EERIE_3D ee3dlv;
+						ee3dlv.x = lv.sx;
+						ee3dlv.y = lv.sy;
+						ee3dlv.z = lv.sz;
+
+
+						ARX_CHECK_SHORT(ltvv.sx);
+						ARX_CHECK_SHORT(ltvv.sy);
+
+						ees2dlv.x = ARX_CLEAN_WARN_CAST_SHORT(ltvv.sx);
+						ees2dlv.y = ARX_CLEAN_WARN_CAST_SHORT(ltvv.sy);
+
+
+						if (!bComputeIO)
+						{
+							GetFirstInterAtPos(&ees2dlv, 2, &ee3dlv, pTableIO, &nNbInTableIO);
+							bComputeIO = true;
+						}
+
+						if (
+							(ltvv.sz > fZFar) ||
+							EERIELaunchRay3(&ACTIVECAM->pos, &ee3dlv, &hit, tp, 1) ||
+							GetFirstInterAtPos(&ees2dlv, 3, &ee3dlv, pTableIO, &nNbInTableIO)
+							)
+						{
+							el->temp -= temp_increase*2.f;
+						}
+						else
+						{
+							el->temp += temp_increase*2.f;
+						}
+
+						LAST_ZVAL = fZFire;
+
+						ARX_CHECK_LONG(danaeApp.zbuffer_max);
+						LAST_FVAL = ARX_CLEAN_WARN_CAST_LONG(danaeApp.zbuffer_max);
+
+					}
+
+					if (el->temp < 0.f) el->temp = 0.f;
+					else if (el->temp > .8f) el->temp = .8f;
+				}
+			}
+		}
+
+		DURING_LOCK = 0;
+		// End 2D Pass ***************************************************************************
+
+		{
+			for (int i = 0; i < TOTPDL; i++)
+			{
+				EERIE_LIGHT * el = PDL[i];
+
+				if ((!el->exist) || (!el->treat)) continue;
+
+				if (el->extras & EXTRAS_FLARE)
+				{
+					if (el->temp > 0.f)
+					{
+						lv.sx = el->pos.x;
+						lv.sy = el->pos.y;
+						lv.sz = el->pos.z;
+						lv.rhw = 1.f;
+						specialEE_RT((D3DTLVERTEX *)&lv, (EERIE_3D *)&ltvv);
+						float v = el->temp;
+
+						if (FADEDIR)
+						{
+							v *= 1.f - LAST_FADEVALUE;
+						}
+
+						float siz;
+
+						if (el->extras & EXTRAS_FIXFLARESIZE)
+							siz = el->ex_flaresize;
+						else
+							siz = -el->ex_flaresize;
+
+						EERIEDrawSprite(GDevice, &lv, siz, tflare, EERIERGB(v*el->rgb.r, v*el->rgb.g, v*el->rgb.b), ltvv.sz);
+
+					}
+				}
+			}
+		}
+	}
 }
 
 HRESULT DANAEGL::BeforeRun()

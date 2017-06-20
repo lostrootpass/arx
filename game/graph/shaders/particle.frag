@@ -16,10 +16,10 @@ void main()
    if(texId != -1)
         c = texture( texsampler, uv ).rgb;
 
-   if(length(c) < 0.1)
+   if(length(c) < 0.25)
    {
        discard;
    }
 
-   color = vec4(c, max(0.0, min(1.0, length(c) - 0.1)));
+   color = inColor * vec4(c, min(1.0, length(c) - 0.1));
 }

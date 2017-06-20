@@ -45,6 +45,7 @@ public:
 	virtual void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io);
 	virtual void DrawRoom(EERIE_ROOM_DATA* room) {};
 	virtual void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) {};
+	virtual void DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer * tex) {};
 
 	virtual void UpdateLights(const std::vector<LightData>& lightData) {};
 
@@ -69,6 +70,7 @@ public:
 	void DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 	void DrawRoom(EERIE_ROOM_DATA* room) override;
 	void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) override;
+	void DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer* tex) override;
 
 	void UpdateLights(const std::vector<LightData>& lightData) override;
 

@@ -1207,8 +1207,12 @@ void EERIEDrawSprite(LPDIRECT3DDEVICE7 pd3dDevice,D3DTLVERTEX *in,float siz,Text
 		v[2]= D3DTLVERTEX( D3DVECTOR( SPRmins.x, SPRmaxs.y, out.sz), out.rhw, col, out.specular, 0.f, 1.f);
 		v[3]= D3DTLVERTEX( D3DVECTOR( SPRmaxs.x, SPRmaxs.y, out.sz), out.rhw, col, out.specular, 1.f, 1.f);
 
+#ifdef ARX_OPENGL
+		g_pRenderApp->renderer->DrawSprite(SPRmins.x, SPRmins.y, SPRmaxs.x - SPRmins.x, SPRmaxs.y - SPRmins.y, col, tex);
+#else
 		SETTC(pd3dDevice,tex);
 		EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , v, 4,  0  );		
+#endif
 	}
 	else SPRmaxs.x=-1;
 }
@@ -1269,9 +1273,9 @@ void EERIEDrawRotatedSprite(LPDIRECT3DDEVICE7 pd3dDevice,D3DTLVERTEX *in,float s
 		{
 			tt=DEG2RAD(MAKEANGLE(rot+90.f*i+45+90));
 #ifdef ARX_OPENGL
-			v[i].sx = EEsin(tt)*t + incopy.sx;
+			v[i].sx = incopy.sx;
 			v[i].sy = EEcos(tt)*t + incopy.sy;
-			v[i].sz = incopy.sz;
+			v[i].sz = EEsin(tt)*t + incopy.sz;
 			v[i].rhw = incopy.rhw;
 #else
 			v[i].sx = EEsin(tt)*t + out.sx;
