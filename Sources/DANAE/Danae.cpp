@@ -8027,6 +8027,14 @@ HRESULT DANAEGL::Render()
 	BENCH_PLAYER = EndBench();
 
 
+	//-------------------------------------------------------------------------------
+	//															DRAW CINEMASCOPE 16/9
+	if (CINEMA_DECAL != 0.f)
+	{
+		int scope = (int)(CINEMA_DECAL * Yratio);
+		glScissor(0, scope, DANAESIZX, DANAESIZY - (scope * 2));
+	}
+
 	///Subjective view start
 	if((inter.iobj[0]) && (inter.iobj[0]->animlayer[0].cur_anim))
 	{
@@ -9009,6 +9017,8 @@ bool DANAEGL::DANAEStartRender()
 
 bool DANAEGL::DANAEEndRender()
 {
+	glScissor(0, 0, DANAESIZX, DANAESIZY);
+
 	//TODO: remove from here. Done purely to satisfy the whims of the existing codebase.
 	SDL_GL_SwapWindow(_window);
 

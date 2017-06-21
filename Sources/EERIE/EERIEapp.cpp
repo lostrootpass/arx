@@ -196,6 +196,8 @@ INT	 COpenGLApplication::Run()
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glViewport(0, 0, DANAESIZX, DANAESIZY);
+
+	glEnable(GL_SCISSOR_TEST);
 	glScissor(0, 0, DANAESIZX, DANAESIZY);
 
 	glEnable(GL_DEPTH_TEST);
