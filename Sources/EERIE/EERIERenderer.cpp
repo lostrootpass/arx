@@ -182,6 +182,7 @@ void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
 void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 	GLenum type = GL_TRIANGLES;
+	bool useAlphaBlending = false;
 
 	EERIE_VERTEX* vtxArray = static_cast<EERIE_VERTEX*>(lpvVertices);
 	std::vector<GLfloat> vtx;
@@ -257,7 +258,8 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 			}
 
 			unsigned short fv;
-			for (int i = 0; i < 3; ++i)
+			int faceVtxCount = (face.facetype & POLY_QUAD) ? 4 : 3;
+			for (int i = 0; i < faceVtxCount; ++i)
 			{
 				fv = face.vid[i];
 
@@ -279,12 +281,37 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 				attrib.texId = b;
 				attrib.normal = glm::vec3(vtxArray[fv].norm.x, vtxArray[fv].norm.y, -vtxArray[fv].norm.z);
 
-				attrib.color.a = (vtxArray[fv].vert.color >> 24 & 0xFF) / 255.0f;
+				float alpha = (vtxArray[fv].vert.color >> 24 & 0xFF) / 255.0f;
+				if (face.transval > 0.0f)
+				{
+					if (!useAlphaBlending)
+					{
+						useAlphaBlending = true;
+					}
+
+					if (face.transval > 1.0f)
+					{
+						alpha = face.transval - 1.0f;
+					}
+					else
+					{
+						alpha = face.transval;
+					}
+				}
+
+				attrib.color.a = alpha;
 				attrib.color.r = (vtxArray[fv].vert.color >> 16 & 0xFF) / 255.0f;
 				attrib.color.g = (vtxArray[fv].vert.color >> 8 & 0xFF) / 255.0f;
 				attrib.color.b = (vtxArray[fv].vert.color >> 0 & 0xFF) / 255.0f;
 
 				vtxAttribs.push_back(attrib);
+			}
+
+			if (faceVtxCount == 4)
+			{
+				indices.push_back(face.vid[3]);
+				indices.push_back(face.vid[2]);
+				indices.push_back(face.vid[1]);
 			}
 		}
 
@@ -343,6 +370,12 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	glEnableVertexAttribArray(4);
 	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
 
+	if (useAlphaBlending)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+	}
+
 	//glDrawElements(type, eobj->nbfaces * 3, GL_UNSIGNED_INT, 0);
 	glDrawArrays(type, 0, eobj->nbfaces * 3);
 
@@ -351,6 +384,9 @@ void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3D
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(3);
 	glDisableVertexAttribArray(4);
+
+	if(useAlphaBlending)
+		glDisable(GL_BLEND);
 }
 
 void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
