@@ -736,6 +736,22 @@ void EERIERendererGL::UpdateLights(const std::vector<LightData>& lightData)
 	}
 }
 
+void EERIERendererGL::setProj(const glm::mat4& proj)
+{
+	EERIERenderer::setProj(proj);
+
+	GLuint program = EERIEGetGLProgramID("poly");
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
+}
+
+void EERIERendererGL::setView(const glm::mat4& view)
+{
+	EERIERenderer::setView(view);
+
+	GLuint program = EERIEGetGLProgramID("poly");
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
+}
+
 void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, float sy, const float* uvs)
 {
 	//Top-left is (0,0); bottom right is (1,1) - legacy Arx assumptions.

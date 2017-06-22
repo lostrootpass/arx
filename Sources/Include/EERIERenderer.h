@@ -50,10 +50,10 @@ public:
 	virtual void UpdateLights(const std::vector<LightData>& lightData) {};
 
 	inline glm::mat4 proj() const { return _projection; }
-	inline void setProj(const glm::mat4& proj) { _projection = proj; }
+	inline virtual void setProj(const glm::mat4& proj) { _projection = proj; }
 
 	inline glm::mat4 view() const { return _view; }
-	inline void setView(const glm::mat4& view) { _view = view; }
+	inline virtual void setView(const glm::mat4& view) { _view = view; }
 };
 
 
@@ -73,6 +73,9 @@ public:
 	void DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer* tex) override;
 
 	void UpdateLights(const std::vector<LightData>& lightData) override;
+
+	void setProj(const glm::mat4& proj) override;
+	void setView(const glm::mat4& view) override;
 
 private:
 

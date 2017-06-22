@@ -210,10 +210,6 @@ void EERIE_CreateMatriceProj(float _fWidth, float _fHeight, float _fFOV, float _
 		GDevice->SetTransform(D3DTRANSFORMSTATE_PROJECTION, &ProjectionMatrix);
 	}
 
-#ifdef ARX_OPENGL
-	g_pRenderApp->renderer->setProj((const glm::mat4&)ProjectionMatrix);
-#endif
-
 
 	D3DVECTOR vEyePt = D3DVECTOR(ACTIVECAM->pos.x, -ACTIVECAM->pos.y, ACTIVECAM->pos.z);
 
@@ -237,12 +233,7 @@ void EERIE_CreateMatriceProj(float _fWidth, float _fHeight, float _fFOV, float _
 	D3DUtil_SetViewMatrix(matView, vEyePt, vLookatPt, vUpVec);
 
 #ifdef ARX_OPENGL
-	GLuint program = EERIEGetGLProgramID("poly");
-	glUseProgram(program);
-
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &matView.m[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &ProjectionMatrix.m[0][0]);
-
+	g_pRenderApp->renderer->setProj((const glm::mat4&)ProjectionMatrix);
 	g_pRenderApp->renderer->setView((const glm::mat4&)matView);
 #endif
 
