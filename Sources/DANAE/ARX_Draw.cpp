@@ -108,8 +108,10 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 		SET_FORCE_NO_VB( true );
 	}
 
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
 	SetZBias(pd3dDevice,1);
+#endif
 
 	long k;
 	long first=1;
@@ -246,6 +248,9 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 								SETBLENDMODE(pd3dDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
 								SETALPHABLEND(pd3dDevice,TRUE);
 								SETTC(pd3dDevice,Boom);
+#ifdef ARX_OPENGL
+								glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+#endif
 							}
 
 							EE_RT2(&in,&ltv[0]);
@@ -270,12 +275,14 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 		
 		}
 
+#ifndef ARX_OPENGL
 	SETALPHABLEND(pd3dDevice,FALSE);
 	SETZWRITE(pd3dDevice, TRUE );
 	SetZBias(pd3dDevice,0);
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);
 	
 	if( bSoftRender ) SET_FORCE_NO_VB( bNoVB );
+#endif
 }
 
 //***********************************************************************************************

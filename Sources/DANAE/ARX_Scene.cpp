@@ -4808,10 +4808,8 @@ else
 	if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_J))
 		bOLD_CLIPP=!bOLD_CLIPP;
 
-#ifndef ARX_OPENGL
 	if ((SHOWSHADOWS) && (!Project.improve))
 		ARXDRAW_DrawInterShadows(pd3dDevice);
-#endif
 
 	FRAME_COUNT=LAST_FC;
 

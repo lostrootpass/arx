@@ -593,7 +593,6 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glPrimitiveRestartIndex(EERIE_PRIM_RESTART_IDX);
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glm::mat4 modelMatrix = glm::mat4();
 	modelMatrix[1][1] *= -1; //flip the Y-axis

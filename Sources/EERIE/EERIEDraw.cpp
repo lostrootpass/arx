@@ -1285,6 +1285,7 @@ void EERIEDrawRotatedSprite(LPDIRECT3DDEVICE7 pd3dDevice,D3DTLVERTEX *in,float s
 
 		SETTC(pd3dDevice,tex);
 #ifdef ARX_OPENGL
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		g_pRenderApp->renderer->DrawRotatedSprite((LPVOID)&v, 4, tex);
 #else
 		EERIEDRAWPRIM(pd3dDevice, D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE , 
