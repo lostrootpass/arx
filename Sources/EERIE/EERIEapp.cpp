@@ -273,11 +273,6 @@ VOID COpenGLApplication::OutputText(DWORD x, DWORD y, TCHAR * str)
 
 }
 
-HRESULT	COpenGLApplication::SetClipping(float x1, float y1, float x2, float y2)
-{
-	return S_OK;
-}
-
 HRESULT COpenGLApplication::Change3DEnvironment()
 {
 	return S_OK;
@@ -1357,20 +1352,6 @@ VOID CalcFPS(BOOL reset)
 			dwFrames  = 0L;
 		}
 	}
-}
-
-//*************************************************************************************
-// ShowStats()
-// Shows frame rate and dimensions of the rendering device.
-//*************************************************************************************
-
-HRESULT CD3DApplication::SetClipping(float x1, float y1, float x2, float y2)
-{
-	D3DVIEWPORT7 vp = {(unsigned long)x1, (unsigned long)y1, (unsigned long)x2, (unsigned long)y2, 0.f, 1.f};
-
-	if (FAILED(m_pd3dDevice->SetViewport(&vp))) return D3DFWERR_NOVIEWPORT;
-
-	return S_OK;
 }
 
 //*************************************************************************************

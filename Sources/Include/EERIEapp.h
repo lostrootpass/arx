@@ -290,8 +290,6 @@ public:
 	virtual void					EvictManagedTextures() = 0;
 	virtual VOID					OutputText(DWORD x, DWORD y, TCHAR * str) = 0;
 
-	virtual HRESULT	SetClipping(float x1, float y1, float x2, float y2) = 0;
-
 	virtual HRESULT					Change3DEnvironment() = 0;
 	virtual HRESULT					Initialize3DEnvironment() = 0;
 	virtual HRESULT	Render3DEnvironment() = 0;
@@ -393,8 +391,6 @@ public:
 	virtual void					EvictManagedTextures();
 	virtual VOID					OutputText(DWORD x, DWORD y, TCHAR * str);
 
-	virtual HRESULT	SetClipping(float x1, float y1, float x2, float y2);
-
 	virtual HRESULT					Change3DEnvironment();
 	virtual HRESULT					Initialize3DEnvironment();
 	virtual HRESULT Render3DEnvironment();
@@ -438,8 +434,6 @@ public:
 		virtual void					EvictManagedTextures();
 		virtual VOID					OutputText( DWORD x, DWORD y, TCHAR * str );
  		
-		virtual HRESULT	SetClipping( float x1, float y1, float x2, float y2 );
-		
 		virtual HRESULT					Change3DEnvironment();
 		virtual HRESULT					Initialize3DEnvironment();
 

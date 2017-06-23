@@ -8641,7 +8641,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 			GDevice->Clear( 1, &rec, D3DCLEAR_ZBUFFER, 0, 1.f, 0L );
 
 			if (ARXmenu.currentmode!=AMCM_OFF)
-				danaeApp.SetClipping(139.f*Xratio,0,139.f*Xratio,310.f*Yratio);
+				g_pRenderApp->renderer->SetViewport(139.f*Xratio,0,139.f*Xratio,310.f*Yratio);
 		}
 		else
 		{
@@ -8730,9 +8730,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 			vp.dwHeight	=	rec.y2 - rec.y1;
 		}
 
-		vp.dvMinZ	=	0.f;
-		vp.dvMaxZ	=	1.f;
-		GDevice->SetViewport(&vp);
+		g_pRenderApp->renderer->SetViewport(vp.dwX, vp.dwY, vp.dwWidth, vp.dwHeight);
 		
 		
 		ePlayerAngle.a=0.f;
@@ -8816,20 +8814,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 		FORCE_NO_HIDE=0;
 		Project.improve=ti;
 		
-
-		vp.dwX		=	0;
-		vp.dwY		=	0;
-
-		vp.dwWidth	=	DANAESIZX;
-		vp.dwHeight	=	DANAESIZY;
-		vp.dvMinZ	=	0.f;
-		vp.dvMaxZ	=	1.f;
-		GDevice->SetViewport(&vp);
-
-		if (ARXmenu.currentmode!=AMCM_OFF)
-		{
-			danaeApp.SetClipping(0,0,(float)DANAESIZX,(float)DANAESIZY);
-		}
+		g_pRenderApp->renderer->SetViewport(0, 0, DANAESIZX, DANAESIZY);
 
 		SETALPHABLEND(GDevice,FALSE);
 		SETCULL(GDevice,D3DCULL_NONE);

@@ -56,6 +56,8 @@ public:
 
 	inline glm::mat4 view() const { return _view; }
 	inline virtual void setView(const glm::mat4& view) { _view = view; }
+
+	virtual void SetViewport(int x, int y, int w, int h) {};
 };
 
 
@@ -79,6 +81,7 @@ public:
 	void setProj(const glm::mat4& proj) override;
 	void setView(const glm::mat4& view) override;
 
+	void SetViewport(int x, int y, int w, int h) override;
 private:
 
 	//TODO: move/remove
@@ -99,6 +102,7 @@ public:
 	void DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
 	void DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags = 0) override;
 
+	void SetViewport(int x, int y, int w, int h) override;
 private:
 
 	D3DPRIMITIVETYPE _toD3DPT(EERIEPrimType primType);

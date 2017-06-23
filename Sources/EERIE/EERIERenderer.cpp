@@ -752,6 +752,11 @@ void EERIERendererGL::setView(const glm::mat4& view)
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
 }
 
+void EERIERendererGL::SetViewport(int x, int y, int w, int h)
+{
+	glViewport(x, y, w, h);
+}
+
 void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, float sy, const float* uvs)
 {
 	//Top-left is (0,0); bottom right is (1,1) - legacy Arx assumptions.
@@ -896,6 +901,13 @@ void EERIERendererD3D7::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc,
 	{
 		GDevice->DrawPrimitive(dptPrimitiveType, dwVertexTypeDesc, lpvVertices, dwVertexCount, dwFlags);
 	}
+}
+
+void EERIERendererD3D7::SetViewport(int x, int y, int w, int h)
+{
+	D3DVIEWPORT7 vp = { (unsigned long)x, (unsigned long)y, (unsigned long)w, (unsigned long)h, 0.f, 1.f };
+
+	GDevice->SetViewport(&vp);
 }
 
 D3DPRIMITIVETYPE EERIERendererD3D7::_toD3DPT(EERIEPrimType primType)
