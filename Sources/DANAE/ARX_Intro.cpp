@@ -78,7 +78,7 @@ void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool
 #ifdef ARX_OPENGL
 	if (_bRatio)
 	{
-		g_pRenderApp->renderer->DrawBitmap(
+		g_pRenderApp->renderer->DrawQuad(
 			(DANAESIZX / 2.f) - ((tc->m_dwWidth*Xratio) / 2.f),
 			(DANAESIZY / 2.f) - ((tc->m_dwHeight*Yratio) / 2.f),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth * Xratio)),
@@ -87,7 +87,7 @@ void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool
 	}
 	else
 	{
-		g_pRenderApp->renderer->DrawBitmap(
+		g_pRenderApp->renderer->DrawQuad(
 			(DANAESIZX / 2) - (tc->m_dwWidth * 0.5f),
 			(DANAESIZY / 2) - (tc->m_dwHeight * 0.5f),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth)),
@@ -368,7 +368,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 						0.0f, 1.0f,
 						ratio, 1.0f
 					};
-					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar, uvs);
+					g_pRenderApp->renderer->DrawQuad(px, py, px2, py2, 0.f, pbar, uvs);
 
 				}
 				else
@@ -391,7 +391,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 						0.0f, 1.0f,
 						ratio, 1.0f
 					};
-					g_pRenderApp->renderer->DrawBitmap(px, py, px2, py2, 0.f, pbar, uvs);
+					g_pRenderApp->renderer->DrawQuad(px, py, px2, py2, 0.f, pbar, uvs);
 				}
 
 			}

@@ -1233,7 +1233,7 @@ void ARX_MAGICAL_FLARES_Draw(LPDIRECT3DDEVICE7  m_pd3dDevice,long FRAMETICKS)
 						if(flare[i].bDrawBitmap)
 						{
 							s*=2.f;
-							EERIEDrawBitmap(m_pd3dDevice,flare[i].v.sx,flare[i].v.sy,s,s,flare[i].v.sz,surf,flare[i].tv.color);
+							g_pRenderApp->renderer->DrawQuad(flare[i].v.sx,flare[i].v.sy,s,s,flare[i].v.sz,surf,0,flare[i].tv.color);
 						}
 						else
 						{
@@ -2538,13 +2538,13 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 						memcpy(&in2,&in,sizeof(D3DTLVERTEX));
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);						
-						EERIEDrawBitmap(pd3dDevice,in.sx,in.sy,siz,siz2,in.sz,tc,color);
+						g_pRenderApp->renderer->DrawQuad(in.sx,in.sy,siz,siz2,in.sz,tc,0,color);
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);						
-						EERIEDrawBitmap(pd3dDevice,in2.sx,in.sy,siz,siz2,in.sz,tc,0xFFFFFFFF);
+						g_pRenderApp->renderer->DrawQuad(in2.sx,in.sy,siz,siz2,in.sz,tc,0,0xFFFFFFFF);
 					}
 					else
-						EERIEDrawBitmap(pd3dDevice,in.sx,in.sy,siz,siz2,in.sz,tc,color);
+						g_pRenderApp->renderer->DrawQuad(in.sx,in.sy,siz,siz2,in.sz,tc,0,color);
 				}
 				else 
 				{

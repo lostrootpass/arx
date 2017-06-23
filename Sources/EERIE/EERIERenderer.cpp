@@ -59,11 +59,6 @@ void EERIERenderer::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D 
 
 }
 
-void EERIERenderer::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs)
-{
-
-}
-
 void EERIERenderer::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 
@@ -78,34 +73,6 @@ void EERIERendererGL::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3
 {
 	D3DCOLOR color = 0L;
 	EERIEDrawAnimQuat(0, eobj, eanim, angle, pos, time, io, color, typ);
-}
-
-void EERIERendererGL::DrawBitmap(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs)
-{
-	const float w = (float)DANAESIZX, h = (float)DANAESIZY;
-
-	const float startX = (x / w);
-	const float startY = (y / h);
-	const float dX = (sx / w);
-	const float dY = (sy / h);
-
-	if (quadVAO == -1)
-	{
-		glGenVertexArrays(1, &quadVAO);
-	}
-
-	glBindVertexArray(quadVAO);
-
-	GLuint program = EERIEGetGLProgramID("bitmap");
-	glUseProgram(program);
-
-	//TODO: store uniforms instead of looking up every frame
-	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex->textureID);
-	glUniform1i(uniformLocation, 0);
-
-	_drawQuad(program, startX, startY, dX, dY, uvs);
 }
 
 void EERIERendererGL::DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND)
@@ -387,6 +354,34 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 
 	if(useAlphaBlending)
 		glDisable(GL_BLEND);
+}
+
+void EERIERendererGL::DrawQuad(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs, unsigned long color)
+{
+	const float w = (float)DANAESIZX, h = (float)DANAESIZY;
+
+	const float startX = (x / w);
+	const float startY = (y / h);
+	const float dX = (sx / w);
+	const float dY = (sy / h);
+
+	if (quadVAO == -1)
+	{
+		glGenVertexArrays(1, &quadVAO);
+	}
+
+	glBindVertexArray(quadVAO);
+
+	GLuint program = EERIEGetGLProgramID("bitmap");
+	glUseProgram(program);
+
+	//TODO: store uniforms instead of looking up every frame
+	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex->textureID);
+	glUniform1i(uniformLocation, 0);
+
+	_drawQuad(program, startX, startY, dX, dY, uvs);
 }
 
 void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
@@ -837,6 +832,34 @@ void EERIERendererD3D7::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE
 
 }
 
+void EERIERendererD3D7::DrawQuad(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs /*= 0*/, unsigned long color /*= 0*/)
+{
+	float smu, smv;
+	float fEndu, fEndv;
+
+	if (tex)
+	{
+		smu = tex->m_hdx;
+		smv = tex->m_hdy;
+		fEndu = tex->m_dx;
+		fEndv = tex->m_dy;
+	}
+	else
+	{
+		smu = smv = 0.f;
+		fEndu = fEndv = 0.f;
+	}
+
+	D3DTLVERTEX v[4];
+	v[0] = D3DTLVERTEX(D3DVECTOR(x, y, z), 1.f, color, 0xFF000000, smu, smv);
+	v[1] = D3DTLVERTEX(D3DVECTOR(x + sx, y, z), 1.f, color, 0xFF000000, fEndu, smv);
+	v[2] = D3DTLVERTEX(D3DVECTOR(x, y + sy, z), 1.f, color, 0xFF000000, smu, fEndv);
+	v[3] = D3DTLVERTEX(D3DVECTOR(x + sx, y + sy, z), 1.f, color, 0xFF000000, fEndu, fEndv);
+
+	SETTC(GDevice, tex);
+	GDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+}
+
 void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 {
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
@@ -844,14 +867,14 @@ void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 	SETZWRITE(GDevice, FALSE);
 	SETALPHABLEND(GDevice, TRUE);
 
-	EERIEDrawBitmap(GDevice, 0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
-		NULL, _EERIERGB(visibility));
+	DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
+		0, 0, _EERIERGB(visibility));
 
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
 	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
 	float col = visibility;
-	EERIEDrawBitmap(GDevice, 0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
-		NULL, EERIERGB(col*FADECOLOR.r, col*FADECOLOR.g, col*FADECOLOR.b));
+	DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
+		0, 0, EERIERGB(col*FADECOLOR.r, col*FADECOLOR.g, col*FADECOLOR.b));
 	SETALPHABLEND(GDevice, FALSE);
 	SETZWRITE(GDevice, TRUE);
 }

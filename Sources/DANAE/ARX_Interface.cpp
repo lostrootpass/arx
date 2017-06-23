@@ -355,11 +355,12 @@ BOOL ARX_INTERFACE_MouseInBook()
 void ARX_INTERFACE_DrawItem(TextureContainer *tc, const float x, const float y, const float z, const D3DCOLOR col)
 {
 	if ((tc) && (tc->m_pddsSurface))
-		EERIEDrawBitmap(GDevice,
+		g_pRenderApp->renderer->DrawQuad(
 		x, y,
 		                INTERFACE_RATIO_DWORD(tc->m_dwWidth), INTERFACE_RATIO_DWORD(tc->m_dwHeight),
 		z,
 		tc,
+		0,
 		col);
 }
 
@@ -645,10 +646,10 @@ void ARX_INTERFACE_HALO_Render(float _fR, float _fG, float _fB,
 		fDeltaXP = 1;
 		fDeltaYP = 1;
 	
-	EERIEDrawBitmap(GDevice,(float)(POSX-tc->halodecalX*fDeltaX),(float)(POSY-tc->halodecalY*fDeltaY)
+		g_pRenderApp->renderer->DrawQuad((float)(POSX-tc->halodecalX*fDeltaX),(float)(POSY-tc->halodecalY*fDeltaY)
 								,((float)fSizeX)*fDeltaXP
 								,((float)fSizeY)*fDeltaYP,0.00001f
-								,tc2,col);
+								,tc2,0,col);
 	SETALPHABLEND(GDevice,false);
 }
 
@@ -6324,24 +6325,25 @@ void ARX_INTERFACE_DrawSecondaryInventory(bool _bSteal)
 							color=0xFF00FF00;
 						else color=D3DCOLORWHITE;
 
-						EERIEDrawBitmap(GDevice,
+						g_pRenderApp->renderer->DrawQuad(
 							px,
 							py,
 						                INTERFACE_RATIO_DWORD(tc->m_dwWidth), INTERFACE_RATIO_DWORD(tc->m_dwHeight),
 							0.001f,
-							tc,color);
+							tc,0,color);
 
 						if (!bItemSteal && (io==FlyingOverIO))
 						{
 							SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
 							SETALPHABLEND(GDevice,true);
 							
-							EERIEDrawBitmap(GDevice,
+							g_pRenderApp->renderer->DrawQuad(
 								px,
 								py,
 							                INTERFACE_RATIO_DWORD(tc->m_dwWidth), INTERFACE_RATIO_DWORD(tc->m_dwHeight),
 								0.001f,
 								tc,
+								0,
 								D3DCOLORWHITE);
 							SETALPHABLEND(GDevice,false);
 						}
@@ -6355,12 +6357,13 @@ void ARX_INTERFACE_DrawSecondaryInventory(bool _bSteal)
 								float fColorPulse	=	255.f * fabs( cos( DEG2RAD( fDecPulse ) ) );
 								DWORD dwColor		=	ARX_CLEAN_WARN_CAST_DWORD(fColorPulse);
 								
-								EERIEDrawBitmap(GDevice,
+								g_pRenderApp->renderer->DrawQuad(
 									px,
 									py,
 								                INTERFACE_RATIO_DWORD(tc->m_dwWidth), INTERFACE_RATIO_DWORD(tc->m_dwHeight),
 									0.001f,
 									tc,
+									0,
 									(dwColor<<16)|(dwColor<<8)|dwColor);
 								SETALPHABLEND(GDevice,false);
 							}
@@ -6431,7 +6434,7 @@ void ARX_INTERFACE_DrawInventory(short _sNum, int _iX=0, int _iY=0)
 							color=0xFF00FF00;
 						else color=D3DCOLORWHITE;
 
-						EERIEDrawBitmap(GDevice,
+						g_pRenderApp->renderer->DrawQuad(
 							px,
 							py,
 
@@ -6439,13 +6442,13 @@ void ARX_INTERFACE_DrawInventory(short _sNum, int _iX=0, int _iY=0)
 							INTERFACE_RATIO_DWORD(tc->m_dwHeight),
 
 							0.001f,
-							tc,color);
+							tc,0,color);
 
 						if (io==FlyingOverIO)
 						{
 							SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
 							SETALPHABLEND(GDevice,true);
-							EERIEDrawBitmap(GDevice,
+							g_pRenderApp->renderer->DrawQuad(
 								px,
 								py,
 
@@ -6453,7 +6456,7 @@ void ARX_INTERFACE_DrawInventory(short _sNum, int _iX=0, int _iY=0)
 								INTERFACE_RATIO_DWORD(tc->m_dwHeight),
 
 								0.001f,
-								tc,D3DCOLORWHITE);
+								tc,0,D3DCOLORWHITE);
 							SETALPHABLEND(GDevice,false);
 						}
 						else
@@ -6465,7 +6468,7 @@ void ARX_INTERFACE_DrawInventory(short _sNum, int _iX=0, int _iY=0)
 
 								SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
 								SETALPHABLEND(GDevice,true);
-								EERIEDrawBitmap(GDevice,
+								g_pRenderApp->renderer->DrawQuad(
 									px,
 									py,
 
@@ -6473,7 +6476,7 @@ void ARX_INTERFACE_DrawInventory(short _sNum, int _iX=0, int _iY=0)
 									INTERFACE_RATIO_DWORD(tc->m_dwHeight),
 
 									0.001f,
-									tc,(dwColor<<16)|(dwColor<<8)|dwColor);
+									tc,0,(dwColor<<16)|(dwColor<<8)|dwColor);
 								SETALPHABLEND(GDevice,false);
 							}
 						}
@@ -6524,9 +6527,9 @@ void ARX_INTERFACE_Draw_Stealth_Gauge()
 			SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
 
 			GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
-			EERIEDrawBitmap(GDevice,
+			g_pRenderApp->renderer->DrawQuad(
 			                px, py, INTERFACE_RATIO_DWORD(stealth_gauge_tc->m_dwWidth), INTERFACE_RATIO_DWORD(stealth_gauge_tc->m_dwHeight), 0.01f,
-				stealth_gauge_tc,col);
+				stealth_gauge_tc,0,col);
 
 			danaeApp.EnableZBuffer();
 			SETALPHABLEND(GDevice, false);
@@ -6783,14 +6786,14 @@ void StdDraw(float posx,float posy,D3DCOLOR color,TextureContainer * tcc,long fl
 
 	if (tc)
 	{
-		EERIEDrawBitmap(GDevice, posx, posy, INTERFACE_RATIO_DWORD(tc->m_dwWidth) * 0.5f, INTERFACE_RATIO_DWORD(tc->m_dwHeight) * 0.5f, 0.01f, tc, color);
+		g_pRenderApp->renderer->DrawQuad(posx, posy, INTERFACE_RATIO_DWORD(tc->m_dwWidth) * 0.5f, INTERFACE_RATIO_DWORD(tc->m_dwHeight) * 0.5f, 0.01f, tc, 0,color);
 
 		if (flag & 2)
 		{
 			SETBLENDMODE(GDevice,D3DBLEND_ZERO,D3DBLEND_ONE);
 
-			EERIEDrawBitmap(GDevice,posx-1,posy-1,INTERFACE_RATIO_DWORD(tc->m_dwWidth)*0.5f,INTERFACE_RATIO_DWORD(tc->m_dwHeight)*0.5f,0.0001f, tc,color);
-			EERIEDrawBitmap(GDevice,posx+1,posy+1,INTERFACE_RATIO_DWORD(tc->m_dwWidth)*0.5f,INTERFACE_RATIO_DWORD(tc->m_dwHeight)*0.5f,0.0001f, tc,color);
+			g_pRenderApp->renderer->DrawQuad(posx-1,posy-1,INTERFACE_RATIO_DWORD(tc->m_dwWidth)*0.5f,INTERFACE_RATIO_DWORD(tc->m_dwHeight)*0.5f,0.0001f, tc,0,color);
+			g_pRenderApp->renderer->DrawQuad(posx+1,posy+1,INTERFACE_RATIO_DWORD(tc->m_dwWidth)*0.5f,INTERFACE_RATIO_DWORD(tc->m_dwHeight)*0.5f,0.0001f, tc,0,color);
 
 			SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
 		}
@@ -9184,11 +9187,11 @@ void ARX_INTERFACE_DrawCurrentTorch()
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,false);
 
-	EERIEDrawBitmap(GDevice,
+	g_pRenderApp->renderer->DrawQuad(
 		px, py,
 	                INTERFACE_RATIO_DWORD(CURRENT_TORCH->inv->m_dwWidth), INTERFACE_RATIO_DWORD(CURRENT_TORCH->inv->m_dwHeight),
 		0.001f,
-		CURRENT_TORCH->inv,D3DCOLORWHITE);
+		CURRENT_TORCH->inv,0,D3DCOLORWHITE);
 	danaeApp.EnableZBuffer();
 	
 	if ( rnd() > 0.2f )
@@ -10093,7 +10096,7 @@ void DANAE::DrawAllInterface()
 
 						lTimeToDrawMecanismCursor += ARX_CLEAN_WARN_CAST_LONG(FrameDiff);
 
-					EERIEDrawBitmap(	GDevice,
+						g_pRenderApp->renderer->DrawQuad(
 						0,0,
 
 						INTERFACE_RATIO_DWORD(mecanism_tc->m_dwWidth),
@@ -10101,6 +10104,7 @@ void DANAE::DrawAllInterface()
 
 						0.01f,
 						mecanism_tc,
+						0,
 						lColorMecanism );
 				}
 				
@@ -10122,13 +10126,14 @@ void DANAE::DrawAllInterface()
 
 					float fMove=fabs(sin(DEG2RAD(fArrowMove)))*fSizeX*.5f;
 					
-					EERIEDrawBitmap(	GDevice,					//left
+					g_pRenderApp->renderer->DrawQuad(					//left
 						0+fMove,
 						(DANAESIZY-fSizeY)*.5f,
 						fSizeX,
 						fSizeY,
 						0.01f,
 						arrow_left_tc,
+						0,
 						lColor );
 					
 					EERIEDrawBitmapUVs(	GDevice,				//right
@@ -10614,9 +10619,9 @@ void ARX_INTERFACE_RenderCursor(long flag)
 		float fTexSizeX = INTERFACE_RATIO_DWORD(surf->m_dwWidth);
 		float fTexSizeY = INTERFACE_RATIO_DWORD(surf->m_dwHeight);
 
-		EERIEDrawBitmap(GDevice,(float)(POSX-(fTexSizeX*0.5f)),(float)(POSY-(surf->m_dwHeight*0.5f)),
+		g_pRenderApp->renderer->DrawQuad((float)(POSX-(fTexSizeX*0.5f)),(float)(POSY-(surf->m_dwHeight*0.5f)),
 			fTexSizeX, fTexSizeY, 0.f,
-			surf,D3DCOLORWHITE);
+			surf,0,D3DCOLORWHITE);
 		
 		SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_WRAP);
 		return;
@@ -10733,10 +10738,10 @@ void ARX_INTERFACE_RenderCursor(long flag)
 
 					if (SpecialCursor==CURSOR_COMBINEON)
 					{
-						EERIEDrawBitmap(GDevice,(float)POSX+MODIF,(float)POSY+MODIF
+						g_pRenderApp->renderer->DrawQuad((float)POSX+MODIF,(float)POSY+MODIF
 							,(float)fTexSizeX
 							,(float)fTexSizeY,0.00001f
-							,tc,0xFFFFFFFF);
+							,tc,0,0xFFFFFFFF);
 
 						if ((FlyingOverIO!=NULL) && (FlyingOverIO->ioflags & IO_BLACKSMITH))
 						{
@@ -10751,10 +10756,10 @@ void ARX_INTERFACE_RenderCursor(long flag)
 						}
 					}
 					else
-						EERIEDrawBitmap(GDevice,(float)POSX+MODIF,(float)POSY+MODIF
+						g_pRenderApp->renderer->DrawQuad((float)POSX+MODIF,(float)POSY+MODIF
 						,(float)fTexSizeX
 						,(float)fTexSizeY,0.00001f
-						,tc,0xFFFFAA66);
+						,tc,0,0xFFFFAA66);
 				}				
 				
 				switch (SpecialCursor)
@@ -10843,11 +10848,11 @@ void ARX_INTERFACE_RenderCursor(long flag)
 
 					if (SpecialCursor == CURSOR_REDIST)
 					{
-						EERIEDrawBitmap(GDevice,(float)POSX,(float)POSY,
+						g_pRenderApp->renderer->DrawQuad((float)POSX,(float)POSY,
 							surf->m_dwWidth * Xratio,
 							surf->m_dwHeight * Yratio,
 							0.f,
-							surf,D3DCOLORWHITE);
+							surf,0,D3DCOLORWHITE);
 						
 						danaeApp.DANAEEndRender();	
 						_TCHAR temp[256];
@@ -10861,9 +10866,9 @@ void ARX_INTERFACE_RenderCursor(long flag)
 						float fTexSizeX = INTERFACE_RATIO_DWORD(surf->m_dwWidth);
 						float fTexSizeY = INTERFACE_RATIO_DWORD(surf->m_dwHeight);
 
-						EERIEDrawBitmap(GDevice,(float)POSX,(float)POSY,
+						g_pRenderApp->renderer->DrawQuad((float)POSX,(float)POSY,
 							fTexSizeX, fTexSizeY, 0.f,
-							surf,D3DCOLORWHITE);
+							surf,0,D3DCOLORWHITE);
 					}
 				}
 
@@ -10901,13 +10906,14 @@ void ARX_INTERFACE_RenderCursor(long flag)
 					float fTexSizeY = INTERFACE_RATIO_DWORD(surf->m_dwHeight);
 
 
-					EERIEDrawBitmap(	GDevice,
+					g_pRenderApp->renderer->DrawQuad(
 										(float)(POSX - (fTexSizeX*0.5f)),
 										(float)(POSY - (fTexSizeY*0.5f)),
 										(float)fTexSizeX,
 										(float)fTexSizeY,
 										0.f,
 										surf,
+										0,
 										D3DCOLORWHITE);
 				}
 				else 
@@ -10953,10 +10959,10 @@ void ARX_INTERFACE_RenderCursor(long flag)
 
 						if (!(DRAGINTER->ioflags & IO_MOVABLE))
 						{
-							EERIEDrawBitmap(GDevice,(float)mx,(float)my
+							g_pRenderApp->renderer->DrawQuad((float)mx,(float)my
 								,(float)fTexSizeX
 								,(float)fTexSizeY,0.00001f
-								,tc,color);
+								,tc,0,color);
 
 							if ((DRAGINTER->ioflags & IO_ITEM) && (DRAGINTER->_itemdata->count!=1))
 								ARX_INTERFACE_DrawNumber(mx+2.f,my+13.f,
@@ -10968,10 +10974,10 @@ void ARX_INTERFACE_RenderCursor(long flag)
 								||
 								(CANNOT_PUT_IT_HERE != -1))
 							{
-								EERIEDrawBitmap(GDevice,(float)mx,(float)my
+								g_pRenderApp->renderer->DrawQuad((float)mx,(float)my
 									,(float)fTexSizeX
 									,(float)fTexSizeY,0.00001f
-									,tc,color);
+									,tc,0,color);
 							}
 						}
 						
@@ -10986,12 +10992,12 @@ void ARX_INTERFACE_RenderCursor(long flag)
 									tcc=ThrowObject;
 
 								if ((tcc) && (tcc!=tc)) // to avoid movable double red cross...
-									EERIEDrawBitmap(GDevice,(float)mx+16,(float)my
+									g_pRenderApp->renderer->DrawQuad((float)mx+16,(float)my
 
 									,INTERFACE_RATIO_DWORD(tcc->m_dwWidth)
 									,INTERFACE_RATIO_DWORD(tcc->m_dwHeight),0.00001f
 
-									,tcc,D3DCOLORWHITE);
+									,tcc,0,D3DCOLORWHITE);
 							}
 						}
 						
@@ -11023,9 +11029,9 @@ void ARX_INTERFACE_RenderCursor(long flag)
 						
 						if (surf) 
 						{
-							EERIEDrawBitmap(GDevice,(float)POSX,(float)POSY,
+							g_pRenderApp->renderer->DrawQuad((float)POSX,(float)POSY,
 							                INTERFACE_RATIO_DWORD(surf->m_dwWidth), INTERFACE_RATIO_DWORD(surf->m_dwHeight), 0.f,
-								surf,D3DCOLORWHITE);
+								surf,0,D3DCOLORWHITE);
 						}
 					}
 				}
@@ -11079,13 +11085,13 @@ void ARX_INTERFACE_RenderCursor(long flag)
 
 							D3DCOLOR col=D3DRGB(0.5f, 0.5f, 0.5f);
 							
-							EERIEDrawBitmap(GDevice,(float)POSX,(float)POSY,
+							g_pRenderApp->renderer->DrawQuad((float)POSX,(float)POSY,
 
 								INTERFACE_RATIO_DWORD(surf->m_dwWidth),
 								INTERFACE_RATIO_DWORD(surf->m_dwHeight),
 
 								0.f,
-								surf, col);
+								surf, 0, col);
 							SETALPHABLEND(GDevice, false);
 						}					
 					}

@@ -834,8 +834,8 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 
 										fpx *= Xratio;
 										fpy *= Yratio;
-										EERIEDrawBitmap(GDevice, fpx, fpy,
-										                5.f * ratiooo, 5.f * ratiooo, 0, pTexDetect, D3DRGB(col, 0, 0));
+										g_pRenderApp->renderer->DrawQuad(fpx, fpy,
+										                5.f * ratiooo, 5.f * ratiooo, 0, pTexDetect, 0, D3DRGB(col, 0, 0));
 
 										if (!fl2)
 											SETALPHABLEND(m_pd3dDevice, false);

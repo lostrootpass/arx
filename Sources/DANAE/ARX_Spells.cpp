@@ -37,6 +37,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEMath.h>
 #include <EERIELight.h>
 #include <EERIEObject.h>
+#include "EERIERenderer.h"
 
 #include "danae.h"
 #include <ARX_Collisions.h>
@@ -7114,7 +7115,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			SETALPHABLEND(GDevice,TRUE);
 			float val = 1.f; 
 
-			EERIEDrawBitmap(GDevice,0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.00009f,NULL,D3DRGB(0.5f+val*DIV2,val,val));
+			g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.00009f,NULL,0,D3DRGB(0.5f+val*DIV2,val,val));
 			SETALPHABLEND(GDevice,FALSE);
 		}	
 		break;

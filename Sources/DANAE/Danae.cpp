@@ -4781,8 +4781,8 @@ void CheckMr()
 			if (!Mr_tc->m_pddsSurface)
 				Mr_tc->Restore(GDevice);
 
-			EERIEDrawBitmap(GDevice,DANAESIZX-(128.f*Xratio),0.f,(float)128*Xratio,(float)128*Yratio,0.0001f,
-				Mr_tc,_EERIERGB(0.5f+PULSATE*DIV10));		
+			g_pRenderApp->renderer->DrawQuad(DANAESIZX-(128.f*Xratio),0.f,(float)128*Xratio,(float)128*Yratio,0.0001f,
+				Mr_tc,0,_EERIERGB(0.5f+PULSATE*DIV10));		
 		}
 		else
 		{
@@ -4795,8 +4795,8 @@ void DrawImproveVisionInterface(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	if (ombrignon->m_pddsSurface) 
 	{
 		float mod = 0.6f + PULSATE * 0.35f;
-		EERIEDrawBitmap(m_pd3dDevice,0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
-			ombrignon,EERIERGB((0.5f+PULSATE*DIV10)*mod,0.f,0.f));		
+		g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
+			ombrignon,0, EERIERGB((0.5f+PULSATE*DIV10)*mod,0.f,0.f));		
 	}
 }
 float MagicSightFader=0.f;
@@ -4821,14 +4821,14 @@ void DrawMagicSightInterface(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			col = 1.f - eyeball.size.x;
 		}
 
-		EERIEDrawBitmap(m_pd3dDevice,0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
-			Flying_Eye,_EERIERGB(col));		
+		g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
+			Flying_Eye,0,_EERIERGB(col));		
 		
 		if (MagicSightFader>0.f)
 		{
 			col=MagicSightFader;
-			EERIEDrawBitmap(m_pd3dDevice,0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
-				NULL,_EERIERGB(col));		
+			g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
+				NULL,0,_EERIERGB(col));		
 			MagicSightFader-=Original_framedelay*DIV400;
 
 			if (MagicSightFader<0.f)
@@ -5745,7 +5745,7 @@ void ShowValue(unsigned long * cur,unsigned long * dest,char * str)
 
 	col=EERIERGB(rgb.r,rgb.g,rgb.b);
 	float width=(float)(*cur)*DIV500;
-	EERIEDrawBitmap(danaeApp.m_pd3dDevice, 0, ARX_CLEAN_WARN_CAST_FLOAT(iVPOS * 16), width, 8, 0.000091f, NULL, col);
+	g_pRenderApp->renderer->DrawQuad(0, ARX_CLEAN_WARN_CAST_FLOAT(iVPOS * 16), width, 8, 0.000091f, NULL, 0, col);
 	danaeApp.OutputText(ARX_CLEAN_WARN_CAST_DWORD(width), iVPOS * 16 - 2, str);
 
 }
@@ -7310,8 +7310,8 @@ HRESULT DANAE::Render()
 		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
 		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);	
 		
-		EERIEDrawBitmap(m_pd3dDevice,0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
-				NULL,EERIERGB(0.2f,0.2f,1.f));		
+		g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
+				NULL, 0, EERIERGB(0.2f,0.2f,1.f));		
 		SETALPHABLEND(m_pd3dDevice,FALSE);
 		SETZWRITE(m_pd3dDevice, TRUE );
 	}

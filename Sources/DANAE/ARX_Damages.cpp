@@ -65,6 +65,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIELight.h"
 #include "EERIEDRAW.h"
 #include "EERIEPoly.h"
+#include "EERIERenderer.h"
 
 #include "ARX_Player.h"
 #include "ARX_NPC.h"
@@ -221,7 +222,7 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 		else
 			color = D3DRGB(1.f, Blood_Pos - 1.f, Blood_Pos - 1.f);
 
-		EERIEDrawBitmap(pd3dDevice, 0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.00009f, NULL, color);
+		g_pRenderApp->renderer->DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.00009f, NULL, 0, color);
 		SETZWRITE(pd3dDevice, TRUE);
 		SETALPHABLEND(pd3dDevice, FALSE);
 	}
@@ -237,7 +238,7 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 		else
 			color = D3DRGB(1.f, 1.f - Blood_Pos, 1.f - Blood_Pos);
 
-		EERIEDrawBitmap(pd3dDevice, 0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.00009f, NULL, color);
+		g_pRenderApp->renderer->DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.00009f, NULL, 0, color);
 		SETALPHABLEND(pd3dDevice, FALSE);
 		SETZWRITE(pd3dDevice, TRUE);
 	}

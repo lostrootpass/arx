@@ -29,6 +29,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "arx_time.h"
 #include "EERIETexture.h"
 #include "EERIEDraw.h"
+#include "EERIERenderer.h"
 #include "Hermesmain.h"
 
 
@@ -206,13 +207,13 @@ void ViewImage::DrawAllImage()
 
 			ARX_CHECK_NOT_NEG(DANAESIZX);
 			ARX_CHECK_NOT_NEG(DANAESIZY);
-			EERIEDrawBitmap(GDevice,
+			g_pRenderApp->renderer->DrawQuad(
 			                fDepX,
 			                fDepY,
 			                ARX_CLEAN_WARN_CAST_FLOAT(__min(pTex->m_dwWidth, ARX_CAST_ULONG(DANAESIZX))),
 			                ARX_CLEAN_WARN_CAST_FLOAT(__min(pTex->m_dwHeight, ARX_CAST_ULONG(DANAESIZY))),
 			                0.f,
-			                pTex,
+			                pTex,0,
 			                D3DRGB(fColor, fColor, fColor));
 
 

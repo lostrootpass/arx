@@ -3889,7 +3889,7 @@ int iDecMenuPrincipaleY=50;
 
 		}
 
-		EERIEDrawBitmap(	GDevice,
+		g_pRenderApp->renderer->DrawQuad(
 			ARX_CLEAN_WARN_CAST_FLOAT(DANAEMouse.x + iOffsetX),
 			ARX_CLEAN_WARN_CAST_FLOAT(DANAEMouse.y + iOffsetY),
 
@@ -3898,7 +3898,8 @@ int iDecMenuPrincipaleY=50;
 
 							0.001f,
 							pTextureLoad,
-			ARX_OPAQUE_WHITE); 
+							0,
+							ARX_OPAQUE_WHITE); 
 
 		SETTC(GDevice,NULL);
 		EERIEDraw2DRect(	GDevice,

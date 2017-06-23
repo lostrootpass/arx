@@ -72,7 +72,6 @@ void EERIE_DrawPolyBump(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY * ep, float alph
 void EERIEDrawLine(float x, float y, float x1, float y1, float z, D3DCOLOR col);
 void EERIEDrawCircle(float x0, float y0, float r, D3DCOLOR col, float z);
 void EERIEDraw2DLine(LPDIRECT3DDEVICE7 pd3dDevice, float x0, float y0, float x1, float y1, float z, D3DCOLOR col);
-void EERIEDrawBitmap(LPDIRECT3DDEVICE7 pd3dDevice, float x, float y, float sx, float sy, float z, TextureContainer * tex, D3DCOLOR col);
 void EERIEDraw2DRect(LPDIRECT3DDEVICE7 pd3dDevice, float x0, float y0, float x1, float y1, float z, D3DCOLOR col);
 void EERIEDrawFill2DRectDegrad(LPDIRECT3DDEVICE7 pd3dDevice, float x0, float y0, float x1, float y1, float z, D3DCOLOR cold, D3DCOLOR cole);
 

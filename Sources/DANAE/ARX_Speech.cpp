@@ -68,6 +68,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_Time.h"
 
 #include "EERIEDRAW.h"
+#include "EERIERenderer.h"
 
 #include "hermesmain.h"
 
@@ -249,11 +250,11 @@ void ARX_SPEECH_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 
 
 
-				EERIEDrawBitmap(GDevice,
+				g_pRenderApp->renderer->DrawQuad(
 				                120 * Xratio - 16 * Xratio, ARX_CLEAN_WARN_CAST_FLOAT(igrec),
 				                16 * Xratio, 16 * Xratio,
 				                0.00001f,
-				                arx_logo_tc,
+				                arx_logo_tc,0,
 				                D3DCOLORWHITE);
 
 
