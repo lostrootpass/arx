@@ -133,7 +133,6 @@ void EERIEPOLY_DrawNormals(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY * ep);
 extern TextureContainer * EERIE_DRAW_sphere_particle;
 extern TextureContainer * EERIE_DRAW_square_particle;
 
-void EERIEDrawBitmap2(LPDIRECT3DDEVICE7 pd3dDevice, float x, float y, float sx, float sy, float z, TextureContainer * tex, D3DCOLOR col);
 void EERIEDrawBitmap_uv(LPDIRECT3DDEVICE7 pd3dDevice, float x, float y, float sx, float sy, float z, TextureContainer * tex, D3DCOLOR col, float u0, float v0, float u1, float v1);
 void EERIEDrawBitmapUVs(LPDIRECT3DDEVICE7 pd3dDevice, float x, float y, float sx, float sy, float z, TextureContainer * tex, D3DCOLOR col
                         , float u0, float v0

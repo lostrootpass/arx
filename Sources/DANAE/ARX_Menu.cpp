@@ -77,6 +77,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEDraw.h"
 #include "EERIEMath.h"
 #include "EERIEObject.h"
+#include "EERIERenderer.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -697,7 +698,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			SETZWRITE(GDevice, false);
 			GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, D3DZB_FALSE);
 
-			EERIEDrawBitmap2(GDevice, 0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.9f, ARXmenu.mda->BookBackground, D3DCOLORWHITE);
+			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.9f, ARXmenu.mda->BookBackground, 0, D3DCOLORWHITE);
 		}
 
 		BOOKZOOM = 1;
@@ -926,7 +927,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			SETZWRITE(GDevice, false);
 			GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, D3DZB_FALSE);
 
-			EERIEDrawBitmap2(GDevice, 0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.9f, ARXmenu.mda->BookBackground, D3DCOLORWHITE);
+			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.9f, ARXmenu.mda->BookBackground, 0, D3DCOLORWHITE);
 		}
 
 		EERIE_3D ePos;

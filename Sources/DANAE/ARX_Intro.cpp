@@ -73,9 +73,19 @@ void ARX_INTERFACE_KillARKANE()
 	ARKANE_img = NULL;
 }
 //-----------------------------------------------------------------------------
-void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool _bRatio = true, float _fFade = 1.f)
+void DrawCenteredImage(TextureContainer * tc, bool _bRatio = true, float _fFade = 1.f)
 {
-#ifdef ARX_OPENGL
+#ifndef ARX_OPENGL
+	DANAESIZX = danaeApp.m_pFramework->m_dwRenderWidth;
+	DANAESIZY = danaeApp.m_pFramework->m_dwRenderHeight;
+
+	if (danaeApp.m_pDeviceInfo->bWindowed)
+		DANAESIZY -= danaeApp.m_pFramework->Ystart;
+
+	DANAECENTERX = DANAESIZX >> 1;
+	DANAECENTERY = DANAESIZY >> 1;
+#endif
+
 	if (_bRatio)
 	{
 		g_pRenderApp->renderer->DrawQuad(
@@ -83,7 +93,7 @@ void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool
 			(DANAESIZY / 2.f) - ((tc->m_dwHeight*Yratio) / 2.f),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth * Xratio)),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight * Yratio)),
-			0.001f, tc);
+			0.001f, tc, 0, D3DRGB(_fFade, _fFade, _fFade));
 	}
 	else
 	{
@@ -92,39 +102,8 @@ void DrawCenteredImage(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc, bool
 			(DANAESIZY / 2) - (tc->m_dwHeight * 0.5f),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth)),
 			ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight)),
-			0.001f, tc);
+			0.001f, tc, 0, D3DRGB(_fFade, _fFade, _fFade));
 	}
-
-#else
-	DANAESIZX = danaeApp.m_pFramework->m_dwRenderWidth;
-	DANAESIZY = danaeApp.m_pFramework->m_dwRenderHeight;
-
-	if(danaeApp.m_pDeviceInfo->bWindowed)
-		DANAESIZY -= danaeApp.m_pFramework->Ystart;
-
-	DANAECENTERX = DANAESIZX >> 1;
-	DANAECENTERY = DANAESIZY >> 1;
-
-
-	if (_bRatio)
-	{
-		EERIEDrawBitmap2(pd3dDevice,
-		                 DANAECENTERX - (tc->m_dwWidth * 0.5f)*Xratio,
-		                 DANAECENTERY - (tc->m_dwHeight * 0.5f)*Yratio,
-		                 ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth * Xratio)),
-		                 ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight * Yratio)),
-		                 0.001f, tc, D3DRGB(_fFade, _fFade, _fFade));
-	}
-	else
-	{
-		EERIEDrawBitmap2(pd3dDevice,
-		                 DANAECENTERX - (tc->m_dwWidth * 0.5f),
-		                 DANAECENTERY - (tc->m_dwHeight * 0.5f),
-		                 ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwWidth)),
-		                 ARX_CLEAN_WARN_CAST_FLOAT((int)(tc->m_dwHeight)),
-		                 0.001f, tc, D3DRGB(_fFade, _fFade, _fFade));
-	}
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -137,7 +116,7 @@ void ARX_INTERFACE_ShowFISHTANK(LPDIRECT3DDEVICE7 pd3dDevice)
 			FISHTANK_img = MakeTCFromFile("misc\\logo.bmp");
 
 		if(FISHTANK_img != NULL)
-			DrawCenteredImage(0, FISHTANK_img, false);
+			DrawCenteredImage(FISHTANK_img, false);
 
 		danaeGLApp.DANAEEndRender();
 	}
@@ -159,7 +138,7 @@ void ARX_INTERFACE_ShowFISHTANK(LPDIRECT3DDEVICE7 pd3dDevice)
 			if (FISHTANK_img != NULL)
 			{
 				pd3dDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
-				DrawCenteredImage(pd3dDevice, FISHTANK_img, false);
+				DrawCenteredImage(FISHTANK_img, false);
 			}
 
 			danaeApp.DANAEEndRender();
@@ -187,7 +166,7 @@ void ARX_INTERFACE_ShowARKANE(LPDIRECT3DDEVICE7 pd3dDevice)
 
 		if(ARKANE_img != NULL)
 		{
-			DrawCenteredImage(0, ARKANE_img, false);
+			DrawCenteredImage(ARKANE_img, false);
 		}
 
 		danaeGLApp.DANAEEndRender();
@@ -215,7 +194,7 @@ void ARX_INTERFACE_ShowARKANE(LPDIRECT3DDEVICE7 pd3dDevice)
 			if (ARKANE_img != NULL)
 			{
 				pd3dDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
-				DrawCenteredImage(GDevice, ARKANE_img, false);
+				DrawCenteredImage(ARKANE_img, false);
 			}
 
 			danaeApp.DANAEEndRender();
@@ -347,7 +326,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 
 			if(tc)
 			{
-				DrawCenteredImage(pd3dDevice, tc, true, fFadeColor);
+				DrawCenteredImage(tc, true, fFadeColor);
 			}
 
 			if(pbar)
@@ -447,7 +426,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 
 				if (tc)
 				{
-					DrawCenteredImage(pd3dDevice, tc, true, fFadeColor);
+					DrawCenteredImage(tc, true, fFadeColor);
 				}
 
 				if (pbar)

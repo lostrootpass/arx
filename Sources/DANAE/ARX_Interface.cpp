@@ -6633,11 +6633,11 @@ void ARX_INTERFACE_DrawDamagedEquipment()
 					INTERACTIVE_OBJ * io=inter.iobj[player.equiped[eq]];
 					float ratio=io->durability/io->max_durability;
 					D3DCOLOR col=EERIERGB(1.f-ratio,ratio,0);
-					EERIEDrawBitmap2(GDevice,
+					g_pRenderApp->renderer->DrawQuad(
 						px,py,
 					                 INTERFACE_RATIO_DWORD(iconequip[i]->m_dwWidth), INTERFACE_RATIO_DWORD(iconequip[i]->m_dwHeight),
 						0.001f,
-						iconequip[i],col);		
+						iconequip[i],0,col);		
 				}
 			}
 		}
@@ -6654,12 +6654,12 @@ void DrawBookInterfaceItem(LPDIRECT3DDEVICE7 m_pd3dDevice,TextureContainer *tc,f
 {
 	if ((tc) && (tc->m_pddsSurface))
 	{
-		EERIEDrawBitmap2(m_pd3dDevice,
+		g_pRenderApp->renderer->DrawQuad(
 			(x+BOOKDECX)*Xratio,
 			(y+BOOKDECY)*Yratio,
 			(float)(tc->m_dwWidth)*Xratio,
 			(float)(tc->m_dwHeight)*Yratio,
-			z, tc, BOOKINTERFACEITEMCOLOR);
+			z, tc, 0, BOOKINTERFACEITEMCOLOR);
 	}
 }
 
@@ -9924,9 +9924,9 @@ void DANAE::DrawAllInterface()
 
 			if (player.SpellToMemorize.iSpellSymbols[i]!=255)
 			{
-				EERIEDrawBitmap2(GDevice, pos.x, pos.y, INTERFACE_RATIO(32), INTERFACE_RATIO(32), 0,
+				g_pRenderApp->renderer->DrawQuad(pos.x, pos.y, INTERFACE_RATIO(32), INTERFACE_RATIO(32), 0,
 					necklace.pTexTab[player.SpellToMemorize.iSpellSymbols[i]]
-					, D3DRGB(1,1,1));
+					, 0, D3DRGB(1,1,1));
 				
 				if (bHalo)
 				{
@@ -9945,9 +9945,9 @@ void DANAE::DrawAllInterface()
 					SETBLENDMODE(GDevice,D3DBLEND_INVDESTCOLOR,D3DBLEND_ONE);
 					SETALPHABLEND(GDevice,true);
 					
-					EERIEDrawBitmap2(GDevice, pos.x, pos.y, INTERFACE_RATIO(32), INTERFACE_RATIO(32), 0,
+					g_pRenderApp->renderer->DrawQuad(pos.x, pos.y, INTERFACE_RATIO(32), INTERFACE_RATIO(32), 0,
 						Movable
-						, D3DRGB(0.8f,0.8f,0.8f));
+						, 0, D3DRGB(0.8f,0.8f,0.8f));
 					SETALPHABLEND(GDevice,false);
 				}
 

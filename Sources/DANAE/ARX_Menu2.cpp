@@ -343,7 +343,7 @@ void ARX_DrawAfterQuickLoad()
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
 
-	EERIEDrawBitmap2(	GDevice, 
+	g_pRenderApp->renderer->DrawQuad(
 						0, 
 						0, 
 
@@ -352,6 +352,7 @@ void ARX_DrawAfterQuickLoad()
 
 						0.f, 
 						pTex, 
+						0,
 						D3DRGB(fColor,fColor,fColor) );
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,FALSE);
@@ -2156,7 +2157,7 @@ static void DrawCredits(void)
 		//Draw Background
 		if(ARXmenu.mda->pTexCredits)
 		{
-			EERIEDrawBitmap2(GDevice, 0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY + 1), .999f, ARXmenu.mda->pTexCredits, 0xFFFFFFFF);
+			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY + 1), .999f, ARXmenu.mda->pTexCredits, 0, 0xFFFFFFFF);
 		}	
 
 		danaeApp.DANAEEndRender();
@@ -4806,7 +4807,7 @@ void CMenuState::Render()
 	{
 		if (pTexBackGround->m_pddsSurface)
 		{
-			EERIEDrawBitmap2(GDevice, 0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.999f, pTexBackGround, D3DCOLORWHITE);
+			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.999f, pTexBackGround, 0, D3DCOLORWHITE);
 	}
 		}
 
@@ -5383,7 +5384,7 @@ void CMenuCheckButton::Render()
 		}
 		
 		//carre
-		EERIEDrawBitmap2(GDevice, ARX_CLEAN_WARN_CAST_FLOAT(rZone.right - iTaille), iY, RATIO_X(iTaille), RATIO_Y(iTaille), 0.f, pTex, color);
+		g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(rZone.right - iTaille), iY, RATIO_X(iTaille), RATIO_Y(iTaille), 0.f, pTex, 0, color);
 	}
 
 	if (pText)
@@ -5426,7 +5427,7 @@ void CMenuCheckButton::RenderMouseOver()
 
 	//carre
 
-	EERIEDrawBitmap2(GDevice, ARX_CLEAN_WARN_CAST_FLOAT(rZone.right - iTaille), iY, RATIO_X(iTaille), RATIO_Y(iTaille), 0.f, pTex, ARX_OPAQUE_WHITE); 
+	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(rZone.right - iTaille), iY, RATIO_X(iTaille), RATIO_Y(iTaille), 0.f, pTex, 0, ARX_OPAQUE_WHITE);
 
 
 	//tick
@@ -6429,9 +6430,9 @@ int CWindowMenuConsole::Render()
 	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
-	EERIEDrawBitmap2(GDevice, ARX_CLEAN_WARN_CAST_FLOAT(iPosX), ARX_CLEAN_WARN_CAST_FLOAT(iSavePosY),
+	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(iPosX), ARX_CLEAN_WARN_CAST_FLOAT(iSavePosY),
 		RATIO_X(pTexBackground->m_dwWidth), RATIO_Y(pTexBackground->m_dwHeight),
-		0, pTexBackground, ARX_OPAQUE_WHITE);
+		0, pTexBackground, 0, ARX_OPAQUE_WHITE);
 
 	danaeApp.EnableZBuffer();
 
@@ -6441,9 +6442,9 @@ int CWindowMenuConsole::Render()
 	SETALPHABLEND(GDevice, false);
 
 	SETALPHABLEND(GDevice,FALSE);
-	EERIEDrawBitmap2(GDevice, ARX_CLEAN_WARN_CAST_FLOAT(iPosX), ARX_CLEAN_WARN_CAST_FLOAT(iSavePosY),
+	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(iPosX), ARX_CLEAN_WARN_CAST_FLOAT(iSavePosY),
 		RATIO_X(pTexBackgroundBorder->m_dwWidth), RATIO_Y(pTexBackgroundBorder->m_dwHeight),
-		0, pTexBackgroundBorder, ARX_OPAQUE_WHITE);
+		0, pTexBackgroundBorder, 0, ARX_OPAQUE_WHITE);
 
 	//------------------------------------------------------------------------
 
@@ -6938,11 +6939,12 @@ void CMenuButton::Render()
 	//affichage de la texture
 	if(pTex)
 	{
-		EERIEDrawBitmap2(GDevice, ARX_CLEAN_WARN_CAST_FLOAT(rZone.left), ARX_CLEAN_WARN_CAST_FLOAT(rZone.top),
+		g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(rZone.left), ARX_CLEAN_WARN_CAST_FLOAT(rZone.top),
 			RATIO_X(pTex->m_dwWidth),
 			RATIO_Y(pTex->m_dwHeight),
 			0,
 			pTex,
+			0,
 			ARX_OPAQUE_WHITE);
 	}
 
@@ -7578,11 +7580,12 @@ void CMenuSlider::Render()
 			}
 		}
 
-		EERIEDrawBitmap2(GDevice, iX, iY, 
+		g_pRenderApp->renderer->DrawQuad(iX, iY,
 			RATIO_X(pTex->m_dwWidth),
 			RATIO_Y(pTex->m_dwHeight),
 			0,
 			pTex,
+			0,
 			ARX_OPAQUE_WHITE);
 
 		iX += iTexW;
@@ -8089,13 +8092,13 @@ void CDirectInput::DrawOneCursor(int _iPosX,int _iPosY,int _iColor)
 	GDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTFG_POINT );
 	SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_CLAMP);
 
-	EERIEDrawBitmap2(GDevice, ARX_CLEAN_WARN_CAST_FLOAT(_iPosX), ARX_CLEAN_WARN_CAST_FLOAT(_iPosY),
+	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(_iPosX), ARX_CLEAN_WARN_CAST_FLOAT(_iPosY),
 
 					INTERFACE_RATIO_DWORD(scursor[iNumCursor]->m_dwWidth),
 					INTERFACE_RATIO_DWORD(scursor[iNumCursor]->m_dwHeight),
 
 					0.00000001f,
-					scursor[iNumCursor],D3DCOLORWHITE);
+					scursor[iNumCursor],0,D3DCOLORWHITE);
 	GDevice->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFP_LINEAR);
 	SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_WRAP);
