@@ -28,6 +28,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_levels.h"
 #include "EERIEUtil.h"
 #include "EERIETexture.h"
+#include "EERIERenderer.h"
 #include "Hermesmain.h"
 #include "EERIEDraw.h"
 
@@ -183,7 +184,7 @@ BOOL C_ARX_Carte::Render(void)
 					else
 						device->SetTexture(0,NULL);
 
-					EERIEDRAWPRIM( device,	D3DPT_TRIANGLESTRIP,
+					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,
 											D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,
 											ep->tv,
 											nb,

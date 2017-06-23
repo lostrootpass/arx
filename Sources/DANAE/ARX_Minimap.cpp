@@ -62,6 +62,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEPhysicsBox.h"
 #include "EERIEDRAW.h"
 #include "EERIEObject.h"
+#include "EERIERenderer.h"
 #include "Hermesmain.h"
 #include "danae.h"
 
@@ -709,7 +710,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 								verts[3].sy += DECALY * Yratio;
 							}
 
-							EERIEDRAWPRIM(GDevice, D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, 4, 0);
+							g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, 4, 0);
 						}
 					}
 				}
@@ -765,7 +766,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 					verts[2].sy += DECALY * Yratio;
 				}
 
-				EERIEDRAWPRIM(GDevice, D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, 3, 0);
+				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, 3, 0);
 
 				if (fl2) SETALPHABLEND(m_pd3dDevice, FALSE);
 			}
@@ -944,7 +945,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 						verts[3].sy += DECALY * Yratio;
 					}
 
-					EERIEDRAWPRIM(GDevice, D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, 4, 0);
+					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, 4, 0);
 				}
 			}
 

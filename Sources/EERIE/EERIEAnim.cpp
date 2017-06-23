@@ -966,8 +966,7 @@ void PopOneTriangleList(TextureContainer *_pTex,bool _bUpdate)
 	if( _pTex->ulNbVertexListCull )
 	{
 		//use bSoftRender with allow or not fix for bGATI8500 flag with VB.
-		EERIEDRAWPRIM(	GDevice,
-						D3DPT_TRIANGLELIST,
+		g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 						D3DFVF_TLVERTEX,
 						_pTex->pVertexListCull,
 						_pTex->ulNbVertexListCull,
@@ -1010,8 +1009,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 
 		if(_pTex->ulNbVertexListCull_TNormalTrans)
 		{
-			EERIEDRAWPRIM(	GDevice,
-				D3DPT_TRIANGLELIST, 
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 				D3DFVF_TLVERTEX,
 				_pTex->pVertexListCull_TNormalTrans,
 				_pTex->ulNbVertexListCull_TNormalTrans,
@@ -1030,8 +1028,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 
 		if(_pTex->ulNbVertexListCull_TAdditive)
 		{
-			EERIEDRAWPRIM(	GDevice,
-				D3DPT_TRIANGLELIST, 
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 				D3DFVF_TLVERTEX,
 				_pTex->pVertexListCull_TAdditive,
 				_pTex->ulNbVertexListCull_TAdditive,
@@ -1049,8 +1046,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 
 		if(_pTex->ulNbVertexListCull_TSubstractive)
 		{
-			EERIEDRAWPRIM(	GDevice,
-				D3DPT_TRIANGLELIST, 
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 				D3DFVF_TLVERTEX,
 				_pTex->pVertexListCull_TSubstractive,
 				_pTex->ulNbVertexListCull_TSubstractive,
@@ -1068,8 +1064,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 	
 		if(_pTex->ulNbVertexListCull_TMultiplicative)
 		{
-			EERIEDRAWPRIM(	GDevice,
-				D3DPT_TRIANGLELIST, 
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 				D3DFVF_TLVERTEX,
 				_pTex->pVertexListCull_TMultiplicative,
 				_pTex->ulNbVertexListCull_TMultiplicative,
@@ -1088,8 +1083,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 		
 		if(_pTex->ulNbVertexListCull_TMetal)
 		{
-			EERIEDRAWPRIM(	GDevice,
-				D3DPT_TRIANGLELIST, 
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 				D3DFVF_TLVERTEX,
 				_pTex->pVertexListCull_TMetal,
 				_pTex->ulNbVertexListCull_TMetal,
@@ -1172,8 +1166,7 @@ void PopOneInterZMapp(TextureContainer *_pTex)
 
 		bool bUseVertexBuffer = bSoftRender; //use bSoftRender with allow or not fix for bGATI8500 flag with VB.
 
-		EERIEDRAWPRIM(	GDevice,
-						D3DPT_TRIANGLELIST, 
+		g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 						D3DFVF_TLVERTEX,
 						tD3DTLVERTEXTab2,
 						iPos,
@@ -1555,8 +1548,7 @@ void PopOneInterBump(LPDIRECT3DDEVICE7 _pDevice,TextureContainer *_pTex)
 					_pDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
 					_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
 
-					EERIEDRAWPRIM(	_pDevice,
-									D3DPT_TRIANGLELIST, 
+					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 									FVF_D3DVERTEX3_T,
 									tD3DTLVERTEXTab,
 									iNbD3DTLVERTEXTab,
@@ -1565,8 +1557,7 @@ void PopOneInterBump(LPDIRECT3DDEVICE7 _pDevice,TextureContainer *_pTex)
 					_pDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 1 );
 					_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE | D3DTA_COMPLEMENT );
 				default:
-					EERIEDRAWPRIM(	_pDevice,
-									D3DPT_TRIANGLELIST, 
+					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 									FVF_D3DVERTEX3_T,
 									tD3DTLVERTEXTab,
 									iNbD3DTLVERTEXTab,
@@ -1603,8 +1594,7 @@ void PopOneInterBump(LPDIRECT3DDEVICE7 _pDevice,TextureContainer *_pTex)
 				_pDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 0 );
 				_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
 				
-				EERIEDRAWPRIM(	_pDevice,
-								D3DPT_TRIANGLELIST, 
+				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 								FVF_D3DVERTEX3_T,
 								tD3DTLVERTEXTab,
 								iNbD3DTLVERTEXTab,
@@ -1613,8 +1603,7 @@ void PopOneInterBump(LPDIRECT3DDEVICE7 _pDevice,TextureContainer *_pTex)
 				_pDevice->SetTextureStageState( 0, D3DTSS_TEXCOORDINDEX, 1);
 				_pDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE | D3DTA_COMPLEMENT );
 			default:
-				EERIEDRAWPRIM(	_pDevice,
-								D3DPT_TRIANGLELIST, 
+				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 								FVF_D3DVERTEX3_T,
 								tD3DTLVERTEXTab,
 								iNbD3DTLVERTEXTab,
@@ -2812,7 +2801,7 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 							io,
 							modinfo);
 #ifdef ARX_OPENGL
-		g_pRenderApp->renderer->DrawPrim(io->obj->vertexlist3, io->obj->nbvertex, io->obj, io);
+		g_pRenderApp->renderer->DrawObj(io->obj->vertexlist3, io->obj->nbvertex, io->obj, io);
 		return;
 #endif
 	 return;
@@ -3668,7 +3657,7 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 			eobj->facelist[i].color[j]=vert_list[j].color;		
 
 		// Finally render our primitive			
-		EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE ,&vert_list, 3,  0, bSoftRender?EERIE_USEVB:0  );
+		g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE ,&vert_list, 3,  0, bSoftRender?EERIE_USEVB:0  );
 			
 
 		// Add some fake specular to Metallic polys
@@ -3718,7 +3707,7 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 					pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
 					SETALPHABLEND( pd3dDevice, TRUE );			
 					SETZWRITE( pd3dDevice, FALSE );
-					EERIEDRAWPRIM( pd3dDevice, D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, &vert_list, 3, 0, bSoftRender?EERIE_USEVB:0);
+					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, &vert_list, 3, 0, bSoftRender?EERIE_USEVB:0);
 					SETALPHABLEND( pd3dDevice, FALSE );			
 					SETZWRITE( pd3dDevice, TRUE );
 				}				

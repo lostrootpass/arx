@@ -73,6 +73,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEDraw.h"
 #include "EERIEObject.h"
 #include "EERIEPhysicsBox.h"
+#include "EERIERenderer.h"
 extern CMenuConfig *pMenuConfig;
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -1647,7 +1648,7 @@ void UpdateObjFx(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_CAMERA * cam)
 					}
 
 					SETTC(pd3dDevice,NULL);
-					EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , v2, 3,  0, bSoftRender?EERIE_USEVB:0  );
+					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , v2, 3,  0, bSoftRender?EERIE_USEVB:0  );
 				}
 			}
 		}
@@ -2360,7 +2361,7 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 					SETTC(pd3dDevice,NULL);
 					ComputeFogVertex(tv);
 
-					EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , tv, 3,  0, bSoftRender?EERIE_USEVB:0 );
+					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , tv, 3,  0, bSoftRender?EERIE_USEVB:0 );
 					if(!ARXPausedTimer)
 					{
 						part->oldpos.x=in.sx;

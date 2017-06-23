@@ -64,7 +64,7 @@ void EERIERenderer::DrawBitmap(float x, float y, float sx, float sy, float z, Te
 
 }
 
-void EERIERenderer::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
+void EERIERenderer::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 
 }
@@ -179,7 +179,7 @@ void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
 	glDisable(GL_BLEND);
 }
 
-void EERIERendererGL::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
+void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 	GLenum type = GL_TRIANGLES;
 	bool useAlphaBlending = false;
@@ -851,7 +851,69 @@ void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 	SETZWRITE(GDevice, TRUE);
 }
 
-void EERIERendererD3D7::DrawPrim(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
+void EERIERendererD3D7::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
 {
 
+}
+
+bool bForce_NoVB = false;
+void SET_FORCE_NO_VB(const bool& _NoVB)
+{
+	bForce_NoVB = _NoVB;
+}
+bool GET_FORCE_NO_VB(void)
+{
+	return bForce_NoVB;
+}
+
+//Draw primitive using vertex buffer
+HRESULT ARX_DrawPrimitiveVB(LPDIRECT3DDEVICE7	_d3dDevice,
+	D3DPRIMITIVETYPE	_dptPrimitiveType,
+	DWORD				_dwVertexTypeDesc,	// Vertex Format
+	LPVOID				_pD3DTLVertex,		// don't specify _pD3DTLVertex type.
+	int *				_piNbVertex,
+	DWORD				_dwFlags);
+
+void EERIERendererD3D7::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags)
+{
+	D3DPRIMITIVETYPE dptPrimitiveType = _toD3DPT(primType);
+
+	if (!(EERIE_NOCOUNT & eerieFlags))
+	{
+		EERIEDrawnPolys++;
+	}
+
+	if (!bForce_NoVB &&	eerieFlags&EERIE_USEVB)
+	{
+		ARX_DrawPrimitiveVB(GDevice,
+			dptPrimitiveType,
+			dwVertexTypeDesc, 		//FVF
+			lpvVertices,			//No type specified
+			(int*)&dwVertexCount,
+			dwFlags);				//Same thing throught DrawPrimitiveVB
+	}
+	else
+	{
+		GDevice->DrawPrimitive(dptPrimitiveType, dwVertexTypeDesc, lpvVertices, dwVertexCount, dwFlags);
+	}
+}
+
+D3DPRIMITIVETYPE EERIERendererD3D7::_toD3DPT(EERIEPrimType primType)
+{
+	D3DPRIMITIVETYPE prim = D3DPT_TRIANGLELIST;
+
+	switch (primType)
+	{
+	case EERIEPrimType::TriangleList:
+		prim = D3DPT_TRIANGLELIST;
+		break;
+	case EERIEPrimType::TriangleStrip:
+		prim = D3DPT_TRIANGLESTRIP;
+		break;
+	case EERIEPrimType::TriangleFan:
+		prim = D3DPT_TRIANGLEFAN;
+		break;
+	}
+
+	return prim;
 }

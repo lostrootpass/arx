@@ -1650,8 +1650,7 @@ bool ARX_DrawPrimitive_SoftClippZ(D3DTLVERTEX * _pVertex1, D3DTLVERTEX * _pVerte
 #ifdef ARX_OPENGL
 	g_pRenderApp->renderer->DrawRotatedSprite(pD3DPointAdd, iNbTotVertex, 0);
 #else
-	EERIEDRAWPRIM(GDevice,
-	              D3DPT_TRIANGLELIST,
+	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
 	              D3DFVF_TLVERTEX,
 	              pD3DPointAdd,
 					iNbTotVertex,
@@ -2439,7 +2438,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 	if (bRenderInterList)
 	{
 #ifdef ARX_OPENGL
-		g_pRenderApp->renderer->DrawPrim(eobj->vertexlist3, eobj->nbvertex, eobj, io);
+		g_pRenderApp->renderer->DrawObj(eobj->vertexlist3, eobj->nbvertex, eobj, io);
 #else
 		Cedric_RenderObject2(pd3dDevice,
 		                     eobj,
@@ -2753,7 +2752,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 				continue;
 			}
 
-			EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG );
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG );
 
 			if (special_color_flag & 2)
 			{
@@ -2768,8 +2767,8 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 				{
 					tv[j].color = v;
 				}
-				EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG  );
-				EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG  );//duplicate ???? @TBR ?
+				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG  );
+				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG  );//duplicate ???? @TBR ?
 				SETALPHABLEND(pd3dDevice, FALSE);
 				SETZWRITE(pd3dDevice, TRUE);
 			}
@@ -2813,7 +2812,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 					pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
 					SETALPHABLEND(pd3dDevice, TRUE);
 					SETZWRITE(pd3dDevice, FALSE);
-					EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, &tv, 3, 0, EERIE_FLAG );
+					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, &tv, 3, 0, EERIE_FLAG );
 					SETALPHABLEND(pd3dDevice, FALSE);
 					SETZWRITE(pd3dDevice, TRUE);
 				}

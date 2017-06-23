@@ -263,6 +263,7 @@
     <ClInclude Include="..\Include\EERIEPoly.h" />
     <ClInclude Include="..\Include\EERIEProgressive.h" />
     <ClInclude Include="..\Include\EERIERenderer.h" />
+    <ClInclude Include="..\Include\EERIERendererTypes.h" />
     <ClInclude Include="..\Include\EERIEres.h" />
     <ClInclude Include="..\Include\EERIETexture.h" />
     <ClInclude Include="..\Include\EERIETypes.h" />

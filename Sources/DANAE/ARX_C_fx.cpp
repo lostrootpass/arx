@@ -25,6 +25,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <stdlib.h>
 #include "arx_c_cinematique.h"
 #include "Resource.h"
+#include "EERIERenderer.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -193,7 +194,7 @@ BOOL FX_FlashBlanc(LPDIRECT3DDEVICE7 device, float w, float h, float speed, int 
 
 	FlashAlpha -= speed * fps / currfps;
 
-	EERIEDRAWPRIM(device, D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 
 	return TRUE;
 }
@@ -252,7 +253,7 @@ BOOL SpecialFade(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, fl
 	v[3].tu = 0.999999f;
 	v[3].tv = dv;
 
-	EERIEDRAWPRIM(device, D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 
 	//empty
 	device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
@@ -285,7 +286,7 @@ BOOL SpecialFade(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, fl
 	v[3].rhw = 1.f;
 	v[3].color = 0xFF000000;
 
-	EERIEDRAWPRIM(device, D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 
 	if (fpscurr > 1.f)
 	{
@@ -355,7 +356,7 @@ BOOL SpecialFadeR(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, f
 	v[3].tu = 0.9999999f;
 	v[3].tv = dv;
 
-	EERIEDRAWPRIM(device, D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 
 	device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 	device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
@@ -387,7 +388,7 @@ BOOL SpecialFadeR(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, f
 	v[3].rhw = 1.f;
 	v[3].color = 0xFF000000;
 
-	EERIEDRAWPRIM(device, D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 
 	if (fpscurr > 1.f)
 	{

@@ -178,6 +178,9 @@
     <ClInclude Include="..\Include\EERIE_GLshaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\EERIERendererTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\lib\OtherLibs\Jpeglib.lib" />

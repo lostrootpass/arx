@@ -63,6 +63,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEDRAW.h"
 #include "EERIEObject.h"
 #include "EERIETexture.h"
+#include "EERIERenderer.h"
 #include "ARX_collisions.h"
 #include "ARX_C_Cinematique.h"
 #include "Hermesmain.h"
@@ -413,7 +414,7 @@ void ARX_INTERFACE_DrawNumber(const float x, const float y, const long num, cons
 				v[2].tv = v[3].tv = divideY * 12; 
 				SETTC(GDevice,inventory_font);
 		
-				EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE| D3DFVF_SPECULAR ,v, 4, 0 );	
+				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE| D3DFVF_SPECULAR ,v, 4, 0 );
 				
 			}
 		}
@@ -9107,10 +9108,10 @@ void ARX_INTERFACE_ManageOpenedBook()
 					{
 						SETBLENDMODE(GDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
 						vert[2].color =0xFF000000;
-						EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 ); //>>> DO NOT USE VERTEX BUFFER HERE <<<
+						g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 ); //>>> DO NOT USE VERTEX BUFFER HERE <<<
 						SETBLENDMODE(GDevice,D3DBLEND_SRCCOLOR,D3DBLEND_ONE);
 					}
-					else EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 ); //>>> DO NOT USE VERTEX BUFFER HERE <<<
+					else g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 ); //>>> DO NOT USE VERTEX BUFFER HERE <<<
 				}
 
 				HALOCUR=0;

@@ -43,6 +43,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "eerietexture.h"
 #include "eeriepoly.h"
 #include "eeriedraw.h"
+#include "EERIERenderer.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -2317,7 +2318,7 @@ D3DTLVERTEX d3dvertex[4];
 	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,false);
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
 
-	EERIEDRAWPRIM( GDevice, D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, d3dvertex, 4, 0, EERIE_NOCOUNT );
+	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, d3dvertex, 4, 0, EERIE_NOCOUNT );
 
 	SETALPHABLEND(GDevice,FALSE);
 	SETZWRITE(GDevice, true);
@@ -5083,8 +5084,8 @@ void CMenuAllZone::DrawZone()
 			v1[0].sz=v1[1].sz=v1[2].sz=v2[0].sz=v2[1].sz=v2[2].sz=0.f;	
 			v1[0].rhw=v1[1].rhw=v1[2].rhw=v2[0].rhw=v2[1].rhw=v2[2].rhw=0.999999f;	
 			
-			EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLESTRIP,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v1,3,0);
-			EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLESTRIP,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v2,3,0);
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v1,3,0);
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v2,3,0);
 		}
 	}
 
@@ -5986,7 +5987,7 @@ void CWindowMenuConsole::UpdateText()
 	v[2].sy = (float)pZoneClick->rZone.bottom;
 	v[3].sx = v[1].sx;
 	v[3].sy = v[2].sy;
-	EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLESTRIP,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
+	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
 }
 
 //-----------------------------------------------------------------------------
@@ -6999,7 +7000,7 @@ void CMenuButton::RenderMouseOver()
 		v[3].sy = v[2].sy;
 		v[3].tu = 0.999999f;
 		v[3].tv = 0.999999f;
-		EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLESTRIP,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
+		g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
 	}
 
 	if( vText.size() )
@@ -8178,7 +8179,7 @@ static void DrawLine2D(EERIE_2DI *_psPoint1,int _iNbPt,float _fSize,float _fRed,
 		if(ComputePer(psOldPoint,_psPoint1+1,&v[1],&v[3],fTaille))
 		{
 			v[1].color=v[3].color=D3DRGBA(fColorRed,fColorGreen,fColorBlue,1.f);	
-			EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLESTRIP,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
 			
 			v[0].sx=v[1].sx;
 			v[0].sy=v[1].sy;
@@ -8199,7 +8200,7 @@ static void DrawLine2D(EERIE_2DI *_psPoint1,int _iNbPt,float _fSize,float _fRed,
 	if(ComputePer(_psPoint1,psOldPoint,&v[1],&v[3],fTaille)) 
 	{
 		v[1].color=v[3].color=D3DRGBA(fColorRed,fColorGreen,fColorBlue,1.f);	
-		EERIEDRAWPRIM(GDevice,D3DPT_TRIANGLESTRIP,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
+		g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
 	}
 
 	SETALPHABLEND(GDevice,false);

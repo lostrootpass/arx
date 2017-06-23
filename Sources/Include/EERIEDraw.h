@@ -68,16 +68,6 @@ void MDL_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice);
 void Delayed_EERIEDRAWPRIM(EERIEPOLY * ep);
 void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice);
 
-HRESULT EERIEDRAWPRIM(LPDIRECT3DDEVICE7 pd3dDevice,
-                      D3DPRIMITIVETYPE dptPrimitiveType,
-                      DWORD  dwVertexTypeDesc,
-                      LPVOID lpvVertices,
-                      DWORD  dwVertexCount,
-                      DWORD  dwFlags,					//d3d flag
-                      long flags = 0,					//eerie flag
-                      EERIEPOLY * ep = NULL
-                     );
-
 void EERIE_DrawPolyBump(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY * ep, float alpha);
 void EERIEDrawLine(float x, float y, float x1, float y1, float z, D3DCOLOR col);
 void EERIEDrawCircle(float x0, float y0, float r, D3DCOLOR col, float z);

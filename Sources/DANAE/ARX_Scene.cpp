@@ -3346,7 +3346,7 @@ SMY_D3DVERTEX *pMyVertex;
 #ifdef ARX_OPENGL
 						///draw
 #else
-						EERIEDRAWPRIM(GDevice, D3DPT_TRIANGLELIST, FVF_D3DVERTEX3, pVertex, (iNbVertex&4)?6:3,  0, EERIE_NOCOUNT );
+						g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList, FVF_D3DVERTEX3, pVertex, (iNbVertex&4)?6:3,  0, EERIE_NOCOUNT );
 #endif
 					}
 
@@ -4900,11 +4900,11 @@ if (HALOCUR>0)
 			pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
 			pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR );									
 			vert[2].color =0xFF000000;
-			EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 );//>>> DO NOT USE EERIE_USEVB FOR HALO <<<
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 );//>>> DO NOT USE EERIE_USEVB FOR HALO <<<
 			pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_SRCCOLOR );
 			pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
 		}
-		else EERIEDRAWPRIM(pd3dDevice,D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 );//>>> DO NOT USE EERIE_USEVB FOR HALO <<<
+		else g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 );//>>> DO NOT USE EERIE_USEVB FOR HALO <<<
 	}
 
 		 HALOCUR = 0; 
