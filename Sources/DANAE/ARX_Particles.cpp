@@ -2423,7 +2423,6 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 
 			if (r>0.f) 
 			{
-#ifndef ARX_OPENGL
 				if (part->special & NO_TRANS)
 				{
 					SETALPHABLEND(pd3dDevice,FALSE);
@@ -2434,16 +2433,23 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 
 					if (part->special & SUBSTRACT) 
 					{
+#ifdef ARX_OPENGL
+						glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+#else
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+#endif
 					}
 					else
 					{
+#ifdef ARX_OPENGL
+						glBlendFunc(GL_ONE, GL_ONE);
+#else
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
 						pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+#endif
 					}
 				}
-#endif
 				
 				EERIE_3D op=part->oldpos;
 
