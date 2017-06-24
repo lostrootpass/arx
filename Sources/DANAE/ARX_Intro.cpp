@@ -442,7 +442,11 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 						py = ipy * Yratio;
 						px2 = (ratio * pbar->m_dwWidth) * Xratio;
 						py2 = pbar->m_dwHeight * Yratio;
-						const float uvs[] = { pbar->m_hdx, pbar->m_hdy, ratio, 1.f };
+						const float uvs[] = { 
+							pbar->m_hdx, pbar->m_hdy,
+							ratio, pbar->m_hdy,
+							pbar->m_hdx, 1.0f,
+							ratio, 1.0f };
 						g_pRenderApp->renderer->DrawQuad(px, py, px2, py2, 0.f, pbar, uvs, D3DRGB(fFadeColor, fFadeColor, fFadeColor));
 					}
 					else
@@ -458,7 +462,11 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 						py = ipy * Yratio;
 						px2 = (ratio * pbar->m_dwWidth) * Xratio;
 						py2 = pbar->m_dwHeight * Yratio;
-						const float uvs[] = { pbar->m_hdx, pbar->m_hdy, ratio, 1.f };
+						const float uvs[] = {
+							pbar->m_hdx, pbar->m_hdy,
+							ratio, pbar->m_hdy,
+							pbar->m_hdx, 1.0f,
+							ratio, 1.0f };
 						g_pRenderApp->renderer->DrawQuad(px, py, px2, py2, 0.f, pbar, uvs, D3DRGB(fFadeColor, fFadeColor, fFadeColor));
 					}
 

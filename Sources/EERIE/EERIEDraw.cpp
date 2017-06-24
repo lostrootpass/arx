@@ -1381,40 +1381,6 @@ void EERIEPOLY_DrawNormals(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY *ep)
 
 //-----------------------------------------------------------------------------
 
-void EERIEDrawBitmapUVs(LPDIRECT3DDEVICE7 pd3dDevice,float x,float y,float sx,float sy,float z,TextureContainer * tex,D3DCOLOR col
-						,float u0,float v0
-						,float u1,float v1
-						,float u2,float v2
-						,float u3,float v3
-						)
-{
-	register float smu,smv;
-	float fEndu,fEndv;
-
-	if (tex)
-	{
-		smu=tex->m_hdx;
-		smv=tex->m_hdy;
-		fEndu=tex->m_dx;
-		fEndv=tex->m_dy;
-	}
-	else
-	{
-		smu=smv=0.f;
-		fEndu=fEndv=0.f;
-	}
-
-	D3DTLVERTEX v[4];
-	v[0]= D3DTLVERTEX( D3DVECTOR( x,	y,		z ), 1.f, col, 0xFF000000, smu+u0,	smv+v0);
-	v[1]= D3DTLVERTEX( D3DVECTOR( x+sx, y,		z ), 1.f, col, 0xFF000000, smu+u1,	smv+v1);
-	v[2]= D3DTLVERTEX( D3DVECTOR( x,	y+sy,	z ), 1.f, col, 0xFF000000, smu+u2,	smv+v2);
-	v[3]= D3DTLVERTEX( D3DVECTOR( x+sx,	y+sy,	z ), 1.f, col, 0xFF000000, smu+u3,	smv+v3);
-	
-	SETTC(pd3dDevice,tex);
-	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, v, 4, 0  );
-}
-
-//-----------------------------------------------------------------------------
 
 void EERIEDrawBitmap2DecalY(LPDIRECT3DDEVICE7 pd3dDevice,float x,float y,float sx,float sy,float z,TextureContainer * tex,D3DCOLOR col,float _fDeltaY)
 {

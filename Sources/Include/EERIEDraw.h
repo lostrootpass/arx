@@ -133,13 +133,6 @@ void EERIEPOLY_DrawNormals(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY * ep);
 extern TextureContainer * EERIE_DRAW_sphere_particle;
 extern TextureContainer * EERIE_DRAW_square_particle;
 
-void EERIEDrawBitmapUVs(LPDIRECT3DDEVICE7 pd3dDevice, float x, float y, float sx, float sy, float z, TextureContainer * tex, D3DCOLOR col
-                        , float u0, float v0
-                        , float u1, float v1
-                        , float u2, float v2
-                        , float u3, float v3
-                       );
-
 void SET_FORCE_NO_VB( const bool& _NoVB );
 bool GET_FORCE_NO_VB( );
 

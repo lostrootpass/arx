@@ -836,15 +836,24 @@ void EERIERendererD3D7::DrawQuad(float x, float y, float sx, float sy, float z, 
 {
 	float smu, smv;
 	float fEndu, fEndv;
-	float fDecalU, fDecalV;
-	float u0 = 0.0f, u1 = 1.0f, v0 = 0.0f, v1 = 1.0f;
+
+	float u0, u1, u2, u3;
+	float v0, v1, v2, v3;
 
 	if (uvs)
 	{
-		u0 = uvs[0];
-		v0 = uvs[1];
-		u1 = uvs[2];
-		v1 = uvs[3];
+		u0 = uvs[0], u1 = uvs[2], u2 = uvs[4], u3 = uvs[6];
+		v0 = uvs[1], v1 = uvs[3], v2 = uvs[5], v3 = uvs[7];
+	}
+	else if (tex)
+	{
+		u0 = tex->m_hdx, u1 = tex->m_dx, u2 = tex->m_hdx, u3 = tex->m_dx;
+		v0 = tex->m_hdy, v1 = tex->m_hdy, v2 = tex->m_dy, v3 = tex->m_dy;
+	}
+	else
+	{
+		u0 = 0.0f, u1 = 1.0f, u2 = 0.0f, u3 = 1.0f;
+		v0 = 0.0f, v1 = 0.0f, v2 = 1.0f, v3 = 1.0f;
 	}
 
 	if (tex)
@@ -853,28 +862,21 @@ void EERIERendererD3D7::DrawQuad(float x, float y, float sx, float sy, float z, 
 		smv = tex->m_hdy;
 		fEndu = tex->m_dx;
 		fEndv = tex->m_dy;
-		fDecalU = tex->m_hdx;
-		fDecalV = tex->m_hdy;
 	}
 	else
 	{
 		smu = smv = 0.f;
-		fEndu = fEndv = 1.f;
-		fDecalU = fDecalV = 0.f;
+		fEndu = fEndv = 0.f;
 	}
 
 	D3DTLVERTEX v[4];
-	u0 = smu + (fEndu - smu + fDecalU)*u0;
-	u1 = smu + (fEndu - smu + fDecalU)*u1;
-	v0 = smv + (fEndv - smv + fDecalV)*v0;
-	v1 = smv + (fEndv - smv + fDecalV)*v1;
-	v[0] = D3DTLVERTEX(D3DVECTOR(x, y, z), 1.f, color, 0xFF000000, u0, v0);
-	v[1] = D3DTLVERTEX(D3DVECTOR(x + sx, y, z), 1.f, color, 0xFF000000, u1, v0);
-	v[2] = D3DTLVERTEX(D3DVECTOR(x + sx, y + sy, z), 1.f, color, 0xFF000000, u1, v1);
-	v[3] = D3DTLVERTEX(D3DVECTOR(x, y + sy, z), 1.f, color, 0xFF000000, u0, v1);
+	v[0] = D3DTLVERTEX(D3DVECTOR(x, y, z), 1.f, color, 0xFF000000, smu + u0, smv + v0);
+	v[1] = D3DTLVERTEX(D3DVECTOR(x + sx, y, z), 1.f, color, 0xFF000000, smu + u1, smv + v1);
+	v[2] = D3DTLVERTEX(D3DVECTOR(x, y + sy, z), 1.f, color, 0xFF000000, smu + u2, smv + v2);
+	v[3] = D3DTLVERTEX(D3DVECTOR(x + sx, y + sy, z), 1.f, color, 0xFF000000, smu + u3, smv + v3);
 
 	SETTC(GDevice, tex);
-	GDevice->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+	GDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 }
 
 void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)

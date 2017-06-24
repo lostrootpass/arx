@@ -10136,44 +10136,65 @@ void DANAE::DrawAllInterface()
 						0,
 						lColor );
 					
-					EERIEDrawBitmapUVs(	GDevice,				//right
-						DANAESIZX-fSizeX-fMove,
-						(DANAESIZY-fSizeY)*.5f,
-						fSizeX,
-						fSizeY,
-						0.01f,
-						arrow_left_tc,
-						lColor,
-						1.f,0.f,
-						0.f,0.f,
-						1.f,1.f,
-						0.f,1.f);
+					//right
+					{
+						const float uvs[] = {
+							1.f, 0.f,
+							0.f, 0.f,
+							1.f, 1.f,
+							0.f, 1.f
+						};
+
+						g_pRenderApp->renderer->DrawQuad(
+							DANAESIZX - fSizeX - fMove,
+							(DANAESIZY - fSizeY)*.5f,
+							fSizeX,
+							fSizeY,
+							0.01f,
+							arrow_left_tc,
+							uvs,
+							lColor);
+					}
 					
-					EERIEDrawBitmapUVs(	GDevice,				//up
-						(DANAESIZX-fSizeY)*.5f,
-						0.f+fMove,
-						fSizeY,
-						fSizeX,
-						0.01f,
-						arrow_left_tc,
-						lColor,
-						0.f,1.f,
-						0.f,0.f,
-						1.f,1.f,
-						1.f,0.f);
+					//up
+					{
+						const float uvs[] = {
+							0.f, 1.f,
+							0.f, 0.f,
+							1.f, 1.f,
+							1.f, 0.f
+						};
+
+						g_pRenderApp->renderer->DrawQuad(
+							(DANAESIZX - fSizeY)*.5f,
+							0.f + fMove,
+							fSizeY,
+							fSizeX,
+							0.01f,
+							arrow_left_tc,
+							uvs,
+							lColor);
+					}
 					
-					EERIEDrawBitmapUVs(	GDevice,				//down
-						(DANAESIZX-fSizeY)*.5f,
-						(DANAESIZY-fSizeX)-fMove,
-						fSizeY,
-						fSizeX,
-						0.01f,
-						arrow_left_tc,
-						lColor,
-						1.f,1.f,
-						1.f,0.f,
-						0.f,1.f,
-						0.f,0.f);
+					//down
+					{
+						const float uvs[] = {
+							1.f, 1.f,
+							1.f, 0.f,
+							0.f, 1.f,
+							0.f, 0.f
+						};
+
+						g_pRenderApp->renderer->DrawQuad(
+							(DANAESIZX - fSizeY)*.5f,
+							(DANAESIZY - fSizeX) - fMove,
+							fSizeY,
+							fSizeX,
+							0.01f,
+							arrow_left_tc,
+							uvs,
+							lColor);
+					}
 				}
 				
 				SETALPHABLEND(GDevice, false);
