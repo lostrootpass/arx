@@ -836,6 +836,16 @@ void EERIERendererD3D7::DrawQuad(float x, float y, float sx, float sy, float z, 
 {
 	float smu, smv;
 	float fEndu, fEndv;
+	float fDecalU, fDecalV;
+	float u0 = 0.0f, u1 = 1.0f, v0 = 0.0f, v1 = 1.0f;
+
+	if (uvs)
+	{
+		u0 = uvs[0];
+		v0 = uvs[1];
+		u1 = uvs[2];
+		v1 = uvs[3];
+	}
 
 	if (tex)
 	{
@@ -843,21 +853,28 @@ void EERIERendererD3D7::DrawQuad(float x, float y, float sx, float sy, float z, 
 		smv = tex->m_hdy;
 		fEndu = tex->m_dx;
 		fEndv = tex->m_dy;
+		fDecalU = tex->m_hdx;
+		fDecalV = tex->m_hdy;
 	}
 	else
 	{
 		smu = smv = 0.f;
-		fEndu = fEndv = 0.f;
+		fEndu = fEndv = 1.f;
+		fDecalU = fDecalV = 0.f;
 	}
 
 	D3DTLVERTEX v[4];
-	v[0] = D3DTLVERTEX(D3DVECTOR(x, y, z), 1.f, color, 0xFF000000, smu, smv);
-	v[1] = D3DTLVERTEX(D3DVECTOR(x + sx, y, z), 1.f, color, 0xFF000000, fEndu, smv);
-	v[2] = D3DTLVERTEX(D3DVECTOR(x, y + sy, z), 1.f, color, 0xFF000000, smu, fEndv);
-	v[3] = D3DTLVERTEX(D3DVECTOR(x + sx, y + sy, z), 1.f, color, 0xFF000000, fEndu, fEndv);
+	u0 = smu + (fEndu - smu + fDecalU)*u0;
+	u1 = smu + (fEndu - smu + fDecalU)*u1;
+	v0 = smv + (fEndv - smv + fDecalV)*v0;
+	v1 = smv + (fEndv - smv + fDecalV)*v1;
+	v[0] = D3DTLVERTEX(D3DVECTOR(x, y, z), 1.f, color, 0xFF000000, u0, v0);
+	v[1] = D3DTLVERTEX(D3DVECTOR(x + sx, y, z), 1.f, color, 0xFF000000, u1, v0);
+	v[2] = D3DTLVERTEX(D3DVECTOR(x + sx, y + sy, z), 1.f, color, 0xFF000000, u1, v1);
+	v[3] = D3DTLVERTEX(D3DVECTOR(x, y + sy, z), 1.f, color, 0xFF000000, u0, v1);
 
 	SETTC(GDevice, tex);
-	GDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+	GDevice->DrawPrimitive(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 }
 
 void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
