@@ -60,6 +60,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "EERIEDraw.h"
 #include "HermesMain.h"
+#include "EERIERenderer.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -771,7 +772,7 @@ CARXTextManager::~CARXTextManager()
 }
 
 //-----------------------------------------------------------------------------
-bool CARXTextManager::AddText(HFONT _hFont, _TCHAR * _lpszUText, RECT & _rRect, long _lCol, long _lBkgCol, long _lTimeOut, long _lTimeScroll, float _fSpeedScroll, int iNbLigneClipp)
+bool CARXTextManager::AddText(HFONT _hFont, _TCHAR * _lpszUText, RECT & _rRect, long _lCol, long _lBkgCol, long _lTimeOut, long _lTimeScroll, float _fSpeedScroll, int iNbLigneClipp, int _iFontSize)
 {
 	if ((_lpszUText) && (_hFont))
 	{
@@ -793,6 +794,7 @@ bool CARXTextManager::AddText(HFONT _hFont, _TCHAR * _lpszUText, RECT & _rRect, 
 				pArxText->fDeltaY		= 0.f;
 				pArxText->fSpeedScrollY	= _fSpeedScroll;
 				pArxText->lTimeOut		= _lTimeOut;
+				pArxText->iFontSize		= _iFontSize;
 
 				if (iNbLigneClipp)
 				{
@@ -864,6 +866,23 @@ bool CARXTextManager::AddText(ARX_TEXT * _pArxText)
 				pArxText->fSpeedScrollY	= _pArxText->fSpeedScrollY;
 				pArxText->lTimeOut		= _pArxText->lTimeOut;
 				pArxText->iNbLineClip   = _pArxText->iNbLineClip;
+				
+				//TODO: fix this somehow. The font sizes are hardcoded below, but messy to pass around everywhere.
+				if (pArxText->hFont == hFontMainMenu)
+				{
+					pArxText->iFontSize = 48;
+				}
+				else if ((pArxText->hFont == hFontMenu) || (pArxText->hFont == hFontCredits))
+				{
+					pArxText->iFontSize = 32;
+				}
+				else if((pArxText->hFont == InBookFont) || (pArxText->hFont == hFontRedist)
+					|| (pArxText->hFont == hFontControls) || (pArxText->hFont == hFontInGame)
+					|| (pArxText->hFont == hFontInGameNote))
+				{
+					pArxText->iFontSize = 16;
+
+				}
 
 				if (pArxText->iNbLineClip)
 				{
@@ -980,6 +999,11 @@ void CARXTextManager::Render()
 
 		if (pArxText)
 		{
+#ifdef ARX_OPENGL
+			char text[MAX_PATH];
+			wcstombs(text, pArxText->lpszUText, wcslen(pArxText->lpszUText) + 1);
+			g_pRenderApp->renderer->DrawText(text, pArxText->rRect.left, pArxText->rRect.top, pArxText->lCol, pArxText->iFontSize);
+#else
 			HRGN hRgn = NULL;
 			hRgn = CreateRectRgn(pArxText->rRectClipp.left,
 			                     pArxText->rRectClipp.top,
@@ -1003,6 +1027,7 @@ void CARXTextManager::Render()
 			{
 				DeleteObject(hRgn);
 			}
+#endif
 
 			if (pArxText->eType == ARX_TEXT_ONCE)
 			{

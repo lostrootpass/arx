@@ -87,6 +87,7 @@ typedef struct _ARX_TEXT
 	long			lTimeOut;
 	long			lTailleLigne;
 	int				iNbLineClip;
+	int				iFontSize;
 } ARX_TEXT;
 
 //-----------------------------------------------------------------------------
@@ -101,7 +102,7 @@ class CARXTextManager
 		CARXTextManager();
 		~CARXTextManager();
 	public:
-		bool AddText(HFONT, _TCHAR *, RECT &, long _lCol = -1, long _lBkgCol = 0, long _lTimeOut = 0, long _lTimeScroll = 0, float _fSpeedScroll = 0.f, int iNbLigneClipp = 0);
+		bool AddText(HFONT, _TCHAR *, RECT &, long _lCol = -1, long _lBkgCol = 0, long _lTimeOut = 0, long _lTimeScroll = 0, float _fSpeedScroll = 0.f, int iNbLigneClipp = 0, int _iFontSize = 24);
 		bool AddText(ARX_TEXT *);
 		void Update(float);
 		void Render();

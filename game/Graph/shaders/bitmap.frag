@@ -10,4 +10,10 @@ uniform sampler2D texsampler;
 void main()
 {
    color = texture( texsampler, uv ).rgb;
+
+   //Behaviour corresponds to RestoreFakeBlack in D3D7 Arx
+   if(color == vec3(0.0, 0.0, 0.0))
+   {
+       discard;
+   }
 }

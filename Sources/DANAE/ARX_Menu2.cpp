@@ -520,12 +520,12 @@ void FontRenderText(HFONT _hFont, EERIE_3D pos, _TCHAR *_pText, COLORREF _c)
 		pText.lpszUText = _pText;
 		pText.lCol = _c;
 		pText.rRect = rRect;
+		pText.hFont = _hFont;
+		pText.lpszUText = _pText;
+		pText.iFontSize = 48;
+		pText.lBkgCol = 0x00FF00FF;
 
-		pTextManage->AddText(	_hFont,
-								_pText,
-								rRect,
-								_c,
-								0x00FF00FF);
+		pTextManage->AddText(&pText);
 	}
 }
 
@@ -2282,6 +2282,10 @@ void Check_Apply()
 
 static void FadeInOut(float _fVal)
 {
+#ifdef ARX_OPENGL
+	return;
+#endif
+
 D3DTLVERTEX d3dvertex[4];
 
 	int iColor=D3DRGBA(_fVal,_fVal,_fVal,1.f);
@@ -2371,8 +2375,10 @@ bool Menu2_Render()
 	if (ARXDiffTimeMenu < 0) //this mean ArxTimeMenu is reseted 
 		ARXDiffTimeMenu = 0 ;
 
+#ifndef ARX_OPENGL
 	GDevice->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFP_LINEAR);
+#endif
 
 	if ((AMCM_NEWQUEST==ARXmenu.currentmode)
 		|| (AMCM_CREDITS==ARXmenu.currentmode)
@@ -2401,7 +2407,11 @@ bool Menu2_Render()
 		return FALSE;
 	}
 
+#ifdef ARX_OPENGL
+	if(!danaeGLApp.DANAEStartRender())
+#else
 	if(!danaeApp.DANAEStartRender())
+#endif
 	{
 		return true;
 	}
@@ -2411,12 +2421,14 @@ bool Menu2_Render()
 		pTextManage->Clear();
 	}
 
+#ifndef ARX_OPENGL
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_CLAMP);
 
 	GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
 	SETZWRITE(GDevice, false);
 	GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
+#endif
 	
 	MENUSTATE eOldMenuState=NOP;
 	MENUSTATE eM;
@@ -3845,7 +3857,11 @@ int iDecMenuPrincipaleY=50;
 
 	bNoMenu=false;
 
+#ifdef ARX_OPENGL
+	//danaeGLApp.DANAEEndRender();
+#else
 	danaeApp.DANAEEndRender();
+#endif
 
 	if(pTextManage)
 	{
@@ -3853,6 +3869,9 @@ int iDecMenuPrincipaleY=50;
 		pTextManage->Render();
 	}
 
+#ifdef ARX_OPENGL
+	//danaeGLApp.DANAEStartRender();
+#else
 	danaeApp.DANAEStartRender();
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_CLAMP);
 
@@ -3861,6 +3880,7 @@ int iDecMenuPrincipaleY=50;
 	GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
 	pGetInfoDirectInput->DrawCursor();
+#endif
 
 	if(pMenu->bReInitAll)
 	{
@@ -3944,6 +3964,9 @@ int iDecMenuPrincipaleY=50;
 		}
 	}
 
+#ifdef ARX_OPENGL
+	danaeGLApp.DANAEEndRender();
+#else
 	SETALPHABLEND(GDevice,FALSE);
 	GDevice->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFP_LINEAR);
@@ -3955,6 +3978,7 @@ int iDecMenuPrincipaleY=50;
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_CCW);
 
 	danaeApp.DANAEEndRender();
+#endif
 	return true;
 }
 
@@ -4764,6 +4788,10 @@ MENUSTATE CMenuState::Update(int _iDTime)
 
 	pZoneClick=NULL;
 
+#ifdef ARX_OPENGL
+	return NOP;
+#endif
+
 	int iR=pMenuAllZone->CheckZone(pGetInfoDirectInput->iMouseAX,pGetInfoDirectInput->iMouseAY);
 
 	bool bReturn=false;
@@ -4805,14 +4833,16 @@ void CMenuState::Render()
 
 	if (pTexBackGround)
 	{
+#ifndef ARX_OPENGL
 		if (pTexBackGround->m_pddsSurface)
+#endif
 		{
 			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.999f, pTexBackGround, 0, D3DCOLORWHITE);
 	}
 		}
 
 	//------------------------------------------------------------------------
-
+	
 	int t=pMenuAllZone->GetNbZone();
 
 

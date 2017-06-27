@@ -12,6 +12,13 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+
+#define STB_RECT_PACK_IMPLEMENTATION
+#include <stb/stb_rect_pack.h>
+#define STB_TRUETYPE_IMPLEMENTATION
+#include <stb/stb_truetype.h>
+
+
 extern INTERACTIVE_OBJ * DESTROYED_DURING_RENDERING;
 extern long USE_CEDRIC_ANIM;
 
@@ -68,6 +75,21 @@ void EERIERenderer::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ
 /************************************************************/
 /*							GL								*/
 /************************************************************/
+
+
+EERIERendererGL::~EERIERendererGL()
+{
+	for (EERIEFont* font : _fonts)
+	{
+		delete font;
+	}
+
+	_fonts.clear();
+
+	glDeleteVertexArrays(1, &ioVAO);
+	glDeleteVertexArrays(1, &quadVAO);
+}
+
 
 void EERIERendererGL::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
 {
@@ -705,6 +727,67 @@ void EERIERendererGL::DrawSprite(float x, float y, float sx, float sy, D3DCOLOR 
 	glDisable(GL_BLEND);
 }
 
+void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeightPx)
+{
+	GLuint program = EERIEGetGLProgramID("text");
+	glUseProgram(program);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//Toggle this if you want a unique fontsheet for every size
+	//EERIEFont* font = _getFont(vHeightPx);
+	//For now just load in the font at a large size and scale it down.
+	EERIEFont* font = _getFont(48);
+
+	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, font->glTextureID);
+	glUniform1i(uniformLocation, 0);
+
+	//col is BGR
+	glm::vec3 color = glm::vec3((col >> 0 & 0xFF) / 255.0f, (col >> 8 & 0xFF) / 255.0f, (col >> 16 & 0xFF) / 255.0f);
+	glUniform3fv(glGetUniformLocation(program, "fontColor"), 1, &color[0]);
+
+	stbtt_aligned_quad quad;
+	float offsetX = 0.0f, offsetY = 0.0f;
+
+	char* c = text;
+
+	float offset = 0.0f;
+	int idx;
+
+	//TODO: the 1.33f factor is a magic number based on Windows point scale divisions i.e. 96/72.
+	//This should be fixed in a different, more reliable way.
+	const float glyphScreenSize = (vHeightPx * Yratio) / 1.33f;
+	const float glyphScale = glyphScreenSize / (float)font->fontSize;
+
+	//TODO: batch!
+	while (*c)
+	{
+		idx = (int)*c - font->info.fontstart;
+
+		stbtt_GetPackedQuad(font->fontData, font->bitmapWidth, font->bitmapHeight, idx, &offsetX, &offsetY, &quad, 0);
+
+		const float uvs[] = {
+			quad.s0, quad.t0,	//Top Left
+			quad.s1, quad.t0,	//Top Right
+			quad.s0, quad.t1,	//Bot Left
+			quad.s1, quad.t1	//Bot Right
+		};
+
+		float adv = font->fontData[idx].xadvance * glyphScale;
+		float yStart = (font->fontData[idx].yoff*glyphScale);
+		float yEnd = (font->fontData[idx].yoff2 - font->fontData[idx].yoff) * glyphScale;
+		_drawQuad(program, (x + offset) / (float)DANAESIZX, ((y + glyphScreenSize) + yStart) / (float)DANAESIZY, adv / (float)DANAESIZX, yEnd / (float)DANAESIZY, uvs);
+
+		offset += adv;
+		++c;
+	}
+
+	glDisable(GL_BLEND);
+}
+
 void EERIERendererGL::UpdateLights(const std::vector<LightData>& lightData)
 {
 	GLuint program = EERIEGetGLProgramID("poly");
@@ -822,6 +905,53 @@ void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, floa
 
 
 
+
+EERIEFont* EERIERendererGL::_getFont(int size)
+{
+	for (EERIEFont* font : _fonts)
+	{
+		if (font->fontSize == size)
+			return font;
+	}
+
+	return _loadFontData(size);
+}
+
+EERIEFont* EERIERendererGL::_loadFontData(int size)
+{
+	EERIEFont* font = new EERIEFont;
+
+	//TODO: this is too big for some fonts. Can make it smaller.
+	font->bitmapWidth = 1024;
+	font->bitmapHeight = 1024;
+	font->fontSize = size;
+
+	char tx[256];
+
+	sprintf(tx, "%smisc\\%s", Project.workingdir, "arx.ttf"); // Full path
+
+	font->ttf = new unsigned char[1 << 24];
+	FILE* file = fopen(tx, "rb");
+	fread(font->ttf, 1, 1 << 24, file);
+	fclose(file);
+
+	stbtt_InitFont(&font->info, font->ttf, 0);
+
+	font->bitmap = new uint8_t[font->bitmapWidth * font->bitmapHeight];
+	font->fontData = new stbtt_packedchar[font->info.numGlyphs];
+
+	stbtt_pack_context context;
+	stbtt_PackBegin(&context, font->bitmap, font->bitmapWidth, font->bitmapHeight, 0, 1, nullptr);
+	stbtt_PackSetOversampling(&context, 2, 2);
+	stbtt_PackFontRange(&context, font->ttf, 0, font->fontSize, font->info.fontstart, font->info.numGlyphs, font->fontData);
+	stbtt_PackEnd(&context);
+
+	font->bind();
+
+	_fonts.push_back(font);
+
+	return font;
+}
 
 /************************************************************/
 /*							D3D								*/
