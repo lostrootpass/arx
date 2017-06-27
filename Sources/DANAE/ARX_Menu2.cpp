@@ -112,6 +112,7 @@ bool bNoMenu=false;
 void ARXMenu_Private_Options_Video_SetResolution(int _iWidth,int _iHeight,int _iBpp);
 void ARX_SetAntiAliasing();
 void ARX_MENU_LaunchAmb(char *_lpszAmb);
+int GetSizeForHFont(HFONT f);
 
 //-----------------------------------------------------------------------------
 
@@ -476,6 +477,13 @@ bool MENU_NoActiveWindow()
 
 void GetTextSize(HFONT _hFont, _TCHAR *_lpszUText, int *_iWidth, int *_iHeight)
 {
+#ifdef ARX_OPENGL
+	//TODO: this flow isn't great. This shouldn't go through the renderer.
+	int size = GetSizeForHFont(_hFont);
+	char text[MAX_PATH];
+	wcstombs(text, _lpszUText, wcslen(_lpszUText) + 1);
+	g_pRenderApp->renderer->MeasureText(text, size, _iWidth, _iHeight);
+#else
 	HDC hDC;
 
 	if (danaeApp.m_pddsRenderTarget)
@@ -493,6 +501,7 @@ void GetTextSize(HFONT _hFont, _TCHAR *_lpszUText, int *_iWidth, int *_iHeight)
             danaeApp.m_pddsRenderTarget->ReleaseDC(hDC);
 		}
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -4661,11 +4670,13 @@ void CMenuElementText::RenderMouseOver()
 
 	if(bNoMenu) return;
 
+#ifndef ARX_OPENGL
 	pGetInfoDirectInput->SetMouseOver();
 
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  true);
 	GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
 	GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
+#endif
 
 	EERIE_3D ePos;
 	ePos.x = (float)rZone.left;
@@ -4674,7 +4685,9 @@ void CMenuElementText::RenderMouseOver()
 
 	FontRenderText(pHFont, ePos, lpszText, lColorHighlight);
 
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  false);
+#endif
 
 	switch (iID)
 	{
@@ -4789,14 +4802,21 @@ MENUSTATE CMenuState::Update(int _iDTime)
 	pZoneClick=NULL;
 
 #ifdef ARX_OPENGL
-	return NOP;
-#endif
-
+	int x, y;
+	SDL_PumpEvents();
+	Uint32 mask = SDL_GetMouseState(&x, &y);
+	int iR = pMenuAllZone->CheckZone(x, y);
+#else
 	int iR=pMenuAllZone->CheckZone(pGetInfoDirectInput->iMouseAX,pGetInfoDirectInput->iMouseAY);
+#endif
 
 	bool bReturn=false;
 
-	if(pGetInfoDirectInput->GetMouseButton(DXI_BUTTON0))
+#ifdef ARX_OPENGL
+	if(mask & SDL_BUTTON(SDL_BUTTON_LEFT))
+#else
+	if (pGetInfoDirectInput->GetMouseButton(DXI_BUTTON0))
+#endif
 	{
 		if(iR!=-1)
 		{
@@ -5576,9 +5596,11 @@ MENUSTATE CWindowMenu::Render()
 	v[0].sz=v[1].sz=v[2].sz=v[3].sz=0.f;	
 	v[0].rhw=v[1].rhw=v[2].rhw=v[3].rhw=0.999999f;
 
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, false);
 		GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
 		GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+#endif
 
 	MENUSTATE eMS=NOP;
 

@@ -64,6 +64,18 @@ struct EERIEFont
 		glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
+
+	void measure(char* text, int* width, int* height)
+	{
+		*width = 0;
+		*height = fontSize;
+
+		char* c = text;
+		while (*c)
+		{
+			*width += (int)fontData[(int)*c++ - info.fontstart].xadvance;
+		}
+	}
 };
 
 class EERIERenderer
@@ -85,6 +97,8 @@ public:
 	virtual void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) {};
 	virtual void DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer * tex) {};
 	virtual void DrawText(char* text, float x, float y, long col = 0xFFFFFF, int vHeightPx = 24) {};
+
+	virtual void MeasureText(char* text, int size, int* width, int* height) {};
 
 	virtual void UpdateLights(const std::vector<LightData>& lightData) {};
 
@@ -116,6 +130,8 @@ public:
 	void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) override;
 	void DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer* tex) override;
 	void DrawText(char* text, float x, float y, long col = 0xFFFFFF, int vHeightPx = 24) override;
+
+	void MeasureText(char* text, int size, int* width, int* height) override;
 
 	void UpdateLights(const std::vector<LightData>& lightData) override;
 

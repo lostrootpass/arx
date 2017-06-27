@@ -718,6 +718,25 @@ void _ShowText(char * text)
 	}
 }
 
+int GetSizeForHFont(HFONT f)
+{
+	//TODO: fix this somehow. The font sizes are hardcoded in ARX_Text_Init below, but messy to pass around everywhere.
+	if (f == hFontMainMenu)
+	{
+		return 48;
+	}
+	else if ((f == hFontMenu) || (f == hFontCredits))
+	{
+		return 32;
+	}
+	else if ((f == InBookFont) || (f == hFontRedist)
+		|| (f == hFontControls) || (f == hFontInGame)
+		|| (f == hFontInGameNote))
+	{
+		return 16;
+	}
+}
+
 //-----------------------------------------------------------------------------
 void ARX_Text_Init(ARX_TEXT * _pArxText)
 {
@@ -867,22 +886,7 @@ bool CARXTextManager::AddText(ARX_TEXT * _pArxText)
 				pArxText->lTimeOut		= _pArxText->lTimeOut;
 				pArxText->iNbLineClip   = _pArxText->iNbLineClip;
 				
-				//TODO: fix this somehow. The font sizes are hardcoded below, but messy to pass around everywhere.
-				if (pArxText->hFont == hFontMainMenu)
-				{
-					pArxText->iFontSize = 48;
-				}
-				else if ((pArxText->hFont == hFontMenu) || (pArxText->hFont == hFontCredits))
-				{
-					pArxText->iFontSize = 32;
-				}
-				else if((pArxText->hFont == InBookFont) || (pArxText->hFont == hFontRedist)
-					|| (pArxText->hFont == hFontControls) || (pArxText->hFont == hFontInGame)
-					|| (pArxText->hFont == hFontInGameNote))
-				{
-					pArxText->iFontSize = 16;
-
-				}
+				pArxText->iFontSize = GetSizeForHFont(pArxText->hFont);
 
 				if (pArxText->iNbLineClip)
 				{
@@ -1002,7 +1006,7 @@ void CARXTextManager::Render()
 #ifdef ARX_OPENGL
 			char text[MAX_PATH];
 			wcstombs(text, pArxText->lpszUText, wcslen(pArxText->lpszUText) + 1);
-			g_pRenderApp->renderer->DrawText(text, pArxText->rRect.left, pArxText->rRect.top, pArxText->lCol, pArxText->iFontSize);
+			g_pRenderApp->renderer->DrawText(text, pArxText->rRect.left, pArxText->rRect.top - pArxText->fDeltaY, pArxText->lCol, pArxText->iFontSize);
 #else
 			HRGN hRgn = NULL;
 			hRgn = CreateRectRgn(pArxText->rRectClipp.left,

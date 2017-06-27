@@ -788,6 +788,13 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 	glDisable(GL_BLEND);
 }
 
+void EERIERendererGL::MeasureText(char* text, int size, int* width, int* height)
+{
+	EERIEFont* f = _getFont(size);
+
+	f->measure(text, width, height);
+}
+
 void EERIERendererGL::UpdateLights(const std::vector<LightData>& lightData)
 {
 	GLuint program = EERIEGetGLProgramID("poly");
