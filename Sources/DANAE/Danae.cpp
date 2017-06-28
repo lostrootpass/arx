@@ -157,7 +157,7 @@ void ShowInfoText(long COR);
 extern long LAST_PORTALS_COUNT;
 extern CARXTextManager	*pTextManage;
 extern float FORCE_TIME_RESTORE;
-extern CDirectInput		*pGetInfoDirectInput;
+extern ARXInputHandler		*pInputHandler;
 extern CMenuConfig		*pMenuConfig;
 extern CMenuState		*pMenu;
 extern SNAPSHOTINFO		snapshotdata;
@@ -1794,6 +1794,9 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 
 	ARX_MINIMAP_FirstInit();
 
+	SDL_Init(SDL_INIT_EVERYTHING);
+	pInputHandler = new ARXInputHandlerSDL();
+
 	//read from cfg file
 	if(strlen(Project.localisationpath) == 0)
 	{
@@ -1834,7 +1837,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 
 	Dbg_str("DInput Init");
 	ARX_INPUT_Init_Game_Impulses();
-	pGetInfoDirectInput = new CDirectInput();
+	pInputHandler = new ARXInputHandlerDI();
 	char szPath[256];
 	sprintf( szPath, "%s\\cfg.ini", Project.workingdir );
 
@@ -5187,14 +5190,14 @@ BOOL DANAE_ManageSplashThings()
 		{
 			for (int i=0; i<256; i++)
 			{
-				pGetInfoDirectInput->iOneTouch[i] = 0;
+				pInputHandler->iOneTouch[i] = 0;
 			}
 
-			pGetInfoDirectInput->GetInput();
+			pInputHandler->GetInput();
 
 			for (int i=0; i<256; i++)
 			{
-				if (pGetInfoDirectInput->iOneTouch[i] > 0)
+				if (pInputHandler->iOneTouch[i] > 0)
 				{
 					REFUSE_GAME_RETURN=1;
 					FORBID_SAVE=0;
@@ -5238,7 +5241,7 @@ BOOL DANAE_ManageSplashThings()
 					if (FileExist(vidToPlayPath)) 
 					{
 						LaunchAVI(danaeApp.m_hWnd,vidToPlayPath);	
-						pGetInfoDirectInput->ResetAll(); // We need to reset all input else we'll skip all vids w/ one key pressed
+						pInputHandler->ResetAll(); // We need to reset all input else we'll skip all vids w/ one key pressed
 					}
 				}
 			
@@ -5387,13 +5390,8 @@ long DANAE_Manage_Cinematic()
 		return 1;
 
 	//fin de l'anim
-#ifdef ARX_OPENGL
-	if(!ControlCinematique->key)
-#else
 	if ((!ControlCinematique->key)
-		|| (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
-		|| (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE)))
-#endif
+		|| pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
 	{			
 		ControlCinematique->projectload=FALSE;
 		StopSoundKeyFramer();
@@ -5466,14 +5464,14 @@ void DanaeItemAdd()
 
 void ReMappDanaeButton()
 {
-	if(!pGetInfoDirectInput) return;
+	if(!pInputHandler) return;
 
 	bool bNoAction=true;
 	int iButton=pMenuConfig->sakActionKey[CONTROLS_CUST_ACTION].iKey[0];
 
 	if(iButton!=-1)
 	{
-		if(pGetInfoDirectInput->GetMouseButtonDoubleClick(iButton&~0x80000000,300))
+		if(pInputHandler->GetMouseButtonDoubleClick(iButton&~0x80000000,300))
 		{
 			LastEERIEMouseButton=EERIEMouseButton;
 			EERIEMouseButton|=4;
@@ -5488,7 +5486,7 @@ void ReMappDanaeButton()
 
 		if(iButton!=-1)
 		{
-			if(pGetInfoDirectInput->GetMouseButtonDoubleClick(iButton&~0x80000000,300))
+			if(pInputHandler->GetMouseButtonDoubleClick(iButton&~0x80000000,300))
 			{
 				LastEERIEMouseButton=EERIEMouseButton;
 				EERIEMouseButton|=4;
@@ -5502,8 +5500,8 @@ void ReMappDanaeButton()
 
 	if(iButton!=-1)
 	{
-		if(	((iButton&0x80000000)&&(pGetInfoDirectInput->GetMouseButtonNowPressed(iButton&~0x80000000)))||
-			((!(iButton&0x80000000))&&pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(iButton)) )
+		if(	((iButton&0x80000000)&&(pInputHandler->GetMouseButtonNowPressed(iButton&~0x80000000)))||
+			((!(iButton&0x80000000))&&pInputHandler->IsVirtualKeyPressedNowPressed(iButton)) )
 		{
 			LastEERIEMouseButton=EERIEMouseButton;
 			EERIEMouseButton|=1;
@@ -5520,8 +5518,8 @@ void ReMappDanaeButton()
 
 		if(iButton!=-1)
 		{
-			if( ((iButton&0x80000000)&&(pGetInfoDirectInput->GetMouseButtonNowPressed(iButton&~0x80000000)))||
-				((!(iButton&0x80000000))&&pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(iButton)) )
+			if( ((iButton&0x80000000)&&(pInputHandler->GetMouseButtonNowPressed(iButton&~0x80000000)))||
+				((!(iButton&0x80000000))&&pInputHandler->IsVirtualKeyPressedNowPressed(iButton)) )
 			{
 				LastEERIEMouseButton=EERIEMouseButton;
 				EERIEMouseButton|=1;
@@ -5536,8 +5534,8 @@ void ReMappDanaeButton()
 
 	if(iButton!=-1)
 	{
-		if(	((iButton&0x80000000)&&(pGetInfoDirectInput->GetMouseButtonNowUnPressed(iButton&~0x80000000)))||
-			((!(iButton&0x80000000))&&pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(iButton)) )
+		if(	((iButton&0x80000000)&&(pInputHandler->GetMouseButtonNowUnPressed(iButton&~0x80000000)))||
+			((!(iButton&0x80000000))&&pInputHandler->IsVirtualKeyPressedNowPressed(iButton)) )
 		{
 			LastEERIEMouseButton=EERIEMouseButton;
 			EERIEMouseButton&=~1;
@@ -5552,8 +5550,8 @@ void ReMappDanaeButton()
 
 		if(iButton!=-1)
 		{
-			if( ((iButton&0x80000000)&&(pGetInfoDirectInput->GetMouseButtonNowUnPressed(iButton&~0x80000000)))||
-				((!(iButton&0x80000000))&&pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(iButton)) )
+			if( ((iButton&0x80000000)&&(pInputHandler->GetMouseButtonNowUnPressed(iButton&~0x80000000)))||
+				((!(iButton&0x80000000))&&pInputHandler->IsVirtualKeyPressedNowPressed(iButton)) )
 			{
 				LastEERIEMouseButton=EERIEMouseButton;
 				EERIEMouseButton&=~1;
@@ -5567,8 +5565,8 @@ void ReMappDanaeButton()
 
 	if(iButton!=-1)
 	{
-		if(	((iButton&0x80000000)&&(pGetInfoDirectInput->GetMouseButtonNowPressed(iButton&~0x80000000)))||
-			((!(iButton&0x80000000))&&pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(iButton)) )
+		if(	((iButton&0x80000000)&&(pInputHandler->GetMouseButtonNowPressed(iButton&~0x80000000)))||
+			((!(iButton&0x80000000))&&pInputHandler->IsVirtualKeyPressedNowPressed(iButton)) )
 		{
 			EERIEMouseButton|=2;
 			bNoAction=false;
@@ -5581,8 +5579,8 @@ void ReMappDanaeButton()
 
 		if(iButton!=-1)
 		{
-			if( ((iButton&0x80000000)&&(pGetInfoDirectInput->GetMouseButtonNowPressed(iButton&~0x80000000)))||
-				((!(iButton&0x80000000))&&pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(iButton)) )
+			if( ((iButton&0x80000000)&&(pInputHandler->GetMouseButtonNowPressed(iButton&~0x80000000)))||
+				((!(iButton&0x80000000))&&pInputHandler->IsVirtualKeyPressedNowPressed(iButton)) )
 			{
 				EERIEMouseButton|=2;
 			}
@@ -5594,8 +5592,8 @@ void ReMappDanaeButton()
 
 	if(iButton!=-1)
 	{
-		if(	((iButton&0x80000000)&&(pGetInfoDirectInput->GetMouseButtonNowUnPressed(iButton&~0x80000000)))||
-			((!(iButton&0x80000000))&&pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(iButton)) )
+		if(	((iButton&0x80000000)&&(pInputHandler->GetMouseButtonNowUnPressed(iButton&~0x80000000)))||
+			((!(iButton&0x80000000))&&pInputHandler->IsVirtualKeyPressedNowUnPressed(iButton)) )
 		{
 			EERIEMouseButton&=~2;
 			bNoAction=false;
@@ -5608,8 +5606,8 @@ void ReMappDanaeButton()
 
 		if(iButton!=-1)
 		{
-			if( ((iButton&0x80000000)&&(pGetInfoDirectInput->GetMouseButtonNowUnPressed(iButton&~0x80000000)))||
-				((!(iButton&0x80000000))&&pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(iButton)) )
+			if( ((iButton&0x80000000)&&(pInputHandler->GetMouseButtonNowUnPressed(iButton&~0x80000000)))||
+				((!(iButton&0x80000000))&&pInputHandler->IsVirtualKeyPressedNowUnPressed(iButton)) )
 			{
 				EERIEMouseButton&=~2;
 			}
@@ -5757,7 +5755,7 @@ extern long NEED_INTRO_LAUNCH;
 
 HRESULT DANAE_NoRenderEnd()
 {
-	if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_F10))
+	if(pInputHandler->IsVirtualKeyPressedNowPressed(DIK_F10))
 	{
 		GetSnapShot();
 	}
@@ -6412,8 +6410,8 @@ HRESULT DANAE::Render()
 		}
 	}
 
-	if(	(pGetInfoDirectInput)&&
-		(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_F12)))
+	if(	(pInputHandler)&&
+		(pInputHandler->IsVirtualKeyPressedNowPressed(DIK_F12)))
 	{
 		bGMergeVertex=!bGMergeVertex;
 		EERIE_PORTAL_ReleaseOnlyVertexBuffer();
@@ -6426,8 +6424,8 @@ HRESULT DANAE::Render()
 		&&	(!FINAL_COMMERCIAL_GAME)	
 		&&  (ARXmenu.currentmode==AMCM_OFF)	)
 	{
-		if(	(pGetInfoDirectInput)&&
-			(pGetInfoDirectInput->IsVirtualKeyPressedOneTouch(DIK_Y)) )
+		if(	(pInputHandler)&&
+			(pInputHandler->IsVirtualKeyPressedOneTouch(DIK_Y)) )
 		{
 			USE_OLD_MOUSE_SYSTEM=(USE_OLD_MOUSE_SYSTEM)?0:1;
 
@@ -6476,7 +6474,7 @@ HRESULT DANAE::Render()
 	// Get DirectInput Infos
 	if ((!USE_OLD_MOUSE_SYSTEM))
 	{
-		pGetInfoDirectInput->GetInput();
+		pInputHandler->GetInput();
 		ReMappDanaeButton();
 	}
 
@@ -6496,7 +6494,7 @@ HRESULT DANAE::Render()
 		ARX_PLAYER_Frame_Update();
 
 	// Checks for ESC key
-	if (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
+	if (pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
 	{
 		if (ARXmenu.currentmode == AMCM_OFF)
 		{
@@ -6522,7 +6520,7 @@ HRESULT DANAE::Render()
 			ARX_MENU_Launch(m_pd3dDevice);
 			bFadeInOut=false;	//fade out
 			bFade=true;			//active le fade
-			pGetInfoDirectInput->iOneTouch[DIK_ESCAPE] = 0;
+			pInputHandler->iOneTouch[DIK_ESCAPE] = 0;
 			TRUE_PLAYER_MOUSELOOK_ON = 0;
 
 			ARX_PLAYER_PutPlayerInNormalStance(1);
@@ -7778,6 +7776,41 @@ HRESULT DANAEGL::Render()
 	// Update Various Player Infos for this frame.
 	if(FirstFrame == 0)
 		ARX_PLAYER_Frame_Update();
+
+	// Checks for ESC key
+	if (pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
+	{
+		if (ARXmenu.currentmode == AMCM_OFF)
+		{
+			if (CINEMASCOPE)
+			{
+				if (!FADEDIR)	// Disabling ESC capture while fading in or out.
+				{
+					if (SendMsgToAllIO(SM_KEY_PRESSED, "") != REFUSE)
+					{
+						REQUEST_SPEECH_SKIP = 1;
+					}
+				}
+			}
+			else
+			{
+				//create a screenshot temporaire pour la sauvegarde
+				::SnapShot *pSnapShot = new ::SnapShot(NULL, "sct", true);
+				pSnapShot->GetSnapShotDim(160, 100);
+				delete pSnapShot;
+
+				ARX_TIME_Pause();
+				ARXTimeMenu = ARXOldTimeMenu = ARX_TIME_Get();
+				ARX_MENU_Launch(0);
+				bFadeInOut = false;	//fade out
+				bFade = true;			//active le fade
+				pInputHandler->iOneTouch[DIK_ESCAPE] = 0;
+				TRUE_PLAYER_MOUSELOOK_ON = 0;
+
+				ARX_PLAYER_PutPlayerInNormalStance(1);
+			}
+		}
+	}
 	
 	// Project need to reload all textures ???
 	if(WILL_RELOAD_ALL_TEXTURES)
@@ -9457,17 +9490,17 @@ LRESULT DANAE::MsgProc( HWND hWnd, UINT uMsg, WPARAM wParam,
 		{
 			DXI_SleepAllDevices();
 
-			if (pGetInfoDirectInput)
+			if (pInputHandler)
 			{
-				pGetInfoDirectInput->bActive=false;
+				pInputHandler->bActive=false;
 			}
 		}
 		else
 		{
-			if(pGetInfoDirectInput)
+			if(pInputHandler)
 			{
-				pGetInfoDirectInput->ResetAll();
-				pGetInfoDirectInput->bActive=true;
+				pInputHandler->ResetAll();
+				pInputHandler->bActive=true;
 			}
 
 			DXI_SleepAllDevices();
@@ -10222,10 +10255,10 @@ void ClearGame()
 	}
 
 	//dinput
-	if(pGetInfoDirectInput)
+	if(pInputHandler)
 	{
-		delete pGetInfoDirectInput;
-		pGetInfoDirectInput=NULL;
+		delete pInputHandler;
+		pInputHandler=NULL;
 	}
 
 	RoomDrawRelease();

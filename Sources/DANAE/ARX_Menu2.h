@@ -265,38 +265,38 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 
-#define DIK_BUTTON1		(0x80000000|DXI_BUTTON0)
-#define DIK_BUTTON2		(0x80000000|DXI_BUTTON1)
-#define DIK_BUTTON3		(0x80000000|DXI_BUTTON2)
-#define DIK_BUTTON4		(0x80000000|DXI_BUTTON3)
-#define DIK_BUTTON5		(0x80000000|DXI_BUTTON4)
-#define DIK_BUTTON6		(0x80000000|DXI_BUTTON5)
-#define DIK_BUTTON7		(0x80000000|DXI_BUTTON6)
-#define DIK_BUTTON8		(0x80000000|DXI_BUTTON7)
-#define DIK_BUTTON9		(0x80000000|DXI_BUTTON8)
-#define DIK_BUTTON10	(0x80000000|DXI_BUTTON9)
-#define DIK_BUTTON11	(0x80000000|DXI_BUTTON10)
-#define DIK_BUTTON12	(0x80000000|DXI_BUTTON11)
-#define DIK_BUTTON13	(0x80000000|DXI_BUTTON12)
-#define DIK_BUTTON14	(0x80000000|DXI_BUTTON13)
-#define DIK_BUTTON15	(0x80000000|DXI_BUTTON14)
-#define DIK_BUTTON16	(0x80000000|DXI_BUTTON15)
-#define DIK_BUTTON17	(0x80000000|DXI_BUTTON16)
-#define DIK_BUTTON18	(0x80000000|DXI_BUTTON17)
-#define DIK_BUTTON19	(0x80000000|DXI_BUTTON18)
-#define DIK_BUTTON20	(0x80000000|DXI_BUTTON19)
-#define DIK_BUTTON21	(0x80000000|DXI_BUTTON20)
-#define DIK_BUTTON22	(0x80000000|DXI_BUTTON21)
-#define DIK_BUTTON23	(0x80000000|DXI_BUTTON22)
-#define DIK_BUTTON24	(0x80000000|DXI_BUTTON23)
-#define DIK_BUTTON25	(0x80000000|DXI_BUTTON24)
-#define DIK_BUTTON26	(0x80000000|DXI_BUTTON25)
-#define DIK_BUTTON27	(0x80000000|DXI_BUTTON26)
-#define DIK_BUTTON28	(0x80000000|DXI_BUTTON27)
-#define DIK_BUTTON29	(0x80000000|DXI_BUTTON28)
-#define DIK_BUTTON30	(0x80000000|DXI_BUTTON29)
-#define DIK_BUTTON31	(0x80000000|DXI_BUTTON30)
-#define DIK_BUTTON32	(0x80000000|DXI_BUTTON31)
+#define DIK_BUTTON1		(0x80000000|ARXMOUSE_BUTTON0)
+#define DIK_BUTTON2		(0x80000000|ARXMOUSE_BUTTON1)
+#define DIK_BUTTON3		(0x80000000|ARXMOUSE_BUTTON2)
+#define DIK_BUTTON4		(0x80000000|ARXMOUSE_BUTTON3)
+#define DIK_BUTTON5		(0x80000000|ARXMOUSE_BUTTON4)
+#define DIK_BUTTON6		(0x80000000|ARXMOUSE_BUTTON5)
+#define DIK_BUTTON7		(0x80000000|ARXMOUSE_BUTTON6)
+#define DIK_BUTTON8		(0x80000000|ARXMOUSE_BUTTON7)
+#define DIK_BUTTON9		(0x80000000|ARXMOUSE_BUTTON8)
+#define DIK_BUTTON10	(0x80000000|ARXMOUSE_BUTTON9)
+#define DIK_BUTTON11	(0x80000000|ARXMOUSE_BUTTON10)
+#define DIK_BUTTON12	(0x80000000|ARXMOUSE_BUTTON11)
+#define DIK_BUTTON13	(0x80000000|ARXMOUSE_BUTTON12)
+#define DIK_BUTTON14	(0x80000000|ARXMOUSE_BUTTON13)
+#define DIK_BUTTON15	(0x80000000|ARXMOUSE_BUTTON14)
+#define DIK_BUTTON16	(0x80000000|ARXMOUSE_BUTTON15)
+#define DIK_BUTTON17	(0x80000000|ARXMOUSE_BUTTON16)
+#define DIK_BUTTON18	(0x80000000|ARXMOUSE_BUTTON17)
+#define DIK_BUTTON19	(0x80000000|ARXMOUSE_BUTTON18)
+#define DIK_BUTTON20	(0x80000000|ARXMOUSE_BUTTON19)
+#define DIK_BUTTON21	(0x80000000|ARXMOUSE_BUTTON20)
+#define DIK_BUTTON22	(0x80000000|ARXMOUSE_BUTTON21)
+#define DIK_BUTTON23	(0x80000000|ARXMOUSE_BUTTON22)
+#define DIK_BUTTON24	(0x80000000|ARXMOUSE_BUTTON23)
+#define DIK_BUTTON25	(0x80000000|ARXMOUSE_BUTTON24)
+#define DIK_BUTTON26	(0x80000000|ARXMOUSE_BUTTON25)
+#define DIK_BUTTON27	(0x80000000|ARXMOUSE_BUTTON26)
+#define DIK_BUTTON28	(0x80000000|ARXMOUSE_BUTTON27)
+#define DIK_BUTTON29	(0x80000000|ARXMOUSE_BUTTON28)
+#define DIK_BUTTON30	(0x80000000|ARXMOUSE_BUTTON29)
+#define DIK_BUTTON31	(0x80000000|ARXMOUSE_BUTTON30)
+#define DIK_BUTTON32	(0x80000000|ARXMOUSE_BUTTON31)
 #define ARX_MAXBUTTON	32
 
 #define DIK_WHEELUP		(0x40000000|0)
@@ -747,77 +747,6 @@ typedef struct
 	int	x;
 	int	y;
 } EERIE_2DI;
-
-//-----------------------------------------------------------------------------
-class CDirectInput
-{
-	public:
-		bool				bActive;
-		bool				bTouch;
-		int					iKeyId;
-		int					iKeyScanCode[256];
-		int					iOneTouch[256];
-		bool				bMouseMove;
-		int					iMouseRX;
-		int					iMouseRY;
-		int					iMouseRZ;
-		int					iMouseAX;
-		int					iMouseAY;
-		int					iMouseAZ;
-		float				fMouseAXTemp;
-		float				fMouseAYTemp;
-		int					iSensibility;
-		int					iOldMouseButton[ARX_MAXBUTTON];
-		bool				bMouseButton[ARX_MAXBUTTON];
-		bool				bOldMouseButton[ARX_MAXBUTTON];
-		int					iMouseTime[ARX_MAXBUTTON];
-		int					iMouseTimeSet[ARX_MAXBUTTON];
-		int					iNbOldCoord;
-		int					iMaxOldCoord;
-		EERIE_2DI			iOldCoord[256];
-
-		TextureContainer	* pTex[8];
-		long				lFrameDiff;
-		CURSORSTATE			eNumTex;
-		int					iNumCursor;
-		float				fTailleX;
-		float				fTailleY;
-		bool				bMouseOver;
-		bool				bDrawCursor;
-
-		int					iOldNumClick[ARX_MAXBUTTON];
-		int					iOldNumUnClick[ARX_MAXBUTTON];
-
-		int					iWheelSens;
-	private:
-		void DrawOneCursor(int, int, int);
- 
-	public:
-		CDirectInput();
-		virtual ~CDirectInput();
-
-		void SetMouseOver();
-		void SetCursorOn();
-		void SetCursorOff();
-		void SetSensibility(int);
-		void GetInput();
-		void DrawCursor();
-		bool GetMouseButton(int);
-		bool GetMouseButtonRepeat(int);
-		bool GetMouseButtonNowPressed(int);
-		bool GetMouseButtonNowUnPressed(int);
-		bool GetMouseButtonDoubleClick(int, int);
- 
-		bool IsVirtualKeyPressed(int);
-		bool IsVirtualKeyPressedOneTouch(int);
-		bool IsVirtualKeyPressedNowPressed(int);
-		bool IsVirtualKeyPressedNowUnPressed(int);
-		_TCHAR * GetFullNameTouch(int);
- 
- 
-		void ResetAll();
-		int GetWheelSens(int);
-};
 
 //-----------------------------------------------------------------------------
 typedef struct

@@ -36,6 +36,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_Text.h"
 #include "ARX_ViewImage.h"
 #include "ARX_Interface.h"
+#include "ARX_Input.h"
 
 #include "Mercury_dx_input.h"
 #include "arx_time.h"
@@ -116,10 +117,7 @@ int GetSizeForHFont(HFONT f);
 
 //-----------------------------------------------------------------------------
 
-bool bGLOBAL_DINPUT_MENU=true;
-bool bGLOBAL_DINPUT_GAME=true;
-
-CDirectInput *pGetInfoDirectInput=NULL;
+ARXInputHandler *pInputHandler=NULL;
 CMenuConfig *pMenuConfig;
 static CWindowMenu *pWindowMenu=NULL;
 CMenuState *pMenu;
@@ -747,13 +745,6 @@ void CMenuConfig::DefaultValue()
 
 //-----------------------------------------------------------------------------
 
-bool CDirectInput::GetMouseButtonDoubleClick(int _iNumButton,int _iTime)
-{
-	return ((iMouseTimeSet[_iNumButton]==2)&&(iMouseTime[_iNumButton]<_iTime)) ;
-}
-
-//-----------------------------------------------------------------------------
-
 CMenuConfig::~CMenuConfig()
 {
 	if(pcName)
@@ -801,7 +792,7 @@ _TCHAR pcT[256];
 
 	for(int iI=0;iI<256;iI++)
 	{
-		_TCHAR *pcT1=pGetInfoDirectInput->GetFullNameTouch(iI);
+		_TCHAR *pcT1=pInputHandler->GetFullNameTouch(iI);
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -810,7 +801,7 @@ _TCHAR pcT[256];
 		}
 
 		free((void*)pcT1);
-		pcT1 = pGetInfoDirectInput->GetFullNameTouch(iI | (DIK_LSHIFT << 16));
+		pcT1 = pInputHandler->GetFullNameTouch(iI | (DIK_LSHIFT << 16));
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -819,7 +810,7 @@ _TCHAR pcT[256];
 		}
 
 		free((void*)pcT1);
-		pcT1=pGetInfoDirectInput->GetFullNameTouch(iI|(DIK_RSHIFT<<16));
+		pcT1=pInputHandler->GetFullNameTouch(iI|(DIK_RSHIFT<<16));
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -828,7 +819,7 @@ _TCHAR pcT[256];
 		}
 
 		free((void*)pcT1);
-		pcT1=pGetInfoDirectInput->GetFullNameTouch(iI|(DIK_LCONTROL<<16));
+		pcT1=pInputHandler->GetFullNameTouch(iI|(DIK_LCONTROL<<16));
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -837,7 +828,7 @@ _TCHAR pcT[256];
 		}
 
 		free((void*)pcT1);
-		pcT1=pGetInfoDirectInput->GetFullNameTouch(iI|(DIK_RCONTROL<<16));
+		pcT1=pInputHandler->GetFullNameTouch(iI|(DIK_RCONTROL<<16));
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -846,7 +837,7 @@ _TCHAR pcT[256];
 		}
 
 		free((void*)pcT1);
-		pcT1=pGetInfoDirectInput->GetFullNameTouch(iI|(DIK_LALT<<16));
+		pcT1=pInputHandler->GetFullNameTouch(iI|(DIK_LALT<<16));
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -855,7 +846,7 @@ _TCHAR pcT[256];
 		}
 
 		free((void*)pcT1);
-		pcT1=pGetInfoDirectInput->GetFullNameTouch(iI|(DIK_RALT<<16));
+		pcT1=pInputHandler->GetFullNameTouch(iI|(DIK_RALT<<16));
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -868,7 +859,7 @@ _TCHAR pcT[256];
 
 	for(int iI=DIK_BUTTON1;iI<=DIK_BUTTON32;iI++)
 	{
-		_TCHAR *pcT1=pGetInfoDirectInput->GetFullNameTouch(iI);
+		_TCHAR *pcT1=pInputHandler->GetFullNameTouch(iI);
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -881,7 +872,7 @@ _TCHAR pcT[256];
 
 	for(int iI=DIK_WHEELUP;iI<=DIK_WHEELDOWN;iI++)
 	{
-		_TCHAR *pcT1=pGetInfoDirectInput->GetFullNameTouch(iI);
+		_TCHAR *pcT1=pInputHandler->GetFullNameTouch(iI);
 
 		if(!_tcsicmp(pcT,pcT1))
 		{
@@ -1079,7 +1070,7 @@ _TCHAR *pcText1;
 	strcpy(tcTxt,_pcKey);
 
 		int iL;
-		pcText1=pGetInfoDirectInput->GetFullNameTouch(sakActionKey[_iAction].iKey[0]);
+		pcText1=pInputHandler->GetFullNameTouch(sakActionKey[_iAction].iKey[0]);
 		iL=_tcslen(pcText1)+1;
 		pcText=(char*)malloc(iL);
 
@@ -1100,7 +1091,7 @@ _TCHAR *pcText1;
 			pcText=NULL;
 		}
 
-		pcText1=pGetInfoDirectInput->GetFullNameTouch(sakActionKey[_iAction].iKey[1]);
+		pcText1=pInputHandler->GetFullNameTouch(sakActionKey[_iAction].iKey[1]);
 		iL=_tcslen(pcText1)+1;
 		pcText=(char*)malloc(iL);
 
@@ -1133,9 +1124,9 @@ void CMenuConfig::ReInitActionKey(CWindowMenuConsole *_pwmcWindowMenuConsole)
 {
 	int iID=BUTTON_MENUOPTIONS_CONTROLS_CUST_JUMP1;
 	int iI=MAX_ACTION_KEY;
-	bool bOldTouch=pGetInfoDirectInput->bTouch;
-	int iOldVirtualKey=pGetInfoDirectInput->iKeyId;
-	pGetInfoDirectInput->bTouch=true;
+	bool bOldTouch=pInputHandler->bTouch;
+	int iOldVirtualKey=pInputHandler->iKeyId;
+	pInputHandler->bTouch=true;
 
 	while(iI--)
 	{
@@ -1148,7 +1139,7 @@ void CMenuConfig::ReInitActionKey(CWindowMenuConsole *_pwmcWindowMenuConsole)
 			if(pmzMenuZone)
 			{
 				_pwmcWindowMenuConsole->pZoneClick=(CMenuElement*)pmzMenuZone;
-				pGetInfoDirectInput->iKeyId=sakActionKey[iTab].iKey[0];
+				pInputHandler->iKeyId=sakActionKey[iTab].iKey[0];
 				_pwmcWindowMenuConsole->GetTouch();
 			}
 
@@ -1157,7 +1148,7 @@ void CMenuConfig::ReInitActionKey(CWindowMenuConsole *_pwmcWindowMenuConsole)
 			if(pmzMenuZone)
 			{
 				_pwmcWindowMenuConsole->pZoneClick=(CMenuElement*)pmzMenuZone;
-				pGetInfoDirectInput->iKeyId=sakActionKey[iTab].iKey[1];
+				pInputHandler->iKeyId=sakActionKey[iTab].iKey[1];
 				_pwmcWindowMenuConsole->GetTouch();
 			}
 		}
@@ -1165,8 +1156,8 @@ void CMenuConfig::ReInitActionKey(CWindowMenuConsole *_pwmcWindowMenuConsole)
 		iID+=2;
 	}
 
-	pGetInfoDirectInput->bTouch=bOldTouch;
-	pGetInfoDirectInput->iKeyId=iOldVirtualKey;
+	pInputHandler->bTouch=bOldTouch;
+	pInputHandler->iKeyId=iOldVirtualKey;
 }
 
 //-----------------------------------------------------------------------------
@@ -3888,8 +3879,8 @@ int iDecMenuPrincipaleY=50;
 	SETZWRITE(GDevice, false);
 	GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
-	pGetInfoDirectInput->DrawCursor();
 #endif
+	pInputHandler->DrawCursor();
 
 	if(pMenu->bReInitAll)
 	{
@@ -4048,8 +4039,8 @@ CMenuElement* CMenuElement::OnShortCut()
 {
 	if(iShortCut==-1) return NULL;
 
-	if(	(pGetInfoDirectInput)&&
-		(pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(iShortCut)) )
+	if(	(pInputHandler)&&
+		(pInputHandler->IsVirtualKeyPressedNowUnPressed(iShortCut)) )
 	{
 		return this;
 	}
@@ -4631,8 +4622,8 @@ CMenuElement* CMenuElementText::OnShortCut()
 {
 	if(iShortCut==-1) return NULL;
 
-	if(	(pGetInfoDirectInput)&&
-		(pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(iShortCut)) )
+	if(	(pInputHandler)&&
+		(pInputHandler->IsVirtualKeyPressedNowUnPressed(iShortCut)) )
 	{
 		return this;
 	}
@@ -4671,7 +4662,7 @@ void CMenuElementText::RenderMouseOver()
 	if(bNoMenu) return;
 
 #ifndef ARX_OPENGL
-	pGetInfoDirectInput->SetMouseOver();
+	pInputHandler->SetMouseOver();
 
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  true);
 	GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
@@ -4801,22 +4792,11 @@ MENUSTATE CMenuState::Update(int _iDTime)
 
 	pZoneClick=NULL;
 
-#ifdef ARX_OPENGL
-	int x, y;
-	SDL_PumpEvents();
-	Uint32 mask = SDL_GetMouseState(&x, &y);
-	int iR = pMenuAllZone->CheckZone(x, y);
-#else
-	int iR=pMenuAllZone->CheckZone(pGetInfoDirectInput->iMouseAX,pGetInfoDirectInput->iMouseAY);
-#endif
+	int iR=pMenuAllZone->CheckZone(pInputHandler->iMouseAX,pInputHandler->iMouseAY);
 
 	bool bReturn=false;
 
-#ifdef ARX_OPENGL
-	if(mask & SDL_BUTTON(SDL_BUTTON_LEFT))
-#else
-	if (pGetInfoDirectInput->GetMouseButton(DXI_BUTTON0))
-#endif
+	if (pInputHandler->GetMouseButton(ARXMOUSE_BUTTON0))
 	{
 		if(iR!=-1)
 		{
@@ -5454,7 +5434,7 @@ void CMenuCheckButton::RenderMouseOver()
 
 	if(bNoMenu) return;
 
-	pGetInfoDirectInput->SetMouseOver();
+	pInputHandler->SetMouseOver();
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true);
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
@@ -5852,13 +5832,13 @@ static int scan2ascii(DWORD scancode, unsigned short* result)
 
 void CWindowMenuConsole::UpdateText()
 {
-	if(pGetInfoDirectInput->bTouch)
+	if(pInputHandler->bTouch)
 	{
-		pGetInfoDirectInput->iKeyId&=0xFFFF;
+		pInputHandler->iKeyId&=0xFFFF;
 
-		if(	(pGetInfoDirectInput->IsVirtualKeyPressed(DIK_RETURN))||
-			(pGetInfoDirectInput->IsVirtualKeyPressed(DIK_NUMPADENTER)) ||
-			(pGetInfoDirectInput->IsVirtualKeyPressed(DIK_ESCAPE)) )
+		if(	(pInputHandler->IsVirtualKeyPressed(DIK_RETURN))||
+			(pInputHandler->IsVirtualKeyPressed(DIK_NUMPADENTER)) ||
+			(pInputHandler->IsVirtualKeyPressed(DIK_ESCAPE)) )
 		{
 			ARX_SOUND_PlayMenu(SND_MENU_CLICK);
 			((CMenuElementText*)pZoneClick)->eState=EDIT;
@@ -5895,7 +5875,7 @@ void CWindowMenuConsole::UpdateText()
 		
 		CMenuElementText *pZoneText=(CMenuElementText*)pZoneClick;
 
-		if(pGetInfoDirectInput->IsVirtualKeyPressedOneTouch(DIK_BACKSPACE))
+		if(pInputHandler->IsVirtualKeyPressedOneTouch(DIK_BACKSPACE))
 		{
 			_tcscpy(tText,pZoneText->lpszText);
 
@@ -5907,14 +5887,14 @@ void CWindowMenuConsole::UpdateText()
 		}
 		else
 		{
-			if(pGetInfoDirectInput->IsVirtualKeyPressedOneTouch(pGetInfoDirectInput->iKeyId))
+			if(pInputHandler->IsVirtualKeyPressedOneTouch(pInputHandler->iKeyId))
 			{
 				_tcscpy(tText,pZoneText->lpszText);
 
 				unsigned short tusOutPut[2];
 				_TCHAR tCat[2];
 
-				int iKey = pGetInfoDirectInput->iKeyId;
+				int iKey = pInputHandler->iKeyId;
 				int iR = scan2ascii(iKey, tusOutPut);
 
 				if(!iR)
@@ -6049,22 +6029,22 @@ void CWindowMenuConsole::UpdateText()
 int IsMouseButtonClick()
 {
 	//MouseButton
-	for(int i=DXI_BUTTON0;i<=DXI_BUTTON31;i++)
+	for(int i=ARXMOUSE_BUTTON0;i<=ARXMOUSE_BUTTON31;i++)
 	{
-		if(pGetInfoDirectInput->GetMouseButtonNowPressed(i))
+		if(pInputHandler->GetMouseButtonNowPressed(i))
 		{
-			return DIK_BUTTON1+i-DXI_BUTTON0;
+			return DIK_BUTTON1+i-ARXMOUSE_BUTTON0;
 		}
 	}
 
 	//Wheel UP/DOWN
-	if(pGetInfoDirectInput->iWheelSens<0)
+	if(pInputHandler->iWheelSens<0)
 	{
 		return DIK_WHEELDOWN;
 	}
 	else
 	{
-		if(pGetInfoDirectInput->iWheelSens>0)
+		if(pInputHandler->iWheelSens>0)
 		{
 			return DIK_WHEELUP;
 		}
@@ -6079,10 +6059,10 @@ CMenuElement * CWindowMenuConsole::GetTouch(bool _bValidateTest)
 {
 	int iMouseButton=0;
 
-	if(	(pGetInfoDirectInput->bTouch)||
+	if(	(pInputHandler->bTouch)||
 		(((iMouseButton = IsMouseButtonClick()) & 0xc0000000)))
 	{
-		if(!pGetInfoDirectInput->bTouch&&!bMouseAttack)
+		if(!pInputHandler->bTouch&&!bMouseAttack)
 		{
 			bMouseAttack=!bMouseAttack;
 			return NULL;
@@ -6106,7 +6086,7 @@ CMenuElement * CWindowMenuConsole::GetTouch(bool _bValidateTest)
 				{
 					for(int iI=DIK_BUTTON1;iI<=DIK_BUTTON32;iI++)
 					{
-						if(pGetInfoDirectInput->iKeyId==iI)
+						if(pInputHandler->iKeyId==iI)
 						{
 							bOk=false;
 							break;
@@ -6121,7 +6101,7 @@ CMenuElement * CWindowMenuConsole::GetTouch(bool _bValidateTest)
 		_TCHAR *pText; 
 
 		if (
-			(pText=pGetInfoDirectInput->GetFullNameTouch((iMouseButton&0xc0000000)?iMouseButton:pGetInfoDirectInput->iKeyId)) )
+			(pText=pInputHandler->GetFullNameTouch((iMouseButton&0xc0000000)?iMouseButton:pInputHandler->iKeyId)) )
 		{
 			pZoneText->lColorHighlight=pZoneText->lOldColor;
 
@@ -6149,7 +6129,7 @@ CMenuElement * CWindowMenuConsole::GetTouch(bool _bValidateTest)
 
 			if(iMouseButton&0xc0000000)
 			{
-				pGetInfoDirectInput->iKeyId=iMouseButton;
+				pInputHandler->iKeyId=iMouseButton;
 			}
 
 			bMouseAttack=false;
@@ -6208,13 +6188,13 @@ MENUSTATE CWindowMenuConsole::Update(int _iPosX,int _iPosY,int _iOffsetY,int _Fr
 		if (!bEdit)
 		{
 			pZoneClick=NULL;
-			int iR = MenuAllZone.CheckZone(pGetInfoDirectInput->iMouseAX,pGetInfoDirectInput->iMouseAY);
+			int iR = MenuAllZone.CheckZone(pInputHandler->iMouseAX,pInputHandler->iMouseAY);
 
 			if(iR!=-1)
 			{
 				pZoneClick=(CMenuElement*)iR;
 
-				if( pGetInfoDirectInput->GetMouseButtonDoubleClick(DXI_BUTTON0,300) )
+				if( pInputHandler->GetMouseButtonDoubleClick(ARXMOUSE_BUTTON0,300) )
 				{
 					MENUSTATE e = pZoneClick->eMenuState;
 					bEdit = pZoneClick->OnMouseDoubleClick(0);
@@ -6228,7 +6208,7 @@ MENUSTATE CWindowMenuConsole::Update(int _iPosX,int _iPosY,int _iOffsetY,int _Fr
 					return e;
 				}
 
-				if( pGetInfoDirectInput->GetMouseButton(DXI_BUTTON0) )
+				if( pInputHandler->GetMouseButton(ARXMOUSE_BUTTON0) )
 				{
 					MENUSTATE e = pZoneClick->eMenuState;
 					bEdit = pZoneClick->OnMouseClick(0);
@@ -6244,13 +6224,13 @@ MENUSTATE CWindowMenuConsole::Update(int _iPosX,int _iPosY,int _iOffsetY,int _Fr
 		{
 			if(!pZoneClick)
 			{
-				int iR = MenuAllZone.CheckZone(pGetInfoDirectInput->iMouseAX,pGetInfoDirectInput->iMouseAY);
+				int iR = MenuAllZone.CheckZone(pInputHandler->iMouseAX,pInputHandler->iMouseAY);
 
 				if(iR!=-1)
 				{
 					pZoneClick=(CMenuElement*)iR;
 					
-					if( pGetInfoDirectInput->GetMouseButtonDoubleClick(DXI_BUTTON0,300) )
+					if( pInputHandler->GetMouseButtonDoubleClick(ARXMOUSE_BUTTON0,300) )
 					{
 						bEdit = pZoneClick->OnMouseDoubleClick(0);
 
@@ -6299,163 +6279,163 @@ static bool UpdateGameKey(bool bEdit,CMenuElement *pmeElement)
 		{
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_JUMP1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_JUMP2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_JUMP,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_JUMP1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_JUMP,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_JUMP1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_MAGICMODE1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_MAGICMODE2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_MAGICMODE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_MAGICMODE1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_MAGICMODE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_MAGICMODE1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_STEALTHMODE1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_STEALTHMODE2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_STEALTHMODE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_STEALTHMODE1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_STEALTHMODE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_STEALTHMODE1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_WALKFORWARD1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_WALKFORWARD2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_WALKFORWARD,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_WALKFORWARD1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_WALKFORWARD,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_WALKFORWARD1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_WALKBACKWARD1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_WALKBACKWARD2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_WALKBACKWARD,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_WALKBACKWARD1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_WALKBACKWARD,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_WALKBACKWARD1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFELEFT1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFELEFT2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_STRAFELEFT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFELEFT1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_STRAFELEFT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFELEFT1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFERIGHT1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFERIGHT2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_STRAFERIGHT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFERIGHT1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_STRAFERIGHT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFERIGHT1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_LEANLEFT1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_LEANLEFT2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_LEANLEFT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_LEANLEFT1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_LEANLEFT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_LEANLEFT1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_LEANRIGHT1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_LEANRIGHT2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_LEANRIGHT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_LEANRIGHT1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_LEANRIGHT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_LEANRIGHT1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_CROUCH1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_CROUCH2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_CROUCH,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_CROUCH1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_CROUCH,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_CROUCH1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_MOUSELOOK1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_MOUSELOOK2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_MOUSELOOK,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_MOUSELOOK1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_MOUSELOOK,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_MOUSELOOK1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_ACTIONCOMBINE1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_ACTIONCOMBINE2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_ACTION,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_ACTIONCOMBINE1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_ACTION,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_ACTIONCOMBINE1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_INVENTORY1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_INVENTORY2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_INVENTORY,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_INVENTORY1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_INVENTORY,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_INVENTORY1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOK1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOK2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOK,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOK1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOK,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOK1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKCHARSHEET1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKCHARSHEET2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOKCHARSHEET,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKCHARSHEET1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOKCHARSHEET,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKCHARSHEET1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKSPELL1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKSPELL2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOKSPELL,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKSPELL1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOKSPELL,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKSPELL1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKMAP1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKMAP2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOKMAP,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKMAP1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOKMAP,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKMAP1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKQUEST1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKQUEST2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOKQUEST,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKQUEST1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_BOOKQUEST,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_BOOKQUEST1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_DRINKPOTIONLIFE1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_DRINKPOTIONLIFE2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_DRINKPOTIONLIFE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_DRINKPOTIONLIFE1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_DRINKPOTIONLIFE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_DRINKPOTIONLIFE1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_DRINKPOTIONMANA1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_DRINKPOTIONMANA2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_DRINKPOTIONMANA,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_DRINKPOTIONMANA1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_DRINKPOTIONMANA,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_DRINKPOTIONMANA1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_TORCH1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_TORCH2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_TORCH,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_TORCH1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_TORCH,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_TORCH1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_CANCELCURSPELL1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_CANCELCURSPELL2:	
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_CANCELCURSPELL,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_CANCELCURSPELL1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_CANCELCURSPELL,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_CANCELCURSPELL1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST1_2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_PRECAST1,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_PRECAST1,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST2:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST2_2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_PRECAST2,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST2,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_PRECAST2,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST2,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST3:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST3_2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_PRECAST3,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST3,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_PRECAST3,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_PRECAST3,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_WEAPON1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_WEAPON2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_WEAPON,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_WEAPON1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_WEAPON,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_WEAPON1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_QUICKLOAD:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_QUICKLOAD2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_QUICKLOAD,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_QUICKLOAD,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_QUICKLOAD,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_QUICKLOAD,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_QUICKSAVE:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_QUICKSAVE2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_QUICKSAVE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_QUICKSAVE,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_QUICKSAVE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_QUICKSAVE,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_TURNLEFT1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_TURNLEFT2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_TURNLEFT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_TURNLEFT1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_TURNLEFT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_TURNLEFT1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_TURNRIGHT1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_TURNRIGHT2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_TURNRIGHT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_TURNRIGHT1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_TURNRIGHT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_TURNRIGHT1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_LOOKUP1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_LOOKUP2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_LOOKUP,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_LOOKUP1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_LOOKUP,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_LOOKUP1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_LOOKDOWN1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_LOOKDOWN2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_LOOKDOWN,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_LOOKDOWN1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_LOOKDOWN,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_LOOKDOWN1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFE1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFE2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_STRAFE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFE1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_STRAFE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_STRAFE1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_CENTERVIEW1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_CENTERVIEW2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_CENTERVIEW,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_CENTERVIEW1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_CENTERVIEW,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_CENTERVIEW1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_FREELOOK1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_FREELOOK2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_FREELOOK,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_FREELOOK1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_FREELOOK,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_FREELOOK1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_PREVIOUS1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_PREVIOUS2:
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_PREVIOUS,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_PREVIOUS1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_PREVIOUS,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_PREVIOUS1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_NEXT1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_NEXT2:	
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_NEXT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_NEXT1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_NEXT,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_NEXT1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_CROUCHTOGGLE1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_CROUCHTOGGLE2:	
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_CROUCHTOGGLE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_CROUCHTOGGLE1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_CROUCHTOGGLE,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_CROUCHTOGGLE1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_UNEQUIPWEAPON1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_UNEQUIPWEAPON2:	
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_UNEQUIPWEAPON,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_UNEQUIPWEAPON1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_UNEQUIPWEAPON,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_UNEQUIPWEAPON1,pInputHandler->iKeyId);
 			break;
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_MINIMAP1:
 		case BUTTON_MENUOPTIONS_CONTROLS_CUST_MINIMAP2:	
-			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_MINIMAP,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_MINIMAP1,pGetInfoDirectInput->iKeyId);
+			bChange=pMenuConfig->SetActionKey(CONTROLS_CUST_MINIMAP,pmeElement->iID-BUTTON_MENUOPTIONS_CONTROLS_CUST_MINIMAP1,pInputHandler->iKeyId);
 			break;
 		}
 	}
@@ -6541,59 +6521,59 @@ int CWindowMenuConsole::Render()
 				else
 					((CMenuElementText*)pZoneClick)->lColorHighlight=RGB(50.f, 0, 0);
 
-				bool bOldTouch=pGetInfoDirectInput->bTouch;
+				bool bOldTouch=pInputHandler->bTouch;
 
-				if(	pGetInfoDirectInput->IsVirtualKeyPressed(DIK_LSHIFT)||
-					pGetInfoDirectInput->IsVirtualKeyPressed(DIK_RSHIFT)||
-					pGetInfoDirectInput->IsVirtualKeyPressed(DIK_LCONTROL)||
-					pGetInfoDirectInput->IsVirtualKeyPressed(DIK_RCONTROL)||
-					pGetInfoDirectInput->IsVirtualKeyPressed(DIK_LALT)||
-					pGetInfoDirectInput->IsVirtualKeyPressed(DIK_RALT) )
+				if(	pInputHandler->IsVirtualKeyPressed(DIK_LSHIFT)||
+					pInputHandler->IsVirtualKeyPressed(DIK_RSHIFT)||
+					pInputHandler->IsVirtualKeyPressed(DIK_LCONTROL)||
+					pInputHandler->IsVirtualKeyPressed(DIK_RCONTROL)||
+					pInputHandler->IsVirtualKeyPressed(DIK_LALT)||
+					pInputHandler->IsVirtualKeyPressed(DIK_RALT) )
 				{
-					if(!((pGetInfoDirectInput->iKeyId&~0x8000FFFF)>>16))
-						pGetInfoDirectInput->bTouch=false;
+					if(!((pInputHandler->iKeyId&~0x8000FFFF)>>16))
+						pInputHandler->bTouch=false;
 				}
 				else
 				{
-					if(pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_LSHIFT))
+					if(pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_LSHIFT))
 					{
-						pGetInfoDirectInput->bTouch=true;
-						pGetInfoDirectInput->iKeyId=DIK_LSHIFT;
+						pInputHandler->bTouch=true;
+						pInputHandler->iKeyId=DIK_LSHIFT;
 					}
 
-					if(pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_RSHIFT))
+					if(pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_RSHIFT))
 					{
-						pGetInfoDirectInput->bTouch=true;
-						pGetInfoDirectInput->iKeyId=DIK_RSHIFT;
+						pInputHandler->bTouch=true;
+						pInputHandler->iKeyId=DIK_RSHIFT;
 					}
 
-					if(pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_LCONTROL))
+					if(pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_LCONTROL))
 					{
-						pGetInfoDirectInput->bTouch=true;
-						pGetInfoDirectInput->iKeyId=DIK_LCONTROL;
+						pInputHandler->bTouch=true;
+						pInputHandler->iKeyId=DIK_LCONTROL;
 					}
 
-					if(pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_RCONTROL))
+					if(pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_RCONTROL))
 					{
-						pGetInfoDirectInput->bTouch=true;
-						pGetInfoDirectInput->iKeyId=DIK_RCONTROL;
+						pInputHandler->bTouch=true;
+						pInputHandler->iKeyId=DIK_RCONTROL;
 					}
 
-					if(pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_LALT))
+					if(pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_LALT))
 					{
-						pGetInfoDirectInput->bTouch=true;
-						pGetInfoDirectInput->iKeyId=DIK_LALT;
+						pInputHandler->bTouch=true;
+						pInputHandler->iKeyId=DIK_LALT;
 					}
 
-					if(pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_RALT))
+					if(pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_RALT))
 					{
-						pGetInfoDirectInput->bTouch=true;
-						pGetInfoDirectInput->iKeyId=DIK_RALT;
+						pInputHandler->bTouch=true;
+						pInputHandler->iKeyId=DIK_RALT;
 					}
 				}
 
 				CMenuElement *pmeElement=GetTouch(true);
-				pGetInfoDirectInput->bTouch=bOldTouch;
+				pInputHandler->bTouch=bOldTouch;
 
 				if(pmeElement)
 				{
@@ -6606,7 +6586,7 @@ int CWindowMenuConsole::Render()
 			break;
 		default:
 			{
-				if(pGetInfoDirectInput->GetMouseButtonNowPressed(DXI_BUTTON0))
+				if(pInputHandler->GetMouseButtonNowPressed(ARXMOUSE_BUTTON0))
 				{
 					CMenuZone *pmzMenuZone = MenuAllZone.GetZoneWithID(BUTTON_MENUOPTIONS_CONTROLS_CUST_DEFAULT);
 
@@ -7028,7 +7008,7 @@ void CMenuButton::RenderMouseOver()
 
 	if(bNoMenu) return;
 
-	pGetInfoDirectInput->SetMouseOver();
+	pInputHandler->SetMouseOver();
 
 	//affichage de la texture
 	if(pTexOver)
@@ -7201,7 +7181,7 @@ void CMenuSliderText::Move(int _iX, int _iY)
 void CMenuSliderText::EmptyFunction()
 {
 	//Touche pour la selection
-	if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_LEFT))
+	if(pInputHandler->IsVirtualKeyPressedNowPressed(DIK_LEFT))
 	{
 		iPos--;
 
@@ -7209,7 +7189,7 @@ void CMenuSliderText::EmptyFunction()
 	}
 	else
 	{
-		if( pGetInfoDirectInput->IsVirtualKeyPressedNowPressed( DIK_RIGHT ) )
+		if( pInputHandler->IsVirtualKeyPressedNowPressed( DIK_RIGHT ) )
 		{
 			iPos++;
 
@@ -7232,8 +7212,8 @@ bool CMenuSliderText::OnMouseClick(int)
 	if(iOldPos<0)
 		iOldPos=iPos;
 
-	int iX = pGetInfoDirectInput->iMouseAX;
-	int iY = pGetInfoDirectInput->iMouseAY;
+	int iX = pInputHandler->iMouseAX;
+	int iY = pInputHandler->iMouseAY;
 
 	if ((iX >= rZone.left) &&
 		(iY >= rZone.top) &&
@@ -7354,10 +7334,10 @@ void CMenuSliderText::RenderMouseOver()
 
 	if(bNoMenu) return;
 
-	pGetInfoDirectInput->SetMouseOver();
+	pInputHandler->SetMouseOver();
 
-	int iX = pGetInfoDirectInput->iMouseAX;
-	int iY = pGetInfoDirectInput->iMouseAY;
+	int iX = pInputHandler->iMouseAX;
+	int iY = pInputHandler->iMouseAY;
 
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, true);
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
@@ -7449,7 +7429,7 @@ void CMenuSlider::Move(int _iX, int _iY)
 void CMenuSlider::EmptyFunction()
 {
 	//Touche pour la selection
-	if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_LEFT))
+	if(pInputHandler->IsVirtualKeyPressedNowPressed(DIK_LEFT))
 	{
 		iPos--;
 
@@ -7457,7 +7437,7 @@ void CMenuSlider::EmptyFunction()
 	}
 	else
 	{
-		if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_RIGHT))
+		if(pInputHandler->IsVirtualKeyPressedNowPressed(DIK_RIGHT))
 		{
 			iPos++;
 
@@ -7473,8 +7453,8 @@ bool CMenuSlider::OnMouseClick(int)
 {
 	ARX_SOUND_PlayMenu(SND_MENU_CLICK);
 
-	int iX = pGetInfoDirectInput->iMouseAX;
-	int iY = pGetInfoDirectInput->iMouseAY;
+	int iX = pInputHandler->iMouseAX;
+	int iY = pInputHandler->iMouseAY;
 
 	if ((iX >= rZone.left) &&
 		(iY >= rZone.top) &&
@@ -7654,10 +7634,10 @@ void CMenuSlider::RenderMouseOver()
 
 	if(bNoMenu) return;
 
-	pGetInfoDirectInput->SetMouseOver();
+	pInputHandler->SetMouseOver();
 
-	int iX = pGetInfoDirectInput->iMouseAX;
-	int iY = pGetInfoDirectInput->iMouseAY;
+	int iX = pInputHandler->iMouseAX;
+	int iY = pInputHandler->iMouseAY;
 
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, true);
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
@@ -7687,945 +7667,6 @@ void CMenuSlider::RenderMouseOver()
 		}
 
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, false);
-}
-
-//-----------------------------------------------------------------------------
-
-CDirectInput::CDirectInput()
-{
-	char temp[256];
-	MakeDir(temp,"graph\\interface\\cursors\\cursor00.bmp");
-	pTex[0]=D3DTextr_GetSurfaceContainer(temp);
-	MakeDir(temp,"graph\\interface\\cursors\\cursor01.bmp");
-	pTex[1]=D3DTextr_GetSurfaceContainer(temp);
-	MakeDir(temp,"graph\\interface\\cursors\\cursor02.bmp");
-	pTex[2]=D3DTextr_GetSurfaceContainer(temp);
-	MakeDir(temp,"graph\\interface\\cursors\\cursor03.bmp");
-	pTex[3]=D3DTextr_GetSurfaceContainer(temp);
-	MakeDir(temp,"graph\\interface\\cursors\\cursor04.bmp");
-	pTex[4]=D3DTextr_GetSurfaceContainer(temp);
-	MakeDir(temp,"graph\\interface\\cursors\\cursor05.bmp");
-	pTex[5]=D3DTextr_GetSurfaceContainer(temp);
-	MakeDir(temp,"graph\\interface\\cursors\\cursor06.bmp");
-	pTex[6]=D3DTextr_GetSurfaceContainer(temp);
-	MakeDir(temp,"graph\\interface\\cursors\\cursor07.bmp");
-	pTex[7]=D3DTextr_GetSurfaceContainer(temp);
-
-	SetCursorOff();
-	SetSensibility(2);
-	iMouseAX=0;
-	iMouseAY=0;
-	iMouseAZ=0;
-	fMouseAXTemp=fMouseAYTemp=0.f;
-	iNbOldCoord=0;
-	iMaxOldCoord=40;
-
-	bMouseOver=false;
-
-	if(pTex[0])
-	{
-		fTailleX=(float)pTex[0]->m_dwWidth;
-		fTailleY=(float)pTex[0]->m_dwHeight;
-	}
-	else
-	{
-		fTailleX=fTailleY=0.f;
-	}
-
-	iNumCursor=0;
-	lFrameDiff=0;
-
-	for(int i=DXI_BUTTON0;i<=DXI_BUTTON31;i++)
-	{
-		iOldMouseButton[i]=0;
-		iMouseTime[i]=0;
-		iMouseTimeSet[i]=0;
-		bMouseButton[i]=bOldMouseButton[i]=false;
-		iOldNumClick[i]=iOldNumUnClick[i]=0;
-	}
-
-	// PreCompute le ScanCode
-	bTouch=false;
-	HKL layout=GetKeyboardLayout(0);
-
-	for(int iI=0;iI<256;iI++)
-	{
-		iKeyScanCode[iI]=MapVirtualKeyEx(iI,0,layout);
-		iOneTouch[iI]=0;
-	}
-
-	bDrawCursor=true;
-	bActive=false;
-
-	iWheelSens=0;
-}
-
-//-----------------------------------------------------------------------------
-
-CDirectInput::~CDirectInput()
-{
-}
-
-//-----------------------------------------------------------------------------
-
-void CDirectInput::SetCursorOff()
-{
-	eNumTex=CURSOR_OFF;
-}
-
-//-----------------------------------------------------------------------------
-
-void CDirectInput::SetCursorOn()
-{
-	eNumTex=CURSOR_ON;
-}
-
-//-----------------------------------------------------------------------------
-
-void CDirectInput::SetMouseOver()
-{
-	bMouseOver=true;
-	SetCursorOn();
-}
-
-//-----------------------------------------------------------------------------
-
-void CDirectInput::SetSensibility(int _iSensibility)
-{
-	iSensibility=_iSensibility;
-}
-
-//-----------------------------------------------------------------------------
-
-void CDirectInput::ResetAll()
-{
-	for(int i=DXI_BUTTON0;i<=DXI_BUTTON31;i++)
-	{
-		iOldMouseButton[i]=0;
-		iMouseTime[i]=0;
-		iMouseTimeSet[i]=0;
-		bMouseButton[i]=bOldMouseButton[i]=false;
-		iOldNumClick[i]=iOldNumUnClick[i]=0;
-	}
-
-	iKeyId=-1;
-	bTouch=false;
-
-	for(int i=0;i<256;i++)
-	{
-		iOneTouch[i]=0;
-	}
-
-	EERIEMouseButton=LastEERIEMouseButton=0;
-
-	iWheelSens=0;
-}
-
-//-----------------------------------------------------------------------------
-
-void CDirectInput::GetInput()
-{
-int iDTime;
-
-	DXI_ExecuteAllDevices(false);
-	iKeyId=DXI_GetKeyIDPressed(DXI_KEYBOARD1);
-	bTouch=(iKeyId>=0)?true:false;
-
-	for(int i=0;i<256;i++)
-	{
-		if(IsVirtualKeyPressed(i))
-		{
-			switch(i)
-			{
-			case DIK_LSHIFT:
-			case DIK_RSHIFT:
-			case DIK_LCONTROL:
-			case DIK_RCONTROL:
-			case DIK_LALT:
-			case DIK_RALT:
-
-				if(i!=iKeyId)
-					iKeyId|=(i<<16);
-
-				break;
-			}
-
-			if(iOneTouch[i]<2)
-			{
-				iOneTouch[i]++;
-			}
-		}
-		else
-		{
-			if(iOneTouch[i]>0)
-			{
-				iOneTouch[i]--;
-			}
-		}
-	}
-
-	if(bTouch)	//priorité des touches
-	{
-		switch(iKeyId)
-		{
-		case DIK_LSHIFT:
-		case DIK_RSHIFT:
-		case DIK_LCONTROL:
-		case DIK_RCONTROL:
-		case DIK_LALT:
-		case DIK_RALT:
-			{
-				bool bFound=false;
-
-				for(int i=0;i<256;i++)
-				{
-					if(bFound)
-					{
-						break;
-					}
-
-					switch(i&0xFFFF)
-					{
-					case DIK_LSHIFT:
-					case DIK_RSHIFT:
-					case DIK_LCONTROL:
-					case DIK_RCONTROL:
-					case DIK_LALT:
-					case DIK_RALT:
-						continue;
-					default:
-						{
-							if(iOneTouch[i])
-							{
-								bFound=true;
-								iKeyId&=~0xFFFF;
-								iKeyId|=i;
-							}
-						}
-						break;
-					}
-				}
-			}
-		}
-	}
-
-
-	ARX_CHECK_INT(ARX_TIME_Get( false ));
-	const int iArxTime = ARX_CLEAN_WARN_CAST_INT(ARX_TIME_Get( false )) ;
-
-
-	for(int i=DXI_BUTTON0;i<=DXI_BUTTON31;i++)
-	{
-		int iNumClick;
-		int iNumUnClick;
-		DXI_MouseButtonCountClick(DXI_MOUSE1,i,&iNumClick,&iNumUnClick);
-
-		iOldNumClick[i]+=iNumClick+iNumUnClick;
-
-		if(	(!bMouseButton[i])&&(iOldNumClick[i]==iNumUnClick) )
-		{
-			iNumUnClick=iOldNumClick[i]=0;
-		}
-
-		bOldMouseButton[i]=bMouseButton[i];
-
-		if(bMouseButton[i])
-		{
-			if(iOldNumClick[i])
-			{
-				bMouseButton[i]=false;
-			}
-		}
-		else
-		{
-			if(iOldNumClick[i])
-			{
-				bMouseButton[i]=true;
-			}
-		}
-
-		if(iOldNumClick[i]) iOldNumClick[i]--;
-
-		iDTime=0;
-		DXI_MouseButtonPressed(DXI_MOUSE1,i,&iDTime);
-
-		if(iDTime)
-		{
-			iMouseTime[i]=iDTime;
-			iMouseTimeSet[i]=2;
-		}
-		else
-		{
-			if(	(iMouseTimeSet[i]>0)&&
-				((ARX_TIME_Get( false )-iMouseTime[i])>300)
-				)
-			{
-				iMouseTime[i]=0;
-				iMouseTimeSet[i]=0;
-			}
-
-			if(GetMouseButtonNowPressed(i))
-			{
-				switch(iMouseTimeSet[i])
-				{
-				case 0:
-					iMouseTime[i] = iArxTime;
-					iMouseTimeSet[i]++;
-					break;
-				case 1:
-					iMouseTime[i] = iArxTime - iMouseTime[i];
-					iMouseTimeSet[i]++;
-					break;
-				}
-			}
-		}
-		}
-
-	iWheelSens=pGetInfoDirectInput->GetWheelSens(DXI_MOUSE1);
-
-	if(	( danaeApp.m_pFramework->m_bIsFullscreen ) &&
-		( bGLOBAL_DINPUT_MENU ) )
-	{
-		float fDX = 0.f;
-		float fDY = 0.f;
-		iMouseRX = iMouseRY = iMouseRZ = 0;
-
-		if( DXI_GetAxeMouseXYZ(DXI_MOUSE1, &iMouseRX, &iMouseRY, &iMouseRZ) )
-		{
-			float fSensMax = 1.f / 6.f;
-			float fSensMin = 2.f;
-			float fSens = ( ( fSensMax - fSensMin ) * ( (float)iSensibility ) / 10.f ) + fSensMin;
-			fSens = pow( .7f, fSens ) * 2.f;
-
-			fDX=( (float)iMouseRX ) * fSens * ( ( (float)DANAESIZX ) / 640.f );
-			fDY=( (float)iMouseRY ) * fSens * ( ( (float)DANAESIZY ) / 480.f );
-			fMouseAXTemp += fDX;
-			fMouseAYTemp += fDY;
-			
-
-			ARX_CHECK_INT(fMouseAXTemp);
-			ARX_CHECK_INT(fMouseAYTemp);
-			iMouseAX  = ARX_CLEAN_WARN_CAST_INT(fMouseAXTemp);
-			iMouseAY  = ARX_CLEAN_WARN_CAST_INT(fMouseAYTemp);
-
-			iMouseAZ += iMouseRZ;
-
-
-			if(iMouseAX<0)
-			{
-				iMouseAX	 = 0;
-				fMouseAXTemp = 0.f; 
-			}
-
-
-			ARX_CHECK_NOT_NEG( iMouseAX );
-
-			if( ARX_CAST_ULONG( iMouseAX ) >= danaeApp.m_pFramework->m_dwRenderWidth )
-			{
-
-				iMouseAX = danaeApp.m_pFramework->m_dwRenderWidth - 1;
-				fMouseAXTemp = ARX_CLEAN_WARN_CAST_FLOAT( iMouseAX );
-			}
-
-			if(iMouseAY<0)
-			{
-				fMouseAYTemp=	0.f;
-				iMouseAY	=	0;
-			}
-
-
-			ARX_CHECK_NOT_NEG( iMouseAY );
-
-			if( ARX_CAST_ULONG( iMouseAY ) >= danaeApp.m_pFramework->m_dwRenderHeight )
-			{
-
-				iMouseAY		= danaeApp.m_pFramework->m_dwRenderHeight - 1;
-				fMouseAYTemp	= ARX_CLEAN_WARN_CAST_FLOAT( iMouseAY ); 
-			}
-
-
-
-			bMouseMove=true;
-		}
-		else
-		{
-			bMouseMove=false;
-		}
-
-		if(bGLOBAL_DINPUT_GAME)
-		{
-			_EERIEMouseXdep=(int)fDX;
-			_EERIEMouseYdep=(int)fDY;
-			EERIEMouseX=iMouseAX;
-			EERIEMouseY=iMouseAY;
-		}
-	}
-	else
-	{
-		bMouseMove = ((iMouseAX != DANAEMouse.x) || (iMouseAY != DANAEMouse.y));
-		iMouseAX=DANAEMouse.x;
-		iMouseAY=DANAEMouse.y;
-		iMouseAZ=0;
-	}
-
-	int iDx;
-	int iDy;
-
-	if(pTex[eNumTex])
-	{
-		iDx=pTex[eNumTex]->m_dwWidth>>1;
-		iDy=pTex[eNumTex]->m_dwHeight>>1;
-	}
-	else
-	{
-		iDx=0;
-		iDy=0;
-	}
-
-	iOldCoord[iNbOldCoord].x=iMouseAX+iDx;
-	iOldCoord[iNbOldCoord].y=iMouseAY+iDy;
-	iNbOldCoord++;
-
-	if(iNbOldCoord>=iMaxOldCoord)
-	{
-		iNbOldCoord=iMaxOldCoord-1;
-		memmove((void*)iOldCoord,(void*)(iOldCoord+1),sizeof(EERIE_2DI)*iNbOldCoord);
-	}
-
-}
-
-//-----------------------------------------------------------------------------
-
-int CDirectInput::GetWheelSens(int _iIDbutton)
-{
-	int iX,iY,iZ=0;
-	DXI_GetAxeMouseXYZ(_iIDbutton,&iX,&iY,&iZ);
-
-	return iZ;
-}
-
-//-----------------------------------------------------------------------------
-
-bool CDirectInput::IsVirtualKeyPressed(int _iVirtualKey)
-{
-	return DXI_KeyPressed(DXI_KEYBOARD1,_iVirtualKey)?true:false;
-}
-
-//-----------------------------------------------------------------------------
-
-bool CDirectInput::IsVirtualKeyPressedOneTouch(int _iVirtualKey)
-{
-
-	return(	(DXI_KeyPressed(DXI_KEYBOARD1,_iVirtualKey))&&
-			(iOneTouch[_iVirtualKey]==1) );
-}
-
-//-----------------------------------------------------------------------------
-
-bool CDirectInput::IsVirtualKeyPressedNowPressed(int _iVirtualKey)
-{
-	return(	(DXI_KeyPressed(DXI_KEYBOARD1,_iVirtualKey))&&
-			(iOneTouch[_iVirtualKey]==1) );
-}
-
-//-----------------------------------------------------------------------------
-
-bool CDirectInput::IsVirtualKeyPressedNowUnPressed(int _iVirtualKey)
-{
-	return(	(!DXI_KeyPressed(DXI_KEYBOARD1,_iVirtualKey))&&
-			(iOneTouch[_iVirtualKey]==1) );
-}
-
-//-----------------------------------------------------------------------------
-
-void CDirectInput::DrawOneCursor(int _iPosX,int _iPosY,int _iColor)
-{
-	GDevice->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTFN_POINT );
-	GDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTFG_POINT );
-	SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_CLAMP);
-
-	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(_iPosX), ARX_CLEAN_WARN_CAST_FLOAT(_iPosY),
-
-					INTERFACE_RATIO_DWORD(scursor[iNumCursor]->m_dwWidth),
-					INTERFACE_RATIO_DWORD(scursor[iNumCursor]->m_dwHeight),
-
-					0.00000001f,
-					scursor[iNumCursor],0,D3DCOLORWHITE);
-	GDevice->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFP_LINEAR);
-	GDevice->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFP_LINEAR);
-	SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_WRAP);
-}
-
-//-----------------------------------------------------------------------------
-
-static bool ComputePer(EERIE_2DI *_psPoint1,EERIE_2DI *_psPoint2,D3DTLVERTEX *_psd3dv1,D3DTLVERTEX *_psd3dv2,float _fSize)
-{
-	EERIE_2D sTemp;
-	float fTemp;
-
-	sTemp.x=(float)(_psPoint2->x-_psPoint1->x);
-	sTemp.y=(float)(_psPoint2->y-_psPoint1->y);
-	fTemp=sTemp.x;
-	sTemp.x=-sTemp.y;
-	sTemp.y=fTemp;
-	float fMag=(float)sqrt(sTemp.x*sTemp.x+sTemp.y*sTemp.y);
-
-	if(fMag<EEdef_EPSILON)
-	{
-		return false;
-	}
-
-	fMag=_fSize/fMag;
-
-	_psd3dv1->sx=(sTemp.x*fMag);
-	_psd3dv1->sy=(sTemp.y*fMag);
-	_psd3dv2->sx=((float)_psPoint1->x)-_psd3dv1->sx;
-	_psd3dv2->sy=((float)_psPoint1->y)-_psd3dv1->sy;
-	_psd3dv1->sx+=((float)_psPoint1->x);
-	_psd3dv1->sy+=((float)_psPoint1->y);
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-
-static void DrawLine2D(EERIE_2DI *_psPoint1,int _iNbPt,float _fSize,float _fRed,float _fGreen,float _fBlue)
-{
-	_iNbPt--;
-
-	if(!_iNbPt) return;
-
-	float fSize=_fSize/_iNbPt;
-	float fTaille=fSize;
-	
-	float fDColorRed=_fRed/_iNbPt;
-	float fColorRed=fDColorRed;
-	float fDColorGreen=_fGreen/_iNbPt;
-	float fColorGreen=fDColorGreen;
-	float fDColorBlue=_fBlue/_iNbPt;
-	float fColorBlue=fDColorBlue;
-
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVDESTCOLOR);
-	SETTC(GDevice,NULL);
-	SETALPHABLEND(GDevice,true);
-	
-	D3DTLVERTEX v[4];
-	v[0].sz=v[1].sz=v[2].sz=v[3].sz=0.f;	
-	v[0].rhw=v[1].rhw=v[2].rhw=v[3].rhw=0.999999f;
-
-	EERIE_2DI *psOldPoint=_psPoint1++;
-	v[0].color=v[2].color=D3DRGBA(fColorRed,fColorGreen,fColorBlue,1.f);	
-
-	if(!ComputePer(psOldPoint,_psPoint1,&v[0],&v[2],fTaille))
-	{
-		v[0].sx=v[2].sx=(float)psOldPoint->x;
-		v[0].sy=v[2].sy=(float)psOldPoint->y;
-	}
-
-	_iNbPt--;
-
-	while(_iNbPt--)
-	{
-		fTaille+=fSize;
-		fColorRed+=fDColorRed;
-		fColorGreen+=fDColorGreen;
-		fColorBlue+=fDColorBlue;
-
-		if(ComputePer(psOldPoint,_psPoint1+1,&v[1],&v[3],fTaille))
-		{
-			v[1].color=v[3].color=D3DRGBA(fColorRed,fColorGreen,fColorBlue,1.f);	
-			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
-			
-			v[0].sx=v[1].sx;
-			v[0].sy=v[1].sy;
-			v[0].color=v[1].color;
-			v[2].sx=v[3].sx;
-			v[2].sy=v[3].sy;
-			v[2].color=v[3].color;
-		}
-
-		psOldPoint=_psPoint1++;
-	}
-
-	fTaille+=fSize;
-	fColorRed+=fDColorRed;
-	fColorGreen+=fDColorGreen;
-	fColorBlue+=fDColorBlue;
-
-	if(ComputePer(_psPoint1,psOldPoint,&v[1],&v[3],fTaille)) 
-	{
-		v[1].color=v[3].color=D3DRGBA(fColorRed,fColorGreen,fColorBlue,1.f);	
-		g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip,D3DFVF_TLVERTEX|D3DFVF_DIFFUSE,v,4,0);
-	}
-
-	SETALPHABLEND(GDevice,false);
-}
-//-----------------------------------------------------------------------------
-
-void CDirectInput::DrawCursor()
-{
-	if(!bDrawCursor) return;
-
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  true);
-	DrawLine2D(iOldCoord,iMaxOldCoord,10.f,.725f,.619f,0.56f);
-
-	if(pTex[iNumCursor]) SETTC(GDevice, pTex[iNumCursor]);
-	else SETTC(GDevice,NULL);
-
-	SETALPHABLEND(GDevice,false);
-
-	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
-	DrawOneCursor(iMouseAX,iMouseAY,-1);
-
-	danaeApp.EnableZBuffer();
-
-
-	ARX_CHECK_LONG( ARXDiffTimeMenu );
-	lFrameDiff += ARX_CLEAN_WARN_CAST_LONG( ARXDiffTimeMenu );
-
-
-	if(lFrameDiff>70)
-	{
-		if(bMouseOver)
-		{
-			if(iNumCursor<4)
-			{
-				iNumCursor++;
-			}
-			else
-			{
-				if(iNumCursor>4)
-				{
-					iNumCursor--;
-				}
-			}
-			
-			SetCursorOff();
-			bMouseOver=false;
-		}
-		else
-		{
-			if (iNumCursor > 0)
-			{
-				iNumCursor++;
-
-				if(iNumCursor>7) iNumCursor=0;
-			}
-		}
-
-		lFrameDiff=0;
-	}
-
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  false);
-}
-
-//-----------------------------------------------------------------------------
-
-bool CDirectInput::GetMouseButton(int _iNumButton)
-{
-
-	return(	(bMouseButton[_iNumButton])&&(!bOldMouseButton[_iNumButton]));
-}
-
-//-----------------------------------------------------------------------------
-
-bool CDirectInput::GetMouseButtonRepeat(int _iNumButton)
-{
-	return( bMouseButton[_iNumButton] );
-}
-
-//-----------------------------------------------------------------------------
-
-bool CDirectInput::GetMouseButtonNowPressed(int _iNumButton)
-{
-
-	return(	(bMouseButton[_iNumButton])&&(!bOldMouseButton[_iNumButton]));
-}
-
-//-----------------------------------------------------------------------------
-
-bool CDirectInput::GetMouseButtonNowUnPressed(int _iNumButton)
-{
-
-	return( (!bMouseButton[_iNumButton])&&(bOldMouseButton[_iNumButton]) );
-}
-
-//-----------------------------------------------------------------------------
-
-_TCHAR * CDirectInput::GetFullNameTouch(int _iVirtualKey)
-{
-	_TCHAR *pText=(_TCHAR*)malloc(256*sizeof(_TCHAR));
-
-	if(!pText) return NULL;
-
-	long lParam;
-
-	_TCHAR *pText2=NULL;
-
-	if(	(_iVirtualKey!=-1)&&
-		(_iVirtualKey&~0xC000FFFF) )	//COMBINAISON
-	{
-		pText2=GetFullNameTouch((_iVirtualKey>>16)&0x3FFF);
-	}
-
-	lParam=((_iVirtualKey)&0x7F)<<16;
-
-	switch(_iVirtualKey)
-	{
-	case DIK_HOME:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_home"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_NEXT:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_pagedown"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_END:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_end"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_INSERT:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_insert"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_DELETE:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_delete"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_NUMLOCK:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_numlock"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_DIVIDE:
-		_tcscpy(pText,_T("_/_"));
-		break;
-	case DIK_MULTIPLY:
-		_tcscpy(pText,_T("_x_"));
-		break;
-	case DIK_SYSRQ:           
-		_tcscpy(pText,_T("?"));
-		break;
-	case DIK_UP:                  // UpArrow on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_up"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_PRIOR:               // PgUp on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_pageup"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_LEFT:                // LeftArrow on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_RIGHT:               // RightArrow on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_right"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_DOWN:                // DownArrow on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_down"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON1:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button0"), _T("string"), _T("b1"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON2:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button1"), _T("string"), _T("b2"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON3:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button2"), _T("string"), _T("b3"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON4:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button3"), _T("string"), _T("b4"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON5:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button4"), _T("string"), _T("b5"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON6:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button5"), _T("string"), _T("b6"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON7:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button6"), _T("string"), _T("b7"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON8:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button7"), _T("string"), _T("b8"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON9:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button8"), _T("string"), _T("b9"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON10:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button9"), _T("string"), _T("b10"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON11:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button10"), _T("string"), _T("b11"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON12:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button11"), _T("string"), _T("b12"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON13:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button12"), _T("string"), _T("b13"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON14:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button13"), _T("string"), _T("b14"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON15:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button14"), _T("string"), _T("b15"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON16:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button15"), _T("string"), _T("b16"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON17:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button16"), _T("string"), _T("b17"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON18:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button17"), _T("string"), _T("b18"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON19:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button18"), _T("string"), _T("b19"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON20:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button19"), _T("string"), _T("b20"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON21:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button20"), _T("string"), _T("b21"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON22:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button21"), _T("string"), _T("b22"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON23:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button22"), _T("string"), _T("b23"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON24:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button23"), _T("string"), _T("b24"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON25:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button24"), _T("string"), _T("b25"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON26:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button25"), _T("string"), _T("b26"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON27:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button26"), _T("string"), _T("b27"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON28:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button27"), _T("string"), _T("b28"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON29:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button28"), _T("string"), _T("b29"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON30:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button29"), _T("string"), _T("b30"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON31:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button30"), _T("string"), _T("b31"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON32:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button31"), _T("string"), _T("b32"), pText, 256, NULL);
-		break;
-	case DIK_WHEELUP:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_wheelup"), _T("string"), _T("w0"), pText, 256, NULL);
-		break;
-	case DIK_WHEELDOWN:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_wheeldown"), _T("string"), _T("w1"), pText, 256, NULL);
-		break;
-	case -1:
-		_tcscpy(pText,_T("---"));
-		break;
-	default:
-		{
-		char tAnsiText[256];
-		GetKeyNameText(lParam,tAnsiText,256);
-		int i=strlen(tAnsiText);
-
-		if(!i)
-		{
-			_stprintf(pText,_T("Key_%d"),_iVirtualKey);
-		}
-		else
-		{
-			MultiByteToWideChar(CP_ACP, 0, tAnsiText, -1, pText, 256);
-
-			if(_iVirtualKey==DIK_LSHIFT)
-			{
-				_TCHAR tText2[256];
-				_TCHAR *pText3;
-				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
-				tText2[1]=0;
-				pText3=(_TCHAR*)malloc((_tcslen(tText2)+_tcslen(pText)+1)*sizeof(_TCHAR));
-				_tcscpy(pText3,tText2);
-				_tcscat(pText3,pText);
-				free((void*)pText);
-				pText=pText3;
-			}
-
-			if(_iVirtualKey==DIK_LCONTROL)
-			{
-				_TCHAR tText2[256];
-				_TCHAR *pText3;
-				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
-				tText2[1]=0;
-				pText3=(_TCHAR*)malloc((_tcslen(tText2)+_tcslen(pText)+1)*sizeof(_TCHAR));
-				_tcscpy(pText3,tText2);
-				_tcscat(pText3,pText);
-				free((void*)pText);
-				pText=pText3;
-			}
-
-			if(_iVirtualKey==DIK_LALT)
-			{
-				_TCHAR tText2[256];
-				_TCHAR *pText3;
-				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
-				tText2[1]=0;
-				pText3=(_TCHAR*)malloc((_tcslen(tText2)+_tcslen(pText)+1)*sizeof(_TCHAR));
-				_tcscpy(pText3,tText2);
-				_tcscat(pText3,pText);
-				free((void*)pText);
-				pText=pText3;
-			}
-
-				if (_iVirtualKey == DIK_NUMPADENTER)
-			{
-				_TCHAR *pText3;
-				pText3=(_TCHAR*)malloc((_tcslen(pText)+1+1)*sizeof(_TCHAR));
-				_tcscpy(pText3,pText);
-				_tcscat(pText3,_T("0"));
-				free((void*)pText);
-				pText=pText3;
-			}
-  
-			if(_tcslen(pText)>8)
-			{
-				pText[8]=0;
-				int iI=8;
-
-				while(iI--)
-				{
-					if(pText[iI]==_T(' '))
-					{
-						pText[iI]=0;
-					}
-					else break;
-				}
-			}
-		}
-		}
-		break;
-	}
-
-	if(pText2)
-	{
-		_TCHAR *pText3=(_TCHAR*)malloc((_tcslen(pText2)+_tcslen(pText)+1+1)*sizeof(_TCHAR));
-		_tcscpy(pText3,pText2);
-		_tcscat(pText3,_T("+"));
-		_tcscat(pText3,pText);
-		free((void*)pText);
-		free((void*)pText2);
-		pText=pText3;
-
-	}
-
-	return pText;
 }
 
 //-----------------------------------------------------------------------------

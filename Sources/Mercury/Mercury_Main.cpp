@@ -317,7 +317,7 @@ INPUT_INFO			*info;
 	if(CompareGUID((GUID*)&lpddoi->guidType,(GUID*)&GUID_RyAxis)) info->info|=DXI_RyAxis;
 	if(CompareGUID((GUID*)&lpddoi->guidType,(GUID*)&GUID_RzAxis)) info->info|=DXI_RzAxis;
 	if(CompareGUID((GUID*)&lpddoi->guidType,(GUID*)&GUID_Slider)) info->info|=DXI_Slider;
-	if(CompareGUID((GUID*)&lpddoi->guidType,(GUID*)&GUID_Button)) info->info|=DXI_Button;
+	if(CompareGUID((GUID*)&lpddoi->guidType,(GUID*)&GUID_Button)) info->info|=ARXMOUSE_BUTTON;
 	if(CompareGUID((GUID*)&lpddoi->guidType,(GUID*)&GUID_Key)) info->info|=DXI_Key;
 	if(CompareGUID((GUID*)&lpddoi->guidType,(GUID*)&GUID_POV)) info->info|=DXI_POV;
 	if(CompareGUID((GUID*)&lpddoi->guidType,(GUID*)&GUID_Unknown)) info->info|=DXI_Unknown;
@@ -989,8 +989,6 @@ void * temp;
 /*-------------------------------------------------------------*/
 BOOL DXI_KeyPressed(int id,int dikkey)
 {
-	return FALSE;
-
 	if(DI_KeyBoardBuffer[id]->bufferstate[dikkey]&0x80) return TRUE;
 	return FALSE;
 }
@@ -1003,8 +1001,6 @@ BOOL DXI_OldKeyPressed(int id,int dikkey)
 /*-------------------------------------------------------------*/
 int DXI_GetKeyIDPressed(int id)
 {
-	return -1;
-
 int		nb;
 char	*buf;
 
@@ -1026,8 +1022,6 @@ void DXI_ClearKeys(int id)
 /*-------------------------------------------------------------*/
 BOOL DXI_GetAxeMouseXY(int id,int *mx,int *my)
 {
-	return FALSE;
-
 DIDEVICEOBJECTDATA	*od;
 int					nb,flg=0;
 
@@ -1057,8 +1051,6 @@ int					nb,flg=0;
 /*-------------------------------------------------------------*/
 BOOL DXI_GetAxeMouseXYZ(int id,int *mx,int *my,int *mz)
 {
-	return FALSE;
-
 DIDEVICEOBJECTDATA	*od;
 int					nb,flg=0;
 
@@ -1095,8 +1087,6 @@ int					nb,flg=0;
 /*-------------------------------------------------------------*/
 BOOL DXI_MouseButtonImage(int id,int numb)
 {
-	return FALSE;
-
 DIDEVICEOBJECTDATA	*od;
 int					state,nb;
 static FILE *fTemp=NULL;
@@ -1113,7 +1103,7 @@ static FILE *fTemp=NULL;
 	{
 		switch(numb)
 		{
-		case DXI_BUTTON0:
+		case ARXMOUSE_BUTTON0:
 			if(od->dwOfs==DIMOFS_BUTTON0)
 			{
 				state=od->dwData;
@@ -1127,7 +1117,7 @@ static FILE *fTemp=NULL;
 				}
 			}
 			break;
-		case DXI_BUTTON1:
+		case ARXMOUSE_BUTTON1:
 			if(od->dwOfs==DIMOFS_BUTTON1)
 			{
 				state=od->dwData;
@@ -1141,17 +1131,17 @@ static FILE *fTemp=NULL;
 				}
 			}
 			break;
-		case DXI_BUTTON2:
+		case ARXMOUSE_BUTTON2:
 			break;
-		case DXI_BUTTON3:
+		case ARXMOUSE_BUTTON3:
 			break;
-		case DXI_BUTTON4:
+		case ARXMOUSE_BUTTON4:
 			break;
-		case DXI_BUTTON5:
+		case ARXMOUSE_BUTTON5:
 			break;
-		case DXI_BUTTON6:
+		case ARXMOUSE_BUTTON6:
 			break;
-		case DXI_BUTTON7:
+		case ARXMOUSE_BUTTON7:
 			break;
 		default:
 			return FALSE;
@@ -1168,8 +1158,6 @@ static FILE *fTemp=NULL;
 /*-------------------------------------------------------------*/
 void DXI_MouseButtonCountClick(int id,int numb,int *_iNumClick,int *_iNumUnClick)
 {
-	return;
-
 DIDEVICEOBJECTDATA	*od;
 int					state,nb;
 
@@ -1183,7 +1171,7 @@ int					state,nb;
 	{
 		switch(numb)
 		{
-		case DXI_BUTTON0:
+		case ARXMOUSE_BUTTON0:
 			if(od->dwOfs==DIMOFS_BUTTON0)
 			{
 				state=od->dwData;
@@ -1197,7 +1185,7 @@ int					state,nb;
 				}
 			}
 			break;
-		case DXI_BUTTON1:
+		case ARXMOUSE_BUTTON1:
 			if(od->dwOfs==DIMOFS_BUTTON1)
 			{
 				state=od->dwData;
@@ -1211,7 +1199,7 @@ int					state,nb;
 				}
 			}
 			break;
-		case DXI_BUTTON2:
+		case ARXMOUSE_BUTTON2:
 			if(od->dwOfs==DIMOFS_BUTTON2)
 			{
 				state=od->dwData;
@@ -1225,7 +1213,7 @@ int					state,nb;
 				}
 			}
 			break;
-		case DXI_BUTTON3:
+		case ARXMOUSE_BUTTON3:
 			if(od->dwOfs==DIMOFS_BUTTON3)
 			{
 				state=od->dwData;
@@ -1239,7 +1227,7 @@ int					state,nb;
 				}
 			}
 			break;
-		case DXI_BUTTON4:
+		case ARXMOUSE_BUTTON4:
 			if(od->dwOfs==DIMOFS_BUTTON4)
 			{
 				state=od->dwData;
@@ -1253,7 +1241,7 @@ int					state,nb;
 				}
 			}
 			break;
-		case DXI_BUTTON5:
+		case ARXMOUSE_BUTTON5:
 			if(od->dwOfs==DIMOFS_BUTTON5)
 			{
 				state=od->dwData;
@@ -1267,7 +1255,7 @@ int					state,nb;
 				}
 			}
 			break;
-		case DXI_BUTTON6:
+		case ARXMOUSE_BUTTON6:
 			if(od->dwOfs==DIMOFS_BUTTON6)
 			{
 				state=od->dwData;
@@ -1281,7 +1269,7 @@ int					state,nb;
 				}
 			}
 			break;
-		case DXI_BUTTON7:
+		case ARXMOUSE_BUTTON7:
 			if(od->dwOfs==DIMOFS_BUTTON7)
 			{
 				state=od->dwData;
@@ -1307,8 +1295,6 @@ int					state,nb;
 /*-------------------------------------------------------------*/
 BOOL DXI_MouseButtonPressed(int id,int numb,int *_iDeltaTime)
 {
-	return FALSE;
-
 DIDEVICEOBJECTDATA	*od;
 int					state,iTime1,iTime2,nb;
 BOOL				bResult;
@@ -1322,7 +1308,7 @@ BOOL				bResult;
 		bResult=FALSE;
 		switch(numb)
 		{
-		case DXI_BUTTON0:
+		case ARXMOUSE_BUTTON0:
 			if(od->dwOfs==DIMOFS_BUTTON0)
 			{
 				state=od->dwData;
@@ -1332,7 +1318,7 @@ BOOL				bResult;
 				}
 			}
 			break;
-		case DXI_BUTTON1:
+		case ARXMOUSE_BUTTON1:
 			if(od->dwOfs==DIMOFS_BUTTON1)
 			{
 				state=od->dwData;
@@ -1342,7 +1328,7 @@ BOOL				bResult;
 				}
 			}
 			break;
-		case DXI_BUTTON2:
+		case ARXMOUSE_BUTTON2:
 			if(od->dwOfs==DIMOFS_BUTTON2)
 			{
 				state=od->dwData;
@@ -1352,7 +1338,7 @@ BOOL				bResult;
 				}
 			}
 			break;
-		case DXI_BUTTON3:
+		case ARXMOUSE_BUTTON3:
 			if(od->dwOfs==DIMOFS_BUTTON3)
 			{
 				state=od->dwData;
@@ -1362,7 +1348,7 @@ BOOL				bResult;
 				}
 			}
 			break;
-		case DXI_BUTTON4:
+		case ARXMOUSE_BUTTON4:
 			if(od->dwOfs==DIMOFS_BUTTON4)
 			{
 				state=od->dwData;
@@ -1372,7 +1358,7 @@ BOOL				bResult;
 				}
 			}
 			break;
-		case DXI_BUTTON5:
+		case ARXMOUSE_BUTTON5:
 			if(od->dwOfs==DIMOFS_BUTTON5)
 			{
 				state=od->dwData;
@@ -1382,7 +1368,7 @@ BOOL				bResult;
 				}
 			}
 			break;
-		case DXI_BUTTON6:
+		case ARXMOUSE_BUTTON6:
 			if(od->dwOfs==DIMOFS_BUTTON6)
 			{
 				state=od->dwData;
@@ -1392,7 +1378,7 @@ BOOL				bResult;
 				}
 			}
 			break;
-		case DXI_BUTTON7:
+		case ARXMOUSE_BUTTON7:
 			if(od->dwOfs==DIMOFS_BUTTON7)
 			{
 				state=od->dwData;
@@ -1436,8 +1422,6 @@ BOOL				bResult;
 /*-------------------------------------------------------------*/
 BOOL DXI_MouseButtonUnPressed(int id,int numb)
 {
-	return FALSE;
-
 DIDEVICEOBJECTDATA	*od;
 int					state,nb;
 
@@ -1450,28 +1434,28 @@ int					state,nb;
 //		state=0x80;
 		switch(numb)
 		{
-		case DXI_BUTTON0:
+		case ARXMOUSE_BUTTON0:
 			if(od->dwOfs==DIMOFS_BUTTON0) state=od->dwData;
 			break;
-		case DXI_BUTTON1:
+		case ARXMOUSE_BUTTON1:
 			if(od->dwOfs==DIMOFS_BUTTON1) state=od->dwData;
 			break;
-		case DXI_BUTTON2:
+		case ARXMOUSE_BUTTON2:
 			if(od->dwOfs==DIMOFS_BUTTON2) state=od->dwData;
 			break;
-		case DXI_BUTTON3:
+		case ARXMOUSE_BUTTON3:
 			if(od->dwOfs==DIMOFS_BUTTON3) state=od->dwData;
 			break;
-		case DXI_BUTTON4:
+		case ARXMOUSE_BUTTON4:
 			if(od->dwOfs==DIMOFS_BUTTON4) state=od->dwData;
 			break;
-		case DXI_BUTTON5:
+		case ARXMOUSE_BUTTON5:
 			if(od->dwOfs==DIMOFS_BUTTON5) state=od->dwData;
 			break;
-		case DXI_BUTTON6:
+		case ARXMOUSE_BUTTON6:
 			if(od->dwOfs==DIMOFS_BUTTON6) state=od->dwData;
 			break;
-		case DXI_BUTTON7:
+		case ARXMOUSE_BUTTON7:
 			if(od->dwOfs==DIMOFS_BUTTON7) state=od->dwData;
 			break;
 		default:
@@ -1499,28 +1483,28 @@ return FALSE;
 		state=0;
 		switch(numb)
 		{
-		case DXI_BUTTON0:
+		case ARXMOUSE_BUTTON0:
 			if(od->dwOfs==DIMOFS_BUTTON0) state=od->dwData;
 			break;
-		case DXI_BUTTON1:
+		case ARXMOUSE_BUTTON1:
 			if(od->dwOfs==DIMOFS_BUTTON1) state=od->dwData;
 			break;
-		case DXI_BUTTON2:
+		case ARXMOUSE_BUTTON2:
 			if(od->dwOfs==DIMOFS_BUTTON2) state=od->dwData;
 			break;
-		case DXI_BUTTON3:
+		case ARXMOUSE_BUTTON3:
 			if(od->dwOfs==DIMOFS_BUTTON3) state=od->dwData;
 			break;
-		case DXI_BUTTON4:
+		case ARXMOUSE_BUTTON4:
 			if(od->dwOfs==DIMOFS_BUTTON4) state=od->dwData;
 			break;
-		case DXI_BUTTON5:
+		case ARXMOUSE_BUTTON5:
 			if(od->dwOfs==DIMOFS_BUTTON5) state=od->dwData;
 			break;
-		case DXI_BUTTON6:
+		case ARXMOUSE_BUTTON6:
 			if(od->dwOfs==DIMOFS_BUTTON6) state=od->dwData;
 			break;
-		case DXI_BUTTON7:
+		case ARXMOUSE_BUTTON7:
 			if(od->dwOfs==DIMOFS_BUTTON7) state=od->dwData;
 			break;
 		default:
@@ -1680,52 +1664,52 @@ int					nb;
 		switch(od->dwOfs)
 		{
 		case DIMOFS_BUTTON0:
-			if(od->dwData&0x80) return DXI_BUTTON0;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON0;
 			break;
 		case DIMOFS_BUTTON1:
-			if(od->dwData&0x80) return DXI_BUTTON1;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON1;
 			break;
 		case DIMOFS_BUTTON2:
-			if(od->dwData&0x80) return DXI_BUTTON2;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON2;
 			break;
 		case DIMOFS_BUTTON3:
-			if(od->dwData&0x80) return DXI_BUTTON3;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON3;
 			break;
 		case DIMOFS_BUTTON4:
-			if(od->dwData&0x80) return DXI_BUTTON4;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON4;
 			break;
 		case DIMOFS_BUTTON5:
-			if(od->dwData&0x80) return DXI_BUTTON5;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON5;
 			break;
 		case DIMOFS_BUTTON6:
-			if(od->dwData&0x80) return DXI_BUTTON6;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON6;
 			break;
 		case DIMOFS_BUTTON7:
-			if(od->dwData&0x80) return DXI_BUTTON7;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON7;
 			break;
 		case DIMOFS_BUTTON8:
-			if(od->dwData&0x80) return DXI_BUTTON8;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON8;
 			break;
 		case DIMOFS_BUTTON9:
-			if(od->dwData&0x80) return DXI_BUTTON9;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON9;
 			break;
 		case DIMOFS_BUTTON10:
-			if(od->dwData&0x80) return DXI_BUTTON10;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON10;
 			break;
 		case DIMOFS_BUTTON11:
-			if(od->dwData&0x80) return DXI_BUTTON11;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON11;
 			break;
 		case DIMOFS_BUTTON12:
-			if(od->dwData&0x80) return DXI_BUTTON12;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON12;
 			break;
 		case DIMOFS_BUTTON13:
-			if(od->dwData&0x80) return DXI_BUTTON13;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON13;
 			break;
 		case DIMOFS_BUTTON14:
-			if(od->dwData&0x80) return DXI_BUTTON14;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON14;
 			break;
 		case DIMOFS_BUTTON15:
-			if(od->dwData&0x80) return DXI_BUTTON15;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON15;
 			break; 
 		default:
 			break;
@@ -1740,8 +1724,6 @@ int					nb;
 /*-------------------------------------------------------------*/
 int DXI_GetIDButtonPressed(int id)
 {
-	return -1;
-
 DIDEVICEOBJECTDATA	*od;
 int					nb;
 
@@ -1753,28 +1735,28 @@ int					nb;
 		switch(od->dwOfs)
 		{
 		case DIMOFS_BUTTON0:
-			if(od->dwData&0x80) return DXI_BUTTON0;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON0;
 			break;
 		case DIMOFS_BUTTON1:
-			if(od->dwData&0x80) return DXI_BUTTON1;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON1;
 			break;
 		case DIMOFS_BUTTON2:
-			if(od->dwData&0x80) return DXI_BUTTON2;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON2;
 			break;
 		case DIMOFS_BUTTON3:
-			if(od->dwData&0x80) return DXI_BUTTON3;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON3;
 			break;
 		case DIMOFS_BUTTON4:
-			if(od->dwData&0x80) return DXI_BUTTON4;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON4;
 			break;
 		case DIMOFS_BUTTON5:
-			if(od->dwData&0x80) return DXI_BUTTON5;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON5;
 			break;
 		case DIMOFS_BUTTON6:
-			if(od->dwData&0x80) return DXI_BUTTON6;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON6;
 			break;
 		case DIMOFS_BUTTON7:
-			if(od->dwData&0x80) return DXI_BUTTON7;
+			if(od->dwData&0x80) return ARXMOUSE_BUTTON7;
 			break;
 		default:
 			break;

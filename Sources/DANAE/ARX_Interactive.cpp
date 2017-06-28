@@ -74,6 +74,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_time.h"
 #include "ARX_scene.h"
 #include "ARX_menu2.h"
+#include "ARX_Input.h"
 #include "danaedlg.h"
 
 #include "HERMESMain.h"
@@ -4395,7 +4396,7 @@ extern INTERACTIVE_OBJ * DESTROYED_DURING_RENDERING;
 // from camera position.
 //*************************************************************************************
 
-extern CDirectInput * pGetInfoDirectInput;
+extern ARXInputHandler * pInputHandler;
 extern TextureContainer TexMetal;
 extern long FINAL_COMMERCIAL_DEMO;
 bool bRenderInterList = true; //false;

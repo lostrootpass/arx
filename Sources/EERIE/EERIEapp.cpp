@@ -100,6 +100,7 @@ long LastEERIEMouseButton = 0;
 long EERIEMouseGrab = 0;
 long MouseDragX, MouseDragY;
 
+extern ARXInputHandler* pInputHandler;
 CRenderApplication	* g_pRenderApp = NULL;
 EERIE_CAMERA		* Kam;
 LPDIRECT3DDEVICE7	GDevice;
@@ -165,8 +166,6 @@ INT	 COpenGLApplication::Run()
 	Xratio = DANAESIZX * DIV640;
 	Yratio = DANAESIZY * DIV480;
 
-	SDL_Init(SDL_INIT_EVERYTHING);
-
 	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -221,7 +220,25 @@ INT	 COpenGLApplication::Run()
 				bRunning = false;
 				break;
 			}
+
+			switch (e.type)
+			{
+			case SDL_QUIT:
+				bRunning = false;
+				break;
+
+			case SDL_KEYDOWN:
+			case SDL_KEYUP:
+				//
+				break;
+
+			case SDL_MOUSEWHEEL:
+				pInputHandler->iWheelSens = e.wheel.y;
+				break;
+			}
 		}
+
+		pInputHandler->GetInput();
 
 		if(m_bActive && m_bReady)
 		{

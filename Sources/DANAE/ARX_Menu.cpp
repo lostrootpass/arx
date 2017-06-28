@@ -70,6 +70,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_Text.h"
 #include "ARX_Time.h"
 #include "ARX_Equipment.h"
+#include "ARX_Input.h"
 #include "DanaeSaveLoad.h"
 #include "eerieapp.h"
 
@@ -83,7 +84,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <crtdbg.h>
 //-----------------------------------------------------------------------------
 extern CARXTextManager * pTextManage;
-extern CDirectInput * pGetInfoDirectInput;
+extern ARXInputHandler * pInputHandler;
 extern CMenuConfig * pMenuConfig;
 extern EERIE_3D ePlayerAngle;
 extern float Xratio, Yratio;
@@ -499,7 +500,7 @@ void ARX_Menu_Manage(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			break;
 		case AMCM_NEWQUEST:
 		{
-			if (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE)
+			if (pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE)
 			        &&	! bFadeInOut // XS: Disabling ESC capture while fading in or out.
 			   )
 			{
@@ -510,7 +511,7 @@ void ARX_Menu_Manage(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		break;
 		case AMCM_MAIN:
 
-			if (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
+			if (pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
 			{
 				if ((MENU_NoActiveWindow())  && (!REFUSE_GAME_RETURN))
 				{
@@ -522,8 +523,8 @@ void ARX_Menu_Manage(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			break;
 		case AMCM_CREDITS:
 
-			if ((pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
-			        || (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(DIK_SPACE)))
+			if ((pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_ESCAPE))
+			        || (pInputHandler->IsVirtualKeyPressedNowUnPressed(DIK_SPACE)))
 			{
 				ARX_MENU_CLICKSOUND();
 				bFadeInOut = true;	//fade out
@@ -550,7 +551,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	// Auto-Launch Demo after 60 sec idle on Main Menu
 	if ((ARXmenu.currentmode == AMCM_MAIN) && CAN_REPLAY_INTRO)
 	{
-		if ((ARXmenu_lastmode != AMCM_MAIN) || (pGetInfoDirectInput && (pGetInfoDirectInput->bTouch || pGetInfoDirectInput->bMouseMove)))
+		if ((ARXmenu_lastmode != AMCM_MAIN) || (pInputHandler && (pInputHandler->bTouch || pInputHandler->bMouseMove)))
 		{
 			ARXmenu_starttick = ARX_TIME_GetUL(); //treat warning C4244 conversion from 'float' to 'unsigned long'
 		}
@@ -586,12 +587,12 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return FALSE;
 	}
 
-	if (pGetInfoDirectInput->GetMouseButton(DXI_BUTTON0))
+	if (pInputHandler->GetMouseButton(ARXMOUSE_BUTTON0))
 	{
 		EERIEMouseButton = 1;
 		LastMouseClick = 1;
 	}
-	else if (pGetInfoDirectInput->GetMouseButton(DXI_BUTTON1))
+	else if (pInputHandler->GetMouseButton(ARXMOUSE_BUTTON1))
 	{
 		EERIEMouseButton = 2;
 		LastMouseClick = 2;

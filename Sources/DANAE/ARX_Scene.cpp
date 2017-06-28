@@ -65,6 +65,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_time.h"
 #include "ARX_HWTransform.h"
 #include "ARX_menu2.h"
+#include "ARX_Input.h"
 
 #include <HERMESMain.h>
 #include <EERIELight.h>
@@ -127,7 +128,7 @@ extern bool bALLOW_BUMP;
 extern unsigned long ulBKGColor;
 extern float fZFogStartWorld;
 extern float fZFogEndWorld;
-extern CDirectInput *pGetInfoDirectInput;
+extern ARXInputHandler *pInputHandler;
 extern CMenuConfig *pMenuConfig;
 //-----------------------------------------------------------------------------
 EERIEPOLY VF_Center;
@@ -4805,7 +4806,7 @@ else
 	}
 }
 
-	if(pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(DIK_J))
+	if(pInputHandler->IsVirtualKeyPressedNowPressed(DIK_J))
 		bOLD_CLIPP=!bOLD_CLIPP;
 
 	if ((SHOWSHADOWS) && (!Project.improve))

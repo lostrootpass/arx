@@ -62,6 +62,12 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "MERCURY_dx_input.h"
 #include "MERCURY_extern.h"
 
+
+#include <SDL.h>
+#include "..\DANAE\ARX_Menu2.h"
+#include "EERIETexture.h"
+
+
 //-----------------------------------------------------------------------------
 #define INTERNAL_MOUSE_1	257
 #define INTERNAL_MOUSE_2	258
@@ -124,6 +130,125 @@ BOOL ARX_INPUT_GetSCIDAxis(int * jx, int * jy, int * jz);
 BOOL ARX_IMPULSE_NowPressed(long ident);
 BOOL ARX_IMPULSE_Pressed(long ident);
 BOOL ARX_IMPULSE_NowUnPressed(long ident);
- 
+
+//-----------------------------------------------------------------------------
+
+class ARXInputHandler
+{
+public:
+	bool				bActive;
+	bool				bTouch;
+	int					iKeyId;
+	int					iKeyScanCode[256];
+	int					iOneTouch[256];
+	bool				bMouseMove;
+	int					iMouseRX;
+	int					iMouseRY;
+	int					iMouseRZ;
+	int					iMouseAX;
+	int					iMouseAY;
+	int					iMouseAZ;
+	float				fMouseAXTemp;
+	float				fMouseAYTemp;
+	int					iSensibility;
+	int					iOldMouseButton[ARX_MAXBUTTON];
+	bool				bMouseButton[ARX_MAXBUTTON];
+	bool				bOldMouseButton[ARX_MAXBUTTON];
+	int					iMouseTime[ARX_MAXBUTTON];
+	int					iMouseTimeSet[ARX_MAXBUTTON];
+	int					iNbOldCoord;
+	int					iMaxOldCoord;
+	EERIE_2DI			iOldCoord[256];
+
+	TextureContainer	* pTex[8];
+	long				lFrameDiff;
+	CURSORSTATE			eNumTex;
+	int					iNumCursor;
+	float				fTailleX;
+	float				fTailleY;
+	bool				bMouseOver;
+	bool				bDrawCursor;
+
+	int					iOldNumClick[ARX_MAXBUTTON];
+	int					iOldNumUnClick[ARX_MAXBUTTON];
+
+	int					iWheelSens;
+protected:
+	virtual void DrawOneCursor(int, int, int);
+	virtual int arxMouseToNative(int) = 0;
+
+public:
+	ARXInputHandler();
+	virtual ~ARXInputHandler();
+
+	virtual void SetMouseOver();
+	virtual void SetCursorOn();
+	virtual void SetCursorOff();
+	virtual void SetSensibility(int);
+	virtual void GetInput();
+	virtual void DrawCursor();
+	virtual bool GetMouseButton(int);
+	virtual bool GetMouseButtonRepeat(int);
+	virtual bool GetMouseButtonNowPressed(int);
+	virtual bool GetMouseButtonNowUnPressed(int);
+	virtual bool GetMouseButtonDoubleClick(int, int);
+
+	virtual bool IsVirtualKeyPressed(int);
+	virtual bool IsVirtualKeyPressedOneTouch(int);
+	virtual bool IsVirtualKeyPressedNowPressed(int);
+	virtual bool IsVirtualKeyPressedNowUnPressed(int);
+	virtual _TCHAR * GetFullNameTouch(int);
+
+
+	virtual void ResetAll();
+	virtual int GetWheelSens(int);
+};
+
+class ARXInputHandlerSDL : public ARXInputHandler
+{
+public:
+	ARXInputHandlerSDL();
+	~ARXInputHandlerSDL() {};
+
+	void ResetAll() override;
+	void GetInput() override;
+	void DrawCursor() override;
+	_TCHAR * GetFullNameTouch(int _iVirtualKey) override;
+
+	bool IsVirtualKeyPressed(int _iVirtualKey) override;
+	bool IsVirtualKeyPressedOneTouch(int _iVirtualKey) override;
+	bool IsVirtualKeyPressedNowPressed(int _iVirtualKey) override;
+	bool IsVirtualKeyPressedNowUnPressed(int _iVirtualKey) override;
+
+	int GetWheelSens(int _iIDbutton) override;
+protected:
+	void DrawOneCursor(int x, int y, int z) override;
+	int arxMouseToNative(int) override;
+private:
+	const Uint8* keystate;
+};
+
+class ARXInputHandlerDI : public ARXInputHandler
+{
+public:
+	ARXInputHandlerDI();
+	~ARXInputHandlerDI() {};
+
+	void ResetAll() override;
+	void GetInput() override;
+	void DrawCursor() override;
+	_TCHAR * GetFullNameTouch(int) override;
+
+	bool IsVirtualKeyPressed(int) override;
+	bool IsVirtualKeyPressedOneTouch(int) override;
+	bool IsVirtualKeyPressedNowPressed(int) override;
+	bool IsVirtualKeyPressedNowUnPressed(int) override;
+
+	int GetWheelSens(int) override;
+protected:
+	void DrawOneCursor(int, int, int) override;
+	int arxMouseToNative(int) override;
+};
+
 
 #endif

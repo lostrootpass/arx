@@ -26,6 +26,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "Danae.h"
 #include "ARX_ViewImage.h"
 #include "ARX_Menu2.h"
+#include "ARX_Input.h"
 #include "arx_time.h"
 #include "EERIETexture.h"
 #include "EERIEDraw.h"
@@ -37,7 +38,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 extern LPDIRECT3DDEVICE7 GDevice;
 extern long DANAESIZX;
 extern long DANAESIZY;
-extern CDirectInput * pGetInfoDirectInput;
+extern ARXInputHandler * pInputHandler;
 extern PakManager * pPakManager;
 
 //-----------------------------------------------------------------------------
@@ -145,13 +146,13 @@ void ViewImage::DrawAllImage()
 				{
 					bool bEnd = false;
 
-					if (pGetInfoDirectInput)
+					if (pInputHandler)
 					{
-						pGetInfoDirectInput->GetInput();
+						pInputHandler->GetInput();
 
 						for (int i = 0 ; i < 256 ; i++)
 						{
-							if (pGetInfoDirectInput->iOneTouch[i] > 0)
+							if (pInputHandler->iOneTouch[i] > 0)
 							{
 								bEnd = true;
 							}

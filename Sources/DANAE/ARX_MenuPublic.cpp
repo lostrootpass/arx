@@ -27,7 +27,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_Menu.h"
 #include "ARX_Interface.h"
 #include "ARX_sound.h"
-#include "ARX_Menu.h"
+#include "ARX_Input.h"
 #include "ARX_Menu2.h"
 #include "ARX_loc.h"
 #include "ARX_Time.h"
@@ -42,7 +42,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <crtdbg.h>
 
 extern CMenuConfig * pMenuConfig;
-extern CDirectInput * pGetInfoDirectInput;
+extern ARXInputHandler * pInputHandler;
 extern LPDIRECT3DDEVICE7 GDevice;
 extern bool bQuickGenFirstClick;
 extern float FORCED_REDUCTION_VALUE;
@@ -599,7 +599,7 @@ void ARXMenu_Options_Control_SetMouseSensitivity(int _iSensitivity)
 	else if (_iSensitivity > 10)_iSensitivity = 10;
 
 	pMenuConfig->iMouseSensitivity = _iSensitivity;
-	pGetInfoDirectInput->SetSensibility(_iSensitivity);
+	pInputHandler->SetSensibility(_iSensitivity);
 
 	danaeApp.fMouseSensibility = ((float)pMenuConfig->iMouseSensitivity) / 10.f;
 }

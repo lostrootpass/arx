@@ -114,7 +114,7 @@ extern TextureContainer * pTCCrossHair;
 extern TextureContainer * mecanism_tc;
 extern TextureContainer * arrow_left_tc;
 extern FOG_DEF fogparam;
-extern CDirectInput *pGetInfoDirectInput;
+extern ARXInputHandler *pInputHandler;
 extern CMenuConfig *pMenuConfig;
 extern D3DTLVERTEX LATERDRAWHALO[];
 extern EERIE_LIGHT lightparam;
@@ -5359,16 +5359,16 @@ void DANAE::ManageKeyMouse()
 		if(	(danaeApp.m_pFramework->m_bIsFullscreen)&&
 			(bGLOBAL_DINPUT_GAME) )
 		{
-			if(pGetInfoDirectInput)
+			if(pInputHandler)
 			{
 
-				pGetInfoDirectInput->fMouseAXTemp	=	DANAEMouse.x ;
-				pGetInfoDirectInput->fMouseAYTemp	=	DANAEMouse.y ;
-				ARX_CHECK_INT(pGetInfoDirectInput->fMouseAXTemp);
-				ARX_CHECK_INT(pGetInfoDirectInput->fMouseAYTemp);
+				pInputHandler->fMouseAXTemp	=	DANAEMouse.x ;
+				pInputHandler->fMouseAYTemp	=	DANAEMouse.y ;
+				ARX_CHECK_INT(pInputHandler->fMouseAXTemp);
+				ARX_CHECK_INT(pInputHandler->fMouseAYTemp);
 				
-				pGetInfoDirectInput->iMouseAX=ARX_CLEAN_WARN_CAST_INT(pGetInfoDirectInput->fMouseAXTemp);
-				pGetInfoDirectInput->iMouseAY=ARX_CLEAN_WARN_CAST_INT(pGetInfoDirectInput->fMouseAYTemp);
+				pInputHandler->iMouseAX=ARX_CLEAN_WARN_CAST_INT(pInputHandler->fMouseAXTemp);
+				pInputHandler->iMouseAY=ARX_CLEAN_WARN_CAST_INT(pInputHandler->fMouseAYTemp);
 
 
 			}
@@ -5554,36 +5554,36 @@ void DANAE::ManageKeyMouse()
 					if (bRenderInCursorMode)
 					{
 						if(	(DANAEMouse.x==(DANAESIZX-1))&&
-						        (pGetInfoDirectInput->iMouseRX > 8))
+						        (pInputHandler->iMouseRX > 8))
 						{
 							EERIEMouseYdep=0;
-							EERIEMouseXdep=pGetInfoDirectInput->iMouseRX;
+							EERIEMouseXdep=pInputHandler->iMouseRX;
 							bKeySpecialMove=true;
 						}
 						else
 						{
 							if( (!DANAEMouse.x)&&
-							        (pGetInfoDirectInput->iMouseRX < -8))
+							        (pInputHandler->iMouseRX < -8))
 							{
 								EERIEMouseYdep=0;
-								EERIEMouseXdep=pGetInfoDirectInput->iMouseRX;
+								EERIEMouseXdep=pInputHandler->iMouseRX;
 								bKeySpecialMove=true;
 							}
 						}
 
 						if(	(DANAEMouse.y==(DANAESIZY-1))&&
-						        (pGetInfoDirectInput->iMouseRY > 8))
+						        (pInputHandler->iMouseRY > 8))
 						{
-							EERIEMouseYdep=pGetInfoDirectInput->iMouseRY;
+							EERIEMouseYdep=pInputHandler->iMouseRY;
 							EERIEMouseXdep=0;
 							bKeySpecialMove=true;
 						}
 						else
 						{
 							if(	(!DANAEMouse.y)&&
-							        (pGetInfoDirectInput->iMouseRY < -8))
+							        (pInputHandler->iMouseRY < -8))
 							{
-								EERIEMouseYdep=pGetInfoDirectInput->iMouseRY;
+								EERIEMouseYdep=pInputHandler->iMouseRY;
 								EERIEMouseXdep=0;
 								bKeySpecialMove=true;
 							}
@@ -5609,7 +5609,7 @@ void DANAE::ManageKeyMouse()
 			else
 			{
 
-				fd = (((float)pGetInfoDirectInput->iSensibility) + 1.f) * 0.1f * ((640.f / (float)DANAESIZX));
+				fd = (((float)pInputHandler->iSensibility) + 1.f) * 0.1f * ((640.f / (float)DANAESIZX));
 
 				if(	(pMenuConfig)&&
 					(pMenuConfig->bMouseSmoothing) )

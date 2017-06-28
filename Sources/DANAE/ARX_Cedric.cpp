@@ -80,8 +80,6 @@ extern long TSU_TEST_NB_LIGHT;
 extern D3DMATRIX ProjectionMatrix;
 extern float fZFogStart;
 
-extern CDirectInput * pGetInfoDirectInput;
-
 float SOFTNEARCLIPPZ=1.f;
 #define SOFTNEARCLIPPTANDLZ (60.f)
 

@@ -34,7 +34,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <edevdefs.h>
 #include <dshow.h>
 
-#include "../danae/arx_menu2.h"			// CDirectInput
+#include "ARX_Input.h"
+#include "../danae/arx_menu2.h"			// ARXInputHandler
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
@@ -47,7 +48,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #define WM_GRAPHNOTIFY  WM_USER+13
 
 //-----------------------------------------------------------------------------
-extern CDirectInput * pGetInfoDirectInput;
+extern ARXInputHandler * pInputHandler;
 extern long EDITMODE;
 extern float Xratio;
 extern float Yratio;
@@ -124,18 +125,18 @@ bool PlayFile(HWND hWnd, char * file)
 
 		for (int i = 0; i < 256; i++)
 		{
-			pGetInfoDirectInput->iOneTouch[i] = 0;
+			pInputHandler->iOneTouch[i] = 0;
 		}
 
 		while (!l && !bSkipVideoIntro)
 		{
 			if (bGameNotFirstLaunch || EDITMODE)
 			{
-				pGetInfoDirectInput->GetInput();
+				pInputHandler->GetInput();
 
 				for (int i = 0; i < 256; i++)
 				{
-					if (pGetInfoDirectInput->iOneTouch[i] > 0)
+					if (pInputHandler->iOneTouch[i] > 0)
 						bSkipVideoIntro = true;
 				}
 			}

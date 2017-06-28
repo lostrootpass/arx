@@ -58,17 +58,38 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "ARX_Input.h"
 #include "Arx_menu2.h" //controls
+#include "ARX_Loc.h"
+#include "Mercury_dx_input.h"
+#include "ARX_Common.h"
+#include "Danae.h"
+#include "EERIEmath.h"
+#include "EERIEDraw.h"
+#include "ARX_Time.h"
+#include "EERIERenderer.h"
+#include "ARX_Interface.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
+
+extern long LastEERIEMouseButton;
+extern long _EERIEMouseXdep;
+extern long _EERIEMouseYdep;
+extern float ARXDiffTimeMenu;
+extern DANAE danaeApp;
+extern CRenderApplication* g_pRenderApp;
+extern TextureContainer * scursor[];
+
+bool bGLOBAL_DINPUT_MENU = true;
+bool bGLOBAL_DINPUT_GAME = true;
+
 
 DXI_INIT	InputInit;
 long ARX_SCID = 0;
 long ARX_XBOXPAD = 0;
 
 //-----------------------------------------------------------------------------
-extern CDirectInput * pGetInfoDirectInput;
+extern ARXInputHandler * pInputHandler;
 extern CMenuConfig * pMenuConfig;
 extern long STOP_KEYBOARD_INPUT;
 
@@ -200,7 +221,7 @@ BOOL ARX_IMPULSE_NowPressed(long ident)
 				{
 					if (pMenuConfig->sakActionKey[ident].iKey[j] & 0x80000000)
 					{
-						if (pGetInfoDirectInput->GetMouseButtonNowPressed(pMenuConfig->sakActionKey[ident].iKey[j]&~0x80000000))
+						if (pInputHandler->GetMouseButtonNowPressed(pMenuConfig->sakActionKey[ident].iKey[j]&~0x80000000))
 							return TRUE;
 					}
 					else
@@ -209,11 +230,11 @@ BOOL ARX_IMPULSE_NowPressed(long ident)
 						{
 							if (pMenuConfig->sakActionKey[ident].iKey[j] == 0x40000001)
 							{
-								if (pGetInfoDirectInput->iWheelSens < 0) return TRUE;
+								if (pInputHandler->iWheelSens < 0) return TRUE;
 							}
 							else
 							{
-								if (pGetInfoDirectInput->iWheelSens > 0) return TRUE;
+								if (pInputHandler->iWheelSens > 0) return TRUE;
 							}
 						}
 						else
@@ -222,11 +243,11 @@ BOOL ARX_IMPULSE_NowPressed(long ident)
 
 							if (pMenuConfig->sakActionKey[ident].iKey[j] & 0x7FFF0000)
 							{
-								if (!pGetInfoDirectInput->IsVirtualKeyPressed((pMenuConfig->sakActionKey[ident].iKey[j] >> 16) & 0xFFFF))
+								if (!pInputHandler->IsVirtualKeyPressed((pMenuConfig->sakActionKey[ident].iKey[j] >> 16) & 0xFFFF))
 									bCombine = false;
 							}
 
-							if (pGetInfoDirectInput->IsVirtualKeyPressedNowPressed(pMenuConfig->sakActionKey[ident].iKey[j] & 0xFFFF))
+							if (pInputHandler->IsVirtualKeyPressedNowPressed(pMenuConfig->sakActionKey[ident].iKey[j] & 0xFFFF))
 								return TRUE & bCombine;
 						}
 					}
@@ -259,7 +280,7 @@ BOOL ARX_IMPULSE_Pressed(long ident)
 					{
 						if (pMenuConfig->sakActionKey[ident].iKey[j] & 0x80000000)
 						{
-							if (pGetInfoDirectInput->GetMouseButtonRepeat(pMenuConfig->sakActionKey[ident].iKey[j]&~0x80000000))
+							if (pInputHandler->GetMouseButtonRepeat(pMenuConfig->sakActionKey[ident].iKey[j]&~0x80000000))
 								return TRUE;
 						}
 						else
@@ -268,11 +289,11 @@ BOOL ARX_IMPULSE_Pressed(long ident)
 							{
 								if (pMenuConfig->sakActionKey[ident].iKey[j] == 0x40000001)
 								{
-									if (pGetInfoDirectInput->iWheelSens < 0) return TRUE;
+									if (pInputHandler->iWheelSens < 0) return TRUE;
 								}
 								else
 								{
-									if (pGetInfoDirectInput->iWheelSens > 0) return TRUE;
+									if (pInputHandler->iWheelSens > 0) return TRUE;
 								}
 							}
 							else
@@ -281,11 +302,11 @@ BOOL ARX_IMPULSE_Pressed(long ident)
 
 								if (pMenuConfig->sakActionKey[ident].iKey[j] & 0x7FFF0000)
 								{
-									if (!pGetInfoDirectInput->IsVirtualKeyPressed((pMenuConfig->sakActionKey[ident].iKey[j] >> 16) & 0xFFFF))
+									if (!pInputHandler->IsVirtualKeyPressed((pMenuConfig->sakActionKey[ident].iKey[j] >> 16) & 0xFFFF))
 										bCombine = false;
 								}
 
-								if (pGetInfoDirectInput->IsVirtualKeyPressed(pMenuConfig->sakActionKey[ident].iKey[j] & 0xFFFF))
+								if (pInputHandler->IsVirtualKeyPressed(pMenuConfig->sakActionKey[ident].iKey[j] & 0xFFFF))
 								{
 									bool bQuit = false;
 
@@ -350,7 +371,7 @@ BOOL ARX_IMPULSE_Pressed(long ident)
 										case CONTROLS_CUST_MAGICMODE:
 										{
 											if ((!j) &&
-											        (pGetInfoDirectInput->IsVirtualKeyPressed(pMenuConfig->sakActionKey[ident].iKey[j+1] & 0xFFFF)))
+											        (pInputHandler->IsVirtualKeyPressed(pMenuConfig->sakActionKey[ident].iKey[j+1] & 0xFFFF)))
 											{
 												continue;
 											}
@@ -371,7 +392,7 @@ BOOL ARX_IMPULSE_Pressed(long ident)
 										case CONTROLS_CUST_STEALTHMODE:
 										{
 											if ((!j) &&
-											        (pGetInfoDirectInput->IsVirtualKeyPressed(pMenuConfig->sakActionKey[ident].iKey[j+1] & 0xFFFF)))
+											        (pInputHandler->IsVirtualKeyPressed(pMenuConfig->sakActionKey[ident].iKey[j+1] & 0xFFFF)))
 											{
 												continue;
 											}
@@ -424,7 +445,7 @@ BOOL ARX_IMPULSE_Pressed(long ident)
 					{
 						if (pMenuConfig->sakActionKey[ident].iKey[j] & 0x80000000)
 						{
-							if (pGetInfoDirectInput->GetMouseButtonRepeat(pMenuConfig->sakActionKey[ident].iKey[j]&~0x80000000))
+							if (pInputHandler->GetMouseButtonRepeat(pMenuConfig->sakActionKey[ident].iKey[j]&~0x80000000))
 								return TRUE;
 						}
 						else
@@ -433,11 +454,11 @@ BOOL ARX_IMPULSE_Pressed(long ident)
 							{
 								if (pMenuConfig->sakActionKey[ident].iKey[j] == 0x40000001)
 								{
-									if (pGetInfoDirectInput->iWheelSens < 0) return TRUE;
+									if (pInputHandler->iWheelSens < 0) return TRUE;
 								}
 								else
 								{
-									if (pGetInfoDirectInput->iWheelSens > 0) return TRUE;
+									if (pInputHandler->iWheelSens > 0) return TRUE;
 								}
 							}
 							else
@@ -446,11 +467,11 @@ BOOL ARX_IMPULSE_Pressed(long ident)
 
 								if (pMenuConfig->sakActionKey[ident].iKey[j] & 0x7FFF0000)
 								{
-									if (!pGetInfoDirectInput->IsVirtualKeyPressed((pMenuConfig->sakActionKey[ident].iKey[j] >> 16) & 0xFFFF))
+									if (!pInputHandler->IsVirtualKeyPressed((pMenuConfig->sakActionKey[ident].iKey[j] >> 16) & 0xFFFF))
 										bCombine = false;
 								}
 
-								if (pGetInfoDirectInput->IsVirtualKeyPressed(pMenuConfig->sakActionKey[ident].iKey[j] & 0xFFFF))
+								if (pInputHandler->IsVirtualKeyPressed(pMenuConfig->sakActionKey[ident].iKey[j] & 0xFFFF))
 									return TRUE & bCombine;
 							}
 						}
@@ -479,7 +500,7 @@ BOOL ARX_IMPULSE_NowUnPressed(long ident)
 				{
 					if (pMenuConfig->sakActionKey[ident].iKey[j] & 0x80000000)
 					{
-						if (pGetInfoDirectInput->GetMouseButtonNowUnPressed(pMenuConfig->sakActionKey[ident].iKey[j]&~0x80000000))
+						if (pInputHandler->GetMouseButtonNowUnPressed(pMenuConfig->sakActionKey[ident].iKey[j]&~0x80000000))
 							return TRUE;
 					}
 					else
@@ -488,11 +509,11 @@ BOOL ARX_IMPULSE_NowUnPressed(long ident)
 
 						if (pMenuConfig->sakActionKey[ident].iKey[j] & 0x7FFF0000)
 						{
-							if (!pGetInfoDirectInput->IsVirtualKeyPressed((pMenuConfig->sakActionKey[ident].iKey[j] >> 16) & 0xFFFF))
+							if (!pInputHandler->IsVirtualKeyPressed((pMenuConfig->sakActionKey[ident].iKey[j] >> 16) & 0xFFFF))
 								bCombine = false;
 						}
 
-						if (pGetInfoDirectInput->IsVirtualKeyPressedNowUnPressed(pMenuConfig->sakActionKey[ident].iKey[j] & 0xFFFF))
+						if (pInputHandler->IsVirtualKeyPressedNowUnPressed(pMenuConfig->sakActionKey[ident].iKey[j] & 0xFFFF))
 							return TRUE & bCombine;
 					}
 				}
@@ -505,27 +526,1164 @@ BOOL ARX_IMPULSE_NowUnPressed(long ident)
 
 //-----------------------------------------------------------------------------
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+ARXInputHandler::ARXInputHandler()
+{
+	char temp[256];
+	MakeDir(temp, "graph\\interface\\cursors\\cursor00.bmp");
+	pTex[0] = D3DTextr_GetSurfaceContainer(temp);
+	MakeDir(temp, "graph\\interface\\cursors\\cursor01.bmp");
+	pTex[1] = D3DTextr_GetSurfaceContainer(temp);
+	MakeDir(temp, "graph\\interface\\cursors\\cursor02.bmp");
+	pTex[2] = D3DTextr_GetSurfaceContainer(temp);
+	MakeDir(temp, "graph\\interface\\cursors\\cursor03.bmp");
+	pTex[3] = D3DTextr_GetSurfaceContainer(temp);
+	MakeDir(temp, "graph\\interface\\cursors\\cursor04.bmp");
+	pTex[4] = D3DTextr_GetSurfaceContainer(temp);
+	MakeDir(temp, "graph\\interface\\cursors\\cursor05.bmp");
+	pTex[5] = D3DTextr_GetSurfaceContainer(temp);
+	MakeDir(temp, "graph\\interface\\cursors\\cursor06.bmp");
+	pTex[6] = D3DTextr_GetSurfaceContainer(temp);
+	MakeDir(temp, "graph\\interface\\cursors\\cursor07.bmp");
+	pTex[7] = D3DTextr_GetSurfaceContainer(temp);
+
+	SetCursorOff();
+	SetSensibility(2);
+	iMouseAX = 0;
+	iMouseAY = 0;
+	iMouseAZ = 0;
+	fMouseAXTemp = fMouseAYTemp = 0.f;
+	iNbOldCoord = 0;
+	iMaxOldCoord = 40;
+
+	bMouseOver = false;
+
+	if (pTex[0])
+	{
+		fTailleX = (float)pTex[0]->m_dwWidth;
+		fTailleY = (float)pTex[0]->m_dwHeight;
+	}
+	else
+	{
+		fTailleX = fTailleY = 0.f;
+	}
+
+	iNumCursor = 0;
+	lFrameDiff = 0;
+
+	bDrawCursor = true;
+	bActive = false;
+
+	iWheelSens = 0;
+}
+
+ARXInputHandler::~ARXInputHandler()
+{
+
+}
+
+void ARXInputHandler::SetCursorOff()
+{
+	eNumTex = CURSOR_OFF;
+}
+
+void ARXInputHandler::SetCursorOn()
+{
+	eNumTex = CURSOR_ON;
+}
+
+void ARXInputHandler::SetMouseOver()
+{
+	bMouseOver = true;
+	SetCursorOn();
+}
+
+void ARXInputHandler::SetSensibility(int _iSensibility)
+{
+	iSensibility = _iSensibility;
+}
+
+void ARXInputHandler::ResetAll()
+{
+
+}
+
+void ARXInputHandler::GetInput()
+{
+
+}
+
+int ARXInputHandler::GetWheelSens(int _iIDbutton)
+{
+	return 0;
+}
+
+bool ARXInputHandler::IsVirtualKeyPressed(int _iVirtualKey)
+{
+	return false;
+}
+
+bool ARXInputHandler::IsVirtualKeyPressedOneTouch(int _iVirtualKey)
+{
+	return false;
+}
+
+bool ARXInputHandler::IsVirtualKeyPressedNowPressed(int _iVirtualKey)
+{
+	return false;
+}
+
+bool ARXInputHandler::IsVirtualKeyPressedNowUnPressed(int _iVirtualKey)
+{
+	return false;
+}
+
+_TCHAR * ARXInputHandler::GetFullNameTouch(int)
+{
+	return _T("XXXXX");
+}
+
+void ARXInputHandler::DrawOneCursor(int _iPosX, int _iPosY, int _iColor)
+{
+
+}
+
+void ARXInputHandler::DrawCursor()
+{
+	if (!bDrawCursor) return;
+
+}
+
+bool ARXInputHandler::GetMouseButton(int _iNumButton)
+{
+	int native = arxMouseToNative(_iNumButton);
+	return((bMouseButton[native]) && (!bOldMouseButton[native]));
+}
+
+bool ARXInputHandler::GetMouseButtonRepeat(int _iNumButton)
+{
+	int native = arxMouseToNative(_iNumButton);
+	return(bMouseButton[native]);
+}
+
+bool ARXInputHandler::GetMouseButtonNowPressed(int _iNumButton)
+{
+	int native = arxMouseToNative(_iNumButton);
+	return((bMouseButton[native]) && (!bOldMouseButton[native]));
+}
+
+bool ARXInputHandler::GetMouseButtonNowUnPressed(int _iNumButton)
+{
+	int native = arxMouseToNative(_iNumButton);
+	return((!bMouseButton[native]) && (bOldMouseButton[native]));
+}
+
+bool ARXInputHandler::GetMouseButtonDoubleClick(int _iNumButton, int _iTime)
+{
+	int native = arxMouseToNative(_iNumButton);
+	return ((iMouseTimeSet[native] == 2) && (iMouseTime[native] < _iTime));
+}
+
+
+
+/************************************************/
+/*						SDL						*/
+/************************************************/
+
+ARXInputHandlerSDL::ARXInputHandlerSDL() : ARXInputHandler()
+{
+	for (int i = ARXMOUSE_BUTTON0; i <= ARXMOUSE_BUTTON31; i++)
+	{
+		iOldMouseButton[i] = 0;
+		iMouseTime[i] = 0;
+		iMouseTimeSet[i] = 0;
+		bMouseButton[i] = bOldMouseButton[i] = false;
+		iOldNumClick[i] = iOldNumUnClick[i] = 0;
+	}
+
+	// PreCompute le ScanCode
+	bTouch = false;
+	HKL layout = GetKeyboardLayout(0);
+
+	for (int iI = 0; iI < 256; iI++)
+	{
+		iKeyScanCode[iI] = MapVirtualKeyEx(iI, 1, layout);
+		iOneTouch[iI] = 0;
+	}
+}
+
+
+
+void ARXInputHandlerSDL::ResetAll()
+{
+	for (int i = ARXMOUSE_BUTTON0; i <= ARXMOUSE_BUTTON31; i++)
+	{
+		iOldMouseButton[i] = 0;
+		iMouseTime[i] = 0;
+		iMouseTimeSet[i] = 0;
+		bMouseButton[i] = bOldMouseButton[i] = false;
+		iOldNumClick[i] = iOldNumUnClick[i] = 0;
+	}
+
+	iKeyId = -1;
+	bTouch = false;
+
+	for (int i = 0; i < 256; i++)
+	{
+		iOneTouch[i] = 0;
+	}
+
+	EERIEMouseButton = LastEERIEMouseButton = 0;
+
+	iWheelSens = 0;
+}
+
+void ARXInputHandlerSDL::GetInput()
+{
+	Uint32 mask = SDL_GetMouseState(&iMouseAX, &iMouseAY);
+
+	bOldMouseButton[SDL_BUTTON_LEFT] = bMouseButton[SDL_BUTTON_LEFT];
+	bOldMouseButton[SDL_BUTTON_MIDDLE] = bMouseButton[SDL_BUTTON_MIDDLE];
+	bOldMouseButton[SDL_BUTTON_RIGHT] = bMouseButton[SDL_BUTTON_RIGHT];
+
+	bMouseButton[SDL_BUTTON_LEFT] = mask & SDL_BUTTON_LMASK;
+	bMouseButton[SDL_BUTTON_MIDDLE] = mask & SDL_BUTTON_MMASK;
+	bMouseButton[SDL_BUTTON_RIGHT] = mask & SDL_BUTTON_RMASK;
+
+	keystate = SDL_GetKeyboardState(0);
+
+	SDL_Scancode scancode;
+	for (int i = 0; i < 256; ++i)
+	{
+		scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[i]);
+
+		if (keystate[scancode])
+		{
+			if (iOneTouch[scancode] < 2)
+			{
+				iOneTouch[scancode]++;
+			}
+		}
+		else
+		{
+			if (iOneTouch[scancode] > 0)
+			{
+				iOneTouch[scancode]--;
+			}
+		}
+	}
+}
+
+void ARXInputHandlerSDL::DrawCursor()
+{
+	if (!bDrawCursor) return;
+
+	DrawOneCursor(iMouseAX, iMouseAY, 0);
+
+	ARX_CHECK_LONG(ARXDiffTimeMenu);
+	lFrameDiff += ARX_CLEAN_WARN_CAST_LONG(ARXDiffTimeMenu);
+
+
+	if (lFrameDiff > 70)
+	{
+		if (bMouseOver)
+		{
+			if (iNumCursor < 4)
+			{
+				iNumCursor++;
+			}
+			else
+			{
+				if (iNumCursor > 4)
+				{
+					iNumCursor--;
+				}
+			}
+
+			SetCursorOff();
+			bMouseOver = false;
+		}
+		else
+		{
+			if (iNumCursor > 0)
+			{
+				iNumCursor++;
+
+				if (iNumCursor > 7) iNumCursor = 0;
+			}
+		}
+
+		lFrameDiff = 0;
+	}
+
+}
+
+_TCHAR * ARXInputHandlerSDL::GetFullNameTouch(int _iVirtualKey)
+{
+	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	return _T("XXXXX");
+}
+
+bool ARXInputHandlerSDL::IsVirtualKeyPressed(int _iVirtualKey)
+{
+	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	return (keystate[scancode]);
+}
+
+bool ARXInputHandlerSDL::IsVirtualKeyPressedOneTouch(int _iVirtualKey)
+{
+	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	return (keystate[scancode] && iOneTouch[scancode]);
+}
+
+bool ARXInputHandlerSDL::IsVirtualKeyPressedNowPressed(int _iVirtualKey)
+{
+	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	return (keystate[scancode] && iOneTouch[scancode]);
+}
+
+bool ARXInputHandlerSDL::IsVirtualKeyPressedNowUnPressed(int _iVirtualKey)
+{
+	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	return (!keystate[scancode] && iOneTouch[scancode]);
+}
+
+int ARXInputHandlerSDL::GetWheelSens(int _iIDbutton)
+{
+	return iWheelSens;
+}
+
+void ARXInputHandlerSDL::DrawOneCursor(int x, int y, int z)
+{
+	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(x), ARX_CLEAN_WARN_CAST_FLOAT(y),
+		INTERFACE_RATIO_DWORD(scursor[iNumCursor]->m_dwWidth),
+		INTERFACE_RATIO_DWORD(scursor[iNumCursor]->m_dwHeight),
+		0.00000001f,
+		scursor[iNumCursor], 0, 0xFFFFFFFF);
+}
+
+int ARXInputHandlerSDL::arxMouseToNative(int button)
+{
+	switch (button)
+	{
+	case ARXMOUSE_BUTTON0:
+		return SDL_BUTTON_LEFT;
+		break;
+	case ARXMOUSE_BUTTON1:
+		return SDL_BUTTON_RIGHT;
+		break;
+	case ARXMOUSE_BUTTON2:
+		return SDL_BUTTON_MIDDLE;
+		break;
+	}
+
+	return SDL_BUTTON_LEFT;
+}
+
+/************************************************/
+/*					DirectInput					*/
+/************************************************/
+ARXInputHandlerDI::ARXInputHandlerDI() : ARXInputHandler()
+{
+	for (int i = ARXMOUSE_BUTTON0; i <= ARXMOUSE_BUTTON31; i++)
+	{
+		iOldMouseButton[i] = 0;
+		iMouseTime[i] = 0;
+		iMouseTimeSet[i] = 0;
+		bMouseButton[i] = bOldMouseButton[i] = false;
+		iOldNumClick[i] = iOldNumUnClick[i] = 0;
+	}
+
+	// PreCompute le ScanCode
+	bTouch = false;
+	HKL layout = GetKeyboardLayout(0);
+
+	for (int iI = 0; iI < 256; iI++)
+	{
+		iKeyScanCode[iI] = MapVirtualKeyEx(iI, 0, layout);
+		iOneTouch[iI] = 0;
+	}
+}
+
+void ARXInputHandlerDI::ResetAll()
+{
+	for (int i = ARXMOUSE_BUTTON0; i <= ARXMOUSE_BUTTON31; i++)
+	{
+		iOldMouseButton[i] = 0;
+		iMouseTime[i] = 0;
+		iMouseTimeSet[i] = 0;
+		bMouseButton[i] = bOldMouseButton[i] = false;
+		iOldNumClick[i] = iOldNumUnClick[i] = 0;
+	}
+
+	iKeyId = -1;
+	bTouch = false;
+
+	for (int i = 0; i < 256; i++)
+	{
+		iOneTouch[i] = 0;
+	}
+
+	EERIEMouseButton = LastEERIEMouseButton = 0;
+
+	iWheelSens = 0;
+}
+
+void ARXInputHandlerDI::GetInput()
+{
+	int iDTime;
+
+	DXI_ExecuteAllDevices(false);
+	iKeyId = DXI_GetKeyIDPressed(DXI_KEYBOARD1);
+	bTouch = (iKeyId >= 0) ? true : false;
+
+	for (int i = 0; i < 256; i++)
+	{
+		if (IsVirtualKeyPressed(i))
+		{
+			switch (i)
+			{
+			case DIK_LSHIFT:
+			case DIK_RSHIFT:
+			case DIK_LCONTROL:
+			case DIK_RCONTROL:
+			case DIK_LALT:
+			case DIK_RALT:
+
+				if (i != iKeyId)
+					iKeyId |= (i << 16);
+
+				break;
+			}
+
+			if (iOneTouch[i] < 2)
+			{
+				iOneTouch[i]++;
+			}
+		}
+		else
+		{
+			if (iOneTouch[i] > 0)
+			{
+				iOneTouch[i]--;
+			}
+		}
+	}
+
+	if (bTouch)	//priorité des touches
+	{
+		switch (iKeyId)
+		{
+		case DIK_LSHIFT:
+		case DIK_RSHIFT:
+		case DIK_LCONTROL:
+		case DIK_RCONTROL:
+		case DIK_LALT:
+		case DIK_RALT:
+		{
+			bool bFound = false;
+
+			for (int i = 0; i < 256; i++)
+			{
+				if (bFound)
+				{
+					break;
+				}
+
+				switch (i & 0xFFFF)
+				{
+				case DIK_LSHIFT:
+				case DIK_RSHIFT:
+				case DIK_LCONTROL:
+				case DIK_RCONTROL:
+				case DIK_LALT:
+				case DIK_RALT:
+					continue;
+				default:
+				{
+					if (iOneTouch[i])
+					{
+						bFound = true;
+						iKeyId &= ~0xFFFF;
+						iKeyId |= i;
+					}
+				}
+				break;
+				}
+			}
+		}
+		}
+	}
+
+
+	ARX_CHECK_INT(ARX_TIME_Get(false));
+	const int iArxTime = ARX_CLEAN_WARN_CAST_INT(ARX_TIME_Get(false));
+
+
+	for (int i = ARXMOUSE_BUTTON0; i <= ARXMOUSE_BUTTON31; i++)
+	{
+		int iNumClick;
+		int iNumUnClick;
+		DXI_MouseButtonCountClick(DXI_MOUSE1, i, &iNumClick, &iNumUnClick);
+
+		iOldNumClick[i] += iNumClick + iNumUnClick;
+
+		if ((!bMouseButton[i]) && (iOldNumClick[i] == iNumUnClick))
+		{
+			iNumUnClick = iOldNumClick[i] = 0;
+		}
+
+		bOldMouseButton[i] = bMouseButton[i];
+
+		if (bMouseButton[i])
+		{
+			if (iOldNumClick[i])
+			{
+				bMouseButton[i] = false;
+			}
+		}
+		else
+		{
+			if (iOldNumClick[i])
+			{
+				bMouseButton[i] = true;
+			}
+		}
+
+		if (iOldNumClick[i]) iOldNumClick[i]--;
+
+		iDTime = 0;
+		DXI_MouseButtonPressed(DXI_MOUSE1, i, &iDTime);
+
+		if (iDTime)
+		{
+			iMouseTime[i] = iDTime;
+			iMouseTimeSet[i] = 2;
+		}
+		else
+		{
+			if ((iMouseTimeSet[i] > 0) &&
+				((ARX_TIME_Get(false) - iMouseTime[i]) > 300)
+				)
+			{
+				iMouseTime[i] = 0;
+				iMouseTimeSet[i] = 0;
+			}
+
+			if (GetMouseButtonNowPressed(i))
+			{
+				switch (iMouseTimeSet[i])
+				{
+				case 0:
+					iMouseTime[i] = iArxTime;
+					iMouseTimeSet[i]++;
+					break;
+				case 1:
+					iMouseTime[i] = iArxTime - iMouseTime[i];
+					iMouseTimeSet[i]++;
+					break;
+				}
+			}
+		}
+	}
+
+	iWheelSens = GetWheelSens(DXI_MOUSE1);
+
+	if ((danaeApp.m_pFramework->m_bIsFullscreen) &&
+		(bGLOBAL_DINPUT_MENU))
+	{
+		float fDX = 0.f;
+		float fDY = 0.f;
+		iMouseRX = iMouseRY = iMouseRZ = 0;
+
+		if (DXI_GetAxeMouseXYZ(DXI_MOUSE1, &iMouseRX, &iMouseRY, &iMouseRZ))
+		{
+			float fSensMax = 1.f / 6.f;
+			float fSensMin = 2.f;
+			float fSens = ((fSensMax - fSensMin) * ((float)iSensibility) / 10.f) + fSensMin;
+			fSens = pow(.7f, fSens) * 2.f;
+
+			fDX = ((float)iMouseRX) * fSens * (((float)DANAESIZX) / 640.f);
+			fDY = ((float)iMouseRY) * fSens * (((float)DANAESIZY) / 480.f);
+			fMouseAXTemp += fDX;
+			fMouseAYTemp += fDY;
+
+
+			ARX_CHECK_INT(fMouseAXTemp);
+			ARX_CHECK_INT(fMouseAYTemp);
+			iMouseAX = ARX_CLEAN_WARN_CAST_INT(fMouseAXTemp);
+			iMouseAY = ARX_CLEAN_WARN_CAST_INT(fMouseAYTemp);
+
+			iMouseAZ += iMouseRZ;
+
+
+			if (iMouseAX < 0)
+			{
+				iMouseAX = 0;
+				fMouseAXTemp = 0.f;
+			}
+
+
+			ARX_CHECK_NOT_NEG(iMouseAX);
+
+			if (ARX_CAST_ULONG(iMouseAX) >= danaeApp.m_pFramework->m_dwRenderWidth)
+			{
+
+				iMouseAX = danaeApp.m_pFramework->m_dwRenderWidth - 1;
+				fMouseAXTemp = ARX_CLEAN_WARN_CAST_FLOAT(iMouseAX);
+			}
+
+			if (iMouseAY < 0)
+			{
+				fMouseAYTemp = 0.f;
+				iMouseAY = 0;
+			}
+
+
+			ARX_CHECK_NOT_NEG(iMouseAY);
+
+			if (ARX_CAST_ULONG(iMouseAY) >= danaeApp.m_pFramework->m_dwRenderHeight)
+			{
+
+				iMouseAY = danaeApp.m_pFramework->m_dwRenderHeight - 1;
+				fMouseAYTemp = ARX_CLEAN_WARN_CAST_FLOAT(iMouseAY);
+			}
+
+
+
+			bMouseMove = true;
+		}
+		else
+		{
+			bMouseMove = false;
+		}
+
+		if (bGLOBAL_DINPUT_GAME)
+		{
+			_EERIEMouseXdep = (int)fDX;
+			_EERIEMouseYdep = (int)fDY;
+			EERIEMouseX = iMouseAX;
+			EERIEMouseY = iMouseAY;
+		}
+	}
+	else
+	{
+		bMouseMove = ((iMouseAX != DANAEMouse.x) || (iMouseAY != DANAEMouse.y));
+		iMouseAX = DANAEMouse.x;
+		iMouseAY = DANAEMouse.y;
+		iMouseAZ = 0;
+	}
+
+	int iDx;
+	int iDy;
+
+	if (pTex[eNumTex])
+	{
+		iDx = pTex[eNumTex]->m_dwWidth >> 1;
+		iDy = pTex[eNumTex]->m_dwHeight >> 1;
+	}
+	else
+	{
+		iDx = 0;
+		iDy = 0;
+	}
+
+	iOldCoord[iNbOldCoord].x = iMouseAX + iDx;
+	iOldCoord[iNbOldCoord].y = iMouseAY + iDy;
+	iNbOldCoord++;
+
+	if (iNbOldCoord >= iMaxOldCoord)
+	{
+		iNbOldCoord = iMaxOldCoord - 1;
+		memmove((void*)iOldCoord, (void*)(iOldCoord + 1), sizeof(EERIE_2DI)*iNbOldCoord);
+	}
+
+}
+
+static bool ComputePer(EERIE_2DI *_psPoint1, EERIE_2DI *_psPoint2, D3DTLVERTEX *_psd3dv1, D3DTLVERTEX *_psd3dv2, float _fSize)
+{
+	EERIE_2D sTemp;
+	float fTemp;
+
+	sTemp.x = (float)(_psPoint2->x - _psPoint1->x);
+	sTemp.y = (float)(_psPoint2->y - _psPoint1->y);
+	fTemp = sTemp.x;
+	sTemp.x = -sTemp.y;
+	sTemp.y = fTemp;
+	float fMag = (float)sqrt(sTemp.x*sTemp.x + sTemp.y*sTemp.y);
+
+	if (fMag < EEdef_EPSILON)
+	{
+		return false;
+	}
+
+	fMag = _fSize / fMag;
+
+	_psd3dv1->sx = (sTemp.x*fMag);
+	_psd3dv1->sy = (sTemp.y*fMag);
+	_psd3dv2->sx = ((float)_psPoint1->x) - _psd3dv1->sx;
+	_psd3dv2->sy = ((float)_psPoint1->y) - _psd3dv1->sy;
+	_psd3dv1->sx += ((float)_psPoint1->x);
+	_psd3dv1->sy += ((float)_psPoint1->y);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
+static void DrawLine2D(EERIE_2DI *_psPoint1, int _iNbPt, float _fSize, float _fRed, float _fGreen, float _fBlue)
+{
+	_iNbPt--;
+
+	if (!_iNbPt) return;
+
+	float fSize = _fSize / _iNbPt;
+	float fTaille = fSize;
+
+	float fDColorRed = _fRed / _iNbPt;
+	float fColorRed = fDColorRed;
+	float fDColorGreen = _fGreen / _iNbPt;
+	float fColorGreen = fDColorGreen;
+	float fDColorBlue = _fBlue / _iNbPt;
+	float fColorBlue = fDColorBlue;
+
+	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_DESTCOLOR);
+	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVDESTCOLOR);
+	SETTC(GDevice, NULL);
+	SETALPHABLEND(GDevice, true);
+
+	D3DTLVERTEX v[4];
+	v[0].sz = v[1].sz = v[2].sz = v[3].sz = 0.f;
+	v[0].rhw = v[1].rhw = v[2].rhw = v[3].rhw = 0.999999f;
+
+	EERIE_2DI *psOldPoint = _psPoint1++;
+	v[0].color = v[2].color = D3DRGBA(fColorRed, fColorGreen, fColorBlue, 1.f);
+
+	if (!ComputePer(psOldPoint, _psPoint1, &v[0], &v[2], fTaille))
+	{
+		v[0].sx = v[2].sx = (float)psOldPoint->x;
+		v[0].sy = v[2].sy = (float)psOldPoint->y;
+	}
+
+	_iNbPt--;
+
+	while (_iNbPt--)
+	{
+		fTaille += fSize;
+		fColorRed += fDColorRed;
+		fColorGreen += fDColorGreen;
+		fColorBlue += fDColorBlue;
+
+		if (ComputePer(psOldPoint, _psPoint1 + 1, &v[1], &v[3], fTaille))
+		{
+			v[1].color = v[3].color = D3DRGBA(fColorRed, fColorGreen, fColorBlue, 1.f);
+			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+
+			v[0].sx = v[1].sx;
+			v[0].sy = v[1].sy;
+			v[0].color = v[1].color;
+			v[2].sx = v[3].sx;
+			v[2].sy = v[3].sy;
+			v[2].color = v[3].color;
+		}
+
+		psOldPoint = _psPoint1++;
+	}
+
+	fTaille += fSize;
+	fColorRed += fDColorRed;
+	fColorGreen += fDColorGreen;
+	fColorBlue += fDColorBlue;
+
+	if (ComputePer(_psPoint1, psOldPoint, &v[1], &v[3], fTaille))
+	{
+		v[1].color = v[3].color = D3DRGBA(fColorRed, fColorGreen, fColorBlue, 1.f);
+		g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+	}
+
+	SETALPHABLEND(GDevice, false);
+}
+void ARXInputHandlerDI::DrawCursor()
+{
+	if (!bDrawCursor) return;
+
+	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true);
+	DrawLine2D(iOldCoord, iMaxOldCoord, 10.f, .725f, .619f, 0.56f);
+
+	if (pTex[iNumCursor]) SETTC(GDevice, pTex[iNumCursor]);
+	else SETTC(GDevice, NULL);
+
+	SETALPHABLEND(GDevice, false);
+
+	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
+	DrawOneCursor(iMouseAX, iMouseAY, -1);
+
+	danaeApp.EnableZBuffer();
+
+
+	ARX_CHECK_LONG(ARXDiffTimeMenu);
+	lFrameDiff += ARX_CLEAN_WARN_CAST_LONG(ARXDiffTimeMenu);
+
+
+	if (lFrameDiff > 70)
+	{
+		if (bMouseOver)
+		{
+			if (iNumCursor < 4)
+			{
+				iNumCursor++;
+			}
+			else
+			{
+				if (iNumCursor > 4)
+				{
+					iNumCursor--;
+				}
+			}
+
+			SetCursorOff();
+			bMouseOver = false;
+		}
+		else
+		{
+			if (iNumCursor > 0)
+			{
+				iNumCursor++;
+
+				if (iNumCursor > 7) iNumCursor = 0;
+			}
+		}
+
+		lFrameDiff = 0;
+	}
+
+	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, false);
+}
+
+_TCHAR * ARXInputHandlerDI::GetFullNameTouch(int _iVirtualKey)
+{
+	_TCHAR *pText = (_TCHAR*)malloc(256 * sizeof(_TCHAR));
+
+	if (!pText) return NULL;
+
+	long lParam;
+
+	_TCHAR *pText2 = NULL;
+
+	if ((_iVirtualKey != -1) &&
+		(_iVirtualKey&~0xC000FFFF))	//COMBINAISON
+	{
+		pText2 = GetFullNameTouch((_iVirtualKey >> 16) & 0x3FFF);
+	}
+
+	lParam = ((_iVirtualKey) & 0x7F) << 16;
+
+	switch (_iVirtualKey)
+	{
+	case DIK_HOME:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_home"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_NEXT:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_pagedown"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_END:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_end"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_INSERT:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_insert"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_DELETE:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_delete"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_NUMLOCK:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_numlock"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_DIVIDE:
+		_tcscpy(pText, _T("_/_"));
+		break;
+	case DIK_MULTIPLY:
+		_tcscpy(pText, _T("_x_"));
+		break;
+	case DIK_SYSRQ:
+		_tcscpy(pText, _T("?"));
+		break;
+	case DIK_UP:                  // UpArrow on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_up"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_PRIOR:               // PgUp on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_pageup"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_LEFT:                // LeftArrow on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_RIGHT:               // RightArrow on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_right"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_DOWN:                // DownArrow on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_down"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON1:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button0"), _T("string"), _T("b1"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON2:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button1"), _T("string"), _T("b2"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON3:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button2"), _T("string"), _T("b3"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON4:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button3"), _T("string"), _T("b4"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON5:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button4"), _T("string"), _T("b5"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON6:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button5"), _T("string"), _T("b6"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON7:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button6"), _T("string"), _T("b7"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON8:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button7"), _T("string"), _T("b8"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON9:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button8"), _T("string"), _T("b9"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON10:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button9"), _T("string"), _T("b10"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON11:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button10"), _T("string"), _T("b11"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON12:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button11"), _T("string"), _T("b12"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON13:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button12"), _T("string"), _T("b13"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON14:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button13"), _T("string"), _T("b14"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON15:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button14"), _T("string"), _T("b15"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON16:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button15"), _T("string"), _T("b16"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON17:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button16"), _T("string"), _T("b17"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON18:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button17"), _T("string"), _T("b18"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON19:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button18"), _T("string"), _T("b19"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON20:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button19"), _T("string"), _T("b20"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON21:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button20"), _T("string"), _T("b21"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON22:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button21"), _T("string"), _T("b22"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON23:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button22"), _T("string"), _T("b23"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON24:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button23"), _T("string"), _T("b24"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON25:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button24"), _T("string"), _T("b25"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON26:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button25"), _T("string"), _T("b26"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON27:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button26"), _T("string"), _T("b27"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON28:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button27"), _T("string"), _T("b28"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON29:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button28"), _T("string"), _T("b29"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON30:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button29"), _T("string"), _T("b30"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON31:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button30"), _T("string"), _T("b31"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON32:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button31"), _T("string"), _T("b32"), pText, 256, NULL);
+		break;
+	case DIK_WHEELUP:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_wheelup"), _T("string"), _T("w0"), pText, 256, NULL);
+		break;
+	case DIK_WHEELDOWN:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_wheeldown"), _T("string"), _T("w1"), pText, 256, NULL);
+		break;
+	case -1:
+		_tcscpy(pText, _T("---"));
+		break;
+	default:
+	{
+		char tAnsiText[256];
+		GetKeyNameText(lParam, tAnsiText, 256);
+		int i = strlen(tAnsiText);
+
+		if (!i)
+		{
+			_stprintf(pText, _T("Key_%d"), _iVirtualKey);
+		}
+		else
+		{
+			MultiByteToWideChar(CP_ACP, 0, tAnsiText, -1, pText, 256);
+
+			if (_iVirtualKey == DIK_LSHIFT)
+			{
+				_TCHAR tText2[256];
+				_TCHAR *pText3;
+				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
+				tText2[1] = 0;
+				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
+				_tcscpy(pText3, tText2);
+				_tcscat(pText3, pText);
+				free((void*)pText);
+				pText = pText3;
+			}
+
+			if (_iVirtualKey == DIK_LCONTROL)
+			{
+				_TCHAR tText2[256];
+				_TCHAR *pText3;
+				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
+				tText2[1] = 0;
+				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
+				_tcscpy(pText3, tText2);
+				_tcscat(pText3, pText);
+				free((void*)pText);
+				pText = pText3;
+			}
+
+			if (_iVirtualKey == DIK_LALT)
+			{
+				_TCHAR tText2[256];
+				_TCHAR *pText3;
+				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
+				tText2[1] = 0;
+				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
+				_tcscpy(pText3, tText2);
+				_tcscat(pText3, pText);
+				free((void*)pText);
+				pText = pText3;
+			}
+
+			if (_iVirtualKey == DIK_NUMPADENTER)
+			{
+				_TCHAR *pText3;
+				pText3 = (_TCHAR*)malloc((_tcslen(pText) + 1 + 1) * sizeof(_TCHAR));
+				_tcscpy(pText3, pText);
+				_tcscat(pText3, _T("0"));
+				free((void*)pText);
+				pText = pText3;
+			}
+
+			if (_tcslen(pText) > 8)
+			{
+				pText[8] = 0;
+				int iI = 8;
+
+				while (iI--)
+				{
+					if (pText[iI] == _T(' '))
+					{
+						pText[iI] = 0;
+					}
+					else break;
+				}
+			}
+		}
+	}
+	break;
+	}
+
+	if (pText2)
+	{
+		_TCHAR *pText3 = (_TCHAR*)malloc((_tcslen(pText2) + _tcslen(pText) + 1 + 1) * sizeof(_TCHAR));
+		_tcscpy(pText3, pText2);
+		_tcscat(pText3, _T("+"));
+		_tcscat(pText3, pText);
+		free((void*)pText);
+		free((void*)pText2);
+		pText = pText3;
+
+	}
+
+	return pText;
+}
+
+bool ARXInputHandlerDI::IsVirtualKeyPressed(int _iVirtualKey)
+{
+	return DXI_KeyPressed(DXI_KEYBOARD1, _iVirtualKey) ? true : false;
+}
+
+bool ARXInputHandlerDI::IsVirtualKeyPressedOneTouch(int _iVirtualKey)
+{
+	return((DXI_KeyPressed(DXI_KEYBOARD1, _iVirtualKey)) &&
+		(iOneTouch[_iVirtualKey] == 1));
+}
+
+bool ARXInputHandlerDI::IsVirtualKeyPressedNowPressed(int _iVirtualKey)
+{
+	return((DXI_KeyPressed(DXI_KEYBOARD1, _iVirtualKey)) &&
+		(iOneTouch[_iVirtualKey] == 1));
+}
+
+bool ARXInputHandlerDI::IsVirtualKeyPressedNowUnPressed(int _iVirtualKey)
+{
+	return((!DXI_KeyPressed(DXI_KEYBOARD1, _iVirtualKey)) &&
+		(iOneTouch[_iVirtualKey] == 1));
+}
+
+int ARXInputHandlerDI::GetWheelSens(int _iIDbutton)
+{
+	int iX, iY, iZ = 0;
+	DXI_GetAxeMouseXYZ(_iIDbutton, &iX, &iY, &iZ);
+
+	return iZ;
+}
+
+void ARXInputHandlerDI::DrawOneCursor(int _iPosX, int _iPosY, int _iColor)
+{
+	GDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+	GDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+	SETTEXTUREWRAPMODE(GDevice, D3DTADDRESS_CLAMP);
+
+	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(_iPosX), ARX_CLEAN_WARN_CAST_FLOAT(_iPosY),
+
+		INTERFACE_RATIO_DWORD(scursor[iNumCursor]->m_dwWidth),
+		INTERFACE_RATIO_DWORD(scursor[iNumCursor]->m_dwHeight),
+
+		0.00000001f,
+		scursor[iNumCursor], 0, D3DCOLORWHITE);
+	GDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFP_LINEAR);
+	GDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFP_LINEAR);
+	SETTEXTUREWRAPMODE(GDevice, D3DTADDRESS_WRAP);
+}
+
+int ARXInputHandlerDI::arxMouseToNative(int button)
+{
+	return button;
+}
