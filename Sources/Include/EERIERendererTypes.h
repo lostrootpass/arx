@@ -11,4 +11,22 @@ enum class EERIEPrimType
 	LineStrip
 };
 
+enum class EERIEBlendType
+{
+	Zero,
+	One,
+	SrcColor, 
+	OneMinusSrcColor, 
+	DstColor, 
+	OneMinusDstColor, 
+	SrcAlpha, 
+	OneMinusSrcAlpha, 
+	DstAlpha, 
+	OneMinusDstAlpha,
+	ConstantColor,
+	OneMinusConstantColor,
+	ConstantAlpha, 
+	OneMinusConstantAlpha
+};
+
 #endif // !EERIE_RENDERER_TYPES_H_

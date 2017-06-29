@@ -76,6 +76,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "EERIEDRAW.h"
 #include "EERIEPhysicsBox.h"
+#include "EERIERenderer.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -1991,8 +1992,7 @@ float CRuban::Render(LPDIRECT3DDEVICE7 device)
 {
 	SETCULL(device, D3DCULL_NONE);
 	SETALPHABLEND(device, TRUE);
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	SETTC(device, NULL);
 
@@ -2006,8 +2006,7 @@ float CRuban::Render(LPDIRECT3DDEVICE7 device)
 	}
 
 	SETALPHABLEND(device, FALSE);
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 
 	return 0;
 }

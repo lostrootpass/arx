@@ -59,6 +59,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEDraw.h>
 #include <EERIEMath.h>
 #include <EERIEObject.h>
+#include <EERIERenderer.h>
 
 #include <ARX_Collisions.h>
 #include <ARX_CSpellFx.h>
@@ -587,12 +588,9 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	cnodetab[0].fy = frand2() * 1.5f * fMySize; //5
 	cnodetab[0].fz = frand2() * 1.5f * fMySize; //5
 
-#ifndef ARX_OPENGL
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 	SETTC(m_pd3dDevice, NULL);
-#endif
 
 	v2[0].color = v2[1].color = v2[2].color = v2[3].color = D3DRGB(1, 1, 1);
 
@@ -905,8 +903,7 @@ float CConfuse::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETZWRITE(m_pd3dDevice, FALSE);
 
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	//-------------------------------------------------------------------------
@@ -1182,18 +1179,16 @@ float CFireField::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 
 	SETALPHABLEND(_pD3DDevice, TRUE);
 	SETZWRITE(_pD3DDevice, FALSE);
-	_pD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	_pD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
 	SETZWRITE(_pD3DDevice, FALSE);
 	SETALPHABLEND(_pD3DDevice, TRUE);
 
-	pPSStream.Render(_pD3DDevice, D3DBLEND_ONE, D3DBLEND_ONE);
-	pPSStream1.Render(_pD3DDevice, D3DBLEND_ONE, D3DBLEND_ONE);
+	pPSStream.Render(_pD3DDevice, EERIEBlendType::One, EERIEBlendType::One);
+	pPSStream1.Render(_pD3DDevice, EERIEBlendType::One, EERIEBlendType::One);
 
-	_pD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	_pD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	SETALPHABLEND(_pD3DDevice, FALSE);
 	SETZWRITE(_pD3DDevice, TRUE);
 
@@ -1355,8 +1350,7 @@ float CIceField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	
 	SETZWRITE(m_pd3dDevice, TRUE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	iMax = (int)(iNumber); 

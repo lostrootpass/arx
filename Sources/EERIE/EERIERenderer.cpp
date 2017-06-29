@@ -609,8 +609,6 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(EERIE_PRIM_RESTART_IDX);
 
-	glEnable(GL_BLEND);
-
 	glm::mat4 modelMatrix = glm::mat4();
 	modelMatrix[1][1] *= -1; //flip the Y-axis
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
@@ -684,8 +682,6 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glDisableVertexAttribArray(3);
 
 	glUseProgram(oldProgram);
-
-	glDisable(GL_BLEND);
 }
 
 void EERIERendererGL::DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer * tex)
@@ -704,10 +700,6 @@ void EERIERendererGL::DrawSprite(float x, float y, float sx, float sy, D3DCOLOR 
 
 	glBindVertexArray(quadVAO);
 
-	glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendFunc(GL_ONE, GL_ONE);
-
 	GLuint program = EERIEGetGLProgramID("screenfx");
 	glUseProgram(program);
 
@@ -723,8 +715,6 @@ void EERIERendererGL::DrawSprite(float x, float y, float sx, float sy, D3DCOLOR 
 	glUniform1i(glGetUniformLocation(program, "texsampler"), 0);
 
 	_drawQuad(program, startX, startY, dX, dY);
-
-	glDisable(GL_BLEND);
 }
 
 void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeightPx)
@@ -835,6 +825,11 @@ void EERIERendererGL::setView(const glm::mat4& view)
 
 	GLuint program = EERIEGetGLProgramID("poly");
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
+}
+
+void EERIERendererGL::SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor)
+{
+	glBlendFunc(_nativeBlendType(srcFactor), _nativeBlendType(dstFactor));
 }
 
 void EERIERendererGL::SetViewport(int x, int y, int w, int h)
@@ -960,6 +955,59 @@ EERIEFont* EERIERendererGL::_loadFontData(int size)
 	return font;
 }
 
+GLenum EERIERendererGL::_nativeBlendType(EERIEBlendType type)
+{
+	switch (type)
+	{
+	case EERIEBlendType::Zero:
+		return GL_ZERO;
+		break;
+	case EERIEBlendType::One:
+		return GL_ONE;
+		break;
+	case EERIEBlendType::SrcColor:
+		return GL_SRC_COLOR;
+		break;
+	case EERIEBlendType::OneMinusSrcColor:
+		return GL_ONE_MINUS_SRC_COLOR;
+		break;
+	case EERIEBlendType::DstColor:
+		return GL_DST_COLOR;
+		break;
+	case EERIEBlendType::OneMinusDstColor:
+		return GL_ONE_MINUS_DST_COLOR;
+		break;
+	case EERIEBlendType::SrcAlpha:
+		return GL_SRC_ALPHA;
+		break;
+	case EERIEBlendType::OneMinusSrcAlpha:
+		return GL_ONE_MINUS_SRC_ALPHA;
+		break;
+	case EERIEBlendType::DstAlpha:
+		return GL_DST_ALPHA;
+		break;
+	case EERIEBlendType::OneMinusDstAlpha:
+		return GL_ONE_MINUS_DST_ALPHA;
+		break;
+	case EERIEBlendType::ConstantColor:
+		return GL_CONSTANT_COLOR;
+		break;
+	case EERIEBlendType::OneMinusConstantColor:
+		return GL_ONE_MINUS_CONSTANT_COLOR;
+		break;
+	case EERIEBlendType::ConstantAlpha:
+		return GL_CONSTANT_ALPHA;
+		break;
+	case EERIEBlendType::OneMinusConstantAlpha:
+		return GL_ONE_MINUS_CONSTANT_ALPHA;
+		break;
+	default:
+		break;
+	}
+
+	return GL_ONE;
+}
+
 /************************************************************/
 /*							D3D								*/
 /************************************************************/
@@ -1014,6 +1062,12 @@ void EERIERendererD3D7::DrawQuad(float x, float y, float sx, float sy, float z, 
 
 	SETTC(GDevice, tex);
 	GDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
+}
+
+void EERIERendererD3D7::SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor)
+{
+	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, _nativeBlendType(srcFactor));
+	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, _nativeBlendType(dstFactor));
 }
 
 void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
@@ -1107,4 +1161,53 @@ D3DPRIMITIVETYPE EERIERendererD3D7::_toD3DPT(EERIEPrimType primType)
 	}
 
 	return prim;
+}
+
+D3DBLEND EERIERendererD3D7::_nativeBlendType(EERIEBlendType type)
+{
+	switch (type)
+	{
+	case EERIEBlendType::Zero:
+		return D3DBLEND_ZERO;
+		break;
+	case EERIEBlendType::One:
+		return D3DBLEND_ONE;
+		break;
+	case EERIEBlendType::SrcColor:
+		return D3DBLEND_SRCCOLOR;
+		break;
+	case EERIEBlendType::OneMinusSrcColor:
+		return D3DBLEND_INVSRCCOLOR;
+		break;
+	case EERIEBlendType::DstColor:
+		return D3DBLEND_DESTCOLOR;
+		break;
+	case EERIEBlendType::OneMinusDstColor:
+		return D3DBLEND_INVDESTCOLOR;
+		break;
+	case EERIEBlendType::SrcAlpha:
+		return D3DBLEND_SRCALPHA;
+		break;
+	case EERIEBlendType::OneMinusSrcAlpha:
+		return D3DBLEND_INVSRCALPHA;
+		break;
+	case EERIEBlendType::DstAlpha:
+		return D3DBLEND_DESTALPHA;
+		break;
+	case EERIEBlendType::OneMinusDstAlpha:
+		return D3DBLEND_INVDESTALPHA;
+		break;
+
+		//Not supported by D3D7
+	case EERIEBlendType::ConstantColor:
+	case EERIEBlendType::OneMinusConstantColor:
+	case EERIEBlendType::ConstantAlpha:
+	case EERIEBlendType::OneMinusConstantAlpha:
+		return D3DBLEND_ONE;
+		break;
+	default:
+		break;
+	}
+
+	return D3DBLEND_ONE;
 }

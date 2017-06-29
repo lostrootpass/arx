@@ -1246,8 +1246,7 @@ static void DrawLine2D(EERIE_2DI *_psPoint1, int _iNbPt, float _fSize, float _fR
 	float fDColorBlue = _fBlue / _iNbPt;
 	float fColorBlue = fDColorBlue;
 
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_DESTCOLOR);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVDESTCOLOR);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::OneMinusDstColor);
 	SETTC(GDevice, NULL);
 	SETALPHABLEND(GDevice, true);
 

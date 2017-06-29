@@ -28,6 +28,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "eerielight.h"
 #include "eeriedraw.h"
 #include "eerietypes.h"
+#include "EERIERenderer.h"
 #include "arx_time.h"
 #include "arx_cspellfx.h"
 #include "arx_cparticles.h"
@@ -563,13 +564,12 @@ void CParticleSystem::Update(long _lTime)
 }
 
 //-----------------------------------------------------------------------------
-void CParticleSystem::Render(LPDIRECT3DDEVICE7 _lpD3DDevice, int _iSRCBLEND, int _iDESTBLEND)
+void CParticleSystem::Render(LPDIRECT3DDEVICE7 _lpD3DDevice, EERIEBlendType _iSRCBLEND, EERIEBlendType _iDESTBLEND)
 {
 	SETCULL(_lpD3DDevice, D3DCULL_NONE);
 	SETZWRITE(_lpD3DDevice, FALSE);
 
-	_lpD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  iSrcBlend);
-	_lpD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, iDstBlend);
+	g_pRenderApp->renderer->SetBlendFunc(_iSRCBLEND, _iDESTBLEND);
 	SETALPHABLEND(_lpD3DDevice, TRUE);
 
 	int inumtex = 0;

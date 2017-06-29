@@ -602,11 +602,11 @@ void ARX_INTERFACE_HALO_Render(float _fR, float _fG, float _fB,
 
 	if (_lHaloType & HALO_NEGATIVE)
 	{
-		SETBLENDMODE(GDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 	}
 	else
 	{
-		SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	}
 
 	SETALPHABLEND(GDevice,true);
@@ -6334,7 +6334,7 @@ void ARX_INTERFACE_DrawSecondaryInventory(bool _bSteal)
 
 						if (!bItemSteal && (io==FlyingOverIO))
 						{
-							SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 							SETALPHABLEND(GDevice,true);
 							
 							g_pRenderApp->renderer->DrawQuad(
@@ -6351,7 +6351,7 @@ void ARX_INTERFACE_DrawSecondaryInventory(bool _bSteal)
 						{
 							if (!bItemSteal && (io->ioflags & IO_CAN_COMBINE)) 
 							{
-								SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 								SETALPHABLEND(GDevice,true);
 
 								float fColorPulse	=	255.f * fabs( cos( DEG2RAD( fDecPulse ) ) );
@@ -6446,7 +6446,7 @@ void ARX_INTERFACE_DrawInventory(short _sNum, int _iX=0, int _iY=0)
 
 						if (io==FlyingOverIO)
 						{
-							SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 							SETALPHABLEND(GDevice,true);
 							g_pRenderApp->renderer->DrawQuad(
 								px,
@@ -6466,7 +6466,7 @@ void ARX_INTERFACE_DrawInventory(short _sNum, int _iX=0, int _iY=0)
 								float fColorPulse	=	255.f * fabs( cos( DEG2RAD( fDecPulse ) ) );
 								DWORD dwColor		=	ARX_CLEAN_WARN_CAST_DWORD(fColorPulse);
 
-								SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 								SETALPHABLEND(GDevice,true);
 								g_pRenderApp->renderer->DrawQuad(
 									px,
@@ -6524,7 +6524,7 @@ void ARX_INTERFACE_Draw_Stealth_Gauge()
 
 			D3DCOLOR col=_EERIERGB(v);
 			SETALPHABLEND(GDevice, true);
-			SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 			GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
 			g_pRenderApp->renderer->DrawQuad(
@@ -6589,7 +6589,7 @@ void ARX_INTERFACE_DrawDamagedEquipment()
 	if (needdraw)
 	{
 		SETALPHABLEND(GDevice, true);
-		SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 		danaeApp.EnableZBuffer();
 		GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
@@ -6790,12 +6790,12 @@ void StdDraw(float posx,float posy,D3DCOLOR color,TextureContainer * tcc,long fl
 
 		if (flag & 2)
 		{
-			SETBLENDMODE(GDevice,D3DBLEND_ZERO,D3DBLEND_ONE);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::One);
 
 			g_pRenderApp->renderer->DrawQuad(posx-1,posy-1,INTERFACE_RATIO_DWORD(tc->m_dwWidth)*0.5f,INTERFACE_RATIO_DWORD(tc->m_dwHeight)*0.5f,0.0001f, tc,0,color);
 			g_pRenderApp->renderer->DrawQuad(posx+1,posy+1,INTERFACE_RATIO_DWORD(tc->m_dwWidth)*0.5f,INTERFACE_RATIO_DWORD(tc->m_dwHeight)*0.5f,0.0001f, tc,0,color);
 
-			SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		}
 
 		if (!(flag & 1))
@@ -7048,7 +7048,7 @@ void ARX_INTERFACE_ManageOpenedBook_Finish()
 							if (r)
 							{
 								SETALPHABLEND(GDevice,TRUE);
-								SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 								DrawEERIEInter(GDevice,necklace.runes[i],&angle,&pos,NULL);
 
 								necklace.runes[i]->angle.b+=_framedelay*2.f;
@@ -7254,7 +7254,7 @@ void ARX_INTERFACE_ManageOpenedBook_Finish()
 						if (spellicons[i].tc)
 						{
 							SETALPHABLEND(GDevice, true);
-							SETBLENDMODE(GDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 
 							if (flyingover)
 							{
@@ -7458,7 +7458,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 			{
 				// Draw highlighted Character sheet icon
 				BOOKINTERFACEITEMCOLOR=0xFF555555;
-				SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 				SETALPHABLEND(GDevice,TRUE);
 				DrawBookInterfaceItem(GDevice,ITC.bookmark_char,px,py);
 				SETALPHABLEND(GDevice,FALSE);
@@ -7499,7 +7499,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 				{
 					// Draw highlighted Magic sheet icon
 					BOOKINTERFACEITEMCOLOR=0xFF555555;
-					SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 					SETALPHABLEND(GDevice,TRUE);
 					DrawBookInterfaceItem(GDevice,ITC.bookmark_magic,px,py);
@@ -7531,7 +7531,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 				&&	MouseInBookRect(px,py,px+ITC.bookmark_map->m_dwWidth,py+ITC.bookmark_map->m_dwHeight))				
 			{
 				BOOKINTERFACEITEMCOLOR=0xFF555555;
-				SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 				SETALPHABLEND(GDevice,TRUE);
 				DrawBookInterfaceItem(GDevice,ITC.bookmark_map,px,py);			
 				SETALPHABLEND(GDevice,FALSE);
@@ -7560,7 +7560,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 				&&	MouseInBookRect(px,py,px+ITC.bookmark_quest->m_dwWidth,py+ITC.bookmark_quest->m_dwHeight))				
 			{
 				BOOKINTERFACEITEMCOLOR=0xFF555555;
-				SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 				SETALPHABLEND(GDevice,TRUE);
 				DrawBookInterfaceItem(GDevice,ITC.bookmark_quest,px,py);
 				SETALPHABLEND(GDevice,FALSE);
@@ -7634,7 +7634,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_1,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7662,7 +7662,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_2,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7690,7 +7690,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_3,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7718,7 +7718,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_4,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7746,7 +7746,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_5,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7774,7 +7774,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_6,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7802,7 +7802,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_7,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7830,7 +7830,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_8,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7858,7 +7858,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_9,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -7886,7 +7886,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 					if (MouseInBookRect(px,py,px+32,py+32))
 					{
 						BOOKINTERFACEITEMCOLOR=0xFF555555;
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						DrawBookInterfaceItem(GDevice,ITC.accessible_10,px,py);
 						SETALPHABLEND(GDevice,FALSE);
@@ -8763,7 +8763,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 
 		if (inter.iobj[0]->invisibility>0.f) 
 		{
-			SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			SETALPHABLEND(GDevice,TRUE);
 		}
 
@@ -9083,7 +9083,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 			if (HALOCUR>0)
 			{
 				SETTC(GDevice,NULL);
-				SETBLENDMODE(GDevice,D3DBLEND_SRCCOLOR,D3DBLEND_ONE);
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcColor, EERIEBlendType::One);
 				SETALPHABLEND(GDevice,TRUE);			
 				SETCULL(GDevice,D3DCULL_NONE);
 				SETZWRITE(GDevice,FALSE);
@@ -9094,10 +9094,10 @@ void ARX_INTERFACE_ManageOpenedBook()
 
 					if (vert[2].color == 0)
 					{
-						SETBLENDMODE(GDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 						vert[2].color =0xFF000000;
 						g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 ); //>>> DO NOT USE VERTEX BUFFER HERE <<<
-						SETBLENDMODE(GDevice,D3DBLEND_SRCCOLOR,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcColor, EERIEBlendType::One);
 					}
 					else g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 ); //>>> DO NOT USE VERTEX BUFFER HERE <<<
 				}
@@ -9124,7 +9124,7 @@ void DANAE::DrawAllInterfaceFinish()
 	if (rrr>1.f) rrr=1.f;
 	else if (rrr<0.f) rrr=0.f;
 	
-	SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(GDevice,TRUE);
 	PRECAST_NUM=0;
 
@@ -9269,7 +9269,7 @@ void DANAE::DrawAllInterface()
 
 			}
 
-			SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 			GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, TRUE );
 			ARX_INTERFACE_DrawItem(ITC.aim_maxi, DANAECENTERX + INTERFACE_RATIO(-320+262.f), DANAESIZY + INTERFACE_RATIO(-72.f), 0.0001f, D3DRGB(j,j,j));
@@ -9281,7 +9281,7 @@ void DANAE::DrawAllInterface()
 				if (player.Full_Skill_Etheral_Link >= 40)
 				{
 					float j = 1.0f - fHitFlash;
-					SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 					GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true );
 					long col = 0;
@@ -9458,7 +9458,7 @@ void DANAE::DrawAllInterface()
 
 						if (MouseInRect(posx, posy, posx+INTERFACE_RATIO(32), posy+INTERFACE_RATIO(32)))
 						{
-							SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 							SETALPHABLEND(GDevice,true);
 							SpecialCursor=CURSOR_INTERACTION_ON;
 							ARX_INTERFACE_DrawItem(ITC.hero_inventory_up, posx, posy);
@@ -9492,7 +9492,7 @@ void DANAE::DrawAllInterface()
 
 						if (MouseInRect(posx, posy, posx+INTERFACE_RATIO(32), posy+INTERFACE_RATIO(32)))
 						{
-							SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 							SETALPHABLEND(GDevice,true);
 							ARX_INTERFACE_DrawItem(ITC.hero_inventory_down,	posx, DANAESIZY - INTERFACE_RATIO(101) + INTERFACE_RATIO_LONG(InventoryY) + INTERFACE_RATIO(-3 + 64));
 							SETALPHABLEND(GDevice,false);
@@ -9677,7 +9677,7 @@ void DANAE::DrawAllInterface()
 
 			if (eMouseState == MOUSE_IN_BOOK_ICON)
 			{
-				SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 				SETALPHABLEND(GDevice,true);
 				ARX_INTERFACE_DrawItem(ITC.book, px, py);
 				SETALPHABLEND(GDevice,false);
@@ -9690,7 +9690,7 @@ void DANAE::DrawAllInterface()
 
 			if (eMouseState == MOUSE_IN_INVENTORY_ICON)
 			{
-				SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 				SETALPHABLEND(GDevice,true);
 				ARX_INTERFACE_DrawItem(ITC.backpack,px,py);
 				SETALPHABLEND(GDevice,false);
@@ -9705,7 +9705,7 @@ void DANAE::DrawAllInterface()
 
 				if (eMouseState == MOUSE_IN_STEAL_ICON)
 				{
-					SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 					SETALPHABLEND(GDevice,true);
 					ARX_INTERFACE_DrawItem(ITC.steal, px, py);
 					SETALPHABLEND(GDevice,false);
@@ -9725,7 +9725,7 @@ void DANAE::DrawAllInterface()
 
 					if (eMouseState == MOUSE_IN_INVENTORY_PICKALL_ICON)
 					{
-						SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,true);
 						ARX_INTERFACE_DrawItem(ITC.inventory_pickall, px, py);
 						SETALPHABLEND(GDevice,false);
@@ -9738,7 +9738,7 @@ void DANAE::DrawAllInterface()
 
 				if (eMouseState == MOUSE_IN_INVENTORY_CLOSE_ICON)
 				{
-					SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 					SETALPHABLEND(GDevice,true);
 					ARX_INTERFACE_DrawItem(ITC.inventory_close, px, py);
 					SETALPHABLEND(GDevice,false);
@@ -9754,7 +9754,7 @@ void DANAE::DrawAllInterface()
 
 				if (eMouseState == MOUSE_IN_REDIST_ICON)
 				{
-					SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 					SETALPHABLEND(GDevice,true);
 					ARX_INTERFACE_DrawItem(ITC.Icon_Lvl_Up,px,py);		
 					SETALPHABLEND(GDevice,false);	
@@ -9770,7 +9770,7 @@ void DANAE::DrawAllInterface()
 
 				if (eMouseState == MOUSE_IN_GOLD_ICON)
 				{
-					SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 					SETALPHABLEND(GDevice,true);
 					SpecialCursor=CURSOR_INTERACTION_ON;
 					ARX_INTERFACE_DrawItem(ITC.gold, px, py);
@@ -9942,7 +9942,7 @@ void DANAE::DrawAllInterface()
 
 				if (!(player.rune_flags & (1<<player.SpellToMemorize.iSpellSymbols[i])))
 				{
-					SETBLENDMODE(GDevice,D3DBLEND_INVDESTCOLOR,D3DBLEND_ONE);
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
 					SETALPHABLEND(GDevice,true);
 					
 					g_pRenderApp->renderer->DrawQuad(pos.x, pos.y, INTERFACE_RATIO(32), INTERFACE_RATIO(32), 0,
@@ -10076,7 +10076,7 @@ void DANAE::DrawAllInterface()
 				if (bRenderInCursorMode)
 				{
 				SETALPHABLEND(GDevice, true);
-				SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 				
 					if (mecanism_tc && (MAGICMODE < 0) && (lNbToDrawMecanismCursor < 3))
 					{
@@ -10586,6 +10586,10 @@ long Manage3DCursor(long flags)
 //-----------------------------------------------------------------------------
 void ARX_INTERFACE_RenderCursor(long flag)
 {
+#ifdef ARX_OPENGL
+	//TODO
+	return;
+#endif
 	if (!SPECIAL_DRAGINTER_RENDER)
 	{
 		ManageIgnition_2(DRAGINTER);	
@@ -11099,7 +11103,7 @@ void ARX_INTERFACE_RenderCursor(long flag)
 						if (surf)
 						{
 							SETALPHABLEND(GDevice, true);
-							SETBLENDMODE(GDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 							POSX = DANAESIZX*0.5f - INTERFACE_RATIO_DWORD(surf->m_dwWidth)*0.5f;
 							POSY = DANAESIZY*0.5f - INTERFACE_RATIO_DWORD(surf->m_dwHeight)*0.5f;

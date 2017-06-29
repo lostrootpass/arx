@@ -212,8 +212,7 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 	}
 	else if (Blood_Pos > 1.f)
 	{
-		pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
-		pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::SrcColor);
 		SETALPHABLEND(pd3dDevice, TRUE);
 		SETZWRITE(pd3dDevice, FALSE);
 
@@ -228,8 +227,7 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 	}
 	else if (Blood_Pos > 0.f)
 	{
-		pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
-		pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::SrcColor);
 		SETALPHABLEND(pd3dDevice, TRUE);
 		SETZWRITE(pd3dDevice, FALSE);
 

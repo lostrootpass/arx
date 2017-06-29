@@ -60,6 +60,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEMath.h>
 #include <EERIELight.h>
 #include <EERIEObject.h>
+#include <EERIERenderer.h>
 
 #include <ARX_Collisions.h>
 #include <ARX_CParticleParams.h>
@@ -387,8 +388,7 @@ float CMagicMissile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	// Set Appropriate Renderstates -------------------------------------------
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
 	SETZWRITE(m_pd3dDevice, FALSE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	// Set Texture ------------------------------------------------------------
@@ -1342,8 +1342,7 @@ float CPortal::Render(LPDIRECT3DDEVICE7 device)
 	SETALPHABLEND(device, TRUE);
 	SETZWRITE(device, FALSE);
 
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	//calcul sphere
 	int			nb = this->spherenbpt;
@@ -1448,8 +1447,7 @@ float CPortal::Render(LPDIRECT3DDEVICE7 device)
 	device->SetTexture(0, NULL);
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->sphered3d, this->spherenbpt, (unsigned short *)this->sphereind, this->spherenbfaces * 3, 0);
 
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	SETALPHABLEND(device, FALSE);
 	SETCULL(device, D3DCULL_NONE);
 	SETZWRITE(device, TRUE);

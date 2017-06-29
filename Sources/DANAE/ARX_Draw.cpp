@@ -189,7 +189,7 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 							{
 								first=0;
 								SETZWRITE(pd3dDevice, FALSE );
-								SETBLENDMODE(pd3dDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
+								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 								SETALPHABLEND(pd3dDevice,TRUE);
 								SETTC(pd3dDevice,Boom);
 							}
@@ -246,12 +246,9 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 							{
 								first=0;
 								SETZWRITE(pd3dDevice, FALSE );
-								SETBLENDMODE(pd3dDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
+								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 								SETALPHABLEND(pd3dDevice,TRUE);
 								SETTC(pd3dDevice,Boom);
-#ifdef ARX_OPENGL
-								glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
-#endif
 							}
 
 							EE_RT2(&in,&ltv[0]);
@@ -276,10 +273,10 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 		
 		}
 
-#ifndef ARX_OPENGL
 	SETALPHABLEND(pd3dDevice,FALSE);
 	SETZWRITE(pd3dDevice, TRUE );
 	SetZBias(pd3dDevice,0);
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);
 	
 	if( bSoftRender ) SET_FORCE_NO_VB( bNoVB );
@@ -411,7 +408,7 @@ void ARXDRAW_DrawEyeBall(LPDIRECT3DDEVICE7 pd3dDevice)
 	rgb.r=d;
 	rgb.g=d;
 	rgb.b=d;
-	SETBLENDMODE(pd3dDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(pd3dDevice,TRUE);
 	DrawEERIEObjEx(pd3dDevice,eyeballobj,&angle,&pos,&scale,&rgb);	
 }
@@ -539,11 +536,11 @@ void ARXDRAW_DrawPolyBoom(LPDIRECT3DDEVICE7 pd3dDevice)
 
 						if (Project.improve) 
 						{
-							SETBLENDMODE(pd3dDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						}
 						else  
 						{
-							SETBLENDMODE(pd3dDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 						}
 
 						SETTC(pd3dDevice,Boom);
@@ -592,7 +589,7 @@ void ARXDRAW_DrawPolyBoom(LPDIRECT3DDEVICE7 pd3dDevice)
 							{
 								
 								SETTEXTUREWRAPMODE(pd3dDevice,D3DTADDRESS_CLAMP);
-								SETBLENDMODE(pd3dDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 							SETTC(pd3dDevice, polyboom[i].tc); 
 
  									ARX_DrawPrimitive_SoftClippZ(		&ltv[0],
@@ -610,7 +607,7 @@ void ARXDRAW_DrawPolyBoom(LPDIRECT3DDEVICE7 pd3dDevice)
 								col=_EERIERGB(tt);
 								ltv[0].color=ltv[1].color=ltv[2].color=ltv[3].color=col;								
 								
-								SETBLENDMODE(pd3dDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
+								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 
 									ARX_DrawPrimitive_SoftClippZ(	&ltv[0],
 																	&ltv[1],
@@ -678,7 +675,7 @@ void ARXDRAW_DrawPolyBoom(LPDIRECT3DDEVICE7 pd3dDevice)
 							EE_RT2(&ltv[2],&ltv[2]);
 								
 								SETTEXTUREWRAPMODE(pd3dDevice,D3DTADDRESS_CLAMP);
-								SETBLENDMODE(pd3dDevice,D3DBLEND_INVDESTCOLOR,D3DBLEND_ONE);
+								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
 						SETTC(pd3dDevice, polyboom[i].tc); 
 				
 								ARX_DrawPrimitive_SoftClippZ(	&ltv[0],
@@ -734,7 +731,7 @@ void ARXDRAW_DrawAllInterTransPolyPos(LPDIRECT3DDEVICE7 pd3dDevice)
 
 		if (ttt>=2.f)  //MULTIPLICATIVE
 		{
-			SETBLENDMODE(pd3dDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			ttt*=DIV2;
 			ttt+=0.5f;
 			InterTransPol[i][2].color=InterTransPol[i][1].color=InterTransPol[i][0].color=_EERIERGB(ttt);
@@ -742,18 +739,18 @@ void ARXDRAW_DrawAllInterTransPolyPos(LPDIRECT3DDEVICE7 pd3dDevice)
 		else if (ttt>=1.f) //ADDITIVE
 		{	
 			ttt-=1.f;
-			SETBLENDMODE(pd3dDevice,D3DBLEND_ONE,D3DBLEND_ONE);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			InterTransPol[i][2].color=InterTransPol[i][1].color=InterTransPol[i][0].color=_EERIERGB(ttt);
 		}
 		else if (ttt>0.f)  //NORMAL TRANS
 		{
 			ttt=1.f-ttt;
-			SETBLENDMODE(pd3dDevice,D3DBLEND_DESTCOLOR,D3DBLEND_SRCCOLOR);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::SrcColor);
 			InterTransPol[i][2].color=InterTransPol[i][1].color=InterTransPol[i][0].color=_EERIERGBA(ttt);//ttt);
 		}
 		else  //SUBTRACTIVE
 		{
-			SETBLENDMODE(pd3dDevice,D3DBLEND_ZERO,D3DBLEND_INVSRCCOLOR);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 			ttt=1.f-ttt;
 			InterTransPol[i][2].color=InterTransPol[i][1].color=InterTransPol[i][0].color=_EERIERGB(ttt);
 		}
@@ -796,7 +793,7 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 
 			if ( ttt >= 2.f )  //MULTIPLICATIVE
 			{
-				SETBLENDMODE( pd3dDevice, D3DBLEND_ONE, D3DBLEND_ONE );
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 				ttt	*= DIV2;
 				ttt	+= 0.5f;
 				ep->tv[3].color = ep->tv[2].color = ep->tv[1].color = ep->tv[0].color = _EERIERGB( ttt );
@@ -804,18 +801,18 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 			else if ( ttt >= 1.f ) //ADDITIVE
 			{	
 				ttt -= 1.f;
-				SETBLENDMODE( pd3dDevice, D3DBLEND_ONE, D3DBLEND_ONE );
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 				ep->tv[3].color = ep->tv[2].color = ep->tv[1].color = ep->tv[0].color = _EERIERGB( ttt );
 			}
 			else if ( ttt > 0.f )  //NORMAL TRANS
 			{
 				ttt = 1.f - ttt;
-				SETBLENDMODE( pd3dDevice, D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR );
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::SrcColor);
 				ep->tv[3].color = ep->tv[2].color = ep->tv[1].color = ep->tv[0].color = _EERIERGBA(ttt);  
 			}
 			else  //SUBTRACTIVE
 			{
-				SETBLENDMODE( pd3dDevice, D3DBLEND_ZERO, D3DBLEND_INVSRCCOLOR );
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 				ttt = 1.f - ttt;
 				ep->tv[3].color = ep->tv[2].color = ep->tv[1].color = ep->tv[0].color = _EERIERGB( ttt );
 			}
@@ -824,8 +821,7 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 
 				if (ep->type & POLY_LAVA)
 				{
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR );
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 					SETALPHABLEND( pd3dDevice, TRUE );	
 					D3DTLVERTEX verts[4];
 					SETTC( pd3dDevice, enviro );
@@ -859,8 +855,7 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 							verts[i].color	= 0xFF666666;
 					}	
 
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR );
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, to, 0, flg_NOCOUNT_USEVB );
 				}
 			}
@@ -868,8 +863,7 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 
 		if ( ep->type & POLY_WATER )
 		{
-				pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR );
-				pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 
 				SETALPHABLEND( pd3dDevice, TRUE );	
 				

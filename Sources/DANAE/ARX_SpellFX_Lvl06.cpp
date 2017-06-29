@@ -60,6 +60,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIELight.h"
 #include <EERIEMath.h>
 #include <EERIEObject.h>
+#include <EERIERenderer.h>
 
 #include "ARX_Spells.h"
 #include "ARX_CSpellFx.h"
@@ -227,8 +228,7 @@ float CCreateField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
 	SETZWRITE(m_pd3dDevice, FALSE);
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	//-------------------------------------------------------------------------
@@ -834,8 +834,7 @@ void CRiseDead::AddStone(EERIE_3D * pos)
 void CRiseDead::DrawStone(LPDIRECT3DDEVICE7 _pD3DDevice)
 {
 	int	nb = 256;
-	_pD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVDESTCOLOR);
-	_pD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
 	SETALPHABLEND(_pD3DDevice, TRUE);
 
 	while (nb--)
@@ -1232,8 +1231,7 @@ float CRiseDead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETZWRITE(m_pd3dDevice, FALSE);
 
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	//-------------------------------------------------------------------------
@@ -1290,8 +1288,7 @@ float CRiseDead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETZWRITE(m_pd3dDevice, TRUE);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcAlpha, EERIEBlendType::OneMinusSrcAlpha);
 	this->DrawStone(m_pd3dDevice);
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_WRAP);
 	SETALPHABLEND(m_pd3dDevice, FALSE);
@@ -1730,8 +1727,7 @@ float CParalyse::Render(LPDIRECT3DDEVICE7 pD3DDevice)
 	SETALPHABLEND(pD3DDevice, TRUE);
 	SETZWRITE(pD3DDevice, FALSE);
 
-	pD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	pD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	int			nb;
 	EERIE_3D	* vertex;
@@ -2104,8 +2100,7 @@ float CParalyse::Render(LPDIRECT3DDEVICE7 pD3DDevice)
 		}
 	}
 
-	pD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	pD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	SETALPHABLEND(pD3DDevice, FALSE);
 	SETZWRITE(pD3DDevice, TRUE);
 

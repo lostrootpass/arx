@@ -4809,8 +4809,7 @@ void DrawMagicSightInterface(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	if (Flying_Eye && Flying_Eye->m_pddsSurface) 
 	{
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR );										
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 		float col=(0.75f+PULSATE*DIV20);
 
 		if (col>1.f) col=1.f;
@@ -4838,8 +4837,7 @@ void DrawMagicSightInterface(LPDIRECT3DDEVICE7 m_pd3dDevice)
 				MagicSightFader=0.f;
 		}
 
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);	
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	}
 }
 		
@@ -5798,10 +5796,9 @@ HRESULT DANAE_NoRenderEnd()
 		if(danaeApp.DANAEStartRender())
 #endif
 		{
-#ifndef ARX_OPENGL
 			SETZWRITE(GDevice, TRUE);
 			SETALPHABLEND(GDevice, FALSE);
-#endif
+
 			iVPOS = 0;
 			ShowValue(&oBENCH_STARTUP, &BENCH_STARTUP, "Startup");
 			ShowValue(&oBENCH_PLAYER, &BENCH_PLAYER, "Player");
@@ -7199,8 +7196,7 @@ HRESULT DANAE::Render()
 			pParticleManager->Render(m_pd3dDevice);
 		}
 
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,   D3DBLEND_ONE );
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE );			
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		SETZWRITE(m_pd3dDevice, FALSE );
 		SETALPHABLEND(m_pd3dDevice,TRUE);
 		ARX_FOGS_Render(0);
@@ -7305,8 +7301,7 @@ HRESULT DANAE::Render()
 	{
 		SETZWRITE(m_pd3dDevice, FALSE );
 		SETALPHABLEND(m_pd3dDevice,TRUE);
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);	
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		
 		g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
 				NULL, 0, EERIERGB(0.2f,0.2f,1.f));		
@@ -7692,8 +7687,7 @@ void DANAE::GoFor2DFX()
 		// End 2D Pass ***************************************************************************
 
 		{
-			GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,   D3DBLEND_ONE);
-			GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			SETALPHABLEND(GDevice,TRUE);		
 			SETZWRITE(GDevice, FALSE );
 			SETCULL(GDevice,D3DCULL_NONE);
@@ -8558,11 +8552,11 @@ finish:; //----------------------------------------------------------------
 
 	if (bRenderInterList)
 	{
-		//SETALPHABLEND(GDevice, FALSE);
+		SETALPHABLEND(GDevice, FALSE);
 		PopAllTriangleList(true);
-		//SETALPHABLEND(GDevice, TRUE);
+		SETALPHABLEND(GDevice, TRUE);
 		//PopAllTriangleListTransparency();
-		//SETALPHABLEND(GDevice, FALSE);
+		SETALPHABLEND(GDevice, FALSE);
 	}
 
 	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, true);
@@ -8597,6 +8591,30 @@ finish:; //----------------------------------------------------------------
 
 		if ((SHOWLEVEL >= 0) && (SHOWLEVEL<32))
 			ARX_MINIMAP_Show(GDevice, SHOWLEVEL, 1, 1);
+	}
+
+	// CURSOR Rendering
+	SETALPHABLEND(GDevice, false);
+
+	if (DRAGINTER)
+	{
+		ARX_INTERFACE_RenderCursor();
+
+		if (bRenderInterList)
+		{
+			SETALPHABLEND(GDevice, FALSE);
+			PopAllTriangleList(true);
+			SETALPHABLEND(GDevice, TRUE);
+			PopAllTriangleListTransparency();
+			SETALPHABLEND(GDevice, FALSE);
+		}
+
+		ARX_INTERFACE_HALO_Flush(0);
+	}
+	else
+	{
+		ARX_INTERFACE_HALO_Flush(0);
+		ARX_INTERFACE_RenderCursor();
 	}
 
 	//----------------RENDEREND------------------------------------------------
@@ -8883,6 +8901,11 @@ void DANAEGL::GoFor2DFX()
 		// End 2D Pass ***************************************************************************
 
 		{
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
+			SETALPHABLEND(GDevice, TRUE);
+			SETZWRITE(GDevice, FALSE);
+			SETCULL(GDevice, D3DCULL_NONE);
+
 			for (int i = 0; i < TOTPDL; i++)
 			{
 				EERIE_LIGHT * el = PDL[i];

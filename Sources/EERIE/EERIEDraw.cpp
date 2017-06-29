@@ -365,8 +365,7 @@ void DRAWLATER_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 	if (curdrawlater==0) return;
 
 		D3DTLVERTEX verts[4];
-		pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
-		pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR );	
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 		SETZWRITE(pd3dDevice,FALSE); 
 		SETALPHABLEND(pd3dDevice,TRUE);					
 		SETCULL( pd3dDevice, D3DCULL_NONE );
@@ -491,8 +490,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 					
 				if ( ptcTexture->userflags & POLY_METAL)
 				{
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR );
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 					SETALPHABLEND(pd3dDevice,TRUE);	
 					SETTC(pd3dDevice,NULL); 
 
@@ -502,8 +500,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 
 				if ( (ep->type & POLY_LAVA) || (ep->type & POLY_WATER) )
 				{
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR );
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 					SETALPHABLEND(pd3dDevice,TRUE);	
 					D3DTLVERTEX verts[4];
 					SETTC(pd3dDevice,enviro);
@@ -524,7 +521,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 						}
 						else
 						{
-							pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE );
+							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 							verts[i].tu=ep->v[i].sx*DIV800+EEsin((ep->v[i].sx)*DIV600+(float)FrameTime*DIV1000)*DIV9;
 							verts[i].tv=ep->v[i].sz*DIV800+EEcos((ep->v[i].sz)*DIV600+(float)FrameTime*DIV1000)*DIV9;
 
@@ -566,8 +563,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 							verts[i].color=0xFF666666;
 						}	
 
-						pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
-						pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 						g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, verts, to, 0, flg_NOCOUNT_USEVB );
 						EERIEDrawnPolys+=2;
 					}
@@ -612,8 +608,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 
 				if (ptcTexture->delayed_nb)
 				{
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR );	
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 					SETZWRITE(pd3dDevice,FALSE); 
 					SETALPHABLEND(pd3dDevice,TRUE);					
 					D3DTLVERTEX verts[4];
@@ -785,8 +780,7 @@ int			nb;
 		(!ep->tv[1].color)&&
 		(!ep->tv[2].color) ) return;
 
-	pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_DESTCOLOR);
-	pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_SRCCOLOR);	
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::SrcColor);
 	SETALPHABLEND(pd3dDevice,TRUE);			
 	SETTC(pd3dDevice,ep->tex);
 
@@ -882,8 +876,7 @@ int			nb;
 	pd3dDevice->SetTextureStageState(0,D3DTSS_ALPHAARG2,D3DTA_DIFFUSE);
 	pd3dDevice->SetTextureStageState(0,D3DTSS_ALPHAOP,D3DTOP_MODULATE);
 
-	pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
-	pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ZERO);	
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	SETALPHABLEND(pd3dDevice,FALSE); 
 	SETZWRITE(pd3dDevice,TRUE); 
 }
@@ -1277,19 +1270,15 @@ void SETZWRITE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD _dwState)
 
 void SETALPHABLEND(LPDIRECT3DDEVICE7 pd3dDevice,DWORD state)
 {
-#ifndef ARX_OPENGL
+#ifdef ARX_OPENGL
+	if (state == TRUE)
+		glEnable(GL_BLEND);
+	else
+		glDisable(GL_BLEND);
+#else
 	pd3dDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, state);
 #endif
 }	
-
-void SETBLENDMODE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD srcblend,DWORD destblend)
-{
-#ifndef ARX_OPENGL
-	pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  srcblend  );
-	pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, destblend );
-#endif
-	
-}
 
 void EERIEPOLY_DrawWired(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY *ep,long col)
 {

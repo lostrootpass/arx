@@ -75,6 +75,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "EERIELight.h"
 #include "EERIEObject.h"
+#include "EERIERenderer.h"
 
 #define new new(_NORMAL_BLOCK,__FILE__, __LINE__)
 
@@ -280,7 +281,7 @@ float CCurePoison::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return 0.f;
 	}
 
-	pPS->Render(m_pd3dDevice, D3DBLEND_ONE, D3DBLEND_ONE);
+	pPS->Render(m_pd3dDevice, EERIEBlendType::One, EERIEBlendType::One);
 
 	return 1;
 }
@@ -425,8 +426,7 @@ float CRuneOfGuarding::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	float z = eSrc.z;
 
 	SETZWRITE(m_pd3dDevice, FALSE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	//----------------------------
@@ -869,8 +869,7 @@ float CPoisonProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
 	SETZWRITE(m_pd3dDevice, FALSE);
 	//-------------------------------------------------------------------------
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	// ------------------------------------------------------------------------
@@ -1307,8 +1306,7 @@ float CRepelUndead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	SETZWRITE(m_pd3dDevice, FALSE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	//----------------------------
@@ -1560,8 +1558,7 @@ void CLevitate::AddStone(EERIE_3D * pos)
 /*--------------------------------------------------------------------------*/
 void CLevitate::DrawStone(LPDIRECT3DDEVICE7 device)
 {
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_INVDESTCOLOR);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
 	SETALPHABLEND(device, TRUE);
 	int	nb = 256;
 
@@ -1891,8 +1888,7 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 	}
 
 	//tracé du cone back
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(device, TRUE);
 	SETTEXTUREWRAPMODE(device, D3DTADDRESS_MIRROR);
 
@@ -1948,12 +1944,10 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 	}
 
 	//tracé des pierres
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcAlpha, EERIEBlendType::OneMinusSrcAlpha);
 	this->DrawStone(device);
 
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	SETALPHABLEND(device, FALSE);
 	SETZWRITE(device, TRUE);
 

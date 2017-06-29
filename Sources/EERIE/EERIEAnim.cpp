@@ -1002,8 +1002,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 	if(	_pTex->ulNbVertexListCull_TNormalTrans||
 		_pTex->ulNbVertexListCull_TNormalTransH)
 	{
-		GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR);
-		GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_SRCCOLOR);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::SrcColor);
 
 		PopOneTriangleListClipp(_pTex->pVertexListCull_TNormalTransH,(int*)&_pTex->ulNbVertexListCull_TNormalTransH);
 
@@ -1021,8 +1020,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 	if(	_pTex->ulNbVertexListCull_TAdditive||
 		_pTex->ulNbVertexListCull_TAdditiveH)
 	{
-		GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-		GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 		PopOneTriangleListClipp(_pTex->pVertexListCull_TAdditiveH,(int*)&_pTex->ulNbVertexListCull_TAdditiveH);
 
@@ -1039,8 +1037,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 
 	if (_pTex->ulNbVertexListCull_TSubstractive)
 	{
-		GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
-		GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_INVSRCCOLOR);	
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 
 		PopOneTriangleListClipp(_pTex->pVertexListCull_TSubstractiveH,(int*)&_pTex->ulNbVertexListCull_TSubstractiveH);
 
@@ -1057,8 +1054,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 
 	if (_pTex->ulNbVertexListCull_TMultiplicative)
 	{
-		GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-		GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 		PopOneTriangleListClipp(_pTex->pVertexListCull_TMultiplicativeH,(int*)&_pTex->ulNbVertexListCull_TMultiplicativeH);
 	
@@ -1076,8 +1072,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 	if(	_pTex->ulNbVertexListCull_TMetal||
 		_pTex->ulNbVertexListCull_TMetalH)
 	{
-		GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR);
-		GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 
 		PopOneTriangleListClipp(_pTex->pVertexListCull_TMetalH,(int*)&_pTex->ulNbVertexListCull_TMetalH);
 		
@@ -1129,8 +1124,7 @@ void PopOneInterZMapp(TextureContainer *_pTex)
 {
 	if(!_pTex->TextureRefinement) return;
 
-	GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO );
-	GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR );	
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 
 	if(_pTex->TextureRefinement->vPolyInterZMap.size())
 	{
@@ -1277,8 +1271,7 @@ void PopAllTriangleListTransparency()
 	SETALPHABLEND(GDevice,TRUE);
 	SETZWRITE(GDevice, FALSE); 
 
-	GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR );
-	GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 	PopOneTriangleList(&TexSpecialColor);
 
 	pTex=GetTextureList();
@@ -1345,8 +1338,7 @@ void PopOneInterBumpTANDL(LPDIRECT3DDEVICE7 _pDevice,TextureContainer *_pTex)
 		//																		Initializing
 		CMY_DYNAMIC_VERTEXBUFFER* pDVB	=	pDynamicVertexBufferBump; //Fixing bump issue : using pDynamicVertexBuffer may result on fatal error on some GC.
 
-		_pDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND , D3DBLEND_DESTCOLOR );
-		_pDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR );	
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::SrcColor);
 		
 		_pDevice->SetTexture( 0, _pTex->m_pddsBumpMap );
 
@@ -1485,8 +1477,7 @@ void PopOneInterBump(LPDIRECT3DDEVICE7 _pDevice,TextureContainer *_pTex)
 		//																		Initializing
 		bool bUseVertexBuffer = bSoftRender;	//Fix Bump issues on some GC when bGATI8500 : use VB instead of DrawPrimitive.
 
-		_pDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND , D3DBLEND_DESTCOLOR );
-		_pDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR );	
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::SrcColor);
 		
 		_pDevice->SetTexture( 0, _pTex->m_pddsBumpMap );
 
@@ -3703,8 +3694,7 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 							SpawnMetalShine( (EERIE_3D *)&eobj->vertexlist3[eobj->facelist[i].vid[0]].vert, r, g, b, GetInterNum( io ) );
 					}
 
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR );
-					pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 					SETALPHABLEND( pd3dDevice, TRUE );			
 					SETZWRITE( pd3dDevice, FALSE );
 					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, &vert_list, 3, 0, bSoftRender?EERIE_USEVB:0);

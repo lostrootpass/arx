@@ -230,8 +230,7 @@ void ARX_SPEECH_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 		sSize.cy = DANAESIZY >> 1;
 	}
 
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(pd3dDevice, TRUE);
 
 	int iEnd = igrec + sSize.cy;
@@ -719,8 +718,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 						danaeApp.DANAEStartRender();
 
 						SETTC(GDevice, NULL);
-						GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
-						GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 						GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
 						GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, FALSE);
 						EERIEDrawFill2DRectDegrad(GDevice,
@@ -741,8 +739,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 						                          RGBA_MAKE(0, 0, 0, 255),
 						                          RGBA_MAKE(255, 255, 255, 255));
 
-						GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-						GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 				
 						danaeApp.EnableZBuffer();
 						GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);

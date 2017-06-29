@@ -27,6 +27,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #define ARX_CPARTICLESYSTEM_H
 
 #include "eerietypes.h"
+#include "EERIERendererTypes.h"
 #include <d3d.h>
 #include <list>
 #include <vector>
@@ -127,7 +128,7 @@ class CParticleSystem
 
 
 	public:
-		void	Render(LPDIRECT3DDEVICE7 _pD3DDevice, int _iSRCBLEND = D3DBLEND_SRCALPHA, int _iDESTBLEND = D3DBLEND_ONE/*flag post prod/genre filtre*/);
+		void	Render(LPDIRECT3DDEVICE7 _pD3DDevice, EERIEBlendType _iSRCBLEND = EERIEBlendType::SrcAlpha, EERIEBlendType _iDESTBLEND = EERIEBlendType::One/*flag post prod/genre filtre*/);
 		bool	IsAlive();
 		void	Update(long);
 		void	RecomputeDirection();

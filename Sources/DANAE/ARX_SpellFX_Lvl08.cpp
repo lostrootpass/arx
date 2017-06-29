@@ -56,6 +56,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEDraw.h>
 #include <EERIELight.h>
 #include <EERIEMath.h>
+#include <EERIERenderer.h>
 
 #include <ARX_CSpellFx.h>
 #include <ARX_Damages.h>
@@ -220,8 +221,7 @@ float CExplosion::Render(LPDIRECT3DDEVICE7 device)
 	SETALPHABLEND(device, TRUE);
 	SETZWRITE(device, FALSE);
 
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	//calcul du disque
 	D3DTLVERTEX d3dvs, *d3dv;
@@ -420,8 +420,7 @@ float CExplosion::Render(LPDIRECT3DDEVICE7 device)
 	device->SetTexture(0, NULL);
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX, disqued3d, disquenbvertex, (unsigned short *)disqueind, disquenbvertex + 2, 0);
 
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	SETALPHABLEND(device, FALSE);
 	SETZWRITE(device, TRUE);
 

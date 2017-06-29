@@ -339,8 +339,7 @@ void ARX_DrawAfterQuickLoad()
 	if(!pTex) return;
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,TRUE);
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	g_pRenderApp->renderer->DrawQuad(
 						0, 
@@ -2317,8 +2316,7 @@ D3DTLVERTEX d3dvertex[4];
 	SETTC(GDevice,NULL);
 	SETALPHABLEND(GDevice,TRUE);
 
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 	SETZWRITE(GDevice, false);
 	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,false);
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
@@ -3964,10 +3962,10 @@ int iDecMenuPrincipaleY=50;
 		}
 	}
 
+	SETALPHABLEND(GDevice, FALSE);
 #ifdef ARX_OPENGL
 	danaeGLApp.DANAEEndRender();
 #else
-	SETALPHABLEND(GDevice,FALSE);
 	GDevice->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
@@ -4661,13 +4659,13 @@ void CMenuElementText::RenderMouseOver()
 
 	if(bNoMenu) return;
 
-#ifndef ARX_OPENGL
 	pInputHandler->SetMouseOver();
 
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  true);
-	GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
 #endif
+
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	EERIE_3D ePos;
 	ePos.x = (float)rZone.left;
@@ -5387,8 +5385,7 @@ void CMenuCheckButton::Render()
 	if(bNoMenu) return;
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true);
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	if (vTex.size())
 	{
@@ -5437,8 +5434,7 @@ void CMenuCheckButton::RenderMouseOver()
 	pInputHandler->SetMouseOver();
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true);
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	TextureContainer *pTex = vTex[iState];
 
@@ -5578,9 +5574,9 @@ MENUSTATE CWindowMenu::Render()
 
 #ifndef ARX_OPENGL
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, false);
-		GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-		GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
 #endif
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
+
 
 	MENUSTATE eMS=NOP;
 
@@ -6458,22 +6454,27 @@ int CWindowMenuConsole::Render()
 	//------------------------------------------------------------------------
 	//Affichage de la console
 
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
+#endif
 	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(iPosX), ARX_CLEAN_WARN_CAST_FLOAT(iSavePosY),
 		RATIO_X(pTexBackground->m_dwWidth), RATIO_Y(pTexBackground->m_dwHeight),
 		0, pTexBackground, 0, ARX_OPAQUE_WHITE);
 
-	danaeApp.EnableZBuffer();
 
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+#ifndef ARX_OPENGL
+	danaeApp.EnableZBuffer();
+#endif
+
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
+
 
 	SETALPHABLEND(GDevice, false);
 
 	SETALPHABLEND(GDevice,FALSE);
+
 	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(iPosX), ARX_CLEAN_WARN_CAST_FLOAT(iSavePosY),
 		RATIO_X(pTexBackgroundBorder->m_dwWidth), RATIO_Y(pTexBackgroundBorder->m_dwHeight),
 		0, pTexBackgroundBorder, 0, ARX_OPAQUE_WHITE);
@@ -7043,8 +7044,7 @@ void CMenuButton::RenderMouseOver()
 		_TCHAR *pText=vText[iPos];
 
 		GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  true);
-		GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-		GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		
 		EERIE_3D ePos;
 		ePos.x = (float)rZone.left;
@@ -7340,8 +7340,7 @@ void CMenuSliderText::RenderMouseOver()
 	int iY = pInputHandler->iMouseAY;
 
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, true);
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	if ((iX >= rZone.left) &&
 		(iY >= rZone.top) &&
@@ -7578,8 +7577,7 @@ void CMenuSlider::Render()
 	float iTexH = 0;
 
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, true);
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	D3DTLVERTEX v[4];
 	v[0].color = v[1].color = v[2].color = v[3].color = ARX_OPAQUE_WHITE;
@@ -7640,8 +7638,7 @@ void CMenuSlider::RenderMouseOver()
 	int iY = pInputHandler->iMouseAY;
 
 	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, true);
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	if ((iX >= rZone.left) &&
 		(iY >= rZone.top) &&

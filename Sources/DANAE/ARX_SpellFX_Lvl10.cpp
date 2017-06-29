@@ -58,6 +58,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include <EERIEMath.h>
 #include <EERIEDraw.h>
+#include <EERIERenderer.h>
 
 #include "ARX_Spells.h"
 #include "ARX_CSpellFx.h"
@@ -258,8 +259,7 @@ float CControlTarget::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	//----------------------------
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	if (tex_mm && tex_mm->m_pddsSurface)

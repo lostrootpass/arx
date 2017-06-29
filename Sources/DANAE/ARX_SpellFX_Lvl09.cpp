@@ -59,6 +59,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEMath.h>
 #include <EERIEDraw.h>
 #include <EERIEObject.h>
+#include <EERIERenderer.h>
 
 #include "ARX_Spells.h"
 #include "ARX_CSpellFx.h"
@@ -547,8 +548,7 @@ float CSummonCreature::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETZWRITE(m_pd3dDevice, FALSE);
 
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	//-------------------------------------------------------------------------
@@ -879,7 +879,7 @@ float CIncinerate::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	SETZWRITE(_pD3DDevice, FALSE);
 	SETALPHABLEND(_pD3DDevice, TRUE);
 
-	pPSStream.Render(_pD3DDevice, D3DBLEND_ONE, D3DBLEND_ONE);
+	pPSStream.Render(_pD3DDevice, EERIEBlendType::One, EERIEBlendType::One);
 
 	return 1;
 }
@@ -985,8 +985,7 @@ float CNegateMagic::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		SETTC(m_pd3dDevice, tex_sol);
 	}
 
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	fSize = ulCurrentTime * fOneOnDuration * 200;
@@ -1058,8 +1057,7 @@ float CNegateMagic::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	stitescale.y = 3.f;
 	stitescale.z = 3.f;
 	DrawEERIEObjEx(m_pd3dDevice, ssol, &stiteangle, &stitepos, &stitescale, &stitecolor);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	stitecolor.r = 0.5f;
 	stitecolor.g = 0.f;
 	stitecolor.b = 0.5f;

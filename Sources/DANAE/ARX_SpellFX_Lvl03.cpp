@@ -60,6 +60,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEMath.h>
 #include <EERIELight.h>
 #include <EERIEObject.h>
+#include <EERIERenderer.h>
 
 #include <ARX_Spells.h>
 #include <ARX_CSpellFx.h>
@@ -71,7 +72,6 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <ARX_CParticles.h>
 #include <ARX_CParticleParams.h>
 #include <ARX_Damages.h>
-#include <EERIEobject.h>
 #include "ARX_Time.h"
 
 
@@ -450,9 +450,9 @@ float CFireBall::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETZWRITE(m_pd3dDevice, FALSE);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
-	pPSFire.Render(m_pd3dDevice, D3DBLEND_ONE, D3DBLEND_ONE);
-	pPSFire2.Render(m_pd3dDevice, D3DBLEND_ONE, D3DBLEND_ONE);
-	pPSSmoke.Render(m_pd3dDevice, D3DBLEND_ONE, D3DBLEND_ONE);
+	pPSFire.Render(m_pd3dDevice, EERIEBlendType::One, EERIEBlendType::One);
+	pPSFire2.Render(m_pd3dDevice, EERIEBlendType::One, EERIEBlendType::One);
+	pPSSmoke.Render(m_pd3dDevice, EERIEBlendType::One, EERIEBlendType::One);
 
 	return 1 - 0.5f * rnd();
 }
@@ -678,8 +678,7 @@ float CIceProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETCULL(m_pd3dDevice, D3DCULL_CW);
 	SETZWRITE(m_pd3dDevice, FALSE);
 
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVDESTCOLOR);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
 	SETALPHABLEND(m_pd3dDevice, TRUE);
 
 	iMax = (int)((iNumber * 2) * fOneOnDuration * ulCurrentTime);
@@ -1035,8 +1034,7 @@ float CSpeed::Render(LPDIRECT3DDEVICE7 device)
 {
 	SETCULL(device, D3DCULL_NONE);
 	SETALPHABLEND(device, TRUE);
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	SETTC(device, NULL);
 	
@@ -1050,8 +1048,7 @@ float CSpeed::Render(LPDIRECT3DDEVICE7 device)
 	}
 
 	SETALPHABLEND(device, FALSE);
-	device->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE);
-	device->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 
 	return 0;
 }
@@ -1188,7 +1185,7 @@ if (ulCurrentTime >= ulDuration)
 //---------------------------------------------------------------------
 float CCreateFood::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 {
-	pPS->Render(m_pd3dDevice, D3DBLEND_ONE, D3DBLEND_ONE);
+	pPS->Render(m_pd3dDevice, EERIEBlendType::One, EERIEBlendType::One);
 
 	return 1;
 }

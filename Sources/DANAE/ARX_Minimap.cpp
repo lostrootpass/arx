@@ -448,15 +448,13 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 			}
 
 			SETALPHABLEND(m_pd3dDevice, TRUE);
-			m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO);
-			m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 			m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
 			SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
 
 			if (fl2)
 			{
-				m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-				m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
+				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::OneMinusSrcColor);
 			}
 		}
 		else
@@ -820,8 +818,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 										if (!fl2)
 										{
 											SETALPHABLEND(m_pd3dDevice, true);
-											m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-											m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+											g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 										}
 										else
 											SETALPHABLEND(m_pd3dDevice, true);

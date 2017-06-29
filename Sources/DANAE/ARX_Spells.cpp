@@ -7110,8 +7110,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			ARX_SOUND_PlaySFX(SND_SPELL_LIGHTNING_START);
 			SPELLCAST_Notify(i);
 			// Draws White Flash on Screen
-			GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-			GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);												
+			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			SETALPHABLEND(GDevice,TRUE);
 			float val = 1.f; 
 
@@ -8130,8 +8129,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 						DynLight[spells[i].longinfo2].fallstart=Es*1.5f;
 					}
 
-					GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,   D3DBLEND_ONE );
-					GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE );
+					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 					SETALPHABLEND(GDevice,TRUE);
 					SETZWRITE(GDevice, FALSE );
 					cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
@@ -9268,8 +9266,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 							DynLight[spells[i].longinfo2].fallstart=Es*1.5f;
 						}
 
-						GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,   D3DBLEND_ONE );
-						GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE );
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						SETZWRITE(GDevice, FALSE );
 						cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
@@ -9368,8 +9365,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 						}
 
 						SETCULL(GDevice,D3DCULL_NONE);
-						GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,   D3DBLEND_ONE );
-						GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE );
+						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						SETALPHABLEND(GDevice,TRUE);
 						SETZWRITE(GDevice, FALSE );
 						cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
