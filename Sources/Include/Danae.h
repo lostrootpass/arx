@@ -167,7 +167,6 @@ class DANAE : public CD3DApplication
 		HRESULT Render();
 		HRESULT FrameMove(FLOAT fTimeKey);
 		HRESULT FinalCleanup();
-		void ManageKeyMouse();
 		BOOL ManageEditorControls();
 		void ManagePlayerControls();
 		void DrawAllInterface();
@@ -198,7 +197,6 @@ protected:
 	HRESULT Render();
 	HRESULT FrameMove(FLOAT fTimeKey);
 	HRESULT FinalCleanup();
-	void ManageKeyMouse();
 	BOOL ManageEditorControls();
 	void ManagePlayerControls();
 	void DrawAllInterface();

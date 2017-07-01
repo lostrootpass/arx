@@ -1791,11 +1791,21 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	Dbg_str("Application Creation Success");
 
 #ifdef ARX_OPENGL
-
-	ARX_MINIMAP_FirstInit();
-
 	SDL_Init(SDL_INIT_EVERYTHING);
 	pInputHandler = new ARXInputHandlerSDL();
+	char szPath[256];
+	sprintf(szPath, "%s\\cfg.ini", Project.workingdir);
+
+	if (!FileExist(szPath))
+	{
+		sprintf(szPath, "%s\\cfg_default.ini", Project.workingdir);
+	}
+
+	pMenuConfig = new CMenuConfig(szPath);
+	pMenuConfig->ReadAll();
+
+
+	ARX_MINIMAP_FirstInit();
 
 	//read from cfg file
 	if(strlen(Project.localisationpath) == 0)
@@ -1862,7 +1872,8 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	Dbg_str("AInput Init");
 
 	//TODO: FIX: if ARX Input is enabled, debugging becomes impossible.
-	if(0) //while (!ARX_INPUT_Init(hInstance,danaeApp.m_hWnd))
+	//if(0) 
+		while (!ARX_INPUT_Init(hInstance,danaeApp.m_hWnd))
 	{		
 		Sleep(30);
 		i--;
@@ -1985,7 +1996,10 @@ TextureContainer * _GetTexture_NoRefinement(char * text)
 //*************************************************************************************
 INTERACTIVE_OBJ * FlyingOverObject(EERIE_S2D * pos,long flag)
 {
-
+#ifdef ARX_OPENGL
+	//TODO
+	return nullptr;
+#endif
 	if ((flag & 1) && danaeApp.Lock()) 
 	{
 		INTERACTIVE_OBJ * io=GetFromInventory(pos);
@@ -3416,6 +3430,9 @@ void ExitProc()
 	
 void SetFilteringMode(LPDIRECT3DDEVICE7 m_pd3dDevice,long mode)
 {
+#ifdef ARX_OPENGL
+	return;
+#endif
 	if (POINTINTERPOLATION)
 	{
 		m_pd3dDevice->SetTextureStageState( 0, D3DTSS_MIPFILTER, D3DTFP_POINT  );	
@@ -7758,6 +7775,8 @@ HRESULT DANAEGL::Render()
 {
 	DANAE_RenderStartTime();
 
+	ACTIVECAM = &subj;
+
 	if(DANAE_ManageSplashThings())
 		return DANAE_NoRenderEnd();
 
@@ -7853,6 +7872,23 @@ HRESULT DANAEGL::Render()
 		//GDevice->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
 		return FALSE;
 	}
+
+	// Now computes screen center
+
+	//Setting long from long
+	subj.centerx = DANAECENTERX = DANAESIZX >> 1;
+	subj.centery = DANAECENTERY = DANAESIZY >> 1;
+	//Casting long to float
+	subj.posleft = subj.transform.xmod = ARX_CLEAN_WARN_CAST_FLOAT(DANAECENTERX);
+	subj.postop = subj.transform.ymod = ARX_CLEAN_WARN_CAST_FLOAT(DANAECENTERY);
+
+
+	// Computes X & Y screen ratios compared to a standard 640x480 screen
+	if (DANAESIZX == 640) Xratio = 1.f;
+	else Xratio = DANAESIZX * DIV640;
+
+	if (DANAESIZY == 480) Yratio = 1.f;
+	else Yratio = DANAESIZY * DIV480;
 
 	// Finally computes current focal
 	BASE_FOCAL = (float)CURRENT_BASE_FOCAL + (float)FOKMOD + (BOW_FOCAL*DIV4);
@@ -8405,12 +8441,14 @@ HRESULT DANAEGL::Render()
 			pParticleManager->Render(0);
 		}
 
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
+		SETZWRITE(0, FALSE);
+		SETALPHABLEND(0, TRUE);
 		ARX_FOGS_Render(0);
 
 		ARX_PARTICLES_Render(0, &subj);
-
-		//TODO
 		UpdateObjFx(0, &subj);
+		SETALPHABLEND(0, FALSE);
 
 		BENCH_PARTICLES = EndBench();
 
@@ -8472,8 +8510,8 @@ HRESULT DANAEGL::Render()
 	if (ItemToBeAdded[0] != 0)
 		DanaeItemAdd();
 
-	//SETALPHABLEND(danaeGLApp.m_pd3dDevice, TRUE);
-	//SETZWRITE(danaeGLApp.m_pd3dDevice, FALSE);
+	SETALPHABLEND(0, TRUE);
+	SETZWRITE(0, FALSE);
 
 	// Checks some specific spell FX
 	CheckMr();
@@ -8496,10 +8534,25 @@ HRESULT DANAEGL::Render()
 		DrawMagicSightInterface(0);
 	}
 
+	if (PLAYER_PARALYSED)
+	{
+		SETZWRITE(0, FALSE);
+		SETALPHABLEND(0, TRUE);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
+
+		g_pRenderApp->renderer->DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
+			NULL, 0, EERIERGB(0.2f, 0.2f, 1.f));
+		SETALPHABLEND(0, FALSE);
+		SETZWRITE(0, TRUE);
+	}
+
 	if (FADEDIR)
 	{
 		ManageFade();
 	}
+
+	SETALPHABLEND(0, FALSE);
+	SETZWRITE(0, TRUE);
 
 	// Reset Last Key
 	danaeGLApp.kbd.lastkey = -1;
@@ -8525,7 +8578,7 @@ finish:; //----------------------------------------------------------------
 
 	// INTERFACE
 	// Remove the Alphablend State if needed : NO Z Clear
-	//SETALPHABLEND(m_pd3dDevice, FALSE);
+	SETALPHABLEND(0, FALSE);
 	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 
 	// Draw game interface if needed
@@ -8735,11 +8788,6 @@ HRESULT DANAEGL::FrameMove(FLOAT fTimeKey)
 HRESULT DANAEGL::FinalCleanup()
 {
 	return S_OK;
-}
-
-void DANAEGL::ManageKeyMouse()
-{
-
 }
 
 BOOL DANAEGL::ManageEditorControls()
@@ -9327,6 +9375,11 @@ void ShowFPS()
 
 void ARX_SetAntiAliasing()
 {
+#ifdef ARX_OPENGL
+	//TODO
+	return;
+#endif
+
 	if(	(pMenuConfig)&&
 		(pMenuConfig->bAntiAliasing) )
 	{

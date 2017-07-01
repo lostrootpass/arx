@@ -740,6 +740,8 @@ void ARXInputHandlerSDL::ResetAll()
 void ARXInputHandlerSDL::GetInput()
 {
 	Uint32 mask = SDL_GetMouseState(&iMouseAX, &iMouseAY);
+	EERIEMouseX = iMouseAX;
+	EERIEMouseY = iMouseAY;
 
 	bOldMouseButton[SDL_BUTTON_LEFT] = bMouseButton[SDL_BUTTON_LEFT];
 	bOldMouseButton[SDL_BUTTON_MIDDLE] = bMouseButton[SDL_BUTTON_MIDDLE];

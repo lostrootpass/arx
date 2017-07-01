@@ -780,6 +780,10 @@ void CMenuConfig::SetDefaultKey()
 
 int CMenuConfig::GetDIKWithASCII(char *_pcTouch)
 {
+#ifdef ARX_OPENGL
+	//TODO
+	return -1;
+#endif
 _TCHAR pcT[256];
 
 	MultiByteToWideChar(CP_ACP, 0, _pcTouch, -1, pcT, strlen(_pcTouch)+1);
@@ -1229,6 +1233,10 @@ bool bOk=true;
 
 bool CMenuConfig::SaveAll()
 {
+#ifdef ARX_OPENGL
+	//TODO
+	return true;
+#endif
 	char tcTxt[256];
 	bool bOk=true;
 
@@ -5384,7 +5392,7 @@ void CMenuCheckButton::Render()
 
 	if(bNoMenu) return;
 
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true);
+	SETALPHABLEND(GDevice, true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	if (vTex.size())
@@ -5420,7 +5428,7 @@ void CMenuCheckButton::Render()
 	}
 
 	//DEBUG
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, false);
+	SETALPHABLEND(GDevice, false);
 }
 
 //-----------------------------------------------------------------------------
@@ -5433,7 +5441,7 @@ void CMenuCheckButton::RenderMouseOver()
 
 	pInputHandler->SetMouseOver();
 
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true);
+	SETALPHABLEND(GDevice, true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	TextureContainer *pTex = vTex[iState];
@@ -5463,7 +5471,7 @@ void CMenuCheckButton::RenderMouseOver()
 	}
 
 	//DEBUG
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, false);
+	SETALPHABLEND(GDevice, true);
 }
 
 //-----------------------------------------------------------------------------

@@ -203,6 +203,9 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	}
 
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &_view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &_projection[0][0]);
+
 	std::vector<GLuint> indices;
 	std::vector<VtxAttrib> vtxAttribs;
 
@@ -723,12 +726,9 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 	glUseProgram(program);
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-	//Toggle this if you want a unique fontsheet for every size
-	//EERIEFont* font = _getFont(vHeightPx);
-	//For now just load in the font at a large size and scale it down.
-	EERIEFont* font = _getFont(48);
+	EERIEFont* font = _getFont(vHeightPx);
 
 	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
 	glActiveTexture(GL_TEXTURE0);
@@ -832,9 +832,14 @@ void EERIERendererGL::SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstF
 	glBlendFunc(_nativeBlendType(srcFactor), _nativeBlendType(dstFactor));
 }
 
+float EERIE_TransformOldFocalToNewFocal(float _fOldFocal);
 void EERIERendererGL::SetViewport(int x, int y, int w, int h)
 {
-	glViewport(x, y, w, h);
+	//D3D and OpenGL y-axes go in opposite directions, so invert here.
+	int invY = DANAESIZY - y - h;
+	glViewport(x, invY, w, h);
+	//glScissor(x, invY, w, h);
+
 }
 
 void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, float sy, const float* uvs)

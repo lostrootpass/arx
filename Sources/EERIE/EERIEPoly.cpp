@@ -1074,12 +1074,6 @@ void EE_RT(D3DTLVERTEX * in, EERIE_3D * out)
 
 void EE_RT2(D3DTLVERTEX * in, D3DTLVERTEX * out)
 {
-#ifdef ARX_OPENGL
-	out->sx = in->sx;
-	out->sy = in->sy;
-	out->sz = in->sz;
-	return;
-#endif
 	out->sx = in->sx - ACTIVECAM->pos.x;
 	out->sy = in->sy - ACTIVECAM->pos.y;
 	out->sz = in->sz - ACTIVECAM->pos.z;
@@ -1099,12 +1093,6 @@ void EE_RT2(D3DTLVERTEX * in, D3DTLVERTEX * out)
 
 void EE_P(EERIE_3D * in, D3DTLVERTEX * out)
 {
-#ifdef ARX_OPENGL
-	out->sx = in->x;
-	out->sy = in->y;
-	out->sz = in->z;
-	return;
-#endif
 	float fZTemp;
 	fZTemp = 1.f / in->z;
 	out->sz = fZTemp * ProjectionMatrix._33 + ProjectionMatrix._43; //HYPERBOLIC
@@ -3348,7 +3336,7 @@ void F_PrepareCamera(EERIE_CAMERA * cam)
 }
 //*************************************************************************************
 //*************************************************************************************
-void PrepareCamera(EERIE_CAMERA * cam)
+void PrepareCamera(EERIE_CAMERA * cam, float viewWidth, float viewHeight)
 {
 	float tmp = DEG2RAD(cam->angle.a);
 	cam->transform.use_focal = cam->use_focal = cam->focal * Xratio;
@@ -3367,12 +3355,11 @@ void PrepareCamera(EERIE_CAMERA * cam)
 	cam->transform.posy = cam->pos.y;
 	cam->transform.posz = cam->pos.z;
 
-	EERIE_CreateMatriceProj(ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX),
-	                        ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY),
+	EERIE_CreateMatriceProj(viewWidth ? viewWidth : ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX),
+							viewHeight ? viewHeight :  ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY),
 	                        EERIE_TransformOldFocalToNewFocal(cam->focal),
 	                        1.f,
 	                        cam->cdepth);
-
 }
 
 void SP_PrepareCamera(EERIE_CAMERA * cam)

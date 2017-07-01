@@ -213,6 +213,11 @@ void ARX_SPEECH_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 	HDC	hDC;
 	SIZE sSize;
 
+#ifdef ARX_OPENGL
+	extern int GetSizeForHFont(HFONT);
+	g_pRenderApp->renderer->MeasureText("p", GetSizeForHFont(InBookFont), (int*)&sSize.cx, (int*)&sSize.cy);
+	sSize.cy *= 3;
+#else
 	if (SUCCEEDED(danaeApp.m_pddsRenderTarget->GetDC(&hDC)))
 	{
 		SelectObject(hDC, InBookFont);
@@ -229,6 +234,7 @@ void ARX_SPEECH_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 	{
 		sSize.cy = DANAESIZY >> 1;
 	}
+#endif
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	SETALPHABLEND(pd3dDevice, TRUE);

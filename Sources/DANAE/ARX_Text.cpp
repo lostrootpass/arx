@@ -115,6 +115,26 @@ void FontError()
 }
 //-----------------------------------------------------------------------------
 
+
+int GetSizeForHFont(HFONT f)
+{
+	//TODO: fix this somehow. The font sizes are hardcoded in ARX_Text_Init below, but messy to pass around everywhere.
+	if (f == hFontMainMenu)
+	{
+		return 48;
+	}
+	else if ((f == hFontMenu) || (f == hFontCredits))
+	{
+		return 32;
+	}
+	else if ((f == InBookFont) || (f == hFontRedist)
+		|| (f == hFontControls) || (f == hFontInGame)
+		|| (f == hFontInGameNote))
+	{
+		return 16;
+	}
+}
+
 long ARX_UNICODE_ForceFormattingInRect(HFONT _hFont, _TCHAR * _lpszUText, int _iSpacingY, RECT _rRect)
 {
 
@@ -313,6 +333,16 @@ long ARX_UNICODE_DrawTextInRect(float x, float y,
                                 HDC hHDC
                                )
 {
+#ifdef ARX_OPENGL
+	char text[256];
+	wcstombs(text, _lpszUText, wcslen(_lpszUText) + 1);
+	int w, h;
+	int size = GetSizeForHFont(font);
+	g_pRenderApp->renderer->MeasureText(text, size, &w, &h);
+	g_pRenderApp->renderer->DrawText(text, x, y, col, size);
+	return (long)w;
+#endif
+
 	HDC hDC = NULL;
 
 	// Get a DC for the surface. Then, write out the buffer
@@ -423,6 +453,15 @@ void DrawBookTextCenter(float x, float y, _TCHAR * text, COLORREF col, COLORREF 
 long UNICODE_ARXDrawTextCenter(float x, float y, _TCHAR * str, COLORREF col, COLORREF bcol, HFONT font)
 {
 	HDC hDC;
+
+#ifdef ARX_OPENGL
+	char text[256];
+	wcstombs(text, str, wcslen(str) + 1);
+	int w, h;
+	int size = GetSizeForHFont(font);
+	g_pRenderApp->renderer->MeasureText(text, size, &w, &h);
+	g_pRenderApp->renderer->DrawText(text, x - (w/2), y, col, size);
+#endif
 
 	// Get a DC for the surface. Then, write out the buffer
 	if (danaeApp.m_pddsRenderTarget)
@@ -718,25 +757,6 @@ void _ShowText(char * text)
 	}
 }
 
-int GetSizeForHFont(HFONT f)
-{
-	//TODO: fix this somehow. The font sizes are hardcoded in ARX_Text_Init below, but messy to pass around everywhere.
-	if (f == hFontMainMenu)
-	{
-		return 48;
-	}
-	else if ((f == hFontMenu) || (f == hFontCredits))
-	{
-		return 32;
-	}
-	else if ((f == InBookFont) || (f == hFontRedist)
-		|| (f == hFontControls) || (f == hFontInGame)
-		|| (f == hFontInGameNote))
-	{
-		return 16;
-	}
-}
-
 //-----------------------------------------------------------------------------
 void ARX_Text_Init(ARX_TEXT * _pArxText)
 {
@@ -815,7 +835,12 @@ bool CARXTextManager::AddText(HFONT _hFont, _TCHAR * _lpszUText, RECT & _rRect, 
 				pArxText->lTimeOut		= _lTimeOut;
 				pArxText->iFontSize		= _iFontSize;
 
+#ifdef ARX_OPENGL
+				//TODO
+				if(0)
+#else
 				if (iNbLigneClipp)
+#endif
 				{
 					HDC hDC;
 					SIZE sSize;

@@ -369,6 +369,7 @@ void ResetPlayerInterface();
 void Set_DragInter(INTERACTIVE_OBJ * io);
 void CreateInterfaceTextureContainers();
 void KillInterfaceTextureContainers();
+void ManageKeyMouse();
 
 #define ARX_MOUSE_OVER_BOOK			1
 #define ARX_MOUSE_OVER_INVENTORY	2

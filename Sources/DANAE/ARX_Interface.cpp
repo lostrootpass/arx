@@ -354,7 +354,11 @@ BOOL ARX_INTERFACE_MouseInBook()
 //-----------------------------------------------------------------------------
 void ARX_INTERFACE_DrawItem(TextureContainer *tc, const float x, const float y, const float z, const D3DCOLOR col)
 {
+#ifdef ARX_OPENGL
+	if(tc)
+#else
 	if ((tc) && (tc->m_pddsSurface))
+#endif
 		g_pRenderApp->renderer->DrawQuad(
 		x, y,
 		                INTERFACE_RATIO_DWORD(tc->m_dwWidth), INTERFACE_RATIO_DWORD(tc->m_dwHeight),
@@ -5075,7 +5079,7 @@ void ARX_INTERFACE_PlayerInterfaceModify(long showhide,long smooth)
 }
 extern void ARX_PrepareBackgroundNRMLs();
 //-----------------------------------------------------------------------------
-void DANAE::ManageKeyMouse() 
+void ManageKeyMouse() 
 {
 	if (ARXmenu.currentmode == AMCM_OFF)
 	{
@@ -5345,17 +5349,20 @@ void DANAE::ManageKeyMouse()
 		pos.x=MemoMouse.x;
 		pos.y=MemoMouse.y;
 
-		if ( this->m_pDeviceInfo->bWindowed)
+#ifndef ARX_OPENGL
+		if ( danaeApp.m_pDeviceInfo->bWindowed)
 		{
-			pos.x+=this->m_pFramework->Xstart;
-			pos.y+=this->m_pFramework->Ystart;
+			pos.x+=danaeApp.m_pFramework->Xstart;
+			pos.y+= danaeApp.m_pFramework->Ystart;
 		}
 
-		ClientToScreen(this->m_hWnd,&pos);
+		ClientToScreen(danaeApp.m_hWnd,&pos);
 		SetCursorPos(pos.x,pos.y);
+#endif
 		DANAEMouse.x=MemoMouse.x;
 		DANAEMouse.y=MemoMouse.y;
 
+#ifndef ARX_OPENGL
 		if(	(danaeApp.m_pFramework->m_bIsFullscreen)&&
 			(bGLOBAL_DINPUT_GAME) )
 		{
@@ -5373,6 +5380,7 @@ void DANAE::ManageKeyMouse()
 
 			}
 		}
+#endif
 
 		bRestoreCoordMouse=false;
 	}
@@ -5415,7 +5423,7 @@ void DANAE::ManageKeyMouse()
 		
 	}
 
-	ARX_Menu_Manage(this->m_pd3dDevice);
+	ARX_Menu_Manage(GDevice);
 	EERIE_3D tm;
 	tm.x=tm.y=tm.z=0.f;
 	INTERACTIVE_OBJ * t;
@@ -5424,18 +5432,19 @@ void DANAE::ManageKeyMouse()
 
 	if(bRestoreCoordMouse)
 	{
-
-		ARX_CHECK_SHORT(EERIEMouseX-this->m_pFramework->Xstart);
-		ARX_CHECK_SHORT(EERIEMouseX-this->m_pFramework->Ystart);
+#ifndef ARX_OPENGL
+		ARX_CHECK_SHORT(EERIEMouseX-danaeApp.m_pFramework->Xstart);
+		ARX_CHECK_SHORT(EERIEMouseX-danaeApp.m_pFramework->Ystart);
 		ARX_CHECK_SHORT(EERIEMouseX);
 		ARX_CHECK_SHORT(EERIEMouseY);
 
-		if ( this->m_pDeviceInfo->bWindowed)
+		if ( danaeApp.m_pDeviceInfo->bWindowed)
 		{
-			DANAEMouse.x=ARX_CLEAN_WARN_CAST_SHORT(EERIEMouseX-this->m_pFramework->Xstart);
-			DANAEMouse.y=ARX_CLEAN_WARN_CAST_SHORT(EERIEMouseY-this->m_pFramework->Ystart);
+			DANAEMouse.x=ARX_CLEAN_WARN_CAST_SHORT(EERIEMouseX-danaeApp.m_pFramework->Xstart);
+			DANAEMouse.y=ARX_CLEAN_WARN_CAST_SHORT(EERIEMouseY-danaeApp.m_pFramework->Ystart);
 		}
 		else 
+#endif
 		{
 			DANAEMouse.x=ARX_CLEAN_WARN_CAST_SHORT(EERIEMouseX);
 			DANAEMouse.y=ARX_CLEAN_WARN_CAST_SHORT(EERIEMouseY);
@@ -5966,15 +5975,15 @@ void DANAE::ManageKeyMouse()
 							if (danaeApp.m_pFramework->m_bIsFullscreen)
 							{
 								ARX_TIME_Pause();
-								Pause(TRUE);
-								DialogBox( (HINSTANCE)GetWindowLong( this->m_hWnd, GWL_HINSTANCE ),
-									MAKEINTRESOURCE(IDD_SCRIPTDIALOG), this->m_hWnd, IOOptionsProc);
-								Pause(FALSE);
+								g_pRenderApp->Pause(TRUE);
+								DialogBox( (HINSTANCE)GetWindowLong(danaeApp.m_hWnd, GWL_HINSTANCE ),
+									MAKEINTRESOURCE(IDD_SCRIPTDIALOG), danaeApp.m_hWnd, IOOptionsProc);
+								g_pRenderApp->Pause(FALSE);
 								ARX_TIME_UnPause();				
 							}
 							else 
-								CDP_IOOptions=(CreateDialogParam( (HINSTANCE)GetWindowLong( this->m_hWnd, GWL_HINSTANCE ),
-								MAKEINTRESOURCE(IDD_SCRIPTDIALOG), this->m_hWnd, IOOptionsProc,0 ));
+								CDP_IOOptions=(CreateDialogParam( (HINSTANCE)GetWindowLong(danaeApp.m_hWnd, GWL_HINSTANCE ),
+								MAKEINTRESOURCE(IDD_SCRIPTDIALOG), danaeApp.m_hWnd, IOOptionsProc,0 ));
 						}
 					}
 				}
@@ -5983,7 +5992,7 @@ void DANAE::ManageKeyMouse()
 					&&	(!FINAL_COMMERCIAL_GAME)	
 					&& (ARXmenu.currentmode == AMCM_OFF))
 				{
-					if (this->kbd.inkey[41])
+					if (g_pRenderApp->kbd.inkey[41])
 					{
 						
 						if (NEED_TEST_TEXT)
@@ -5998,7 +6007,7 @@ void DANAE::ManageKeyMouse()
 						}
 					}
 
-					this->kbd.inkey[41]=0;					
+					g_pRenderApp->kbd.inkey[41]=0;
 				}
 
 #ifndef NOEDITOR
@@ -6008,20 +6017,20 @@ void DANAE::ManageKeyMouse()
 					if ((ALLOW_CHEATS || GAME_EDITOR)
 						&& (ARXmenu.currentmode == AMCM_OFF))
 					{
-						if ((this->kbd.inkey[INKEY_C]) 
-							&& ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT]) ) ) 
+						if ((g_pRenderApp->kbd.inkey[INKEY_C])
+							&& ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])))
 						{
 							if (USE_PLAYERCOLLISIONS) USE_PLAYERCOLLISIONS=0;
 							else USE_PLAYERCOLLISIONS=1;
 
-							this->kbd.inkey[INKEY_C]=0;
+							g_pRenderApp->kbd.inkey[INKEY_C]=0;
 						}
 
-				if ((this->kbd.inkey[INKEY_W]))
+				if ((g_pRenderApp->kbd.inkey[INKEY_W]))
 						{
 							ARX_PLAYER_Poison(0.f);
 							ARX_PLAYER_Modify_XP(1000);
-							this->kbd.inkey[INKEY_W]=0;
+							g_pRenderApp->kbd.inkey[INKEY_W]=0;
 						}
 					}
 				}
@@ -6029,7 +6038,7 @@ void DANAE::ManageKeyMouse()
 				if (	(GAME_EDITOR)
 					&&	(ARXmenu.currentmode == AMCM_OFF))
 				{
-					if (this->kbd.inkey[INKEY_F7]) 
+					if (g_pRenderApp->kbd.inkey[INKEY_F7])
 					{
 						if (EDITION==EDITION_LIGHTS) 
 						{
@@ -6048,10 +6057,10 @@ void DANAE::ManageKeyMouse()
 							EDITION=EDITION_LIGHTS;
 						}
 
-						this->kbd.inkey[INKEY_F7]=0;
+						g_pRenderApp->kbd.inkey[INKEY_F7]=0;
 					}
 					
-					if	(this->kbd.inkey[INKEY_F9])
+					if	(g_pRenderApp->kbd.inkey[INKEY_F9])
 					{
 						if (EDITMODE) 
 						{
@@ -6067,15 +6076,15 @@ void DANAE::ManageKeyMouse()
 							RestoreAllIOInitPos();
 						}
 
-						this->kbd.inkey[INKEY_F9]=0;
+						g_pRenderApp->kbd.inkey[INKEY_F9]=0;
 					}
 
-					if (this->kbd.inkey[INKEY_F8]) 
+					if (g_pRenderApp->kbd.inkey[INKEY_F8])
 					{
 						if (ARXPausedTimer) ARX_TIME_UnPause();
 						else ARX_TIME_Pause();
 
-						this->kbd.inkey[INKEY_F8]=0;
+						g_pRenderApp->kbd.inkey[INKEY_F8]=0;
 					}
 					
 #endif
@@ -6084,7 +6093,7 @@ void DANAE::ManageKeyMouse()
 
 				if (GAME_EDITOR)
 				{
-					if ((this->kbd.inkey[INKEY_F1]) && (FirstFrame==0))
+					if ((g_pRenderApp->kbd.inkey[INKEY_F1]) && (FirstFrame==0))
 					{
 						ARX_PARTICLES_ClearAll();
 						ARX_SPELLS_ClearAll();
@@ -6109,7 +6118,7 @@ void DANAE::ManageKeyMouse()
 						
 						ARX_TIME_UnPause();
 						LaunchDummyParticle();
-						this->kbd.inkey[INKEY_F1]=0;		
+						g_pRenderApp->kbd.inkey[INKEY_F1]=0;
 					}
 				}
 
@@ -6118,9 +6127,9 @@ void DANAE::ManageKeyMouse()
 				{
 					if (MouseInCam(&subj)) 
 					{
-						if (this->kbd.nbkeydown)
+						if (g_pRenderApp->kbd.nbkeydown)
 						{
-							if (this->kbd.inkey[INKEY_0]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_0])
 							{
 
 								if (USE_LIGHT_OPTIM)
@@ -6131,30 +6140,30 @@ void DANAE::ManageKeyMouse()
 									USE_LIGHT_OPTIM=1;
 								}
 
-								this->kbd.inkey[INKEY_0]=0;
+								g_pRenderApp->kbd.inkey[INKEY_0]=0;
 							}			
 
-							if (this->kbd.inkey[INKEY_7]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_7])
 							{
 								unsigned long tim = ARX_TIME_GetUL();//treat warning C4244 conversion from 'float' to 'unsigned long'
 								RecalcLightZone(player.pos.x,player.pos.y,player.pos.z,12);
 								tim=ARX_TIME_GetUL() - tim;//treat warning C4244 conversion from 'float' to 'unsigned long'
-								this->kbd.inkey[INKEY_7]=0;
+								g_pRenderApp->kbd.inkey[INKEY_7]=0;
 							}			
 
-							if (this->kbd.inkey[INKEY_9]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_9])
 							{
 								ARX_SPELLS_Launch(SPELL_FLYING_EYE,0);
-								this->kbd.inkey[INKEY_9]=0;
+								g_pRenderApp->kbd.inkey[INKEY_9]=0;
 							}
 
-							if (this->kbd.inkey[INKEY_1]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_1])
 							{
 								ARX_SPELLS_Launch(SPELL_FIREBALL,0);
-								this->kbd.inkey[INKEY_1]=0;
+								g_pRenderApp->kbd.inkey[INKEY_1]=0;
 							}
 
-							if (this->kbd.inkey[INKEY_2]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_2])
 							{
 								if (Project.improve) 
 								{
@@ -6165,10 +6174,10 @@ void DANAE::ManageKeyMouse()
 								}
 								else ARX_SPELLS_Launch(SPELL_MAGIC_SIGHT,0);
 
-								this->kbd.inkey[INKEY_2]=0;
+								g_pRenderApp->kbd.inkey[INKEY_2]=0;
 							}
 
-							if (this->kbd.inkey[INKEY_6]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_6])
 							{
 								if (inter.iobj[0]->invisibility>0.f)
 								{
@@ -6179,10 +6188,10 @@ void DANAE::ManageKeyMouse()
 								}
 								else ARX_SPELLS_Launch(SPELL_INVISIBILITY,0);
 
-								this->kbd.inkey[INKEY_6]=0;
+								g_pRenderApp->kbd.inkey[INKEY_6]=0;
 							}
 
-							if (this->kbd.inkey[INKEY_5]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_5])
 							{
 								if (Project.telekinesis) 
 								{
@@ -6193,10 +6202,10 @@ void DANAE::ManageKeyMouse()
 								}
 								else ARX_SPELLS_Launch(SPELL_TELEKINESIS,0);
 
-								this->kbd.inkey[INKEY_5]=0;
+								g_pRenderApp->kbd.inkey[INKEY_5]=0;
 							}
 
-							if (this->kbd.inkey[INKEY_4]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_4])
 							{
 								if (Project.improvespeed) 
 								{
@@ -6212,29 +6221,29 @@ void DANAE::ManageKeyMouse()
 									tm.z+=+(float)EEcos(DEG2RAD(player.pos.b))*(float)FrameDiff*DIV3;
 								}
 
-								this->kbd.inkey[INKEY_4]=0;
+								g_pRenderApp->kbd.inkey[INKEY_4]=0;
 							}
 
-							if (this->kbd.inkey[INKEY_3]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_3])
 							{
 								ARX_SPELLS_Launch(SPELL_HEAL,0);
-								this->kbd.inkey[INKEY_3]=0;
+								g_pRenderApp->kbd.inkey[INKEY_3]=0;
 							}
 
-							if (this->kbd.inkey[INKEY_8]) 
+							if (g_pRenderApp->kbd.inkey[INKEY_8])
 							{
 								ARX_SPELLS_Launch(SPELL_ICE_PROJECTILE,0);
-								this->kbd.inkey[INKEY_8]=0;
+								g_pRenderApp->kbd.inkey[INKEY_8]=0;
 							}
 							
-							if (this->kbd.inkey[INKEY_PAD1])
+							if (g_pRenderApp->kbd.inkey[INKEY_PAD1])
 							{
 								extern long TSU_TEST;
 								TSU_TEST = TSU_TEST ++;
 
 								if (TSU_TEST>2) TSU_TEST = 0;
 
-								this->kbd.inkey[INKEY_PAD1] = 0;
+								g_pRenderApp->kbd.inkey[INKEY_PAD1] = 0;
 							}
 						}
 					}
@@ -6314,7 +6323,9 @@ void ARX_INTERFACE_DrawSecondaryInventory(bool _bSteal)
 						io->inv=GoldCoinsTC[num];
 					}
 
+#ifndef ARX_OPENGL
 					if (tc->m_pddsSurface) 
+#endif
 					{
 						float px = INTERFACE_RATIO(InventoryX) + (float)i*INTERFACE_RATIO(32) + INTERFACE_RATIO(2);
 						float py = (float)j*INTERFACE_RATIO(32) + INTERFACE_RATIO(13);
@@ -6426,7 +6437,9 @@ void ARX_INTERFACE_DrawInventory(short _sNum, int _iX=0, int _iY=0)
 					float px = fPosX + i*INTERFACE_RATIO(32) + INTERFACE_RATIO(7);
 					float py = fPosY + j*INTERFACE_RATIO(32) + INTERFACE_RATIO(6);
 
+#ifndef ARX_OPENGL
 					if (tc->m_pddsSurface) 
+#endif
 					{
 						D3DCOLOR color;
 
@@ -6652,7 +6665,11 @@ void ARX_INTERFACE_DrawDamagedEquipment()
 //-----------------------------------------------------------------------------
 void DrawBookInterfaceItem(LPDIRECT3DDEVICE7 m_pd3dDevice,TextureContainer *tc,float x,float y,float z)
 {
+#ifdef ARX_OPENGL
+	if (tc)
+#else
 	if ((tc) && (tc->m_pddsSurface))
+#endif
 	{
 		g_pRenderApp->renderer->DrawQuad(
 			(x+BOOKDECX)*Xratio,
@@ -7316,7 +7333,9 @@ void ARX_INTERFACE_ManageOpenedBook()
 	bGATI8500			=	false;
 	bSoftRender			=	false;
 
+#ifndef ARX_OPENGL
 	GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, FALSE );
+#endif
 	
 	if (ITC.questbook==NULL)
 	{
@@ -7388,14 +7407,17 @@ void ARX_INTERFACE_ManageOpenedBook()
 	
 	BOOKDECX = 0;
 	BOOKDECY = 0;
+#ifndef ARX_OPENGL
 	GDevice->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFP_LINEAR);
+#endif
 	
 	if (ARXmenu.currentmode != AMCM_NEWQUEST)
 	{
  
- 
+#ifndef ARX_OPENGL
 		GDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
+#endif
 
 		if (Book_Mode == 0)
 		{
@@ -7414,7 +7436,9 @@ void ARX_INTERFACE_ManageOpenedBook()
 			DrawBookInterfaceItem(GDevice,ITC.questbook, 97, 64, 0.9999f);
 		}
 
+#ifndef ARX_OPENGL
 		GDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
+#endif
 	}
 	else 
 	{
@@ -7918,13 +7942,21 @@ void ARX_INTERFACE_ManageOpenedBook()
 		
 		ARX_PLAYER_ComputePlayerFullStats();
 
+#ifdef ARX_OPENGL
+		//danaeGLApp.DANAEEndRender();
+#else
 		danaeApp.DANAEEndRender();
+#endif
 		_stprintf(tex, _T("%s %3d"), ITC.lpszULevel, player.level);
 		DrawBookTextCenter( 398, 74, tex,Color,0x00FF00FF,InBookFont);
 		
 		_stprintf(tex, _T("%s %8d"), ITC.lpszUXp, player.xp);
 		DrawBookTextCenter( 510, 74, tex, Color,0x00FF00FF,InBookFont);
+#ifdef ARX_OPENGL
+		//danaeGLApp.DANAEStartRender():
+#else
 		danaeApp.DANAEStartRender();
+#endif
 
 		if (MouseInBookRect(463, 74, 550, 94))
 		{
@@ -8183,7 +8215,11 @@ void ARX_INTERFACE_ManageOpenedBook()
 
 		//------------------------------
 		
+#ifdef ARX_OPENGL
+		//danaeGLApp.DANAEEndRender();
+#else
 		danaeApp.DANAEEndRender();
+#endif
 		_stprintf(tex, _T("%3.0f"),player.Full_Attribute_Strength);
 
 		if (player.Mod_Attribute_Strength<0.f)
@@ -8454,7 +8490,11 @@ void ARX_INTERFACE_ManageOpenedBook()
 		else Color = 0;
 
 		DrawBookTextCenter( 153, 278, tex, Color, 0x00FF00FF, InBookFont);
+#ifdef ARX_OPENGL
+		//danaeGLApp.DANAEStartRender();
+#else
 		danaeApp.DANAEStartRender();
+#endif
 	}
 	else if (Book_Mode==2)
 	{
@@ -8532,12 +8572,20 @@ void ARX_INTERFACE_ManageOpenedBook()
 			
 			while(lLenght>0)
 			{
+#ifdef ARX_OPENGL
+				//danaeGLApp.DANAEEndRender();
+#else
 				danaeApp.DANAEEndRender();
+#endif
 				long lLengthDraw=ARX_UNICODE_ForceFormattingInRect(	hFontInGameNote,
 					lpszQuests + lLenghtCurr,
 					0,
 					rRect);
+#ifdef ARX_OPENGL
+				//danaeGLApp.DANAEStartRender();
+#else
 				danaeApp.DANAEStartRender();
+#endif
 				lLenght -= lLengthDraw;
 				lLenghtCurr += lLengthDraw;
 
@@ -8629,7 +8677,9 @@ void ARX_INTERFACE_ManageOpenedBook()
 	{
 
 		SETZWRITE(GDevice,true);
+#ifndef ARX_OPENGL
 		danaeApp.EnableZBuffer();
+#endif
 		SetFilteringMode(GDevice,1);
 		D3DRECT rec;
 
@@ -8638,10 +8688,16 @@ void ARX_INTERFACE_ManageOpenedBook()
  
 			F2L((float)((118.F+BOOKDECX)*Xratio),&rec.x1);
 			F2L((float)((69.f +BOOKDECY)*Yratio),&rec.y1);
-			F2L((float)((280.f + BOOKDECY)*Xratio), &rec.x2); 
+
+			//TODO: is BOOKDECY a typo? Behaviour seems correct with BOOKDECY.
+			F2L((float)((280.f + BOOKDECY)*Xratio), &rec.x2);
 			F2L((float)((310.f+BOOKDECY)*Yratio),&rec.y2);
 
+#ifdef ARX_OPENGL
+			glClear(GL_DEPTH_BUFFER_BIT);
+#else
 			GDevice->Clear( 1, &rec, D3DCLEAR_ZBUFFER, 0, 1.f, 0L );
+#endif
 
 			if (ARXmenu.currentmode!=AMCM_OFF)
 				g_pRenderApp->renderer->SetViewport(139.f*Xratio,0,139.f*Xratio,310.f*Yratio);
@@ -8654,7 +8710,11 @@ void ARX_INTERFACE_ManageOpenedBook()
 			F2L((float)((300.f+50+BOOKDECX)*Xratio),&rec.x2);
 			F2L((float)((338.f+BOOKDECY)*Yratio),&rec.y2);
 			
+#ifdef ARX_OPENGL
+			glClear(GL_DEPTH_BUFFER_BIT);
+#else
 			GDevice->Clear( 1, &rec, D3DCLEAR_ZBUFFER, 0, 1.f, 0L );
+#endif
 			rec.x2 -= 50;
 		}
 		
@@ -8733,8 +8793,13 @@ void ARX_INTERFACE_ManageOpenedBook()
 			vp.dwHeight	=	rec.y2 - rec.y1;
 		}
 
+#ifdef ARX_OPENGL
+		//TODO: there are still differences between how D3D7 and OpenGL set viewports.
+		//This extra call is needed here to maintain the correct perspective. See about removing it.
+		PrepareCamera(&bookcam, (float)vp.dwWidth, (float)vp.dwHeight);
+#endif
+
 		g_pRenderApp->renderer->SetViewport(vp.dwX, vp.dwY, vp.dwWidth, vp.dwHeight);
-		
 		
 		ePlayerAngle.a=0.f;
 		ePlayerAngle.g=0.f;
@@ -8798,13 +8863,17 @@ void ARX_INTERFACE_ManageOpenedBook()
 		{
 			if(bRenderInterList)
 			{
+#ifndef ARX_OPENGL
 				GDevice->SetTextureStageState( 0, D3DTSS_MIPFILTER, D3DTFP_NONE);
+#endif
 				SETALPHABLEND(GDevice,FALSE);
 				PopAllTriangleList(true);
 				SETALPHABLEND(GDevice,TRUE);
 				PopAllTriangleListTransparency();
 				SETALPHABLEND(GDevice,FALSE);
+#ifndef ARX_OPENGL
 				GDevice->SetTextureStageState( 0, D3DTSS_MIPFILTER, D3DTFP_POINT);
+#endif
 			}
 		}
 
@@ -10586,15 +10655,13 @@ long Manage3DCursor(long flags)
 //-----------------------------------------------------------------------------
 void ARX_INTERFACE_RenderCursor(long flag)
 {
-#ifdef ARX_OPENGL
-	//TODO
-	return;
-#endif
 	if (!SPECIAL_DRAGINTER_RENDER)
 	{
 		ManageIgnition_2(DRAGINTER);	
+#ifndef ARX_OPENGL
 		GDevice->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTFN_POINT );
 		GDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTFG_POINT );
+#endif
 		SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_CLAMP);
 	}
 	
@@ -10879,11 +10946,15 @@ void ARX_INTERFACE_RenderCursor(long flag)
 							0.f,
 							surf,0,D3DCOLORWHITE);
 						
+#ifndef ARX_OPENGL
 						danaeApp.DANAEEndRender();	
+#endif
 						_TCHAR temp[256];
 						_stprintf(temp, _T("%3d"), lCursorRedistValue);
 						ARX_TEXT_Draw(GDevice, InBookFont, DANAEMouse.x + 6* Xratio, DANAEMouse.y + 11* Yratio, 999, 999, temp, D3DCOLORBLACK, 0x00FF00FF);
+#ifndef ARX_OPENGL
 						danaeApp.DANAEStartRender();
+#endif
 					}
 					else
 					{
@@ -11123,8 +11194,10 @@ void ARX_INTERFACE_RenderCursor(long flag)
 				}
 			}
 		
+#ifndef ARX_OPENGL
 		GDevice->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTFN_LINEAR );
 		GDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTFG_LINEAR );
+#endif
 		SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_WRAP);
 	}
 }

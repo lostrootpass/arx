@@ -1990,6 +1990,11 @@ void EERIE_ActivateBump(void)
 {
 	EERIE_USES_BUMP_MAP = 0;		//pas de bump
 
+#ifdef ARX_OPENGL
+	//TODO
+	return;
+#endif
+
 	if (g_pRenderApp)
 	{
 		D3DEnum_DeviceInfo* deviceInfo = static_cast<CD3DApplication*>(g_pRenderApp)->m_pDeviceInfo;
@@ -3569,8 +3574,13 @@ TextureContainer * D3DTextr_CreateTextureFromFile(TCHAR * strName, char * wd , D
 		ptcTexture->m_dwBPP    = (DWORD)bm.bmBitsPixel;
 	}
 
+#ifdef ARX_OPENGL
+	ptcTexture->m_dwDeviceWidth = ptcTexture->m_dwWidth;
+	ptcTexture->m_dwDeviceHeight = ptcTexture->m_dwHeight;
+#else
 	ptcTexture->m_dwDeviceWidth = 0;
 	ptcTexture->m_dwDeviceHeight = 0;
+#endif
 	ptcTexture->m_dwOriginalWidth = ptcTexture->m_dwWidth;
 	ptcTexture->m_dwOriginalHeight = ptcTexture->m_dwHeight;
 

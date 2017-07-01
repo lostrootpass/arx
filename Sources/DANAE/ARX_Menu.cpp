@@ -602,12 +602,18 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		EERIEMouseButton = 0;
 	}
 
+#ifdef ARX_OPENGL
+	if(!danaeGLApp.DANAEStartRender())
+#else
 	if (!danaeApp.DANAEStartRender())
+#endif
 	{
 		return TRUE;
 	}
 
+#ifndef ARX_OPENGL
 	GDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0L);
+#endif
 	long posx;
 	posx = DANAESIZX >> 1;
 
@@ -689,15 +695,21 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			ARXDiffTimeMenu = 0;
 		}
 
+#ifndef ARX_OPENGL
 		GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
+#endif
 		SETALPHABLEND(GDevice, FALSE);
 
 		if (ARXmenu.mda->BookBackground != NULL)
 		{
 			SETALPHABLEND(GDevice, FALSE);
+#ifndef ARX_OPENGL
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
+#endif
 			SETZWRITE(GDevice, false);
+#ifndef ARX_OPENGL
 			GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, D3DZB_FALSE);
+#endif
 
 			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.9f, ARXmenu.mda->BookBackground, 0, D3DCOLORWHITE);
 		}
@@ -924,9 +936,13 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		if (ARXmenu.mda->BookBackground != NULL)
 		{
 			SETALPHABLEND(GDevice, FALSE);
+#ifndef ARX_OPENGL
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
+#endif
 			SETZWRITE(GDevice, false);
+#ifndef ARX_OPENGL
 			GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, D3DZB_FALSE);
+#endif
 
 			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.9f, ARXmenu.mda->BookBackground, 0, D3DCOLORWHITE);
 		}
@@ -1004,7 +1020,11 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	DynLight[0].pos.x = 0.f + EERIEMouseX - (DANAESIZX >> 1);
 	DynLight[0].pos.y = 0.f + EERIEMouseY - (DANAESIZY >> 1);
 
+#ifdef ARX_OPENGL
+	//danaeGLApp.DANAEEndRender();
+#else
 	danaeApp.DANAEEndRender();
+#endif
 
 	if (pTextManage)
 	{
@@ -1012,7 +1032,11 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		pTextManage->Render();
 	}
 
+#ifdef ARX_OPENGL
+	//danaeGLApp.DANAEStartRender();
+#else
 	danaeApp.DANAEStartRender();
+#endif
 
 	if (ARXmenu.currentmode != AMCM_CREDITS)
 		ARX_INTERFACE_RenderCursor(1);
@@ -1040,6 +1064,10 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		}
 	}
 
+#ifdef ARX_OPENGL
+	danaeGLApp.DANAEEndRender();
+#else
 	danaeApp.DANAEEndRender();
+#endif
 	return TRUE;
 }

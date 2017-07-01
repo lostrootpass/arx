@@ -77,7 +77,11 @@ void ARXMenu_Options_Video_GetResolution(int & _iWidth, int & _iHeight, int & _i
 {
 	_iWidth		= DANAESIZX;
 	_iHeight	= DANAESIZY;
+#ifdef ARX_OPENGL
+	_iBpp = 24;
+#else
 	_iBpp		= danaeApp.m_pFramework->bitdepth;
+#endif
 }
 
 //-----------------------------------------------------------------------------

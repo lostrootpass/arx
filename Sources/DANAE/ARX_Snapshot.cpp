@@ -458,6 +458,9 @@ bool SnapShot::GetSnapShot()
 //Sauvegarde en BMP 24bits
 bool SnapShot::GetSnapShotDim(int _iWith, int _iHeight)
 {
+#ifdef ARX_OPENGL
+	return FALSE;
+#endif
 	DDSURFACEDESC2 ddsd2;
 	memset((void *)&ddsd2, 0, sizeof(ddsd2));
 	ddsd2.dwSize = sizeof(ddsd2);
