@@ -9,7 +9,7 @@ layout(location = 4) in vec4 inColor;
 
 out vec4 color;
 
-uniform sampler2D texsampler[24];
+uniform sampler2D texsampler[64];
 
 struct Light
 {

@@ -167,10 +167,6 @@ class DANAE : public CD3DApplication
 		HRESULT Render();
 		HRESULT FrameMove(FLOAT fTimeKey);
 		HRESULT FinalCleanup();
-		BOOL ManageEditorControls();
-		void ManagePlayerControls();
-		void DrawAllInterface();
-		void DrawAllInterfaceFinish();
 		void GoFor2DFX();
 		HRESULT BeforeRun();
 	public:
@@ -178,7 +174,6 @@ class DANAE : public CD3DApplication
  
 		LRESULT MsgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		DANAE();
-		long MustRefresh;
 
 		bool DANAEStartRender();
 		bool DANAEEndRender();
@@ -197,17 +192,12 @@ protected:
 	HRESULT Render();
 	HRESULT FrameMove(FLOAT fTimeKey);
 	HRESULT FinalCleanup();
-	BOOL ManageEditorControls();
-	void ManagePlayerControls();
-	void DrawAllInterface();
-	void DrawAllInterfaceFinish();
 	void GoFor2DFX();
 	HRESULT BeforeRun();
 public:
 	HRESULT InitDeviceObjects();
 
 	DANAEGL();
-	long MustRefresh;
 
 	bool DANAEStartRender();
 	bool DANAEEndRender();
@@ -226,5 +216,9 @@ void SetFilteringMode(LPDIRECT3DDEVICE7 m_pd3dDevice, long mode);
 void SendGameReadyMsg();
 void DanaeSwitchFullScreen();
 void DANAE_KillCinematic();
+void ManagePlayerControls();
+void DrawAllInterface();
+void DrawAllInterfaceFinish();
+BOOL ManageEditorControls();
 
 #endif

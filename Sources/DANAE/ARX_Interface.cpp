@@ -1640,7 +1640,7 @@ void GetInfosCombine()
 }
 
 //-----------------------------------------------------------------------------
-BOOL DANAE::ManageEditorControls()
+BOOL ManageEditorControls()
 {
 	float val = 0.f;
 	EERIE_3D trans;
@@ -2750,7 +2750,7 @@ BOOL DANAE::ManageEditorControls()
 }
 
 	// Load Level Command
-	if (((EDITMODE)&&((this->kbd.inkey[INKEY_L]) && ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT])))) || WILLLOADLEVEL)
+	if (((EDITMODE)&&((g_pRenderApp->kbd.inkey[INKEY_L]) && ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])))) || WILLLOADLEVEL)
 	{
 		char loadfrom[512];
 
@@ -2763,13 +2763,13 @@ BOOL DANAE::ManageEditorControls()
 			if (OKBox("Erase Current Level ?","Load Level..."))
 			{
 				strcpy(loadfrom, ""); 
-				if (HERMESFileSelectorOpen(loadfrom,"Load Danae Level","Danae Level File (*.DLF)\0*.DLF\0\0",this->m_hWnd))
+				if (HERMESFileSelectorOpen(loadfrom,"Load Danae Level","Danae Level File (*.DLF)\0*.DLF\0\0",g_pRenderApp->m_hWnd))
 				{
 					char pp[256];
 					strcpy(pp,GetName(loadfrom));
 					LoadLevelScreen(GDevice,GetLevelNumByName(pp));
 					
-					Pause(TRUE);
+					g_pRenderApp->Pause(TRUE);
 
 					if (CDP_LIGHTOptions!=NULL) SendMessage(CDP_LIGHTOptions,WM_CLOSE,0,0);
 
@@ -2782,28 +2782,28 @@ BOOL DANAE::ManageEditorControls()
 					PROGRESS_BAR_TOTAL = 108;
 					OLD_PROGRESS_BAR_COUNT=PROGRESS_BAR_COUNT=0;
 					LoadLevelScreen();
-					DanaeLoadLevel(m_pd3dDevice,loadfrom);
+					DanaeLoadLevel(GDevice,loadfrom);
 					FORBID_SAVE=0;
 
 					FirstFrame=1;
-					this->kbd.inkey[INKEY_L]=0;
-					this->kbd.inkey[INKEY_LEFTSHIFT]=0;
-					this->kbd.inkey[INKEY_RIGHTSHIFT]=0;
-					Pause(FALSE);
+					g_pRenderApp->kbd.inkey[INKEY_L]=0;
+					g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]=0;
+					g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT]=0;
+					g_pRenderApp->Pause(FALSE);
 					return TRUE;
 				}
 				
 			}
 		}
 
-		this->kbd.inkey[INKEY_L]=0;
-		this->kbd.inkey[INKEY_LEFTSHIFT]=0;
-		this->kbd.inkey[INKEY_RIGHTSHIFT]=0;
+		g_pRenderApp->kbd.inkey[INKEY_L]=0;
+		g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]=0;
+		g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT]=0;
 	}
 
 	// Save Level Command
 	if (EDITMODE)
-		if ((this->kbd.inkey[INKEY_S]) && ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT])) || WILLSAVELEVEL)
+		if ((g_pRenderApp->kbd.inkey[INKEY_S]) && ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])) || WILLSAVELEVEL)
 		{
 			WILLSAVELEVEL=0;
 
@@ -2812,16 +2812,16 @@ BOOL DANAE::ManageEditorControls()
 			else if (OKBox("Save Current Level ?", "Save Level..."))
 				{
 					char saveto[512];
-				strcpy(saveto, ""); 
-					Pause(TRUE);
-					HERMESFileSelectorSave(saveto,"Save Danae Level","Danae Level File (*.DLF)\0*.DLF\0\0",this->m_hWnd);            
+					strcpy(saveto, ""); 
+					g_pRenderApp->Pause(TRUE);
+					HERMESFileSelectorSave(saveto,"Save Danae Level","Danae Level File (*.DLF)\0*.DLF\0\0",g_pRenderApp->m_hWnd);            
 					DanaeSaveLevel(saveto);
-					Pause(FALSE);
+					g_pRenderApp->Pause(FALSE);
 				}
 
-				this->kbd.inkey[INKEY_S]=0;
-				this->kbd.inkey[INKEY_LEFTSHIFT]=0;
-				this->kbd.inkey[INKEY_RIGHTSHIFT]=0;
+				g_pRenderApp->kbd.inkey[INKEY_S]=0;
+				g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]=0;
+				g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT]=0;
 		}
 
 		// PATHWAYS edition Sub-Commands
@@ -2845,7 +2845,7 @@ BOOL DANAE::ManageEditorControls()
 				}
 			}
 
-			if (this->kbd.inkey[INKEY_PAD8]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD8]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -2855,10 +2855,10 @@ BOOL DANAE::ManageEditorControls()
 					ARX_PATHS_ModifyPathWay(ARX_PATHS_SelectedAP,ARX_PATHS_SelectedNum,ARX_PATHS_HIERARCHYMOVE | ARX_PATH_MOD_TRANSLATE,&trans,0,0);
 				}
 
-				this->kbd.inkey[INKEY_PAD8]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD8]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PAD2]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD2]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -2868,10 +2868,10 @@ BOOL DANAE::ManageEditorControls()
 					ARX_PATHS_ModifyPathWay(ARX_PATHS_SelectedAP,ARX_PATHS_SelectedNum,ARX_PATHS_HIERARCHYMOVE | ARX_PATH_MOD_TRANSLATE,&trans,0,0);
 				}
 
-				this->kbd.inkey[INKEY_PAD2]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD2]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PAD6]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD6]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -2881,10 +2881,10 @@ BOOL DANAE::ManageEditorControls()
 					ARX_PATHS_ModifyPathWay(ARX_PATHS_SelectedAP,ARX_PATHS_SelectedNum,ARX_PATHS_HIERARCHYMOVE | ARX_PATH_MOD_TRANSLATE,&trans,0,0);
 				}
 
-				this->kbd.inkey[INKEY_PAD6]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD6]=0;
 			}		
 
-			if (this->kbd.inkey[INKEY_PAD4]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD4]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -2894,10 +2894,10 @@ BOOL DANAE::ManageEditorControls()
 					ARX_PATHS_ModifyPathWay(ARX_PATHS_SelectedAP,ARX_PATHS_SelectedNum,ARX_PATHS_HIERARCHYMOVE | ARX_PATH_MOD_TRANSLATE,&trans,0,0);
 				}
 
-				this->kbd.inkey[INKEY_PAD4]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD4]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PADADD]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PADADD]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -2907,10 +2907,10 @@ BOOL DANAE::ManageEditorControls()
 					ARX_PATHS_ModifyPathWay(ARX_PATHS_SelectedAP,ARX_PATHS_SelectedNum,ARX_PATHS_HIERARCHYMOVE | ARX_PATH_MOD_TRANSLATE,&trans,0,0);
 				}
 
-				this->kbd.inkey[INKEY_PADADD]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PADADD]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PADMINUS]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PADMINUS]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -2920,10 +2920,10 @@ BOOL DANAE::ManageEditorControls()
 					ARX_PATHS_ModifyPathWay(ARX_PATHS_SelectedAP,ARX_PATHS_SelectedNum,ARX_PATHS_HIERARCHYMOVE | ARX_PATH_MOD_TRANSLATE,&trans,0,0);
 				}
 
-				this->kbd.inkey[INKEY_PADMINUS]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PADMINUS]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PADDIVIDE]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PADDIVIDE]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -2934,10 +2934,10 @@ BOOL DANAE::ManageEditorControls()
 					if (CDP_PATHWAYS_Options) SendMessage(CDP_PATHWAYS_Options,WM_INITDIALOG,0,0);
 				}
 
-				this->kbd.inkey[INKEY_PADDIVIDE]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PADDIVIDE]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PADMULTIPLY]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PADMULTIPLY]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -2948,28 +2948,28 @@ BOOL DANAE::ManageEditorControls()
 					if (CDP_PATHWAYS_Options) SendMessage(CDP_PATHWAYS_Options,WM_INITDIALOG,0,0);
 				}
 
-				this->kbd.inkey[INKEY_PADMULTIPLY]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PADMULTIPLY]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_RETURN]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_RETURN]) 
 			{
 				if (danaeApp.m_pFramework->m_bIsFullscreen)
 				{
 					ARX_TIME_Pause();
-					Pause(TRUE);
-					DialogBox( (HINSTANCE)GetWindowLong( this->m_hWnd, GWL_HINSTANCE ),
-						MAKEINTRESOURCE(IDD_PATHWAYDLG), this->m_hWnd, PathwayOptionsProc);
-					Pause(FALSE);
+					g_pRenderApp->Pause(TRUE);
+					DialogBox( (HINSTANCE)GetWindowLong( g_pRenderApp->m_hWnd, GWL_HINSTANCE ),
+						MAKEINTRESOURCE(IDD_PATHWAYDLG), g_pRenderApp->m_hWnd, PathwayOptionsProc);
+					g_pRenderApp->Pause(FALSE);
 					ARX_TIME_UnPause();				
 				}
 				else 
-					CDP_PATHWAYS_Options=(CreateDialogParam( (HINSTANCE)GetWindowLong( this->m_hWnd, GWL_HINSTANCE ),
-					MAKEINTRESOURCE(IDD_PATHWAYDLG), this->m_hWnd, PathwayOptionsProc,0 ));	
+					CDP_PATHWAYS_Options=(CreateDialogParam( (HINSTANCE)GetWindowLong( g_pRenderApp->m_hWnd, GWL_HINSTANCE ),
+					MAKEINTRESOURCE(IDD_PATHWAYDLG), g_pRenderApp->m_hWnd, PathwayOptionsProc,0 ));	
 
-				this->kbd.inkey[INKEY_RETURN]=0;
+				g_pRenderApp->kbd.inkey[INKEY_RETURN]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_N]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_N]) 
 			{
 				EERIE_3D pos;
 				pos.x=player.pos.x-(float)EEsin(DEG2RAD(player.angle.b))*150.f;
@@ -2983,18 +2983,18 @@ BOOL DANAE::ManageEditorControls()
 
 				if (CDP_PATHWAYS_Options) SendMessage(CDP_PATHWAYS_Options,WM_INITDIALOG,0,0);
 
-				this->kbd.inkey[INKEY_N]=0;
+				g_pRenderApp->kbd.inkey[INKEY_N]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_DEL]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_DEL]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 					ARX_PATHS_DeletePathWay(ARX_PATHS_SelectedAP,ARX_PATHS_SelectedNum);
 
-				this->kbd.inkey[INKEY_DEL]=0;
+				g_pRenderApp->kbd.inkey[INKEY_DEL]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_SPACE]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_SPACE]) 
 			{
 				if ((ARX_PATHS_SelectedAP!=NULL) && (ARX_PATHS_SelectedNum!=-1))
 				{
@@ -3023,7 +3023,7 @@ BOOL DANAE::ManageEditorControls()
 					
 				}
 
-				this->kbd.inkey[INKEY_SPACE]=0;
+				g_pRenderApp->kbd.inkey[INKEY_SPACE]=0;
 			}
 		}
 
@@ -3065,11 +3065,11 @@ BOOL DANAE::ManageEditorControls()
 				}
 			}
 
-			if (this->kbd.inkey[INKEY_DEL]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_DEL]) 
 			{
 				PrecalcIOLighting(NULL,0,1);
 
-				if ( (this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT]))
+				if ( (g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT]))
 				{
 					if (OKBox("Destroy ALL Lights from this level ???","GAIA Popup"))
 					{
@@ -3082,8 +3082,8 @@ BOOL DANAE::ManageEditorControls()
 						EERIE_LIGHT_ClearAll();
 					}
 
-					this->kbd.inkey[INKEY_LEFTSHIFT]=0;
-					this->kbd.inkey[INKEY_RIGHTSHIFT]=0;
+					g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]=0;
+					g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT]=0;
 				}
 				else if (OKBox("Destroy Selected Light ?","GAIA Popup"))
 				{
@@ -3098,23 +3098,23 @@ BOOL DANAE::ManageEditorControls()
 					RecalcLightZone(player.pos.x,player.pos.y,player.pos.z,12);
 				}
 
-				this->kbd.inkey[INKEY_DEL]=0;
+				g_pRenderApp->kbd.inkey[INKEY_DEL]=0;
 			}
 
 			val=10.f;
 
-			if ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT])) 
+			if ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])) 
 				val=2.f;
 			
 
-			if (this->kbd.inkey[INKEY_RETURN]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_RETURN]) 
 			{
 				PrecalcIOLighting(NULL,0,1);
 				launchlightdialog();
-				this->kbd.inkey[INKEY_RETURN]=0;
+				g_pRenderApp->kbd.inkey[INKEY_RETURN]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_SPACE]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_SPACE]) 
 			{
 				PrecalcIOLighting(NULL,0,1);
 
@@ -3157,67 +3157,67 @@ BOOL DANAE::ManageEditorControls()
 					RecalcLightZone(GLight[LastSelectedLight]->pos.x,GLight[LastSelectedLight]->pos.y,GLight[LastSelectedLight]->pos.z,(long)(GLight[LastSelectedLight]->fallend*ACTIVEBKG->Xmul)+1);
 				}
 				
-				this->kbd.inkey[INKEY_SPACE]=0;
+				g_pRenderApp->kbd.inkey[INKEY_SPACE]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PAD8]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD8]) 
 			{
 				PrecalcIOLighting(NULL,0,1);	
 				trans.x=-(float)EEsin(DEG2RAD(player.angle.b))*val;
 				trans.y=0.f;
 				trans.z=(float)EEcos(DEG2RAD(player.angle.b))*val;
 				EERIE_LIGHT_TranslateSelected(&trans);
-				this->kbd.inkey[INKEY_PAD8]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD8]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PAD2]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD2]) 
 			{
 				PrecalcIOLighting(NULL,0,1);
 				trans.x=(float)EEsin(DEG2RAD(player.angle.b))*val;
 				trans.y=0.f;
 				trans.z=-(float)EEcos(DEG2RAD(player.angle.b))*val;
 				EERIE_LIGHT_TranslateSelected(&trans);
-				this->kbd.inkey[INKEY_PAD2]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD2]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PAD6]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD6]) 
 			{
 				PrecalcIOLighting(NULL,0,1);
 				trans.x=-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b-90.f)))*val;
 				trans.y=0.f;
 				trans.z=(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b-90.f)))*val;
 				EERIE_LIGHT_TranslateSelected(&trans);
-				this->kbd.inkey[INKEY_PAD6]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD6]=0;
 			}		
 
-			if (this->kbd.inkey[INKEY_PAD4]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD4]) 
 			{
 				PrecalcIOLighting(NULL,0,1);
 				trans.x=-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b+90.f)))*val;
 				trans.y=0.f;
 				trans.z=(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b+90.f)))*val;
 				EERIE_LIGHT_TranslateSelected(&trans);
-				this->kbd.inkey[INKEY_PAD4]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD4]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PADADD]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PADADD]) 
 			{
 				PrecalcIOLighting(NULL,0,1);
 			trans.x = 0.f;
 			trans.y = -val;
 			trans.z = 0.f;
 				EERIE_LIGHT_TranslateSelected(&trans);
-				this->kbd.inkey[INKEY_PADADD]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PADADD]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PADMINUS]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PADMINUS]) 
 			{
 				PrecalcIOLighting(NULL,0,1);
 			trans.x = 0.f;
 			trans.y = val;
 			trans.z = 0.f;
 				EERIE_LIGHT_TranslateSelected(&trans);
-				this->kbd.inkey[INKEY_PADMINUS]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PADMINUS]=0;
 			}
 	}
 	
@@ -3228,84 +3228,84 @@ BOOL DANAE::ManageEditorControls()
 		{
 		}
 		
-		if (this->kbd.inkey[INKEY_DEL]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_DEL]) 
 		{
 			if (OKBox("Destroy Selected Particle ?","GAIA Popup"))
 			{
 			}
 
-			this->kbd.inkey[INKEY_DEL]=0;
+			g_pRenderApp->kbd.inkey[INKEY_DEL]=0;
 		}
 
 		val=10.f;
 
-		if ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT])) 
+		if ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])) 
 			val=2.f;
 		
-		if (this->kbd.inkey[INKEY_RETURN]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_RETURN]) 
 		{
 			// Launch Particle Dialog
-			this->kbd.inkey[INKEY_RETURN]=0;
+			g_pRenderApp->kbd.inkey[INKEY_RETURN]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_SPACE]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_SPACE]) 
 		{
 			// Create a Particle FX
-			this->kbd.inkey[INKEY_SPACE]=0;
+			g_pRenderApp->kbd.inkey[INKEY_SPACE]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD8]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD8]) 
 		{
 			// Translate FRONT
 			trans.x=-(float)EEsin(DEG2RAD(player.angle.b))*val;
 			trans.y=0.f;
 			trans.z=(float)EEcos(DEG2RAD(player.angle.b))*val;
-			this->kbd.inkey[INKEY_PAD8]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD8]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD2]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD2]) 
 		{
 			//	translate BACK
 			trans.x=(float)EEsin(DEG2RAD(player.angle.b))*val;
 			trans.y=0.f;
 			trans.z=-(float)EEcos(DEG2RAD(player.angle.b))*val;
-			this->kbd.inkey[INKEY_PAD2]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD2]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD6]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD6]) 
 		{
 			//	translate RIGHT
 			trans.x=-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b-90.f)))*val;
 			trans.y=0.f;
 			trans.z=(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b-90.f)))*val;
-			this->kbd.inkey[INKEY_PAD6]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD6]=0;
 		}		
 
-		if (this->kbd.inkey[INKEY_PAD4]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD4]) 
 		{
 			// translate LEFT
 			trans.x=-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b+90.f)))*val;
 			trans.y=0.f;
 			trans.z=(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b+90.f)))*val;
-			this->kbd.inkey[INKEY_PAD4]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD4]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PADADD]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PADADD]) 
 		{
 			//	translate UP
 			trans.x = 0.f;
 			trans.y = -val;
 			trans.z = 0.f;
-			this->kbd.inkey[INKEY_PADADD]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PADADD]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PADMINUS]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PADMINUS]) 
 		{
 			//	translate DOWN
 			trans.x = 0.f;
 			trans.y = val;
 			trans.z = 0.f;
-			this->kbd.inkey[INKEY_PADMINUS]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PADMINUS]=0;
 		}
 	}
 	
@@ -3330,8 +3330,8 @@ BOOL DANAE::ManageEditorControls()
 			}
 		}
 
-		if (!(this->kbd.inkey[INKEY_LEFTSHIFT]) && !(this->kbd.inkey[INKEY_RIGHTSHIFT])) 
-			if ((this->kbd.inkey[INKEY_L]) && (LastSelectedNode!=-1))
+		if (!(g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) && !(g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])) 
+			if ((g_pRenderApp->kbd.inkey[INKEY_L]) && (LastSelectedNode!=-1))
 			{
 				for (long i=0;i<nodes.nbmax;i++)
 				{
@@ -3345,10 +3345,10 @@ BOOL DANAE::ManageEditorControls()
 					}
 				}
 
-				this->kbd.inkey[INKEY_L]=0;
+				g_pRenderApp->kbd.inkey[INKEY_L]=0;
 			}
 
-			if ((this->kbd.inkey[INKEY_U]) && (LastSelectedNode!=-1))
+			if ((g_pRenderApp->kbd.inkey[INKEY_U]) && (LastSelectedNode!=-1))
 			{
 				for (long i=0;i<nodes.nbmax;i++)
 				{
@@ -3362,17 +3362,17 @@ BOOL DANAE::ManageEditorControls()
 					}
 				}
 
-				this->kbd.inkey[INKEY_U]=0;
+				g_pRenderApp->kbd.inkey[INKEY_U]=0;
 			}
 
 			float val=10.f;
 
-			if ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT])) 
+			if ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])) 
 			{
 				val=1.f;				
 			}
 
-			if (this->kbd.inkey[INKEY_RETURN])
+			if (g_pRenderApp->kbd.inkey[INKEY_RETURN])
 			{
 				for (long i=0;i<nodes.nbmax;i++)
 				{
@@ -3394,10 +3394,10 @@ BOOL DANAE::ManageEditorControls()
 					}
 				}
 
-				this->kbd.inkey[INKEY_RETURN]=0;
+				g_pRenderApp->kbd.inkey[INKEY_RETURN]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_N])
+			if (g_pRenderApp->kbd.inkey[INKEY_N])
 			{
 				long n=GetFreeNode();
 
@@ -3423,16 +3423,16 @@ BOOL DANAE::ManageEditorControls()
 					}
 				}
 
-				this->kbd.inkey[INKEY_N]=0;
+				g_pRenderApp->kbd.inkey[INKEY_N]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_DEL]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_DEL]) 
 			{
 				ClearSelectedNodes();
-				this->kbd.inkey[INKEY_DEL]=0;
+				g_pRenderApp->kbd.inkey[INKEY_DEL]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PAD8]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD8]) 
 			{
 				float ag=GetNearestSnappedAngle(player.angle.b);
 				ag=DEG2RAD(ag);
@@ -3440,10 +3440,10 @@ BOOL DANAE::ManageEditorControls()
 				trans.y=0.f;
 				trans.z=(float)EEcos(ag)*val;
 				TranslateSelectedNodes(&trans);
-				this->kbd.inkey[INKEY_PAD8]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD8]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PAD2]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD2]) 
 			{
 				float ag=GetNearestSnappedAngle(player.angle.b);
 				ag=DEG2RAD(ag);
@@ -3451,10 +3451,10 @@ BOOL DANAE::ManageEditorControls()
 				trans.y=0.f;
 				trans.z=-(float)EEcos(ag)*val;
 				TranslateSelectedNodes(&trans);
-				this->kbd.inkey[INKEY_PAD2]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD2]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PAD6]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD6]) 
 			{
 				float ag=GetNearestSnappedAngle(MAKEANGLE(player.angle.b-90.f));
 				ag=DEG2RAD(ag);
@@ -3462,10 +3462,10 @@ BOOL DANAE::ManageEditorControls()
 				trans.y=0.f;
 				trans.z=(float)EEcos(ag)*val;
 				TranslateSelectedNodes(&trans);
-				this->kbd.inkey[INKEY_PAD6]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD6]=0;
 			}		
 
-			if (this->kbd.inkey[INKEY_PAD4]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PAD4]) 
 			{
 				float ag=GetNearestSnappedAngle(MAKEANGLE(player.angle.b+90.f));
 				ag=DEG2RAD(ag);
@@ -3473,25 +3473,25 @@ BOOL DANAE::ManageEditorControls()
 				trans.y=0.f;
 				trans.z=(float)EEcos(ag)*val;
 				TranslateSelectedNodes(&trans);
-				this->kbd.inkey[INKEY_PAD4]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PAD4]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PADADD]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PADADD]) 
 			{
 				trans.x=0.f;
 				trans.y=-val;
 				trans.z=0.f;
 				TranslateSelectedNodes(&trans);
-				this->kbd.inkey[INKEY_PADADD]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PADADD]=0;
 			}
 
-			if (this->kbd.inkey[INKEY_PADMINUS]) 
+			if (g_pRenderApp->kbd.inkey[INKEY_PADMINUS]) 
 			{
 				trans.x=0.f;
 				trans.y=val;
 				trans.z=0.f;
 				TranslateSelectedNodes(&trans);
-				this->kbd.inkey[INKEY_PADMINUS]=0;
+				g_pRenderApp->kbd.inkey[INKEY_PADMINUS]=0;
 			}
 	}
 	
@@ -3526,12 +3526,12 @@ BOOL DANAE::ManageEditorControls()
 			}
 		}
 
-		if ( !( this->kbd.inkey[INKEY_LEFTSHIFT] ) && !( this->kbd.inkey[INKEY_RIGHTSHIFT] ) ) 
+		if ( !( g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT] ) && !( g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT] ) ) 
 		{
 			val=10.f;
 		}
 
-		if ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT])) 
+		if ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])) 
 		{
 			val=1.f;
 
@@ -3552,7 +3552,7 @@ BOOL DANAE::ManageEditorControls()
 			}
 		}
 
-		if (this->kbd.inkey[INKEY_RETURN])
+		if (g_pRenderApp->kbd.inkey[INKEY_RETURN])
 		{
 			if ((LastSelectedFog>-1) && (!CDP_FogOptions))
 			{
@@ -3563,21 +3563,21 @@ BOOL DANAE::ManageEditorControls()
 				if (danaeApp.m_pFramework->m_bIsFullscreen)
 				{
 					ARX_TIME_Pause();
-					Pause(TRUE);
-					DialogBox( (HINSTANCE)GetWindowLong( this->m_hWnd, GWL_HINSTANCE ),
-						MAKEINTRESOURCE(IDD_FOGDIALOG), this->m_hWnd, FogOptionsProc);
-					Pause(FALSE);
+					g_pRenderApp->Pause(TRUE);
+					DialogBox( (HINSTANCE)GetWindowLong( g_pRenderApp->m_hWnd, GWL_HINSTANCE ),
+						MAKEINTRESOURCE(IDD_FOGDIALOG), g_pRenderApp->m_hWnd, FogOptionsProc);
+					g_pRenderApp->Pause(FALSE);
 					ARX_TIME_UnPause();				
 				}
 				else 
-					CDP_FogOptions=(CreateDialogParam( (HINSTANCE)GetWindowLong( this->m_hWnd, GWL_HINSTANCE ),
-					MAKEINTRESOURCE(IDD_FOGDIALOG), this->m_hWnd, FogOptionsProc,0 ));
+					CDP_FogOptions=(CreateDialogParam( (HINSTANCE)GetWindowLong( g_pRenderApp->m_hWnd, GWL_HINSTANCE ),
+					MAKEINTRESOURCE(IDD_FOGDIALOG), g_pRenderApp->m_hWnd, FogOptionsProc,0 ));
 			}
 
-			this->kbd.inkey[INKEY_RETURN]=0;
+			g_pRenderApp->kbd.inkey[INKEY_RETURN]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_SPACE])
+		if (g_pRenderApp->kbd.inkey[INKEY_SPACE])
 		{
 			long n=ARX_FOGS_GetFree();
 
@@ -3625,10 +3625,10 @@ BOOL DANAE::ManageEditorControls()
 				}
 			}
 
-			this->kbd.inkey[INKEY_SPACE]=0;
+			g_pRenderApp->kbd.inkey[INKEY_SPACE]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_DEL]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_DEL]) 
 		{
 			if (OKBox("Destroy Selected Fog ?","GAIA Popup"))
 			{
@@ -3641,66 +3641,66 @@ BOOL DANAE::ManageEditorControls()
 				ARX_FOGS_KillSelected();
 			}
 
-			this->kbd.inkey[INKEY_DEL]=0;
+			g_pRenderApp->kbd.inkey[INKEY_DEL]=0;
 		}
 
-		if ( this->kbd.inkey[INKEY_PAD8] ) 
+		if ( g_pRenderApp->kbd.inkey[INKEY_PAD8] ) 
 		{
 			trans.x = -(float)EEsin( DEG2RAD( player.angle.b ) ) * val;
 			trans.y = 0.f;
 			trans.z = (float)EEcos( DEG2RAD( player.angle.b ) ) * val;
 			ARX_FOGS_TranslateSelected( &trans );
-			this->kbd.inkey[INKEY_PAD8] = 0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD8] = 0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD2]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD2]) 
 		{
 			EERIE_3D trans;
 			trans.x=(float)EEsin(DEG2RAD(player.angle.b))*val;
 			trans.y=0.f;
 			trans.z=-(float)EEcos(DEG2RAD(player.angle.b))*val;
 			ARX_FOGS_TranslateSelected(&trans);
-			this->kbd.inkey[INKEY_PAD2]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD2]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD6]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD6]) 
 		{
 			EERIE_3D trans;
 			trans.x=-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b-90.f)))*val;
 			trans.y=0.f;
 			trans.z=(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b-90.f)))*val;
 			ARX_FOGS_TranslateSelected(&trans);
-			this->kbd.inkey[INKEY_PAD6]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD6]=0;
 		}		
 
-		if (this->kbd.inkey[INKEY_PAD4]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD4]) 
 		{
 			EERIE_3D trans;
 			trans.x=-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b+90.f)))*val;
 			trans.y=0.f;
 			trans.z=(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b+90.f)))*val;
 			ARX_FOGS_TranslateSelected(&trans);
-			this->kbd.inkey[INKEY_PAD4]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD4]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PADADD]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PADADD]) 
 		{
 			EERIE_3D trans;
 			trans.x=0.f;
 			trans.y=-val;
 			trans.z=0.f;
 			ARX_FOGS_TranslateSelected(&trans);
-			this->kbd.inkey[INKEY_PADADD]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PADADD]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PADMINUS]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PADMINUS]) 
 		{
 			EERIE_3D trans;
 			trans.x=0.f;
 			trans.y=val;
 			trans.z=0.f;
 			ARX_FOGS_TranslateSelected(&trans);
-			this->kbd.inkey[INKEY_PADMINUS]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PADMINUS]=0;
 		}
 		
 	}
@@ -3710,31 +3710,31 @@ BOOL DANAE::ManageEditorControls()
 	{ 
 		float val;
 
-		if ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT]))
+		if ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT]))
 		{
 			val=1.f;		
 		}
 		else val=20.f;
 
-		if (this->kbd.inkey[INKEY_HOME]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_HOME]) 
 		{
 			ResetSelectedIORot();
-			this->kbd.inkey[INKEY_HOME]=0;
+			g_pRenderApp->kbd.inkey[INKEY_HOME]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_DEL]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_DEL]) 
 		{
 			DeleteSelectedIO();
-			this->kbd.inkey[INKEY_DEL]=0;
+			g_pRenderApp->kbd.inkey[INKEY_DEL]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD7]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD7]) 
 		{
 			GroundSnapSelectedIO();
-			this->kbd.inkey[INKEY_PAD7]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD7]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD0]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD0]) 
 		{
 			if (ValidIONum(LastSelectedIONum))
 			{
@@ -3746,10 +3746,10 @@ BOOL DANAE::ManageEditorControls()
 				inter.iobj[LastSelectedIONum]->initangle.g=0.f;
 			}
 
-			this->kbd.inkey[INKEY_PAD0]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD0]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD8]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD8]) 
 		{
 			EERIE_3D trans;
 			float ag=GetNearestSnappedAngle(player.angle.b);
@@ -3758,10 +3758,10 @@ BOOL DANAE::ManageEditorControls()
 			trans.y=0.f;
 			trans.z=(float)EEcos(ag)*val;
 			TranslateSelectedIO(&trans);
-			this->kbd.inkey[INKEY_PAD8]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD8]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD2]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD2]) 
 		{
 			EERIE_3D trans;
 			float ag=GetNearestSnappedAngle(player.angle.b);
@@ -3770,10 +3770,10 @@ BOOL DANAE::ManageEditorControls()
 			trans.y=0.f;
 			trans.z=-(float)EEcos(ag)*val;
 			TranslateSelectedIO(&trans);
-			this->kbd.inkey[INKEY_PAD2]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD2]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD6]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD6]) 
 		{
 			EERIE_3D trans;
 			float ag=GetNearestSnappedAngle(MAKEANGLE(player.angle.b-90.f));
@@ -3782,10 +3782,10 @@ BOOL DANAE::ManageEditorControls()
 			trans.y=0.f;
 			trans.z=(float)EEcos(ag)*val;
 			TranslateSelectedIO(&trans);
-			this->kbd.inkey[INKEY_PAD6]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD6]=0;
 		}		
 
-		if (this->kbd.inkey[INKEY_PAD4]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD4]) 
 		{
 			EERIE_3D trans;
 			float ag=GetNearestSnappedAngle(MAKEANGLE(player.angle.b+90.f));
@@ -3794,41 +3794,41 @@ BOOL DANAE::ManageEditorControls()
 			trans.y=0.f;
 			trans.z=(float)EEcos(ag)*val;
 			TranslateSelectedIO(&trans);
-			this->kbd.inkey[INKEY_PAD4]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD4]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PADADD]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PADADD]) 
 		{
 			EERIE_3D trans;
 			trans.x=0.f;
 			trans.y=-val;
 			trans.z=0.f;
 			TranslateSelectedIO(&trans);
-			this->kbd.inkey[INKEY_PADADD]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PADADD]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PADMINUS]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PADMINUS]) 
 		{
 			EERIE_3D trans;
 			trans.x=0.f;
 			trans.y=val;
 			trans.z=0.f;
 			TranslateSelectedIO(&trans);
-			this->kbd.inkey[INKEY_PADMINUS]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PADMINUS]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PAD9]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PAD9]) 
 		{
 			ObjectRotAxis++;
 
 			if (ObjectRotAxis>2) ObjectRotAxis=0;
 
-			this->kbd.inkey[INKEY_PAD9]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PAD9]=0;
 		}
 
 		if (val!=1.f) val=45.f;
 
-		if (this->kbd.inkey[INKEY_PADMULTIPLY]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PADMULTIPLY]) 
 		{
 			EERIE_3D rot;
 			rot.a=rot.b=rot.g=0.f;
@@ -3838,10 +3838,10 @@ BOOL DANAE::ManageEditorControls()
 			else rot.g=val;
 
 			RotateSelectedIO(&rot);
-			this->kbd.inkey[INKEY_PADMULTIPLY]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PADMULTIPLY]=0;
 		}
 
-		if (this->kbd.inkey[INKEY_PADDIVIDE]) 
+		if (g_pRenderApp->kbd.inkey[INKEY_PADDIVIDE]) 
 		{
 			EERIE_3D rot;
 			rot.a=rot.b=rot.g=0.f;
@@ -3851,13 +3851,13 @@ BOOL DANAE::ManageEditorControls()
 			else rot.g=-val;
 
 			RotateSelectedIO(&rot);
-			this->kbd.inkey[INKEY_PADDIVIDE]=0;
+			g_pRenderApp->kbd.inkey[INKEY_PADDIVIDE]=0;
 		}
 	}
 	
 	
 	if (EDITMODE)
-		if ((this->kbd.inkey[INKEY_RETURN])  
+		if ((g_pRenderApp->kbd.inkey[INKEY_RETURN])  
 			&& (ValidIONum(LastSelectedIONum)))
 		{
 			//CDP_IOOptions			
@@ -3873,18 +3873,18 @@ BOOL DANAE::ManageEditorControls()
 				if (danaeApp.m_pFramework->m_bIsFullscreen)
 				{
 					ARX_TIME_Pause();
-					Pause(TRUE);
-					DialogBox( (HINSTANCE)GetWindowLong( this->m_hWnd, GWL_HINSTANCE ),
-						MAKEINTRESOURCE(IDD_SCRIPTDIALOG), this->m_hWnd, IOOptionsProc);
-					Pause(FALSE);
+					g_pRenderApp->Pause(TRUE);
+					DialogBox( (HINSTANCE)GetWindowLong( g_pRenderApp->m_hWnd, GWL_HINSTANCE ),
+						MAKEINTRESOURCE(IDD_SCRIPTDIALOG), g_pRenderApp->m_hWnd, IOOptionsProc);
+					g_pRenderApp->Pause(FALSE);
 					ARX_TIME_UnPause();				
 				}
 				else 
-					CDP_IOOptions=(CreateDialogParam( (HINSTANCE)GetWindowLong( this->m_hWnd, GWL_HINSTANCE ),
-					MAKEINTRESOURCE(IDD_SCRIPTDIALOG), this->m_hWnd, IOOptionsProc,0 ));
+					CDP_IOOptions=(CreateDialogParam( (HINSTANCE)GetWindowLong( g_pRenderApp->m_hWnd, GWL_HINSTANCE ),
+					MAKEINTRESOURCE(IDD_SCRIPTDIALOG), g_pRenderApp->m_hWnd, IOOptionsProc,0 ));
 			}
 
-			this->kbd.inkey[INKEY_RETURN]=0;
+			g_pRenderApp->kbd.inkey[INKEY_RETURN]=0;
 		}
 		
 		return FALSE;
@@ -3952,7 +3952,7 @@ long MOVE_PRECEDENCE=0;
 extern long DISABLE_JUMP;
 extern unsigned long REQUEST_JUMP;
 //-----------------------------------------------------------------------------
-void DANAE::ManagePlayerControls()
+void ManagePlayerControls()
 {
 	
 	if (((EERIEMouseButton & 4) && (!EDITMODE) && !(player.Interface & INTER_COMBATMODE)) 
@@ -4079,7 +4079,6 @@ void DANAE::ManagePlayerControls()
 				tr=DEG2RAD(eyeball.angle.b);
 				eyeball.pos.x+=-(float)EEsin(tr)*20.f*(float)FD*0.033f;
 				eyeball.pos.z+=+(float)EEcos(tr)*20.f*(float)FD*0.033f;
-				MustRefresh=TRUE;
 				NOMOREMOVES=1;
 			}
 
@@ -4089,7 +4088,6 @@ void DANAE::ManagePlayerControls()
 				tr=DEG2RAD(eyeball.angle.b);
 				eyeball.pos.x+=(float)EEsin(tr)*20.f*(float)FD*0.033f;
 				eyeball.pos.z+=-(float)EEcos(tr)*20.f*(float)FD*0.033f;
-				MustRefresh=TRUE;
 				NOMOREMOVES=1;
 			}				
 
@@ -4101,7 +4099,6 @@ void DANAE::ManagePlayerControls()
 				tr=DEG2RAD(MAKEANGLE(eyeball.angle.b+90.f));
 				eyeball.pos.x+=-(float)EEsin(tr)*10.f*(float)FD*0.033f;
 				eyeball.pos.z+=+(float)EEcos(tr)*10.f*(float)FD*0.033f;
-				MustRefresh=TRUE;
 				NOMOREMOVES=1;			
 			}
 
@@ -4114,7 +4111,6 @@ void DANAE::ManagePlayerControls()
 				eyeball.pos.x+=-(float)EEsin(tr)*10.f*(float)FD*0.033f;
 				//eyeball.pos.y+=FD*0.33f;
 				eyeball.pos.z+=(float)EEcos(tr)*10.f*(float)FD*0.033f;
-				MustRefresh=TRUE;
 				NOMOREMOVES=1;
 			}	
 
@@ -4273,12 +4269,12 @@ void DANAE::ManagePlayerControls()
 	  
 	  if (!USE_PLAYERCOLLISIONS)
 	  {
-		  if (this->kbd.inkey[INKEY_PAGEUP]) 
+		  if (g_pRenderApp->kbd.inkey[INKEY_PAGEUP]) 
 		  {
 			  if (!USE_PLAYERCOLLISIONS) moveto.y=player.pos.y=player.pos.y-10.f;
 		  }
 
-		  if (this->kbd.inkey[INKEY_PAGEDOWN]) 
+		  if (g_pRenderApp->kbd.inkey[INKEY_PAGEDOWN]) 
 		  {
 			  moveto.y=player.pos.y=player.pos.y+10.f;
 		  }
@@ -4287,16 +4283,16 @@ void DANAE::ManagePlayerControls()
 	  // To remove for FINAL_RELEASE---------------------------------------
 	  if (ALLOW_CHEATS || GAME_EDITOR)
 	  {
-		  if (this->kbd.inkey[INKEY_PAD5]) 
+		  if (g_pRenderApp->kbd.inkey[INKEY_PAD5]) 
 		  {
 			  moveto.y=player.pos.y=FirstPolyPosY(player.pos.x,player.pos.z)-180.f;		
 			  player.angle.a=0.f;
 			  player.desiredangle.a=0.f;
-			  this->kbd.inkey[INKEY_PAD5]=0;
+			  g_pRenderApp->kbd.inkey[INKEY_PAD5]=0;
 		  }
 
-		  if ((this->kbd.inkey[INKEY_A]) 
-			  && ((this->kbd.inkey[INKEY_LEFTSHIFT]) || (this->kbd.inkey[INKEY_RIGHTSHIFT]) ) ) 
+		  if ((g_pRenderApp->kbd.inkey[INKEY_A]) 
+			  && ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT]) ) ) 
 		  {
 			  BLOCK_PLAYER_CONTROLS=0;
 			  player.life=player.Full_maxlife;
@@ -6539,7 +6535,7 @@ void ARX_INTERFACE_Draw_Stealth_Gauge()
 			SETALPHABLEND(GDevice, true);
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
-			GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
+			SETZWRITE(GDevice, false);
 			g_pRenderApp->renderer->DrawQuad(
 			                px, py, INTERFACE_RATIO_DWORD(stealth_gauge_tc->m_dwWidth), INTERFACE_RATIO_DWORD(stealth_gauge_tc->m_dwHeight), 0.01f,
 				stealth_gauge_tc,0,col);
@@ -8570,6 +8566,10 @@ void ARX_INTERFACE_ManageOpenedBook()
 				}
 			}
 			
+#ifdef ARX_OPENGL
+			//TODO
+			QuestBook.totpages = lCurPage;
+#else
 			while(lLenght>0)
 			{
 #ifdef ARX_OPENGL
@@ -8599,6 +8599,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 				QuestBook.pages[MAX_PAGES-1] = -1;
 
 			QuestBook.totpages = lCurPage;
+#endif
 			
 			//---------------------------------------------------------------------
 			// render
@@ -9184,7 +9185,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 
 
 //-----------------------------------------------------------------------------
-void DANAE::DrawAllInterfaceFinish()
+void DrawAllInterfaceFinish()
 {
 	currpos = ARX_CLEAN_WARN_CAST_LONG(INTERFACE_RATIO(50.f));
 	float rrr;
@@ -9298,11 +9299,12 @@ void ARX_INTERFACE_DrawCurrentTorch()
 extern float GLOBAL_SLOWDOWN;
 extern long SPLASH_THINGS_STAGE;
 //-----------------------------------------------------------------------------
-void DANAE::DrawAllInterface()
+void DrawAllInterface()
 {
-	
+#ifndef ARX_OPENGL
 	GDevice->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTFN_POINT );
 	GDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTFG_POINT );
+#endif
 	SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_CLAMP);
 	
 	if (!EDITMODE)
@@ -9340,9 +9342,9 @@ void DANAE::DrawAllInterface()
 
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
-			GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, TRUE );
+			SETALPHABLEND(GDevice, TRUE);
 			ARX_INTERFACE_DrawItem(ITC.aim_maxi, DANAECENTERX + INTERFACE_RATIO(-320+262.f), DANAESIZY + INTERFACE_RATIO(-72.f), 0.0001f, D3DRGB(j,j,j));
-			GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, FALSE );
+			SETALPHABLEND(GDevice, FALSE);
 			ARX_INTERFACE_DrawItem(ITC.aim_empty, DANAECENTERX + INTERFACE_RATIO(-320+262.f), DANAESIZY + INTERFACE_RATIO(-72.f), 0.0001f, D3DRGB(1,1,1));
 			
 			if (bHitFlash)
@@ -9352,7 +9354,7 @@ void DANAE::DrawAllInterface()
 					float j = 1.0f - fHitFlash;
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
-					GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true );
+					SETALPHABLEND(GDevice, TRUE);
 					long col = 0;
 
 					if (j < 0.5f)
@@ -9361,7 +9363,7 @@ void DANAE::DrawAllInterface()
 						col = D3DRGB(1,fHitFlash,0);
 
 					ARX_INTERFACE_DrawItem(ITC.aim_hit, DANAECENTERX + INTERFACE_RATIO(-320+262.f-25), DANAESIZY + INTERFACE_RATIO(-72.f-30), 0.0001f, col);
-					GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, false);
+					SETALPHABLEND(GDevice, FALSE);
 				}
 			}
 		}
@@ -9915,7 +9917,7 @@ void DANAE::DrawAllInterface()
 			float px = DANAESIZX - INTERFACE_RATIO_DWORD(ChangeLevel->m_dwWidth);
 		float py = 0;
 
-		GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,false);
+		SETZWRITE(GDevice, false);
 		float vv = 0.9f - EEsin(FrameTime*DIV50)*DIV2+rnd()*DIV10;
 
 		if ( vv < 0.f ) vv = 0;
@@ -10039,7 +10041,7 @@ void DANAE::DrawAllInterface()
 		v[2]= D3DTLVERTEX( D3DVECTOR( 0, 0, 0.001f ), 1.f, D3DCOLORWHITE, 1, 1.f, 1.f);
 		v[3]= D3DTLVERTEX( D3DVECTOR( 0, 0, 0.001f ), 1.f, D3DCOLORWHITE, 1, 0.f, 1.f);
 		
-		GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,false);
+		SETZWRITE(GDevice, false);
 		px = DANAESIZX - INTERFACE_RATIO(33) + INTERFACE_RATIO(1) + lSLID_VALUE;
 		py = DANAESIZY - INTERFACE_RATIO(81);
 		ARX_INTERFACE_DrawItem(ITC.empty_gauge_blue, px, py, 0.f); //399
@@ -10095,7 +10097,7 @@ void DANAE::DrawAllInterface()
 		//---------------------------------------------------------------------
 		//END RED GAUGE
 		
-		GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,false);
+		SETZWRITE(GDevice, false);
 		px = 0.f-lSLID_VALUE;
 		py = DANAESIZY - INTERFACE_RATIO(78);
 		ARX_INTERFACE_DrawItem(ITC.empty_gauge_red, px, py, 0.001f);
@@ -10273,8 +10275,10 @@ void DANAE::DrawAllInterface()
 	}
 	
 	danaeApp.EnableZBuffer();
+#ifndef ARX_OPENGL
 	GDevice->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTFN_LINEAR );
 	GDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTFG_LINEAR );
+#endif
 	SETTEXTUREWRAPMODE(GDevice,D3DTADDRESS_WRAP);
 }
 

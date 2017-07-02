@@ -1033,7 +1033,6 @@ void InitializeDanae()
 	map.bkgcolor=0x001F1F55;
 	SetActiveCamera(&map);
 	SetCameraDepth(10000.f);
-	danaeApp.MustRefresh=TRUE;
 
 	for (long i=0;i<32;i++)
 		memcpy(&TCAM[i],&subj,sizeof(EERIE_CAMERA));
@@ -1802,7 +1801,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	}
 
 	pMenuConfig = new CMenuConfig(szPath);
-	pMenuConfig->ReadAll();
+	//pMenuConfig->ReadAll();
 
 
 	ARX_MINIMAP_FirstInit();
@@ -8071,7 +8070,7 @@ HRESULT DANAEGL::Render()
 	{
 		if(!PLAYER_PARALYSED)
 		{
-			//if(ManageEditorControls()) goto finish;
+			if(ManageEditorControls()) goto finish;
 		}
 
 		if((!BLOCK_PLAYER_CONTROLS) && (!PLAYER_PARALYSED))
@@ -8788,26 +8787,6 @@ HRESULT DANAEGL::FrameMove(FLOAT fTimeKey)
 HRESULT DANAEGL::FinalCleanup()
 {
 	return S_OK;
-}
-
-BOOL DANAEGL::ManageEditorControls()
-{
-	return TRUE;
-}
-
-void DANAEGL::ManagePlayerControls()
-{
-
-}
-
-void DANAEGL::DrawAllInterface()
-{
-
-}
-
-void DANAEGL::DrawAllInterfaceFinish()
-{
-
 }
 
 void DANAEGL::GoFor2DFX()

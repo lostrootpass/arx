@@ -140,6 +140,14 @@ long ARX_UNICODE_ForceFormattingInRect(HFONT _hFont, _TCHAR * _lpszUText, int _i
 
 	int iTemp = 0;
 
+#ifdef ARX_OPENGL
+	int w, h;
+	char text[256];
+	wcstombs(text, _lpszUText, wcslen(_lpszUText) + 1);
+	g_pRenderApp->renderer->MeasureText(text, GetSizeForHFont(_hFont), &w, &h);
+	return iTemp;
+#endif
+
 	if (danaeApp.m_pddsRenderTarget)
 	{
 		HDC hDC;

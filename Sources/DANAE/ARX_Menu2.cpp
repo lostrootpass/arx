@@ -780,11 +780,7 @@ void CMenuConfig::SetDefaultKey()
 
 int CMenuConfig::GetDIKWithASCII(char *_pcTouch)
 {
-#ifdef ARX_OPENGL
-	//TODO
-	return -1;
-#endif
-_TCHAR pcT[256];
+	_TCHAR pcT[256];
 
 	MultiByteToWideChar(CP_ACP, 0, _pcTouch, -1, pcT, strlen(_pcTouch)+1);
 
@@ -2289,10 +2285,6 @@ void Check_Apply()
 
 static void FadeInOut(float _fVal)
 {
-#ifdef ARX_OPENGL
-	return;
-#endif
-
 D3DTLVERTEX d3dvertex[4];
 
 	int iColor=D3DRGBA(_fVal,_fVal,_fVal,1.f);
@@ -2326,8 +2318,7 @@ D3DTLVERTEX d3dvertex[4];
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 	SETZWRITE(GDevice, false);
-	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,false);
-	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
+	SETCULL(GDevice, D3DCULL_NONE);
 
 	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, d3dvertex, 4, 0, EERIE_NOCOUNT );
 
@@ -2335,7 +2326,7 @@ D3DTLVERTEX d3dvertex[4];
 	SETZWRITE(GDevice, true);
 
 	danaeApp.EnableZBuffer();
-	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_CCW);
+	SETCULL(GDevice, D3DCULL_CCW);
 }
 
 //-----------------------------------------------------------------------------
