@@ -1655,7 +1655,8 @@ BOOL ManageEditorControls()
 		//the mouselook is being enabled/disabled correctly. Moving it requires refactoring
 		//TRUE_PLAYER_MOUSELOOK_ON in to some other function rather than raw toggling.
 		SDL_SetRelativeMouseMode(SDL_TRUE);
-#else
+		SDL_WarpMouseInWindow(0, DANAECENTERX, DANAECENTERY);
+#endif
 		float fX =  DANAESIZX * 0.5f;
 		float fY =	DANAESIZY * 0.5f;
 		ARX_CHECK_SHORT(fX);
@@ -1663,7 +1664,6 @@ BOOL ManageEditorControls()
 
 		DANAEMouse.x = ARX_CLEAN_WARN_CAST_SHORT(fX);
 		DANAEMouse.y = ARX_CLEAN_WARN_CAST_SHORT(fY);
-#endif
 	}
 	else
 	{

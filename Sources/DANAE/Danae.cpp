@@ -1996,10 +1996,10 @@ TextureContainer * _GetTexture_NoRefinement(char * text)
 INTERACTIVE_OBJ * FlyingOverObject(EERIE_S2D * pos,long flag)
 {
 #ifdef ARX_OPENGL
-	//TODO
-	return nullptr;
+	if(0)
+#else
+	if ((flag & 1) && danaeApp.Lock())
 #endif
-	if ((flag & 1) && danaeApp.Lock()) 
 	{
 		INTERACTIVE_OBJ * io=GetFromInventory(pos);
 
@@ -9108,7 +9108,7 @@ bool DANAEGL::DANAEEndRender()
 	glScissor(0, 0, DANAESIZX, DANAESIZY);
 
 	//TODO: remove from here. Done purely to satisfy the whims of the existing codebase.
-	SDL_GL_SwapWindow(_window);
+	//SDL_GL_SwapWindow(_window);
 
 	return true;
 }

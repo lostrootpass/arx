@@ -1133,10 +1133,6 @@ void ARXInputHandlerSDL::GetInput()
 	EERIEMouseX = iMouseAX;
 	EERIEMouseY = iMouseAY;
 
-	bOldMouseButton[SDL_BUTTON_LEFT] = bMouseButton[SDL_BUTTON_LEFT];
-	bOldMouseButton[SDL_BUTTON_MIDDLE] = bMouseButton[SDL_BUTTON_MIDDLE];
-	bOldMouseButton[SDL_BUTTON_RIGHT] = bMouseButton[SDL_BUTTON_RIGHT];
-
 	ARX_CHECK_INT(ARX_TIME_Get(false));
 	const int iArxTime = ARX_CLEAN_WARN_CAST_INT(ARX_TIME_Get(false));
 
@@ -1145,48 +1141,10 @@ void ARXInputHandlerSDL::GetInput()
 		mask & SDL_BUTTON_MMASK,
 		mask & SDL_BUTTON_RMASK
 	};
-	for (int i = 0; i <= 0; i++)
+	for (int i = ARXMOUSE_BUTTON0; i <= ARXMOUSE_BUTTON31; i++)
 	{
-		int iNumClick = 0;
-		int iNumUnClick = 0;
-		//DXI_MouseButtonCountClick(DXI_MOUSE1, i, &iNumClick, &iNumUnClick);
-
-		iOldNumClick[i] += iNumClick + iNumUnClick;
-
-		if ((!bMouseButton[i]) && (iOldNumClick[i] == iNumUnClick))
 		{
-			iNumUnClick = iOldNumClick[i] = 0;
-		}
-
-		bOldMouseButton[i] = bMouseButton[i];
-
-		if (bMouseButton[i])
-		{
-			if (iOldNumClick[i])
-			{
-				bMouseButton[i] = false;
-			}
-		}
-		else
-		{
-			if (iOldNumClick[i])
-			{
-				bMouseButton[i] = true;
-			}
-		}
-
-		if (iOldNumClick[i]) iOldNumClick[i]--;
-
-		iDTime = 0;
-		if (masks[i]) iDTime = ARX_TIME_Get(false);
-
-		if (iDTime)
-		{
-			iMouseTime[i] = iDTime;
-			iMouseTimeSet[i] = 2;
-		}
-		else
-		{
+			int b = arxMouseToNative(i);
 			if ((iMouseTimeSet[i] > 0) &&
 				((ARX_TIME_Get(false) - iMouseTime[i]) > 300)
 				)
@@ -1195,7 +1153,7 @@ void ARXInputHandlerSDL::GetInput()
 				iMouseTimeSet[i] = 0;
 			}
 
-			if (masks[i])
+			if (bMouseButton[i] && !bOldMouseButton[i])
 			{
 				switch (iMouseTimeSet[i])
 				{
@@ -1213,6 +1171,10 @@ void ARXInputHandlerSDL::GetInput()
 	}
 
 	iWheelSens = GetWheelSens(DXI_MOUSE1);
+
+	bOldMouseButton[SDL_BUTTON_LEFT] = bMouseButton[SDL_BUTTON_LEFT];
+	bOldMouseButton[SDL_BUTTON_MIDDLE] = bMouseButton[SDL_BUTTON_MIDDLE];
+	bOldMouseButton[SDL_BUTTON_RIGHT] = bMouseButton[SDL_BUTTON_RIGHT];
 
 	bMouseButton[SDL_BUTTON_LEFT] = mask & SDL_BUTTON_LMASK;
 	bMouseButton[SDL_BUTTON_MIDDLE] = mask & SDL_BUTTON_MMASK;

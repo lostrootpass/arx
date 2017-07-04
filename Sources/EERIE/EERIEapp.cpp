@@ -338,6 +338,8 @@ HRESULT COpenGLApplication::Render3DEnvironment()
 	if(FAILED(hr = Render()))
 		return hr;
 
+	SDL_GL_SwapWindow(_window);
+
 	return S_OK;
 }
 
