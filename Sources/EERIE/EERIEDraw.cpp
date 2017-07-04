@@ -1411,6 +1411,16 @@ void EERIEDrawBitmap2DecalY(LPDIRECT3DDEVICE7 pd3dDevice,float x,float y,float s
 		v[3]= D3DTLVERTEX( D3DVECTOR( x, y+sy, z ), 1.f, col, 0xFF000000, smu, fEndv);
 	}
 
+#ifdef ARX_OPENGL
+	const float uvs[] = {
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f - _fDeltaY,
+		1.0f, 1.0f - _fDeltaY,
+	};
+	g_pRenderApp->renderer->DrawQuad(x, y + fDy, sx, sy, 1.f, tex, uvs, col);
+#else
 	SETTC(pd3dDevice,tex);
 	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, v, 4, 0  );
+#endif
 }

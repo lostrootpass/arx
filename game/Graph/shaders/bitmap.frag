@@ -3,17 +3,20 @@
 
 layout(location = 0) in vec2 uv;
 
-out vec3 color;
+out vec3 fragColor;
 
 uniform sampler2D texsampler;
+uniform vec3 color;
 
 void main()
 {
-   color = texture( texsampler, uv ).rgb;
+   fragColor = texture( texsampler, uv ).rgb;
 
    //Behaviour corresponds to RestoreFakeBlack in D3D7 Arx
-   if(color == vec3(0.0, 0.0, 0.0))
+   if(fragColor == vec3(0.0, 0.0, 0.0))
    {
        discard;
    }
+
+   fragColor *= color;
 }

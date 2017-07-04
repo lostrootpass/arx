@@ -406,6 +406,12 @@ void EERIERendererGL::DrawQuad(float x, float y, float sx, float sy, float z, Te
 	glBindTexture(GL_TEXTURE_2D, tex->textureID);
 	glUniform1i(uniformLocation, 0);
 
+	glm::vec3 col;
+	col.r = ((color >> 16) & 0xFF) / 255.0f;
+	col.g = ((color >> 8) & 0xFF) / 255.0f;
+	col.b = ((color >> 0) & 0xFF) / 255.0f;
+	glUniform3fv(glGetUniformLocation(program, "color"), 1, &col[0]);
+
 	_drawQuad(program, startX, startY, dX, dY, uvs);
 }
 
