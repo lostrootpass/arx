@@ -236,6 +236,12 @@ INT	 COpenGLApplication::Run()
 			case SDL_MOUSEWHEEL:
 				pInputHandler->iWheelSens = e.wheel.y;
 				break;
+
+			case SDL_MOUSEMOTION:
+				pInputHandler->iMouseRX = e.motion.xrel;
+				pInputHandler->iMouseRY = e.motion.yrel;
+				EERIEMouseUpdate(e.motion.xrel, e.motion.yrel);
+				break;
 			}
 		}
 
@@ -305,6 +311,19 @@ HRESULT COpenGLApplication::Render3DEnvironment()
 {
 	HRESULT hr = S_OK;
 
+	EERIEMouseXdep = _EERIEMouseXdep;
+	EERIEMouseYdep = _EERIEMouseYdep;
+	_EERIEMouseXdep = 0;
+	_EERIEMouseYdep = 0;
+
+	// mode systemshock
+	if ((EERIEMouseButton & 1) &&
+		(pMenuConfig->bAutoReadyWeapon == false))
+	{
+		MouseDragX += EERIEMouseXdep;
+		MouseDragY += EERIEMouseYdep;
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Get the relative time, in seconds
@@ -324,7 +343,14 @@ HRESULT COpenGLApplication::Render3DEnvironment()
 
 void COpenGLApplication::EERIEMouseUpdate(short x, short y)
 {
+	// Inactive App: ignore
+	if (!this->m_bActive)	return;
 
+	// Updates MouseX & MouseY offsets
+	_EERIEMouseXdep += x;
+	_EERIEMouseYdep += y;
+
+	SDL_GetMouseState((int*)&EERIEMouseX, (int*)&EERIEMouseY);
 }
 
 //****************************************************************************************

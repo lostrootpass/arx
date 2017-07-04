@@ -213,7 +213,6 @@ public:
 	void ResetAll() override;
 	void GetInput() override;
 	void DrawCursor() override;
-	_TCHAR * GetFullNameTouch(int _iVirtualKey) override;
 
 	bool IsVirtualKeyPressed(int _iVirtualKey) override;
 	bool IsVirtualKeyPressedOneTouch(int _iVirtualKey) override;
@@ -237,7 +236,6 @@ public:
 	void ResetAll() override;
 	void GetInput() override;
 	void DrawCursor() override;
-	_TCHAR * GetFullNameTouch(int) override;
 
 	bool IsVirtualKeyPressed(int) override;
 	bool IsVirtualKeyPressedOneTouch(int) override;

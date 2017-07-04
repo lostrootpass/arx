@@ -1649,7 +1649,13 @@ BOOL ManageEditorControls()
 
 	if (TRUE_PLAYER_MOUSELOOK_ON && (pMenuConfig->bAutoReadyWeapon == false) && (pMenuConfig->bMouseLookToggle))
 	{
-
+#ifdef ARX_OPENGL
+		//TODO: move this elsewhere.
+		//Unfortunately, this is currently the most reliable place where we know that
+		//the mouselook is being enabled/disabled correctly. Moving it requires refactoring
+		//TRUE_PLAYER_MOUSELOOK_ON in to some other function rather than raw toggling.
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+#else
 		float fX =  DANAESIZX * 0.5f;
 		float fY =	DANAESIZY * 0.5f;
 		ARX_CHECK_SHORT(fX);
@@ -1657,8 +1663,13 @@ BOOL ManageEditorControls()
 
 		DANAEMouse.x = ARX_CLEAN_WARN_CAST_SHORT(fX);
 		DANAEMouse.y = ARX_CLEAN_WARN_CAST_SHORT(fY);
-
-
+#endif
+	}
+	else
+	{
+#ifdef ARX_OPENGL
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+#endif
 	}
 
 	

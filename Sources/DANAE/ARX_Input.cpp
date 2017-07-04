@@ -637,9 +637,280 @@ bool ARXInputHandler::IsVirtualKeyPressedNowUnPressed(int _iVirtualKey)
 	return false;
 }
 
-_TCHAR * ARXInputHandler::GetFullNameTouch(int)
+_TCHAR * ARXInputHandler::GetFullNameTouch(int _iVirtualKey)
 {
-	return _T("XXXXX");
+	_TCHAR *pText = (_TCHAR*)malloc(256 * sizeof(_TCHAR));
+
+	if (!pText) return NULL;
+
+	long lParam;
+
+	_TCHAR *pText2 = NULL;
+
+	if ((_iVirtualKey != -1) &&
+		(_iVirtualKey&~0xC000FFFF))	//COMBINAISON
+	{
+		pText2 = GetFullNameTouch((_iVirtualKey >> 16) & 0x3FFF);
+	}
+
+	lParam = ((_iVirtualKey) & 0x7F) << 16;
+
+	switch (_iVirtualKey)
+	{
+	case DIK_HOME:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_home"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_NEXT:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_pagedown"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_END:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_end"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_INSERT:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_insert"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_DELETE:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_delete"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_NUMLOCK:
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_numlock"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_DIVIDE:
+		_tcscpy(pText, _T("_/_"));
+		break;
+	case DIK_MULTIPLY:
+		_tcscpy(pText, _T("_x_"));
+		break;
+	case DIK_SYSRQ:
+		_tcscpy(pText, _T("?"));
+		break;
+	case DIK_UP:                  // UpArrow on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_up"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_PRIOR:               // PgUp on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_pageup"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_LEFT:                // LeftArrow on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_RIGHT:               // RightArrow on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_right"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_DOWN:                // DownArrow on arrow keypad
+
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_down"), _T("string"), _T("---"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON1:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button0"), _T("string"), _T("b1"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON2:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button1"), _T("string"), _T("b2"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON3:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button2"), _T("string"), _T("b3"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON4:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button3"), _T("string"), _T("b4"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON5:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button4"), _T("string"), _T("b5"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON6:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button5"), _T("string"), _T("b6"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON7:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button6"), _T("string"), _T("b7"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON8:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button7"), _T("string"), _T("b8"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON9:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button8"), _T("string"), _T("b9"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON10:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button9"), _T("string"), _T("b10"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON11:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button10"), _T("string"), _T("b11"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON12:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button11"), _T("string"), _T("b12"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON13:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button12"), _T("string"), _T("b13"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON14:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button13"), _T("string"), _T("b14"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON15:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button14"), _T("string"), _T("b15"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON16:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button15"), _T("string"), _T("b16"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON17:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button16"), _T("string"), _T("b17"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON18:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button17"), _T("string"), _T("b18"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON19:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button18"), _T("string"), _T("b19"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON20:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button19"), _T("string"), _T("b20"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON21:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button20"), _T("string"), _T("b21"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON22:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button21"), _T("string"), _T("b22"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON23:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button22"), _T("string"), _T("b23"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON24:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button23"), _T("string"), _T("b24"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON25:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button24"), _T("string"), _T("b25"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON26:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button25"), _T("string"), _T("b26"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON27:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button26"), _T("string"), _T("b27"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON28:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button27"), _T("string"), _T("b28"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON29:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button28"), _T("string"), _T("b29"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON30:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button29"), _T("string"), _T("b30"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON31:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button30"), _T("string"), _T("b31"), pText, 256, NULL);
+		break;
+	case DIK_BUTTON32:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button31"), _T("string"), _T("b32"), pText, 256, NULL);
+		break;
+	case DIK_WHEELUP:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_wheelup"), _T("string"), _T("w0"), pText, 256, NULL);
+		break;
+	case DIK_WHEELDOWN:
+		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_wheeldown"), _T("string"), _T("w1"), pText, 256, NULL);
+		break;
+	case -1:
+		_tcscpy(pText, _T("---"));
+		break;
+	default:
+	{
+		char tAnsiText[256];
+		GetKeyNameText(lParam, tAnsiText, 256);
+		int i = strlen(tAnsiText);
+
+		if (!i)
+		{
+			_stprintf(pText, _T("Key_%d"), _iVirtualKey);
+		}
+		else
+		{
+			MultiByteToWideChar(CP_ACP, 0, tAnsiText, -1, pText, 256);
+
+			if (_iVirtualKey == DIK_LSHIFT)
+			{
+				_TCHAR tText2[256];
+				_TCHAR *pText3;
+				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
+				tText2[1] = 0;
+				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
+				_tcscpy(pText3, tText2);
+				_tcscat(pText3, pText);
+				free((void*)pText);
+				pText = pText3;
+			}
+
+			if (_iVirtualKey == DIK_LCONTROL)
+			{
+				_TCHAR tText2[256];
+				_TCHAR *pText3;
+				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
+				tText2[1] = 0;
+				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
+				_tcscpy(pText3, tText2);
+				_tcscat(pText3, pText);
+				free((void*)pText);
+				pText = pText3;
+			}
+
+			if (_iVirtualKey == DIK_LALT)
+			{
+				_TCHAR tText2[256];
+				_TCHAR *pText3;
+				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
+				tText2[1] = 0;
+				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
+				_tcscpy(pText3, tText2);
+				_tcscat(pText3, pText);
+				free((void*)pText);
+				pText = pText3;
+			}
+
+			if (_iVirtualKey == DIK_NUMPADENTER)
+			{
+				_TCHAR *pText3;
+				pText3 = (_TCHAR*)malloc((_tcslen(pText) + 1 + 1) * sizeof(_TCHAR));
+				_tcscpy(pText3, pText);
+				_tcscat(pText3, _T("0"));
+				free((void*)pText);
+				pText = pText3;
+			}
+
+			if (_tcslen(pText) > 8)
+			{
+				pText[8] = 0;
+				int iI = 8;
+
+				while (iI--)
+				{
+					if (pText[iI] == _T(' '))
+					{
+						pText[iI] = 0;
+					}
+					else break;
+				}
+			}
+		}
+	}
+	break;
+	}
+
+	if (pText2)
+	{
+		_TCHAR *pText3 = (_TCHAR*)malloc((_tcslen(pText2) + _tcslen(pText) + 1 + 1) * sizeof(_TCHAR));
+		_tcscpy(pText3, pText2);
+		_tcscat(pText3, _T("+"));
+		_tcscat(pText3, pText);
+		free((void*)pText);
+		free((void*)pText2);
+		pText = pText3;
+
+	}
+
+	return pText;
+
 }
 
 void ARXInputHandler::DrawOneCursor(int _iPosX, int _iPosY, int _iColor)
@@ -689,8 +960,135 @@ bool ARXInputHandler::GetMouseButtonDoubleClick(int _iNumButton, int _iTime)
 /*						SDL						*/
 /************************************************/
 
+
+//Map DIK_* to SDL scancodes
+SDL_Scancode DIK2SDL[256];
+void initDIK2SDLMap()
+{
+	for (size_t i = 0; i < 256; ++i)
+		DIK2SDL[i] = SDL_SCANCODE_UNKNOWN;
+
+	DIK2SDL[DIK_A] = SDL_SCANCODE_A;
+	DIK2SDL[DIK_B] = SDL_SCANCODE_B;
+	DIK2SDL[DIK_C] = SDL_SCANCODE_C;
+	DIK2SDL[DIK_D] = SDL_SCANCODE_D;
+	DIK2SDL[DIK_E] = SDL_SCANCODE_E;
+	DIK2SDL[DIK_F] = SDL_SCANCODE_F;
+	DIK2SDL[DIK_G] = SDL_SCANCODE_G;
+	DIK2SDL[DIK_H] = SDL_SCANCODE_H;
+	DIK2SDL[DIK_I] = SDL_SCANCODE_I;
+	DIK2SDL[DIK_J] = SDL_SCANCODE_J;
+	DIK2SDL[DIK_K] = SDL_SCANCODE_K;
+	DIK2SDL[DIK_L] = SDL_SCANCODE_L;
+	DIK2SDL[DIK_M] = SDL_SCANCODE_M;
+	DIK2SDL[DIK_N] = SDL_SCANCODE_N;
+	DIK2SDL[DIK_O] = SDL_SCANCODE_O;
+	DIK2SDL[DIK_P] = SDL_SCANCODE_P;
+	DIK2SDL[DIK_Q] = SDL_SCANCODE_Q;
+	DIK2SDL[DIK_R] = SDL_SCANCODE_R;
+	DIK2SDL[DIK_S] = SDL_SCANCODE_S;
+	DIK2SDL[DIK_T] = SDL_SCANCODE_T;
+	DIK2SDL[DIK_U] = SDL_SCANCODE_U;
+	DIK2SDL[DIK_V] = SDL_SCANCODE_V;
+	DIK2SDL[DIK_W] = SDL_SCANCODE_W;
+	DIK2SDL[DIK_X] = SDL_SCANCODE_X;
+	DIK2SDL[DIK_Y] = SDL_SCANCODE_Y;
+	DIK2SDL[DIK_Z] = SDL_SCANCODE_Z;
+	DIK2SDL[DIK_1] = SDL_SCANCODE_1;
+	DIK2SDL[DIK_2] = SDL_SCANCODE_2;
+	DIK2SDL[DIK_3] = SDL_SCANCODE_3;
+	DIK2SDL[DIK_4] = SDL_SCANCODE_4;
+	DIK2SDL[DIK_5] = SDL_SCANCODE_5;
+	DIK2SDL[DIK_6] = SDL_SCANCODE_6;
+	DIK2SDL[DIK_7] = SDL_SCANCODE_7;
+	DIK2SDL[DIK_8] = SDL_SCANCODE_8;
+	DIK2SDL[DIK_9] = SDL_SCANCODE_9;
+	DIK2SDL[DIK_0] = SDL_SCANCODE_0;
+	DIK2SDL[DIK_RETURN] = SDL_SCANCODE_RETURN;
+	DIK2SDL[DIK_ESCAPE] = SDL_SCANCODE_ESCAPE;
+	DIK2SDL[DIK_BACKSPACE] = SDL_SCANCODE_BACKSPACE;
+	DIK2SDL[DIK_TAB] = SDL_SCANCODE_TAB;
+	DIK2SDL[DIK_SPACE] = SDL_SCANCODE_SPACE;
+	DIK2SDL[DIK_MINUS] = SDL_SCANCODE_MINUS;
+	DIK2SDL[DIK_EQUALS] = SDL_SCANCODE_EQUALS;
+	DIK2SDL[DIK_LBRACKET] = SDL_SCANCODE_LEFTBRACKET;
+	DIK2SDL[DIK_RBRACKET] = SDL_SCANCODE_RIGHTBRACKET;
+	DIK2SDL[DIK_BACKSLASH] = SDL_SCANCODE_BACKSLASH;
+	DIK2SDL[DIK_SEMICOLON] = SDL_SCANCODE_SEMICOLON;
+	DIK2SDL[DIK_APOSTROPHE] = SDL_SCANCODE_APOSTROPHE;
+	DIK2SDL[DIK_GRAVE] = SDL_SCANCODE_GRAVE;
+	DIK2SDL[DIK_COMMA] = SDL_SCANCODE_COMMA;
+	DIK2SDL[DIK_PERIOD] = SDL_SCANCODE_PERIOD;
+	DIK2SDL[DIK_SLASH] = SDL_SCANCODE_SLASH;
+	DIK2SDL[DIK_CAPSLOCK] = SDL_SCANCODE_CAPSLOCK;
+	DIK2SDL[DIK_F1] = SDL_SCANCODE_F1;
+	DIK2SDL[DIK_F2] = SDL_SCANCODE_F2;
+	DIK2SDL[DIK_F3] = SDL_SCANCODE_F3;
+	DIK2SDL[DIK_F4] = SDL_SCANCODE_F4;
+	DIK2SDL[DIK_F5] = SDL_SCANCODE_F5;
+	DIK2SDL[DIK_F6] = SDL_SCANCODE_F6;
+	DIK2SDL[DIK_F7] = SDL_SCANCODE_F7;
+	DIK2SDL[DIK_F8] = SDL_SCANCODE_F8;
+	DIK2SDL[DIK_F9] = SDL_SCANCODE_F9;
+	DIK2SDL[DIK_F10] = SDL_SCANCODE_F10;
+	DIK2SDL[DIK_F11] = SDL_SCANCODE_F11;
+	DIK2SDL[DIK_F12] = SDL_SCANCODE_F12;
+	DIK2SDL[DIK_SCROLL] = SDL_SCANCODE_SCROLLLOCK;
+	DIK2SDL[DIK_PAUSE] = SDL_SCANCODE_PAUSE;
+	DIK2SDL[DIK_INSERT] = SDL_SCANCODE_INSERT;
+	DIK2SDL[DIK_HOME] = SDL_SCANCODE_HOME;
+	DIK2SDL[DIK_PGUP] = SDL_SCANCODE_PAGEUP;
+	DIK2SDL[DIK_DELETE] = SDL_SCANCODE_DELETE;
+	DIK2SDL[DIK_END] = SDL_SCANCODE_END;
+	DIK2SDL[DIK_PGDN] = SDL_SCANCODE_PAGEDOWN;
+	DIK2SDL[DIK_RIGHT] = SDL_SCANCODE_RIGHT;
+	DIK2SDL[DIK_LEFT] = SDL_SCANCODE_LEFT;
+	DIK2SDL[DIK_DOWN] = SDL_SCANCODE_DOWN;
+	DIK2SDL[DIK_UP] = SDL_SCANCODE_UP;
+	DIK2SDL[DIK_NUMLOCK] = SDL_SCANCODE_NUMLOCKCLEAR;
+	DIK2SDL[DIK_DIVIDE] = SDL_SCANCODE_KP_DIVIDE;
+	DIK2SDL[DIK_MULTIPLY] = SDL_SCANCODE_KP_MULTIPLY;
+	DIK2SDL[DIK_NUMPADMINUS] = SDL_SCANCODE_KP_MINUS;
+	DIK2SDL[DIK_NUMPADPLUS] = SDL_SCANCODE_KP_PLUS;
+	DIK2SDL[DIK_NUMPADENTER] = SDL_SCANCODE_KP_ENTER;
+	DIK2SDL[DIK_NUMPAD1] = SDL_SCANCODE_KP_1;
+	DIK2SDL[DIK_NUMPAD2] = SDL_SCANCODE_KP_2;
+	DIK2SDL[DIK_NUMPAD3] = SDL_SCANCODE_KP_3;
+	DIK2SDL[DIK_NUMPAD4] = SDL_SCANCODE_KP_4;
+	DIK2SDL[DIK_NUMPAD5] = SDL_SCANCODE_KP_5;
+	DIK2SDL[DIK_NUMPAD6] = SDL_SCANCODE_KP_6;
+	DIK2SDL[DIK_NUMPAD7] = SDL_SCANCODE_KP_7;
+	DIK2SDL[DIK_NUMPAD8] = SDL_SCANCODE_KP_8;
+	DIK2SDL[DIK_NUMPAD9] = SDL_SCANCODE_KP_9;
+	DIK2SDL[DIK_NUMPAD0] = SDL_SCANCODE_KP_0;
+	DIK2SDL[DIK_NUMPADPERIOD] = SDL_SCANCODE_KP_PERIOD;
+	DIK2SDL[DIK_NUMPADEQUALS] = SDL_SCANCODE_KP_EQUALS;
+	DIK2SDL[DIK_F13] = SDL_SCANCODE_F13;
+	DIK2SDL[DIK_F14] = SDL_SCANCODE_F14;
+	DIK2SDL[DIK_F15] = SDL_SCANCODE_F15;
+	DIK2SDL[DIK_LALT] = SDL_SCANCODE_MENU;
+	DIK2SDL[DIK_NUMPADCOMMA] = SDL_SCANCODE_KP_COMMA;
+	DIK2SDL[DIK_SYSRQ] = SDL_SCANCODE_SYSREQ;	
+	DIK2SDL[DIK_LCONTROL] = SDL_SCANCODE_LCTRL;
+	DIK2SDL[DIK_LSHIFT] = SDL_SCANCODE_LSHIFT;
+	DIK2SDL[DIK_LALT] = SDL_SCANCODE_LALT;
+	DIK2SDL[DIK_RCONTROL] = SDL_SCANCODE_RCTRL;
+	DIK2SDL[DIK_RSHIFT] = SDL_SCANCODE_RSHIFT;
+	DIK2SDL[DIK_RALT] = SDL_SCANCODE_RALT;
+}
+
+SDL_Scancode dikToScancode(int dik)
+{
+	if (dik > 255 || dik < 0) return SDL_SCANCODE_UNKNOWN;
+
+	//SDL_GetScancodeFromName(SDL_GetKeyName((SDL_Keycode)iKeyScanCode[dik]))
+	return DIK2SDL[dik];
+}
+
 ARXInputHandlerSDL::ARXInputHandlerSDL() : ARXInputHandler()
 {
+	initDIK2SDLMap();
+
 	for (int i = ARXMOUSE_BUTTON0; i <= ARXMOUSE_BUTTON31; i++)
 	{
 		iOldMouseButton[i] = 0;
@@ -698,16 +1096,6 @@ ARXInputHandlerSDL::ARXInputHandlerSDL() : ARXInputHandler()
 		iMouseTimeSet[i] = 0;
 		bMouseButton[i] = bOldMouseButton[i] = false;
 		iOldNumClick[i] = iOldNumUnClick[i] = 0;
-	}
-
-	// PreCompute le ScanCode
-	bTouch = false;
-	HKL layout = GetKeyboardLayout(0);
-
-	for (int iI = 0; iI < 256; iI++)
-	{
-		iKeyScanCode[iI] = MapVirtualKeyEx(iI, 1, layout);
-		iOneTouch[iI] = 0;
 	}
 }
 
@@ -739,6 +1127,8 @@ void ARXInputHandlerSDL::ResetAll()
 
 void ARXInputHandlerSDL::GetInput()
 {
+	int iDTime;
+
 	Uint32 mask = SDL_GetMouseState(&iMouseAX, &iMouseAY);
 	EERIEMouseX = iMouseAX;
 	EERIEMouseY = iMouseAY;
@@ -747,16 +1137,98 @@ void ARXInputHandlerSDL::GetInput()
 	bOldMouseButton[SDL_BUTTON_MIDDLE] = bMouseButton[SDL_BUTTON_MIDDLE];
 	bOldMouseButton[SDL_BUTTON_RIGHT] = bMouseButton[SDL_BUTTON_RIGHT];
 
+	ARX_CHECK_INT(ARX_TIME_Get(false));
+	const int iArxTime = ARX_CLEAN_WARN_CAST_INT(ARX_TIME_Get(false));
+
+	const bool masks[] = { 
+		mask & SDL_BUTTON_LMASK,
+		mask & SDL_BUTTON_MMASK,
+		mask & SDL_BUTTON_RMASK
+	};
+	for (int i = 0; i <= 0; i++)
+	{
+		int iNumClick = 0;
+		int iNumUnClick = 0;
+		//DXI_MouseButtonCountClick(DXI_MOUSE1, i, &iNumClick, &iNumUnClick);
+
+		iOldNumClick[i] += iNumClick + iNumUnClick;
+
+		if ((!bMouseButton[i]) && (iOldNumClick[i] == iNumUnClick))
+		{
+			iNumUnClick = iOldNumClick[i] = 0;
+		}
+
+		bOldMouseButton[i] = bMouseButton[i];
+
+		if (bMouseButton[i])
+		{
+			if (iOldNumClick[i])
+			{
+				bMouseButton[i] = false;
+			}
+		}
+		else
+		{
+			if (iOldNumClick[i])
+			{
+				bMouseButton[i] = true;
+			}
+		}
+
+		if (iOldNumClick[i]) iOldNumClick[i]--;
+
+		iDTime = 0;
+		if (masks[i]) iDTime = ARX_TIME_Get(false);
+
+		if (iDTime)
+		{
+			iMouseTime[i] = iDTime;
+			iMouseTimeSet[i] = 2;
+		}
+		else
+		{
+			if ((iMouseTimeSet[i] > 0) &&
+				((ARX_TIME_Get(false) - iMouseTime[i]) > 300)
+				)
+			{
+				iMouseTime[i] = 0;
+				iMouseTimeSet[i] = 0;
+			}
+
+			if (masks[i])
+			{
+				switch (iMouseTimeSet[i])
+				{
+				case 0:
+					iMouseTime[i] = iArxTime;
+					iMouseTimeSet[i]++;
+					break;
+				case 1:
+					iMouseTime[i] = iArxTime - iMouseTime[i];
+					iMouseTimeSet[i]++;
+					break;
+				}
+			}
+		}
+	}
+
+	iWheelSens = GetWheelSens(DXI_MOUSE1);
+
 	bMouseButton[SDL_BUTTON_LEFT] = mask & SDL_BUTTON_LMASK;
 	bMouseButton[SDL_BUTTON_MIDDLE] = mask & SDL_BUTTON_MMASK;
 	bMouseButton[SDL_BUTTON_RIGHT] = mask & SDL_BUTTON_RMASK;
+
+	bMouseMove = ((iMouseAX != DANAEMouse.x) || (iMouseAY != DANAEMouse.y));
+	iMouseAX = DANAEMouse.x;
+	iMouseAY = DANAEMouse.y;
+	iMouseAZ = 0;
 
 	keystate = SDL_GetKeyboardState(0);
 
 	SDL_Scancode scancode;
 	for (int i = 0; i < 256; ++i)
 	{
-		scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[i]);
+		scancode = dikToScancode(i);
 
 		if (keystate[scancode])
 		{
@@ -819,33 +1291,27 @@ void ARXInputHandlerSDL::DrawCursor()
 
 }
 
-_TCHAR * ARXInputHandlerSDL::GetFullNameTouch(int _iVirtualKey)
-{
-	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
-	return _T("XXXXX");
-}
-
 bool ARXInputHandlerSDL::IsVirtualKeyPressed(int _iVirtualKey)
 {
-	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	SDL_Scancode scancode = dikToScancode(_iVirtualKey);
 	return (keystate[scancode]);
 }
 
 bool ARXInputHandlerSDL::IsVirtualKeyPressedOneTouch(int _iVirtualKey)
 {
-	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	SDL_Scancode scancode = dikToScancode(_iVirtualKey);
 	return (keystate[scancode] && iOneTouch[scancode]);
 }
 
 bool ARXInputHandlerSDL::IsVirtualKeyPressedNowPressed(int _iVirtualKey)
 {
-	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	SDL_Scancode scancode = dikToScancode(_iVirtualKey);
 	return (keystate[scancode] && iOneTouch[scancode]);
 }
 
 bool ARXInputHandlerSDL::IsVirtualKeyPressedNowUnPressed(int _iVirtualKey)
 {
-	SDL_Scancode scancode = SDL_GetScancodeFromKey((SDL_Keycode)iKeyScanCode[_iVirtualKey]);
+	SDL_Scancode scancode = dikToScancode(_iVirtualKey);
 	return (!keystate[scancode] && iOneTouch[scancode]);
 }
 
@@ -1358,281 +1824,6 @@ void ARXInputHandlerDI::DrawCursor()
 	}
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, false);
-}
-
-_TCHAR * ARXInputHandlerDI::GetFullNameTouch(int _iVirtualKey)
-{
-	_TCHAR *pText = (_TCHAR*)malloc(256 * sizeof(_TCHAR));
-
-	if (!pText) return NULL;
-
-	long lParam;
-
-	_TCHAR *pText2 = NULL;
-
-	if ((_iVirtualKey != -1) &&
-		(_iVirtualKey&~0xC000FFFF))	//COMBINAISON
-	{
-		pText2 = GetFullNameTouch((_iVirtualKey >> 16) & 0x3FFF);
-	}
-
-	lParam = ((_iVirtualKey) & 0x7F) << 16;
-
-	switch (_iVirtualKey)
-	{
-	case DIK_HOME:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_home"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_NEXT:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_pagedown"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_END:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_end"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_INSERT:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_insert"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_DELETE:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_delete"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_NUMLOCK:
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_numlock"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_DIVIDE:
-		_tcscpy(pText, _T("_/_"));
-		break;
-	case DIK_MULTIPLY:
-		_tcscpy(pText, _T("_x_"));
-		break;
-	case DIK_SYSRQ:
-		_tcscpy(pText, _T("?"));
-		break;
-	case DIK_UP:                  // UpArrow on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_up"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_PRIOR:               // PgUp on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_pageup"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_LEFT:                // LeftArrow on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_RIGHT:               // RightArrow on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_right"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_DOWN:                // DownArrow on arrow keypad
-
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_down"), _T("string"), _T("---"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON1:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button0"), _T("string"), _T("b1"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON2:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button1"), _T("string"), _T("b2"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON3:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button2"), _T("string"), _T("b3"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON4:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button3"), _T("string"), _T("b4"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON5:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button4"), _T("string"), _T("b5"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON6:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button5"), _T("string"), _T("b6"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON7:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button6"), _T("string"), _T("b7"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON8:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button7"), _T("string"), _T("b8"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON9:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button8"), _T("string"), _T("b9"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON10:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button9"), _T("string"), _T("b10"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON11:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button10"), _T("string"), _T("b11"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON12:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button11"), _T("string"), _T("b12"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON13:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button12"), _T("string"), _T("b13"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON14:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button13"), _T("string"), _T("b14"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON15:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button14"), _T("string"), _T("b15"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON16:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button15"), _T("string"), _T("b16"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON17:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button16"), _T("string"), _T("b17"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON18:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button17"), _T("string"), _T("b18"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON19:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button18"), _T("string"), _T("b19"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON20:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button19"), _T("string"), _T("b20"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON21:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button20"), _T("string"), _T("b21"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON22:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button21"), _T("string"), _T("b22"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON23:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button22"), _T("string"), _T("b23"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON24:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button23"), _T("string"), _T("b24"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON25:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button24"), _T("string"), _T("b25"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON26:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button25"), _T("string"), _T("b26"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON27:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button26"), _T("string"), _T("b27"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON28:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button27"), _T("string"), _T("b28"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON29:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button28"), _T("string"), _T("b29"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON30:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button29"), _T("string"), _T("b30"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON31:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button30"), _T("string"), _T("b31"), pText, 256, NULL);
-		break;
-	case DIK_BUTTON32:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_button31"), _T("string"), _T("b32"), pText, 256, NULL);
-		break;
-	case DIK_WHEELUP:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_wheelup"), _T("string"), _T("w0"), pText, 256, NULL);
-		break;
-	case DIK_WHEELDOWN:
-		PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_wheeldown"), _T("string"), _T("w1"), pText, 256, NULL);
-		break;
-	case -1:
-		_tcscpy(pText, _T("---"));
-		break;
-	default:
-	{
-		char tAnsiText[256];
-		GetKeyNameText(lParam, tAnsiText, 256);
-		int i = strlen(tAnsiText);
-
-		if (!i)
-		{
-			_stprintf(pText, _T("Key_%d"), _iVirtualKey);
-		}
-		else
-		{
-			MultiByteToWideChar(CP_ACP, 0, tAnsiText, -1, pText, 256);
-
-			if (_iVirtualKey == DIK_LSHIFT)
-			{
-				_TCHAR tText2[256];
-				_TCHAR *pText3;
-				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
-				tText2[1] = 0;
-				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
-				_tcscpy(pText3, tText2);
-				_tcscat(pText3, pText);
-				free((void*)pText);
-				pText = pText3;
-			}
-
-			if (_iVirtualKey == DIK_LCONTROL)
-			{
-				_TCHAR tText2[256];
-				_TCHAR *pText3;
-				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
-				tText2[1] = 0;
-				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
-				_tcscpy(pText3, tText2);
-				_tcscat(pText3, pText);
-				free((void*)pText);
-				pText = pText3;
-			}
-
-			if (_iVirtualKey == DIK_LALT)
-			{
-				_TCHAR tText2[256];
-				_TCHAR *pText3;
-				PAK_UNICODE_GetPrivateProfileString(_T("system_menus_options_input_customize_controls_left"), _T("string"), _T("---"), tText2, 256, NULL);
-				tText2[1] = 0;
-				pText3 = (_TCHAR*)malloc((_tcslen(tText2) + _tcslen(pText) + 1) * sizeof(_TCHAR));
-				_tcscpy(pText3, tText2);
-				_tcscat(pText3, pText);
-				free((void*)pText);
-				pText = pText3;
-			}
-
-			if (_iVirtualKey == DIK_NUMPADENTER)
-			{
-				_TCHAR *pText3;
-				pText3 = (_TCHAR*)malloc((_tcslen(pText) + 1 + 1) * sizeof(_TCHAR));
-				_tcscpy(pText3, pText);
-				_tcscat(pText3, _T("0"));
-				free((void*)pText);
-				pText = pText3;
-			}
-
-			if (_tcslen(pText) > 8)
-			{
-				pText[8] = 0;
-				int iI = 8;
-
-				while (iI--)
-				{
-					if (pText[iI] == _T(' '))
-					{
-						pText[iI] = 0;
-					}
-					else break;
-				}
-			}
-		}
-	}
-	break;
-	}
-
-	if (pText2)
-	{
-		_TCHAR *pText3 = (_TCHAR*)malloc((_tcslen(pText2) + _tcslen(pText) + 1 + 1) * sizeof(_TCHAR));
-		_tcscpy(pText3, pText2);
-		_tcscat(pText3, _T("+"));
-		_tcscat(pText3, pText);
-		free((void*)pText);
-		free((void*)pText2);
-		pText = pText3;
-
-	}
-
-	return pText;
 }
 
 bool ARXInputHandlerDI::IsVirtualKeyPressed(int _iVirtualKey)

@@ -1801,7 +1801,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	}
 
 	pMenuConfig = new CMenuConfig(szPath);
-	//pMenuConfig->ReadAll();
+	pMenuConfig->ReadAll();
 
 
 	ARX_MINIMAP_FirstInit();
@@ -7775,6 +7775,11 @@ HRESULT DANAEGL::Render()
 	DANAE_RenderStartTime();
 
 	ACTIVECAM = &subj;
+
+	if ((!USE_OLD_MOUSE_SYSTEM))
+	{
+		ReMappDanaeButton();
+	}
 
 	if(DANAE_ManageSplashThings())
 		return DANAE_NoRenderEnd();
