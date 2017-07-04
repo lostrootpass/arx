@@ -667,6 +667,11 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 
 						sSize.cx = sSize.cy = 0;
 
+#ifdef ARX_OPENGL
+						char text[256];
+						wcstombs(text, speech->text, _tcslen(speech->text));
+						g_pRenderApp->renderer->MeasureText(text, _tcslen(speech->text), (int*)&sSize.cx, (int*)&sSize.cy);
+#else
 						if (SUCCEEDED(danaeApp.m_pddsRenderTarget->GetDC(&hDC)))
 						{
 							SelectObject(hDC, InBookFont);
@@ -682,7 +687,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 						{
 							ARX_CHECK_NO_ENTRY();
 						}
-
+#endif
 
 
 						float fZoneClippHeight	=	ARX_CLEAN_WARN_CAST_FLOAT(sSize.cy * 3);
@@ -702,7 +707,9 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 						                     ARX_CLEAN_WARN_CAST_INT(fAdd));
 
 
+#ifndef ARX_OPENGL
 						danaeApp.DANAEEndRender();
+#endif
 						float iTaille = (float)ARX_TEXT_DrawRect(
 						                    pd3dDevice,
 						                    InBookFont,
@@ -721,12 +728,14 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 							DeleteObject(hRgn);
 						}
 
+#ifndef ARX_OPENGL
 						danaeApp.DANAEStartRender();
+#endif
 
 						SETTC(GDevice, NULL);
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-						GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
-						GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, FALSE);
+						SETALPHABLEND(GDevice, true);
+						SETZWRITE(GDevice, false);
 						EERIEDrawFill2DRectDegrad(GDevice,
 						                          0.f,
 						                          fZoneClippY - 1.f, 
@@ -747,8 +756,10 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 				
+#ifndef ARX_OPENGL
 						danaeApp.EnableZBuffer();
-						GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
+#endif
+						SETALPHABLEND(GDevice, false);
 
 
 						iTaille += (int)fZoneClippHeight;
@@ -758,7 +769,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 							//vitesse du scroll
 							float fDTime;
 
-							if (speech->sample)
+							if (speech->sample > 0)
 							{
 								fDTime				= ((float)iTaille * (float)FrameDiff) / (float)ARX_SOUND_GetDuration(speech->sample);    //speech->duration;
 								float fTimeOneLine	= ((float)sSize.cy) * fDTime;
