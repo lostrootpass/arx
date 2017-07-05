@@ -1086,7 +1086,7 @@ void ARX_MAGICAL_FLARES_Draw(LPDIRECT3DDEVICE7  m_pd3dDevice,long FRAMETICKS)
 	SETZWRITE(m_pd3dDevice, FALSE );
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
-	SETALPHABLEND(m_pd3dDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	shinum++;
 
 	if (shinum>=10) shinum=1;
@@ -1527,7 +1527,7 @@ void UpdateObjFx(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_CAMERA * cam)
 	v[2]= D3DTLVERTEX( D3DVECTOR( 0, 0, 0.001f ), 1.f, D3DRGB(1.f,1.f,1.f), 1, 1.f, 1.f);
 	
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(pd3dDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	SETZWRITE(pd3dDevice, FALSE );
 	
@@ -2312,11 +2312,11 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 				{
 					if (part->special & NO_TRANS)
 					{
-						SETALPHABLEND(pd3dDevice,FALSE);
+						g_pRenderApp->renderer->SetAlphaBlend(false);
 					}
 					else
 					{
-						SETALPHABLEND(pd3dDevice,TRUE);
+						g_pRenderApp->renderer->SetAlphaBlend(true);
 
 						if (part->special & SUBSTRACT) 
 						{
@@ -2420,11 +2420,11 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 			{
 				if (part->special & NO_TRANS)
 				{
-					SETALPHABLEND(pd3dDevice,FALSE);
+					g_pRenderApp->renderer->SetAlphaBlend(false);
 				}
 				else
 				{
-					SETALPHABLEND(pd3dDevice,TRUE);
+					g_pRenderApp->renderer->SetAlphaBlend(true);
 
 					if (part->special & SUBSTRACT) 
 					{

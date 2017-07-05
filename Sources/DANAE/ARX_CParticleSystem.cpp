@@ -570,7 +570,7 @@ void CParticleSystem::Render(LPDIRECT3DDEVICE7 _lpD3DDevice, EERIEBlendType _iSR
 	SETZWRITE(_lpD3DDevice, FALSE);
 
 	g_pRenderApp->renderer->SetBlendFunc(_iSRCBLEND, _iDESTBLEND);
-	SETALPHABLEND(_lpD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	int inumtex = 0;
 

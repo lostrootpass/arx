@@ -124,7 +124,6 @@ __forceinline void SETTC(LPDIRECT3DDEVICE7 pd3dDevice, TextureContainer * tc)
 
 void SETCULL(LPDIRECT3DDEVICE7 pd3dDevice, DWORD state);
 void SETZWRITE(LPDIRECT3DDEVICE7 pd3dDevice, DWORD state);
-void SETALPHABLEND(LPDIRECT3DDEVICE7 pd3dDevice, DWORD state);
 void SETTEXTUREWRAPMODE(LPDIRECT3DDEVICE7 pd3dDevice, DWORD mode);
 void EERIEPOLY_DrawWired(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY * ep, long col = 0);
 void EERIEPOLY_DrawNormals(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY * ep);

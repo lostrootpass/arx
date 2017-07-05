@@ -61,6 +61,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 #include "EERIEMath.h"
 #include "EERIEDraw.h"
+#include "EERIERenderer.h"
 
 #include <stdio.h>
 #define _CRTDBG_MAP_ALLOC
@@ -316,7 +317,7 @@ void ARX_FOGS_RenderAll(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	EERIE_3D angle;
 	Vector_Init(&angle); 
 
-	SETALPHABLEND(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	for (long i = 0; i < MAX_FOG; i++)
 	{

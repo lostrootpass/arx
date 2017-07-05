@@ -190,7 +190,7 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 								first=0;
 								SETZWRITE(pd3dDevice, FALSE );
 								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-								SETALPHABLEND(pd3dDevice,TRUE);
+								g_pRenderApp->renderer->SetAlphaBlend(true);
 								SETTC(pd3dDevice,Boom);
 							}
 
@@ -247,7 +247,7 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 								first=0;
 								SETZWRITE(pd3dDevice, FALSE );
 								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-								SETALPHABLEND(pd3dDevice,TRUE);
+								g_pRenderApp->renderer->SetAlphaBlend(true);
 								SETTC(pd3dDevice,Boom);
 							}
 
@@ -273,7 +273,7 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 		
 		}
 
-	SETALPHABLEND(pd3dDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETZWRITE(pd3dDevice, TRUE );
 	SetZBias(pd3dDevice,0);
 #ifndef ARX_OPENGL
@@ -409,7 +409,7 @@ void ARXDRAW_DrawEyeBall(LPDIRECT3DDEVICE7 pd3dDevice)
 	rgb.g=d;
 	rgb.b=d;
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(pd3dDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	DrawEERIEObjEx(pd3dDevice,eyeballobj,&angle,&pos,&scale,&rgb);	
 }
 //*************************************************************************************
@@ -474,7 +474,7 @@ void ARXDRAW_DrawPolyBoom(LPDIRECT3DDEVICE7 pd3dDevice)
 	SetZBias(pd3dDevice,8);
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
 	unsigned long tim = ARXTimeUL(); 	
-	SETALPHABLEND(pd3dDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	for ( i = 0 ; i < MAX_POLYBOOM ; i++ )
 	{
@@ -712,7 +712,7 @@ extern TextureContainer * InterTransTC[MAX_INTERTRANSPOL];
 
 void ARXDRAW_DrawAllInterTransPolyPos(LPDIRECT3DDEVICE7 pd3dDevice)
 {
-	SETALPHABLEND(pd3dDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	EERIEDrawnPolys+=INTERTRANSPOLYSPOS;
 
 	for (long i=0;i<INTERTRANSPOLYSPOS;i++) 
@@ -768,7 +768,7 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 	int flg_NOCOUNT_USEVB = EERIE_NOCOUNT | (bSoftRender?EERIE_USEVB:0);
 	SetZBias( pd3dDevice, 1 );
 
-	SETALPHABLEND( pd3dDevice, TRUE );
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	long i, to = 0; 
 
@@ -822,7 +822,7 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 				if (ep->type & POLY_LAVA)
 				{
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
-					SETALPHABLEND( pd3dDevice, TRUE );	
+					g_pRenderApp->renderer->SetAlphaBlend(true);
 					D3DTLVERTEX verts[4];
 					SETTC( pd3dDevice, enviro );
 
@@ -865,7 +865,7 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 		{
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 
-				SETALPHABLEND( pd3dDevice, TRUE );	
+			g_pRenderApp->renderer->SetAlphaBlend(true);
 				
 				D3DTLVERTEX verts[4];
 

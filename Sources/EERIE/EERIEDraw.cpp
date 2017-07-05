@@ -367,7 +367,7 @@ void DRAWLATER_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 		D3DTLVERTEX verts[4];
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 		SETZWRITE(pd3dDevice,FALSE); 
-		SETALPHABLEND(pd3dDevice,TRUE);					
+		g_pRenderApp->renderer->SetAlphaBlend(true);					
 		SETCULL( pd3dDevice, D3DCULL_NONE );
 		long to;
 
@@ -444,7 +444,7 @@ void DRAWLATER_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 		}
 
 		EERIEDrawnPolys+=curdrawlater;
-		SETALPHABLEND(pd3dDevice,FALSE); 
+		g_pRenderApp->renderer->SetAlphaBlend(false); 
 		SETZWRITE(pd3dDevice,TRUE); 
 
 	SETTC(pd3dDevice,NULL);
@@ -491,7 +491,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 				if ( ptcTexture->userflags & POLY_METAL)
 				{
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
-					SETALPHABLEND(pd3dDevice,TRUE);	
+					g_pRenderApp->renderer->SetAlphaBlend(true);	
 					SETTC(pd3dDevice,NULL); 
 
 					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, ep->tv,	to,	0, flg_NOCOUNT_USEVB );
@@ -501,7 +501,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 				if ( (ep->type & POLY_LAVA) || (ep->type & POLY_WATER) )
 				{
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
-					SETALPHABLEND(pd3dDevice,TRUE);	
+					g_pRenderApp->renderer->SetAlphaBlend(true);	
 					D3DTLVERTEX verts[4];
 					SETTC(pd3dDevice,enviro);
 
@@ -593,7 +593,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 					}
 
 					SETTC(pd3dDevice,ptcTexture);				
-					SETALPHABLEND(pd3dDevice,FALSE);	
+					g_pRenderApp->renderer->SetAlphaBlend(false);	
 			}				
 			
 			if (ZMAPMODE)
@@ -610,7 +610,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 				{
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 					SETZWRITE(pd3dDevice,FALSE); 
-					SETALPHABLEND(pd3dDevice,TRUE);					
+					g_pRenderApp->renderer->SetAlphaBlend(true);					
 					D3DTLVERTEX verts[4];
 					SETTC(pd3dDevice,ptcTexture->TextureRefinement); 
 
@@ -680,7 +680,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 				}
 
 				EERIEDrawnPolys+=ptcTexture->delayed_nb;
-				SETALPHABLEND(pd3dDevice,FALSE); 
+				g_pRenderApp->renderer->SetAlphaBlend(false); 
 				SETZWRITE(pd3dDevice,TRUE);
 			}
 
@@ -723,7 +723,7 @@ void Delayed_EERIEDRAWPRIM( EERIEPOLY * ep)
 					{
 						pd3dDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR );
 						pd3dDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE );	
-						SETALPHABLEND(pd3dDevice,TRUE);	
+						g_pRenderApp->renderer->SetAlphaBlend(true);	
 						D3DTLVERTEX verts[4];
 						SETTC(pd3dDevice,enviro);
 						for (long i=0;i<to;i++)
@@ -781,7 +781,7 @@ int			nb;
 		(!ep->tv[2].color) ) return;
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::SrcColor);
-	SETALPHABLEND(pd3dDevice,TRUE);			
+	g_pRenderApp->renderer->SetAlphaBlend(true);			
 	SETTC(pd3dDevice,ep->tex);
 
 	CalculTriangleBump( ep->tv[0], ep->tv[1], ep->tv[2], &du, &dv );
@@ -877,7 +877,7 @@ int			nb;
 	pd3dDevice->SetTextureStageState(0,D3DTSS_ALPHAOP,D3DTOP_MODULATE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
-	SETALPHABLEND(pd3dDevice,FALSE); 
+	g_pRenderApp->renderer->SetAlphaBlend(false); 
 	SETZWRITE(pd3dDevice,TRUE); 
 }
 
@@ -1267,18 +1267,6 @@ void SETZWRITE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD _dwState)
 
 //*************************************************************************************
 //*************************************************************************************
-
-void SETALPHABLEND(LPDIRECT3DDEVICE7 pd3dDevice,DWORD state)
-{
-#ifdef ARX_OPENGL
-	if (state == TRUE)
-		glEnable(GL_BLEND);
-	else
-		glDisable(GL_BLEND);
-#else
-	pd3dDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, state);
-#endif
-}	
 
 void EERIEPOLY_DrawWired(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY *ep,long col)
 {

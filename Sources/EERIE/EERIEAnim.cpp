@@ -1268,7 +1268,7 @@ void PopAllTriangleListTransparency()
 	}
 
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
-	SETALPHABLEND(GDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETZWRITE(GDevice, FALSE); 
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
@@ -1291,7 +1291,7 @@ void PopAllTriangleListTransparency()
 	}
 
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);
-	SETALPHABLEND(GDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETZWRITE(GDevice,TRUE);
 
 	if(bGATI8500)
@@ -3695,10 +3695,10 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 					}
 
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
-					SETALPHABLEND( pd3dDevice, TRUE );			
+					g_pRenderApp->renderer->SetAlphaBlend(true);
 					SETZWRITE( pd3dDevice, FALSE );
 					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, &vert_list, 3, 0, bSoftRender?EERIE_USEVB:0);
-					SETALPHABLEND( pd3dDevice, FALSE );			
+					g_pRenderApp->renderer->SetAlphaBlend(false);
 					SETZWRITE( pd3dDevice, TRUE );
 				}				
 	}

@@ -2755,7 +2755,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 			if (special_color_flag & 2)
 			{
 				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
-				SETALPHABLEND(pd3dDevice, TRUE);
+				g_pRenderApp->renderer->SetAlphaBlend(true);
 				SETZWRITE(pd3dDevice, FALSE);
 				SETTC(pd3dDevice, NULL);
 				unsigned long v = _EERIERGB(special_color.r);
@@ -2766,7 +2766,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 				}
 				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG  );
 				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG  );//duplicate ???? @TBR ?
-				SETALPHABLEND(pd3dDevice, FALSE);
+				g_pRenderApp->renderer->SetAlphaBlend(false);
 				SETZWRITE(pd3dDevice, TRUE);
 			}
 
@@ -2806,10 +2806,10 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 				if (todo)
 				{
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
-					SETALPHABLEND(pd3dDevice, TRUE);
+					g_pRenderApp->renderer->SetAlphaBlend(true);
 					SETZWRITE(pd3dDevice, FALSE);
 					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, &tv, 3, 0, EERIE_FLAG );
-					SETALPHABLEND(pd3dDevice, FALSE);
+					g_pRenderApp->renderer->SetAlphaBlend(false);
 					SETZWRITE(pd3dDevice, TRUE);
 				}
 			}

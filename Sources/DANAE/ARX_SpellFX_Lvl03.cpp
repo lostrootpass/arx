@@ -448,7 +448,7 @@ float CFireBall::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
 	SETZWRITE(m_pd3dDevice, FALSE);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	pPSFire.Render(m_pd3dDevice, EERIEBlendType::One, EERIEBlendType::One);
 	pPSFire2.Render(m_pd3dDevice, EERIEBlendType::One, EERIEBlendType::One);
@@ -679,7 +679,7 @@ float CIceProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETZWRITE(m_pd3dDevice, FALSE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	iMax = (int)((iNumber * 2) * fOneOnDuration * ulCurrentTime);
 
@@ -1033,7 +1033,7 @@ void CSpeed::DrawRuban(LPDIRECT3DDEVICE7 device, int num, float size, int dec, f
 float CSpeed::Render(LPDIRECT3DDEVICE7 device)
 {
 	SETCULL(device, D3DCULL_NONE);
-	SETALPHABLEND(device, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	SETTC(device, NULL);
@@ -1047,7 +1047,7 @@ float CSpeed::Render(LPDIRECT3DDEVICE7 device)
 		                trubandef[i].r2, trubandef[i].g2, trubandef[i].b2) ;
 	}
 
-	SETALPHABLEND(device, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 
 	return 0;

@@ -698,11 +698,11 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 #ifndef ARX_OPENGL
 		GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 #endif
-		SETALPHABLEND(GDevice, FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 
 		if (ARXmenu.mda->BookBackground != NULL)
 		{
-			SETALPHABLEND(GDevice, FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 #ifndef ARX_OPENGL
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 #endif
@@ -935,7 +935,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	{
 		if (ARXmenu.mda->BookBackground != NULL)
 		{
-			SETALPHABLEND(GDevice, FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 #ifndef ARX_OPENGL
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 #endif

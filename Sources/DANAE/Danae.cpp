@@ -4866,7 +4866,7 @@ void RenderAllNodes(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	long j;
 	Vector_Init(&angle);
 
-	SETALPHABLEND(m_pd3dDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	for (long i=0;i<nodes.nbmax;i++)
 	{
@@ -5813,7 +5813,7 @@ HRESULT DANAE_NoRenderEnd()
 #endif
 		{
 			SETZWRITE(GDevice, TRUE);
-			SETALPHABLEND(GDevice, FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 
 			iVPOS = 0;
 			ShowValue(&oBENCH_STARTUP, &BENCH_STARTUP, "Startup");
@@ -6863,7 +6863,7 @@ HRESULT DANAE::Render()
 	}
 	
 	SETZWRITE(m_pd3dDevice, TRUE );
-	SETALPHABLEND(m_pd3dDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	if ( (inter.iobj[0]) && (inter.iobj[0]->animlayer[0].cur_anim) )
 	{
@@ -7214,7 +7214,7 @@ HRESULT DANAE::Render()
 
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		SETZWRITE(m_pd3dDevice, FALSE );
-		SETALPHABLEND(m_pd3dDevice,TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		ARX_FOGS_Render(0);
 
 		bool bNoVB	=	false;
@@ -7228,7 +7228,7 @@ HRESULT DANAE::Render()
 		UpdateObjFx(m_pd3dDevice,&subj);
 		if( bSoftRender ) SET_FORCE_NO_VB( bNoVB );
 		
-		SETALPHABLEND(m_pd3dDevice,FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 		BENCH_PARTICLES=EndBench();
 	
 	}
@@ -7289,7 +7289,7 @@ HRESULT DANAE::Render()
 	if (ItemToBeAdded[0]!=0) 
 		DanaeItemAdd();
 	    
-	SETALPHABLEND(danaeApp.m_pd3dDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETZWRITE(danaeApp.m_pd3dDevice, FALSE );
 
 	// Checks some specific spell FX
@@ -7316,12 +7316,12 @@ HRESULT DANAE::Render()
 		if (PLAYER_PARALYSED)
 	{
 		SETZWRITE(m_pd3dDevice, FALSE );
-		SETALPHABLEND(m_pd3dDevice,TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		
 		g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
 				NULL, 0, EERIERGB(0.2f,0.2f,1.f));		
-		SETALPHABLEND(m_pd3dDevice,FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 		SETZWRITE(m_pd3dDevice, TRUE );
 	}
 
@@ -7330,7 +7330,7 @@ HRESULT DANAE::Render()
 		ManageFade();
 	}
 
-	SETALPHABLEND(danaeApp.m_pd3dDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETZWRITE(danaeApp.m_pd3dDevice, TRUE );
 	
 	// Reset Last Key
@@ -7357,7 +7357,7 @@ HRESULT DANAE::Render()
 
 	// INTERFACE
 		// Remove the Alphablend State if needed : NO Z Clear
-	SETALPHABLEND(m_pd3dDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 
 	// Draw game interface if needed
@@ -7384,11 +7384,11 @@ HRESULT DANAE::Render()
 
 	if(bRenderInterList)
 	{
-		SETALPHABLEND(GDevice,FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 		PopAllTriangleList(true);
-		SETALPHABLEND(GDevice,TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		PopAllTriangleListTransparency();
-		SETALPHABLEND(GDevice,FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 	}
 
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, true);
@@ -7428,7 +7428,7 @@ m_pd3dDevice->Clear( 0, NULL, D3DCLEAR_ZBUFFER,0, 1.0f, 0L );
 		//-------------------------------------------------------------------------
 
 	// CURSOR Rendering
-	SETALPHABLEND(GDevice, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	if (DRAGINTER)
 	{
@@ -7436,11 +7436,11 @@ m_pd3dDevice->Clear( 0, NULL, D3DCLEAR_ZBUFFER,0, 1.0f, 0L );
 
 		if(bRenderInterList)
 		{
-			SETALPHABLEND(GDevice,FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 			PopAllTriangleList(true);
-			SETALPHABLEND(GDevice,TRUE);
+			g_pRenderApp->renderer->SetAlphaBlend(true);
 			PopAllTriangleListTransparency();
-			SETALPHABLEND(GDevice,FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 		}
 
 		ARX_INTERFACE_HALO_Flush(m_pd3dDevice);
@@ -7704,7 +7704,7 @@ void DANAE::GoFor2DFX()
 
 		{
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-			SETALPHABLEND(GDevice,TRUE);		
+			g_pRenderApp->renderer->SetAlphaBlend(true);		
 			SETZWRITE(GDevice, FALSE );
 			SETCULL(GDevice,D3DCULL_NONE);
 			GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE, FALSE);
@@ -8447,12 +8447,12 @@ HRESULT DANAEGL::Render()
 
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		SETZWRITE(0, FALSE);
-		SETALPHABLEND(0, TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		ARX_FOGS_Render(0);
 
 		ARX_PARTICLES_Render(0, &subj);
 		UpdateObjFx(0, &subj);
-		SETALPHABLEND(0, FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 
 		BENCH_PARTICLES = EndBench();
 
@@ -8514,7 +8514,7 @@ HRESULT DANAEGL::Render()
 	if (ItemToBeAdded[0] != 0)
 		DanaeItemAdd();
 
-	SETALPHABLEND(0, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETZWRITE(0, FALSE);
 
 	// Checks some specific spell FX
@@ -8541,12 +8541,12 @@ HRESULT DANAEGL::Render()
 	if (PLAYER_PARALYSED)
 	{
 		SETZWRITE(0, FALSE);
-		SETALPHABLEND(0, TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 		g_pRenderApp->renderer->DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
 			NULL, 0, EERIERGB(0.2f, 0.2f, 1.f));
-		SETALPHABLEND(0, FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 		SETZWRITE(0, TRUE);
 	}
 
@@ -8555,7 +8555,7 @@ HRESULT DANAEGL::Render()
 		ManageFade();
 	}
 
-	SETALPHABLEND(0, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETZWRITE(0, TRUE);
 
 	// Reset Last Key
@@ -8582,7 +8582,7 @@ finish:; //----------------------------------------------------------------
 
 	// INTERFACE
 	// Remove the Alphablend State if needed : NO Z Clear
-	SETALPHABLEND(0, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 
 	// Draw game interface if needed
@@ -8609,11 +8609,11 @@ finish:; //----------------------------------------------------------------
 
 	if (bRenderInterList)
 	{
-		SETALPHABLEND(GDevice, FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 		PopAllTriangleList(true);
-		SETALPHABLEND(GDevice, TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		//PopAllTriangleListTransparency();
-		SETALPHABLEND(GDevice, FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 	}
 
 	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, true);
@@ -8651,7 +8651,7 @@ finish:; //----------------------------------------------------------------
 	}
 
 	// CURSOR Rendering
-	SETALPHABLEND(GDevice, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	if (DRAGINTER)
 	{
@@ -8659,11 +8659,11 @@ finish:; //----------------------------------------------------------------
 
 		if (bRenderInterList)
 		{
-			SETALPHABLEND(GDevice, FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 			PopAllTriangleList(true);
-			SETALPHABLEND(GDevice, TRUE);
+			g_pRenderApp->renderer->SetAlphaBlend(true);
 			PopAllTriangleListTransparency();
-			SETALPHABLEND(GDevice, FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 		}
 
 		ARX_INTERFACE_HALO_Flush(0);
@@ -8934,7 +8934,7 @@ void DANAEGL::GoFor2DFX()
 
 		{
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-			SETALPHABLEND(GDevice, TRUE);
+			g_pRenderApp->renderer->SetAlphaBlend(true);
 			SETZWRITE(GDevice, FALSE);
 			SETCULL(GDevice, D3DCULL_NONE);
 

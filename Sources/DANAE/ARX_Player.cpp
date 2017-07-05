@@ -3680,7 +3680,7 @@ void ARX_PLAYER_Manage_Death()
 	}
 
 	{
-		SETALPHABLEND(GDevice, TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 		g_pRenderApp->renderer->DrawQuad(0.f, 0.f, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.000091f,
 		                NULL, 0, _EERIERGB(ratio));

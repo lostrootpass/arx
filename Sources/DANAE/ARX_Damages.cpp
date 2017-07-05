@@ -213,7 +213,7 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 	else if (Blood_Pos > 1.f)
 	{
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::SrcColor);
-		SETALPHABLEND(pd3dDevice, TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		SETZWRITE(pd3dDevice, FALSE);
 
 		if (player.poison > 1.f)
@@ -223,12 +223,12 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 
 		g_pRenderApp->renderer->DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.00009f, NULL, 0, color);
 		SETZWRITE(pd3dDevice, TRUE);
-		SETALPHABLEND(pd3dDevice, FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 	}
 	else if (Blood_Pos > 0.f)
 	{
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::SrcColor);
-		SETALPHABLEND(pd3dDevice, TRUE);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		SETZWRITE(pd3dDevice, FALSE);
 
 		if (player.poison > 1.f)
@@ -237,7 +237,7 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 			color = D3DRGB(1.f, 1.f - Blood_Pos, 1.f - Blood_Pos);
 
 		g_pRenderApp->renderer->DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.00009f, NULL, 0, color);
-		SETALPHABLEND(pd3dDevice, FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 		SETZWRITE(pd3dDevice, TRUE);
 	}
 

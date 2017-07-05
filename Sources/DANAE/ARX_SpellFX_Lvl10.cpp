@@ -256,11 +256,11 @@ float CControlTarget::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
 	SETZWRITE(m_pd3dDevice, FALSE);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	//----------------------------
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	if (tex_mm && tex_mm->m_pddsSurface)
 	{

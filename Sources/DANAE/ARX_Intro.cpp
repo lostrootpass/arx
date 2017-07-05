@@ -391,7 +391,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 				GDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
 				SETZWRITE(GDevice, true);
 				GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
-				SETALPHABLEND(GDevice, false);
+				g_pRenderApp->renderer->SetAlphaBlend(false);
 
 				long old = GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE;
 				GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = -1;

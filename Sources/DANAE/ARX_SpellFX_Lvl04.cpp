@@ -59,6 +59,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <EERIEDraw.h>
 #include <EERIEMath.h>
 #include <EERIEObject.h>
+#include <EERIERenderer.h>
 #include "ARX_CSpellFx.h"
 #include "ARX_SpellFx_Lvl05.h"
 #include "ARX_SpellFx_Lvl04.h"
@@ -135,7 +136,7 @@ float CBless::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
 	SETZWRITE(_pD3DDevice, FALSE);
-	SETALPHABLEND(_pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	D3DTLVERTEX v[4];
 	D3DTLVERTEX v3[4];
@@ -190,7 +191,7 @@ float CBless::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	                             &v3[3]);
 	
 	//----------------------------
-	SETALPHABLEND(_pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	for (i = 0; i < 12; i++)
 	{
@@ -225,7 +226,7 @@ float CBless::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
 	SETZWRITE(_pD3DDevice, FALSE);
-	SETALPHABLEND(_pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	return 1;
 }
@@ -275,7 +276,7 @@ float CDispellField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	SETZWRITE(m_pd3dDevice, FALSE);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	for (i = 0; i < inter.nbmax; i++)
 	{
@@ -315,7 +316,7 @@ float CDispellField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	stitepos.y = y;
 	stitepos.z = z;
 
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	stiteangle.b = -stiteangle.b * 1.5f;
 	stitecolor.r = 0.7f;
@@ -332,7 +333,7 @@ float CDispellField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	stitescale.x = 2;
 	stitescale.y = 2;
 	stitescale.z = 2;
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	DrawEERIEObjEx(m_pd3dDevice, ssol, &stiteangle, &stitepos, &stitescale, &stitecolor);
 
 	y = player.pos.y + 20;
@@ -499,8 +500,8 @@ float CTelekinesis::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	//SETTC(m_pd3dDevice,NULL);
 	//SETCULL(m_pd3dDevice,D3DCULL_NONE);
 	SETZWRITE(m_pd3dDevice, FALSE);
-	//SETALPHABLEND(m_pd3dDevice, FALSE);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	//g_pRenderApp->renderer->SetAlphaBlend(false);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 
 	//	register INTERACTIVE_OBJ * io;
@@ -612,7 +613,7 @@ float CTelekinesis::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	stitepos.y = y;//player.pos.y+60.f-mov;
 	stitepos.z = z;//tPos[i].z;//player.pos.z;//+(float)EEcos(DEG2RAD(player.angle.b))*(100.f) ;
 
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	stiteangle.b = -stiteangle.b * 1.5f;
 	stitecolor.r = 0.7f;
@@ -630,7 +631,7 @@ float CTelekinesis::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	stitescale.x = 2;
 	stitescale.y = 2;
 	stitescale.z = 2;
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	DrawEERIEObjEx(m_pd3dDevice, ssol, &stiteangle, &stitepos, &stitescale, &stitecolor);
 
  
@@ -762,7 +763,7 @@ float CCurse::Render(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D * pos)
 	EERIE_3D stitepos;
 	EERIE_3D stitescale;
 	EERIE_RGB stitecolor;
-	SETALPHABLEND(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 
 	stiteangle.b = fRot;
@@ -1174,7 +1175,7 @@ void CFieldProtectionPentagram::Render(LPDIRECT3DDEVICE7 device)
 {
 	if(this->currduration>this->duration) return;
 
-	SETALPHABLEND(device,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETCULL(device,D3DCULL_NONE);
 	device->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	device->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
@@ -1226,7 +1227,7 @@ void CFieldProtectionPentagram::Render(LPDIRECT3DDEVICE7 device)
 		}
 	}
 
-	SETALPHABLEND(device,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	device->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	device->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ZERO);
 }
@@ -1846,7 +1847,7 @@ void CFieldProtection::Render(LPDIRECT3DDEVICE7 device)
 {
 	if(this->key>2) return ;
 
-	SETALPHABLEND(device,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	device->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	device->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
@@ -1864,7 +1865,7 @@ void CFieldProtection::Render(LPDIRECT3DDEVICE7 device)
 
 	device->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	device->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ZERO);
-	SETALPHABLEND(device,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETCULL(device,D3DCULL_NONE);
 }
 /*--------------------------------------------------------------------------*/
@@ -2106,7 +2107,7 @@ int numsuiv;
 float CFireProtection::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 {
 	SETCULL(_pD3DDevice,D3DCULL_NONE);
-	SETALPHABLEND(_pD3DDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	_pD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	_pD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
 
@@ -2127,7 +2128,7 @@ float CFireProtection::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 		num++;
 	}
 
-	SETALPHABLEND(_pD3DDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	_pD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	_pD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ZERO);
 

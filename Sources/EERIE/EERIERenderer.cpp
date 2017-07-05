@@ -921,6 +921,14 @@ void EERIERendererGL::setView(const glm::mat4& view)
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
 }
 
+void EERIERendererGL::SetAlphaBlend(bool enableAlphaBlending)
+{
+	if (enableAlphaBlending)
+		glEnable(GL_BLEND);
+	else
+		glDisable(GL_BLEND);
+}
+
 void EERIERendererGL::SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor)
 {
 	glBlendFunc(_nativeBlendType(srcFactor), _nativeBlendType(dstFactor));
@@ -1183,6 +1191,11 @@ void EERIERendererD3D7::DrawQuad(float x, float y, float sx, float sy, float z, 
 	GDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 }
 
+void EERIERendererD3D7::SetAlphaBlend(bool enableAlphaBlending)
+{
+	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, enableAlphaBlending ? TRUE : FALSE);
+}
+
 void EERIERendererD3D7::SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor)
 {
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, _nativeBlendType(srcFactor));
@@ -1194,7 +1207,7 @@ void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
 	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
 	SETZWRITE(GDevice, FALSE);
-	SETALPHABLEND(GDevice, TRUE);
+	SetAlphaBlend(true);
 
 	DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
 		0, 0, _EERIERGB(visibility));
@@ -1204,7 +1217,7 @@ void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 	float col = visibility;
 	DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
 		0, 0, EERIERGB(col*FADECOLOR.r, col*FADECOLOR.g, col*FADECOLOR.b));
-	SETALPHABLEND(GDevice, FALSE);
+	SetAlphaBlend(false);
 	SETZWRITE(GDevice, TRUE);
 }
 

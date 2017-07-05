@@ -1678,7 +1678,7 @@ static void DrawLine2D(EERIE_2DI *_psPoint1, int _iNbPt, float _fSize, float _fR
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::OneMinusDstColor);
 	SETTC(GDevice, NULL);
-	SETALPHABLEND(GDevice, true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	D3DTLVERTEX v[4];
 	v[0].sz = v[1].sz = v[2].sz = v[3].sz = 0.f;
@@ -1729,7 +1729,7 @@ static void DrawLine2D(EERIE_2DI *_psPoint1, int _iNbPt, float _fSize, float _fR
 		g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 	}
 
-	SETALPHABLEND(GDevice, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 void ARXInputHandlerDI::DrawCursor()
 {
@@ -1741,7 +1741,7 @@ void ARXInputHandlerDI::DrawCursor()
 	if (pTex[iNumCursor]) SETTC(GDevice, pTex[iNumCursor]);
 	else SETTC(GDevice, NULL);
 
-	SETALPHABLEND(GDevice, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
 	DrawOneCursor(iMouseAX, iMouseAY, -1);

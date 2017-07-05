@@ -2152,7 +2152,7 @@ static void DrawCredits(void)
 		//Set the device
 		if(!danaeApp.DANAEStartRender()) return;
 
-		SETALPHABLEND(GDevice,FALSE);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 		GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
 		SETZWRITE(GDevice,true);
 		GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
@@ -2314,7 +2314,7 @@ D3DTLVERTEX d3dvertex[4];
 	d3dvertex[3].color=iColor;
 
 	SETTC(GDevice,NULL);
-	SETALPHABLEND(GDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 	SETZWRITE(GDevice, false);
@@ -2322,7 +2322,7 @@ D3DTLVERTEX d3dvertex[4];
 
 	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, d3dvertex, 4, 0, EERIE_NOCOUNT );
 
-	SETALPHABLEND(GDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETZWRITE(GDevice, true);
 
 	danaeApp.EnableZBuffer();
@@ -2559,7 +2559,7 @@ int iDecMenuPrincipaleY=50;
 				pMenu=NULL;
 			}
 
-			SETALPHABLEND(GDevice,FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 			GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
 			SETZWRITE(GDevice, true);
 			danaeApp.EnableZBuffer();
@@ -3961,7 +3961,7 @@ int iDecMenuPrincipaleY=50;
 		}
 	}
 
-	SETALPHABLEND(GDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 #ifdef ARX_OPENGL
 	danaeGLApp.DANAEEndRender();
 #else
@@ -5084,7 +5084,7 @@ void CMenuAllZone::DrawZone()
 	
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
 	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
-	SETALPHABLEND(GDevice,true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	vector<CMenuZone*>::iterator i;
 
@@ -5120,7 +5120,7 @@ void CMenuAllZone::DrawZone()
 		}
 	}
 
-	SETALPHABLEND(GDevice,false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -5385,7 +5385,7 @@ void CMenuCheckButton::Render()
 
 	if(bNoMenu) return;
 
-	SETALPHABLEND(GDevice, true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	if (vTex.size())
@@ -5421,7 +5421,7 @@ void CMenuCheckButton::Render()
 	}
 
 	//DEBUG
-	SETALPHABLEND(GDevice, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -5434,7 +5434,7 @@ void CMenuCheckButton::RenderMouseOver()
 
 	pInputHandler->SetMouseOver();
 
-	SETALPHABLEND(GDevice, true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	TextureContainer *pTex = vTex[iState];
@@ -5464,7 +5464,7 @@ void CMenuCheckButton::RenderMouseOver()
 	}
 
 	//DEBUG
-	SETALPHABLEND(GDevice, true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -5566,7 +5566,7 @@ MENUSTATE CWindowMenu::Render()
 		bChangeConsole=false;
 	}
 
-	SETALPHABLEND(GDevice,false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	D3DTLVERTEX v[4];
 	v[0].color = v[1].color = v[2].color = v[3].color = ARX_OPAQUE_WHITE;
@@ -5616,14 +5616,14 @@ MENUSTATE CWindowMenu::Render()
 
 			if(iNbHide=((*i)->Render()))
 			{
-				SETALPHABLEND(GDevice,false);
+				g_pRenderApp->renderer->SetAlphaBlend(false);
 			}
 
 			break;
 		}
 	}
 
-	SETALPHABLEND(GDevice,false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	if(eMS!=NOP)
 	{
@@ -6450,7 +6450,7 @@ int CWindowMenuConsole::Render()
 
 	int iSlider=0;
 
-	SETALPHABLEND(GDevice,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	//------------------------------------------------------------------------
 	//Affichage de la console
@@ -6472,9 +6472,9 @@ int CWindowMenuConsole::Render()
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 
-	SETALPHABLEND(GDevice, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
-	SETALPHABLEND(GDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(iPosX), ARX_CLEAN_WARN_CAST_FLOAT(iSavePosY),
 		RATIO_X(pTexBackgroundBorder->m_dwWidth), RATIO_Y(pTexBackgroundBorder->m_dwHeight),

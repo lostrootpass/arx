@@ -218,7 +218,7 @@ float CExplosion::Render(LPDIRECT3DDEVICE7 device)
 {
 	if (this->key > 1) return 0;
 
-	SETALPHABLEND(device, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETZWRITE(device, FALSE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
@@ -421,7 +421,7 @@ float CExplosion::Render(LPDIRECT3DDEVICE7 device)
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX, disqued3d, disquenbvertex, (unsigned short *)disqueind, disquenbvertex + 2, 0);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
-	SETALPHABLEND(device, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETZWRITE(device, TRUE);
 
 	return 0;

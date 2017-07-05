@@ -427,7 +427,7 @@ float CRuneOfGuarding::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETZWRITE(m_pd3dDevice, FALSE);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	//----------------------------
 	//	long color = D3DRGB(1,1,1);
@@ -870,7 +870,7 @@ float CPoisonProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETZWRITE(m_pd3dDevice, FALSE);
 	//-------------------------------------------------------------------------
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	// ------------------------------------------------------------------------
 	int n = BEZIERPrecision;
@@ -994,7 +994,7 @@ float CPoisonProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
 	SETZWRITE(m_pd3dDevice, FALSE);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	return 1;
 }
@@ -1307,7 +1307,7 @@ float CRepelUndead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETZWRITE(m_pd3dDevice, FALSE);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	//----------------------------
 	EERIE_3D  eObjAngle;
@@ -1559,7 +1559,7 @@ void CLevitate::AddStone(EERIE_3D * pos)
 void CLevitate::DrawStone(LPDIRECT3DDEVICE7 device)
 {
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
-	SETALPHABLEND(device, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	int	nb = 256;
 
 	while (nb--)
@@ -1622,7 +1622,7 @@ void CLevitate::DrawStone(LPDIRECT3DDEVICE7 device)
 		}
 	}
 
-	SETALPHABLEND(device, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -1694,7 +1694,7 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 {
 	if (this->key > 1) return 0;
 
-	SETALPHABLEND(device, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETZWRITE(device, FALSE);
 
 	//calcul du cone
@@ -1889,7 +1889,7 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 
 	//tracé du cone back
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(device, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETTEXTUREWRAPMODE(device, D3DTADDRESS_MIRROR);
 
 	if (this->tsouffle) device->SetTexture(0, this->tsouffle->m_pddsSurface);
@@ -1948,7 +1948,7 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 	this->DrawStone(device);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
-	SETALPHABLEND(device, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETZWRITE(device, TRUE);
 
 	return 0;

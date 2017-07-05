@@ -348,7 +348,7 @@ void CSummonCreature::RenderFissure(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	//-------------------------------------------------------------------------
 	// rendu de la fissure
-	SETALPHABLEND(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	vr[0].color = vr[1].color = vr[2].color = vr[3].color = D3DRGB(0, 0, 0);
 
 	if (bIntro)
@@ -386,7 +386,7 @@ void CSummonCreature::RenderFissure(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	//-------------------------------------------------------------------------
 	// rendu de la bordure
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	vr[0].color = vr[1].color = D3DRGB(0, 0, 0);
 	vr[2].color = vr[3].color = D3DRGB(fColorBorder[0], fColorBorder[1], fColorBorder[2]);
 
@@ -435,7 +435,7 @@ void CSummonCreature::RenderFissure(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	// blend additif ou mul
 	// smooth sur les cotés ou pas ..
 	// texture sympa avec glow au milieu ou uv wrap
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	if (tex_light && tex_light->m_pddsSurface)
 	{
@@ -549,7 +549,7 @@ float CSummonCreature::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	//-------------------------------------------------------------------------
 	fTexWrap += 0.02f;
@@ -589,11 +589,11 @@ float CSummonCreature::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		}
 	}
 
-	SETALPHABLEND(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	RenderFissure(m_pd3dDevice);
 
 	SETZWRITE(m_pd3dDevice, TRUE);
-	SETALPHABLEND(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_WRAP);
 
 	return (fSizeIntro / end);
@@ -836,7 +836,7 @@ float CIncinerate::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
 	SETZWRITE(_pD3DDevice, FALSE);
-	SETALPHABLEND(_pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	
 	iMax ++;
 	float x = eSrc.x + (eTarget.x - eSrc.x) * (ulCurrentTime * fOneOnDuration);
@@ -855,7 +855,7 @@ float CIncinerate::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 		EERIEDraw3DLine(_pD3DDevice, &s, &d, 0xFFFF0000);
 	}
 
-	SETALPHABLEND(_pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	EERIE_3D stiteangle;
 	EERIE_3D stitepos;
@@ -877,7 +877,7 @@ float CIncinerate::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
 	SETZWRITE(_pD3DDevice, FALSE);
-	SETALPHABLEND(_pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	pPSStream.Render(_pD3DDevice, EERIEBlendType::One, EERIEBlendType::One);
 
@@ -978,7 +978,7 @@ float CNegateMagic::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	SETZWRITE(m_pd3dDevice, FALSE);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	if (tex_sol && tex_sol->m_pddsSurface)
 	{
@@ -986,7 +986,7 @@ float CNegateMagic::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	fSize = ulCurrentTime * fOneOnDuration * 200;
  
@@ -1047,7 +1047,7 @@ float CNegateMagic::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	stitepos.y = y;
 	stitepos.z = z;
 
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	stiteangle.b = -stiteangle.b;
 	stitecolor.r = 0.4f;

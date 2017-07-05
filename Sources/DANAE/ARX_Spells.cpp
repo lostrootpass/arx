@@ -7111,11 +7111,11 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			SPELLCAST_Notify(i);
 			// Draws White Flash on Screen
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-			SETALPHABLEND(GDevice,TRUE);
+			g_pRenderApp->renderer->SetAlphaBlend(true);
 			float val = 1.f; 
 
 			g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.00009f,NULL,0,D3DRGB(0.5f+val*DIV2,val,val));
-			SETALPHABLEND(GDevice,FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 		}	
 		break;
 		//----------------------------------------------------------------------------
@@ -8130,7 +8130,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 					}
 
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-					SETALPHABLEND(GDevice,TRUE);
+					g_pRenderApp->renderer->SetAlphaBlend(true);
 					SETZWRITE(GDevice, FALSE );
 					cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
 					spells[i].fdata=cabalangle.b;
@@ -8159,7 +8159,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 							cabalcolor.g = 0.1f;
 							cabalcolor.r = 0.15f;
 					DrawEERIEObjEx(GDevice,cabal,&cabalangle,&cabalpos,&cabalscale,&cabalcolor);	
-					SETALPHABLEND(GDevice,FALSE);		
+					g_pRenderApp->renderer->SetAlphaBlend(false);		
 					SETZWRITE(GDevice, TRUE );	
 				}
 			}
@@ -9267,7 +9267,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 						}
 
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-						SETALPHABLEND(GDevice,TRUE);
+						g_pRenderApp->renderer->SetAlphaBlend(true);
 						SETZWRITE(GDevice, FALSE );
 						cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
 						spells[i].fdata=cabalangle.b;
@@ -9316,7 +9316,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 							cabalcolor.b = 0.8f;
 						DrawEERIEObjEx(GDevice,cabal,&cabalangle,&cabalpos,&cabalscale,&cabalcolor);	
 						cabalangle.b=-cabalangle.b;
-						SETALPHABLEND(GDevice,FALSE);		
+						g_pRenderApp->renderer->SetAlphaBlend(false);		
 						SETZWRITE(GDevice, TRUE );	
 
 						ARX_SOUND_RefreshPosition(spells[i].snd_loop, &cabalpos);
@@ -9366,7 +9366,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 						SETCULL(GDevice,D3DCULL_NONE);
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-						SETALPHABLEND(GDevice,TRUE);
+						g_pRenderApp->renderer->SetAlphaBlend(true);
 						SETZWRITE(GDevice, FALSE );
 						cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
 						spells[i].fdata=cabalangle.b;
@@ -9413,7 +9413,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 							cabalcolor.r = 0.8f;
 						DrawEERIEObjEx(GDevice,cabal,&cabalangle,&cabalpos,&cabalscale,&cabalcolor);	
 						cabalangle.b=-cabalangle.b;
-						SETALPHABLEND(GDevice,FALSE);		
+						g_pRenderApp->renderer->SetAlphaBlend(false);		
 						SETZWRITE(GDevice, TRUE );	
 
 						ARX_SOUND_RefreshPosition(spells[i].snd_loop, &cabalpos);

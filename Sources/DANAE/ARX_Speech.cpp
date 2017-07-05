@@ -237,7 +237,7 @@ void ARX_SPEECH_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 #endif
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	int iEnd = igrec + sSize.cy;
 
@@ -277,7 +277,7 @@ void ARX_SPEECH_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 		}
 	}
 
-	SETALPHABLEND(pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 void ARX_SPEECH_Check(LPDIRECT3DDEVICE7 pd3dDevice)
@@ -734,7 +734,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 
 						SETTC(GDevice, NULL);
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-						SETALPHABLEND(GDevice, true);
+						g_pRenderApp->renderer->SetAlphaBlend(true);
 						SETZWRITE(GDevice, false);
 						EERIEDrawFill2DRectDegrad(GDevice,
 						                          0.f,
@@ -759,7 +759,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 #ifndef ARX_OPENGL
 						danaeApp.EnableZBuffer();
 #endif
-						SETALPHABLEND(GDevice, false);
+						g_pRenderApp->renderer->SetAlphaBlend(false);
 
 
 						iTaille += (int)fZoneClippHeight;

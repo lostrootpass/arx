@@ -1991,7 +1991,7 @@ void CRuban::DrawRuban(LPDIRECT3DDEVICE7 device, int num, float size, int dec, f
 float CRuban::Render(LPDIRECT3DDEVICE7 device)
 {
 	SETCULL(device, D3DCULL_NONE);
-	SETALPHABLEND(device, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	SETTC(device, NULL);
@@ -2005,7 +2005,7 @@ float CRuban::Render(LPDIRECT3DDEVICE7 device)
 		                trubandef[i].r2, trubandef[i].g2, trubandef[i].b2) ;
 	}
 
-	SETALPHABLEND(device, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 
 	return 0;

@@ -455,7 +455,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 				}
 			}
 
-			SETALPHABLEND(m_pd3dDevice, TRUE);
+			g_pRenderApp->renderer->SetAlphaBlend(true);
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 			if(m_pd3dDevice) m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
 			SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
@@ -734,7 +734,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 			m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
 #endif
 
-			SETALPHABLEND(m_pd3dDevice, FALSE);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
 
 			if ((SHOWLEVEL == ARX_LEVELS_GetRealNum(CURRENTLEVEL)))
 			{
@@ -769,7 +769,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 
 				if (fl2)
 				{
-					SETALPHABLEND(m_pd3dDevice, TRUE);
+					g_pRenderApp->renderer->SetAlphaBlend(true);
 					verts[0].sx += DECALX * Xratio;
 					verts[0].sy += DECALY * Yratio;
 					verts[1].sx += DECALX * Xratio;
@@ -780,7 +780,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 
 				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, 3, 0);
 
-				if (fl2) SETALPHABLEND(m_pd3dDevice, FALSE);
+				if (fl2) g_pRenderApp->renderer->SetAlphaBlend(false);
 			}
 		}
 
@@ -831,11 +831,11 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 
 										if (!fl2)
 										{
-											SETALPHABLEND(m_pd3dDevice, true);
+											g_pRenderApp->renderer->SetAlphaBlend(true);
 											g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 										}
 										else
-											SETALPHABLEND(m_pd3dDevice, true);
+											g_pRenderApp->renderer->SetAlphaBlend(true);
 
 										if (fl2)
 										{
@@ -849,7 +849,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 										                5.f * ratiooo, 5.f * ratiooo, 0, pTexDetect, 0, D3DRGB(col, 0, 0));
 
 										if (!fl2)
-											SETALPHABLEND(m_pd3dDevice, false);
+											g_pRenderApp->renderer->SetAlphaBlend(false);
 									}
 								}
 							}

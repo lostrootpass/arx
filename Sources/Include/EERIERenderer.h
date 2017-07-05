@@ -108,6 +108,7 @@ public:
 	inline glm::mat4 view() const { return _view; }
 	inline virtual void setView(const glm::mat4& view) { _view = view; }
 
+	virtual void SetAlphaBlend(bool enableAlphaBlending) {};
 	virtual void SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor) {};
 	virtual void SetViewport(int x, int y, int w, int h) {};
 };
@@ -140,6 +141,7 @@ public:
 	void setProj(const glm::mat4& proj) override;
 	void setView(const glm::mat4& view) override;
 
+	void SetAlphaBlend(bool enableAlphaBlending) override;
 	void SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor) override;
 	void SetViewport(int x, int y, int w, int h) override;
 private:
@@ -175,6 +177,7 @@ public:
 	void DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags = 0) override;
 	void DrawQuad(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs = 0, unsigned long color = 0) override;
 
+	void SetAlphaBlend(bool enableAlphaBlending) override;
 	void SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor) override;
 	void SetViewport(int x, int y, int w, int h) override;
 

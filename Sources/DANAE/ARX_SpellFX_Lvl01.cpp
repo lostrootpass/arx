@@ -389,7 +389,7 @@ float CMagicMissile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
 	SETZWRITE(m_pd3dDevice, FALSE);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	// Set Texture ------------------------------------------------------------
 	if (tex_mm && tex_mm->m_pddsSurface)
@@ -1339,7 +1339,7 @@ void CPortal::Update(unsigned long _ulTime)
 /*--------------------------------------------------------------------------*/
 float CPortal::Render(LPDIRECT3DDEVICE7 device)
 {
-	SETALPHABLEND(device, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETZWRITE(device, FALSE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
@@ -1448,7 +1448,7 @@ float CPortal::Render(LPDIRECT3DDEVICE7 device)
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->sphered3d, this->spherenbpt, (unsigned short *)this->sphereind, this->spherenbfaces * 3, 0);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
-	SETALPHABLEND(device, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETCULL(device, D3DCULL_NONE);
 	SETZWRITE(device, TRUE);
 

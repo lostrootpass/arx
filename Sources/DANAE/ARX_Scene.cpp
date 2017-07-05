@@ -2378,7 +2378,7 @@ void ARX_PORTALS_Frustrum_RenderRooms_TransparencyT()
 	SetZBias(GDevice,0);
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);
 	GDevice->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_MODULATE);
-	SETALPHABLEND(GDevice,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 void ARX_PORTALS_Frustrum_RenderRoomTCullSoft(long room_num,EERIE_FRUSTRUM_DATA * frustrums,long prec,long tim);
@@ -4865,7 +4865,7 @@ if (HALOCUR>0)
 {
 	SETTC(pd3dDevice,NULL);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcColor, EERIEBlendType::One);
-	SETALPHABLEND(pd3dDevice,TRUE);			
+	g_pRenderApp->renderer->SetAlphaBlend(true);			
 	SETCULL(pd3dDevice,D3DCULL_NONE);
 	SETZWRITE(pd3dDevice,FALSE);
 
@@ -4885,11 +4885,11 @@ if (HALOCUR>0)
 	}
 
 		 HALOCUR = 0; 
-	SETALPHABLEND(pd3dDevice,FALSE);			
+	g_pRenderApp->renderer->SetAlphaBlend(false);			
 }
 
 	SETCULL(pd3dDevice,D3DCULL_CCW);
-	SETALPHABLEND(pd3dDevice,FALSE);	
+	g_pRenderApp->renderer->SetAlphaBlend(false);	
 	SETZWRITE(pd3dDevice, TRUE );
 
 	if (EDITION==EDITION_LIGHTS)

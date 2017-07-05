@@ -589,7 +589,7 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	cnodetab[0].fz = frand2() * 1.5f * fMySize; //5
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETTC(m_pd3dDevice, NULL);
 
 	v2[0].color = v2[1].color = v2[2].color = v2[3].color = D3DRGB(1, 1, 1);
@@ -797,7 +797,7 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	SETZWRITE(m_pd3dDevice, TRUE);
-	SETALPHABLEND(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	return falpha;
 }
 
@@ -904,7 +904,7 @@ float CConfuse::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETZWRITE(m_pd3dDevice, FALSE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	//-------------------------------------------------------------------------
 	if (tex_trail && tex_trail->m_pddsSurface)
@@ -1177,19 +1177,19 @@ float CFireField::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 {
 	if (this->key > 1) return 0;
 
-	SETALPHABLEND(_pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	SETZWRITE(_pD3DDevice, FALSE);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
 	SETZWRITE(_pD3DDevice, FALSE);
-	SETALPHABLEND(_pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	pPSStream.Render(_pD3DDevice, EERIEBlendType::One, EERIEBlendType::One);
 	pPSStream1.Render(_pD3DDevice, EERIEBlendType::One, EERIEBlendType::One);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
-	SETALPHABLEND(_pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETZWRITE(_pD3DDevice, TRUE);
 
 	return 0;
@@ -1351,7 +1351,7 @@ float CIceField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	
 	SETZWRITE(m_pd3dDevice, TRUE);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-	SETALPHABLEND(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	iMax = (int)(iNumber); 
 
