@@ -60,6 +60,39 @@ void addLights(std::vector<LightData>& data, EERIE_LIGHT** sources, size_t count
 	}
 }
 
+glm::vec3 unpackRGB(long color)
+{
+	glm::vec3 c;
+
+	c.r = (color >> 16 & 0xFF) / 255.0f;
+	c.g = (color >> 8 & 0xFF) / 255.0f;
+	c.b = (color >> 0 & 0xFF) / 255.0f;
+
+	return c;
+}
+
+glm::vec3 unpackBGR(long color)
+{
+	glm::vec3 c;
+
+	c.b = (color >> 16 & 0xFF) / 255.0f;
+	c.g = (color >> 8 & 0xFF) / 255.0f;
+	c.r = (color >> 0 & 0xFF) / 255.0f;
+
+	return c;
+}
+
+glm::vec4 unpackARGB(long color)
+{
+	glm::vec4 c;
+
+	c.a = (color >> 24 & 0xFF) / 255.0f;
+	c.r = (color >> 16 & 0xFF) / 255.0f;
+	c.g = (color >> 8 & 0xFF) / 255.0f;
+	c.b = (color >> 0 & 0xFF) / 255.0f;
+
+	return c;
+}
 
 void EERIERenderer::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
 {
@@ -291,10 +324,7 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 					}
 				}
 
-				attrib.color.a = alpha;
-				attrib.color.r = (vtxArray[fv].vert.color >> 16 & 0xFF) / 255.0f;
-				attrib.color.g = (vtxArray[fv].vert.color >> 8 & 0xFF) / 255.0f;
-				attrib.color.b = (vtxArray[fv].vert.color >> 0 & 0xFF) / 255.0f;
+				attrib.color = glm::vec4(unpackRGB(vtxArray[fv].vert.color), alpha);
 
 				vtxAttribs.push_back(attrib);
 			}
@@ -410,10 +440,7 @@ void EERIERendererGL::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, L
 		attrib.uv.s = vtx.tu;
 		attrib.uv.t = vtx.tv;
 
-		attrib.color.a = (vtx.color >> 24 & 0xFF) / 255.0f;
-		attrib.color.r = (vtx.color >> 16 & 0xFF) / 255.0f;
-		attrib.color.g = (vtx.color >> 8 & 0xFF) / 255.0f;
-		attrib.color.b = (vtx.color >> 0 & 0xFF) / 255.0f;
+		attrib.color = unpackARGB(vtx.color);
 
 		attribData.push_back(attrib);
 
@@ -494,10 +521,7 @@ void EERIERendererGL::DrawQuad(float x, float y, float sx, float sy, float z, Te
 		glUniform1i(uniformLocation, 0);
 	}
 
-	glm::vec3 col;
-	col.r = ((color >> 16) & 0xFF) / 255.0f;
-	col.g = ((color >> 8) & 0xFF) / 255.0f;
-	col.b = ((color >> 0) & 0xFF) / 255.0f;
+	glm::vec3 col = unpackRGB(color);
 	glUniform3fv(glGetUniformLocation(program, "color"), 1, &col[0]);
 
 	_drawQuad(program, startX, startY, dX, dY, uvs);
@@ -592,10 +616,7 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 			short b = (room->pTexIdBuffer[i] == -1) ? -1 : texMapBindings[room->pTexIdBuffer[i]];
 			attrib.texId = b;
 
-			attrib.color.a = (room->pVtxBuffer[i].color >> 24 & 0xFF) / 255.0f;
-			attrib.color.r = (room->pVtxBuffer[i].color >> 16 & 0xFF) / 255.0f;
-			attrib.color.g = (room->pVtxBuffer[i].color >> 8 & 0xFF) / 255.0f;
-			attrib.color.b = (room->pVtxBuffer[i].color >> 0 & 0xFF) / 255.0f;
+			attrib.color = unpackARGB(room->pVtxBuffer[i].color);
 
 			attrib.normal = glm::vec3(room->pNormals[i].x, -room->pNormals[i].y, room->pNormals[i].z);
 
@@ -735,10 +756,7 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 
 		attrib.texId = (tex ? 0 : -1);
 
-		attrib.color.a = (vtxArray[i].color >> 24 & 0xFF) / 255.0f;
-		attrib.color.r = (vtxArray[i].color >> 16 & 0xFF) / 255.0f;
-		attrib.color.g = (vtxArray[i].color >> 8 & 0xFF) / 255.0f;
-		attrib.color.b = (vtxArray[i].color >> 0 & 0xFF) / 255.0f;
+		attrib.color = unpackARGB(vtxArray[i].color);
 
 		vtxAttribs.push_back(attrib);
 	}
@@ -800,11 +818,7 @@ void EERIERendererGL::DrawSprite(float x, float y, float sx, float sy, D3DCOLOR 
 	GLuint program = EERIEGetGLProgramID("screenfx");
 	glUseProgram(program);
 
-	glm::vec4 color;
-	color.a = (col >> 24 & 0xFF) / 255.0f;
-	color.r = (col >> 16 & 0xFF) / 255.0f;
-	color.g = (col >> 8 & 0xFF) / 255.0f;
-	color.b = (col >> 0 & 0xFF) / 255.0f;
+	glm::vec4 color = unpackARGB(col);
 	glUniform4fv(glGetUniformLocation(program, "color"), 1, &color[0]);
 	
 	glActiveTexture(GL_TEXTURE0);
