@@ -5396,9 +5396,7 @@ long DANAE_Manage_Cinematic()
 	PlayTrack(ControlCinematique);
 	ControlCinematique->InitDeviceObjects();
 
-#ifndef ARX_OPENGL
-	danaeApp.m_pd3dDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
-#endif
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	if(ControlCinematique->Render(FrameTicks-LastFrameTicks)==E_FAIL) 
 		return 1;

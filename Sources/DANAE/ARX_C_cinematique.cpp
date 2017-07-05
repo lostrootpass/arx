@@ -396,7 +396,7 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_LINEAR);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, (DWORD)(0));
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE);
 
 	EditLight = FALSE;
@@ -463,7 +463,7 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_LINEAR);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, (DWORD)(0));
 
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, TRUE);
 
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);

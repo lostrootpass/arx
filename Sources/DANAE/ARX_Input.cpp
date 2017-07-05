@@ -1735,7 +1735,7 @@ void ARXInputHandlerDI::DrawCursor()
 {
 	if (!bDrawCursor) return;
 
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	DrawLine2D(iOldCoord, iMaxOldCoord, 10.f, .725f, .619f, 0.56f);
 
 	if (pTex[iNumCursor]) SETTC(GDevice, pTex[iNumCursor]);
@@ -1785,7 +1785,7 @@ void ARXInputHandlerDI::DrawCursor()
 		lFrameDiff = 0;
 	}
 
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 bool ARXInputHandlerDI::IsVirtualKeyPressed(int _iVirtualKey)

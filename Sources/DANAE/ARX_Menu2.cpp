@@ -338,7 +338,7 @@ void ARX_DrawAfterQuickLoad()
 
 	if(!pTex) return;
 
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,TRUE);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	g_pRenderApp->renderer->DrawQuad(
@@ -353,7 +353,7 @@ void ARX_DrawAfterQuickLoad()
 						0,
 						D3DRGB(fColor,fColor,fColor) );
 
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,FALSE);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -4657,10 +4657,7 @@ void CMenuElementText::RenderMouseOver()
 
 	pInputHandler->SetMouseOver();
 
-#ifndef ARX_OPENGL
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  true);
-#endif
-
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	EERIE_3D ePos;
@@ -4670,9 +4667,7 @@ void CMenuElementText::RenderMouseOver()
 
 	FontRenderText(pHFont, ePos, lpszText, lColorHighlight);
 
-#ifndef ARX_OPENGL
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  false);
-#endif
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	switch (iID)
 	{
@@ -5561,16 +5556,12 @@ MENUSTATE CWindowMenu::Render()
 		bChangeConsole=false;
 	}
 
-	g_pRenderApp->renderer->SetAlphaBlend(false);
-
 	D3DTLVERTEX v[4];
 	v[0].color = v[1].color = v[2].color = v[3].color = ARX_OPAQUE_WHITE;
 	v[0].sz=v[1].sz=v[2].sz=v[3].sz=0.f;	
 	v[0].rhw=v[1].rhw=v[2].rhw=v[3].rhw=0.999999f;
 
-#ifndef ARX_OPENGL
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, false);
-#endif
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 
@@ -6976,7 +6967,7 @@ void CMenuButton::Render()
 	{
 		_TCHAR *pText=vText[iPos];
 
-		GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  true);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
 		GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
 
@@ -6987,7 +6978,7 @@ void CMenuButton::Render()
 		
 		FontRenderText(pHFont, ePos, pText, RGB(232, 204, 142));
 
-		GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  false);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 	}
 }
 
@@ -7033,7 +7024,7 @@ void CMenuButton::RenderMouseOver()
 	{
 		_TCHAR *pText=vText[iPos];
 
-		GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  true);
+		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		
 		EERIE_3D ePos;
@@ -7043,7 +7034,7 @@ void CMenuButton::RenderMouseOver()
 		
 		FontRenderText(pHFont, ePos, pText, RGB(255, 255, 255));
 		
-		GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE,  false);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 	}
 }
 
@@ -7304,16 +7295,13 @@ void CMenuSliderText::Render()
 
 	pRightButton->Render();
 
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	if(vText[iPos])
 	{
 		vText[iPos]->Render();
 
 	}
-
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, false);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -7329,7 +7317,7 @@ void CMenuSliderText::RenderMouseOver()
 	int iX = pInputHandler->iMouseAX;
 	int iY = pInputHandler->iMouseAY;
 
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	if ((iX >= rZone.left) &&
@@ -7566,7 +7554,7 @@ void CMenuSlider::Render()
 	float iTexW = 0;
 	float iTexH = 0;
 
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	D3DTLVERTEX v[4];
@@ -7611,7 +7599,7 @@ void CMenuSlider::Render()
 		iX += iTexW;
 	}
 
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -7627,7 +7615,7 @@ void CMenuSlider::RenderMouseOver()
 	int iX = pInputHandler->iMouseAX;
 	int iY = pInputHandler->iMouseAY;
 
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, true);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	if ((iX >= rZone.left) &&
@@ -7653,7 +7641,7 @@ void CMenuSlider::RenderMouseOver()
 			}
 		}
 
-	GDevice->SetRenderState( D3DRENDERSTATE_ALPHABLENDENABLE, false);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
 }
 
 //-----------------------------------------------------------------------------
