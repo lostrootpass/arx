@@ -668,11 +668,15 @@ void ARXMenu_NewQuest()
 void ARXMenu_LoadQuest(long num)
 {
 	CAN_REPLAY_INTRO = 0;
+#ifndef ARX_OPENGL
 	danaeApp.DANAEEndRender();
+#endif
 
 	ARX_SOUND_MixerPause(ARX_SOUND_MixerMenu);
 	LoadSaveGame(num); 
+#ifndef ARX_OPENGL
 	danaeApp.DANAEStartRender();
+#endif
 }
 
 //-----------------------------------------------------------------------------

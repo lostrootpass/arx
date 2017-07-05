@@ -3892,7 +3892,7 @@ int iDecMenuPrincipaleY=50;
 
 	if (pTextureLoadRender)
 	{
-		GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,FALSE);
+		SETZWRITE(GDevice, false);
 
 		int iOffsetX = 0;
 		int iOffsetY=0;
@@ -4317,7 +4317,9 @@ bool CMenuElementText::OnMouseClick(int _iMouseButton)
 							memset( ml, 0, 256 );
 
 							eMenuState = MAIN;
+#ifndef ARX_OPENGL
 							GDevice->Clear( 0, NULL, D3DCLEAR_ZBUFFER,0, 1.0f, 0L );	
+#endif
 							ARXMenu_LoadQuest( lData );
 
 							bNoMenu=true;
