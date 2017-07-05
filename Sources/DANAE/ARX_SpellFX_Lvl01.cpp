@@ -387,7 +387,7 @@ float CMagicMissile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	// Set Appropriate Renderstates -------------------------------------------
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
@@ -1340,7 +1340,7 @@ void CPortal::Update(unsigned long _ulTime)
 float CPortal::Render(LPDIRECT3DDEVICE7 device)
 {
 	g_pRenderApp->renderer->SetAlphaBlend(true);
-	SETZWRITE(device, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
@@ -1450,7 +1450,7 @@ float CPortal::Render(LPDIRECT3DDEVICE7 device)
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETCULL(device, D3DCULL_NONE);
-	SETZWRITE(device, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	return 0;
 }

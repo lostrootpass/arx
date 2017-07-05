@@ -6546,12 +6546,12 @@ void ARX_INTERFACE_Draw_Stealth_Gauge()
 			g_pRenderApp->renderer->SetAlphaBlend(true);
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
-			SETZWRITE(GDevice, false);
+			g_pRenderApp->renderer->SetZWrite(false);
 			g_pRenderApp->renderer->DrawQuad(
 			                px, py, INTERFACE_RATIO_DWORD(stealth_gauge_tc->m_dwWidth), INTERFACE_RATIO_DWORD(stealth_gauge_tc->m_dwHeight), 0.01f,
 				stealth_gauge_tc,0,col);
 
-			danaeApp.EnableZBuffer();
+			g_pRenderApp->renderer->SetZWrite(true);
 			g_pRenderApp->renderer->SetAlphaBlend(false);
 		}
 	}
@@ -6611,9 +6611,8 @@ void ARX_INTERFACE_DrawDamagedEquipment()
 		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
-		danaeApp.EnableZBuffer();
+		g_pRenderApp->renderer->SetZWrite(true);
 		SETCULL(GDevice,D3DCULL_NONE);
-		SETZWRITE(GDevice, true);
 #ifndef ARX_OPENGL
 		GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
 #endif
@@ -6930,9 +6929,7 @@ void ARX_INTERFACE_ManageOpenedBook_Finish()
 	bGATI8500			=	false;
 	bSoftRender			=	false;
 
-	SETZWRITE(GDevice, TRUE );
-
-	danaeApp.EnableZBuffer();
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	if ((player.Interface & INTER_MAP ) &&  (!(player.Interface & INTER_COMBATMODE))) 
 	{
@@ -6983,7 +6980,7 @@ void ARX_INTERFACE_ManageOpenedBook_Finish()
 			float n;
 			long xpos=0;
 			long ypos=0;
-			GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
+			g_pRenderApp->renderer->SetZWrite(false);
 
 			for (long i=0;i<NB_RUNES;i++)
 			{
@@ -7028,7 +7025,7 @@ void ARX_INTERFACE_ManageOpenedBook_Finish()
 						angle.b-=20.f;
 						
 						angle.b+=20.f;
-						SETZWRITE(GDevice,TRUE);
+						g_pRenderApp->renderer->SetZWrite(true);
 						g_pRenderApp->renderer->SetAlphaBlend(false);
 						DynLight[0].exist=1;	
 						
@@ -7183,7 +7180,7 @@ void ARX_INTERFACE_ManageOpenedBook_Finish()
 				}
 			}
 
-			GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, true);
+			g_pRenderApp->renderer->SetZWrite(true);
 			
 			SETCULL( GDevice, D3DCULL_CCW);
 
@@ -7424,9 +7421,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 	if (ARXmenu.currentmode != AMCM_NEWQUEST)
 	{
  
-#ifndef ARX_OPENGL
-		GDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
-#endif
+		g_pRenderApp->renderer->SetZFunc(EERIEZFunc::Always);
 
 		if (Book_Mode == 0)
 		{
@@ -7445,9 +7440,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 			DrawBookInterfaceItem(GDevice,ITC.questbook, 97, 64, 0.9999f);
 		}
 
-#ifndef ARX_OPENGL
-		GDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
-#endif
+		g_pRenderApp->renderer->SetZFunc(EERIEZFunc::LEqual);
 	}
 	else 
 	{
@@ -8690,10 +8683,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 	if ((Book_Mode==0) && (inter.iobj[0]->obj!=NULL))
 	{
 
-		SETZWRITE(GDevice,true);
-#ifndef ARX_OPENGL
-		danaeApp.EnableZBuffer();
-#endif
+		g_pRenderApp->renderer->SetZWrite(true);
 		SetFilteringMode(GDevice,1);
 		D3DRECT rec;
 
@@ -9169,7 +9159,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcColor, EERIEBlendType::One);
 				g_pRenderApp->renderer->SetAlphaBlend(true);			
 				SETCULL(GDevice,D3DCULL_NONE);
-				SETZWRITE(GDevice,FALSE);
+				g_pRenderApp->renderer->SetZWrite(false);
 
 				for (int i=0;i<HALOCUR;i++)
 				{
@@ -9268,14 +9258,14 @@ void ARX_INTERFACE_DrawCurrentTorch()
 
 	py = DANAESIZY - INTERFACE_RATIO(158+32);
 
-	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,false);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	g_pRenderApp->renderer->DrawQuad(
 		px, py,
 	                INTERFACE_RATIO_DWORD(CURRENT_TORCH->inv->m_dwWidth), INTERFACE_RATIO_DWORD(CURRENT_TORCH->inv->m_dwHeight),
 		0.001f,
 		CURRENT_TORCH->inv,0,D3DCOLORWHITE);
-	danaeApp.EnableZBuffer();
+	g_pRenderApp->renderer->SetZWrite(true);
 	
 	if ( rnd() > 0.2f )
 	{
@@ -9930,14 +9920,14 @@ void DrawAllInterface()
 			float px = DANAESIZX - INTERFACE_RATIO_DWORD(ChangeLevel->m_dwWidth);
 		float py = 0;
 
-		SETZWRITE(GDevice, false);
+		g_pRenderApp->renderer->SetZWrite(false);
 		float vv = 0.9f - EEsin(FrameTime*DIV50)*DIV2+rnd()*DIV10;
 
 		if ( vv < 0.f ) vv = 0;
 		else if ( vv > 1.f ) vv = 1.f;
 
 		ARX_INTERFACE_DrawItem( ChangeLevel, px, py, 0.0001f, D3DRGB( vv, vv, vv ) );
-		danaeApp.EnableZBuffer();
+		g_pRenderApp->renderer->SetZWrite(true);
 
 			if (MouseInRect(px, py, px + INTERFACE_RATIO_DWORD(ChangeLevel->m_dwWidth), py + INTERFACE_RATIO_DWORD(ChangeLevel->m_dwHeight)))
 		{
@@ -10054,7 +10044,7 @@ void DrawAllInterface()
 		v[2]= D3DTLVERTEX( D3DVECTOR( 0, 0, 0.001f ), 1.f, D3DCOLORWHITE, 1, 1.f, 1.f);
 		v[3]= D3DTLVERTEX( D3DVECTOR( 0, 0, 0.001f ), 1.f, D3DCOLORWHITE, 1, 0.f, 1.f);
 		
-		SETZWRITE(GDevice, false);
+		g_pRenderApp->renderer->SetZWrite(false);
 		px = DANAESIZX - INTERFACE_RATIO(33) + INTERFACE_RATIO(1) + lSLID_VALUE;
 		py = DANAESIZY - INTERFACE_RATIO(81);
 		ARX_INTERFACE_DrawItem(ITC.empty_gauge_blue, px, py, 0.f); //399
@@ -10110,7 +10100,7 @@ void DrawAllInterface()
 		//---------------------------------------------------------------------
 		//END RED GAUGE
 		
-		SETZWRITE(GDevice, false);
+		g_pRenderApp->renderer->SetZWrite(false);
 		px = 0.f-lSLID_VALUE;
 		py = DANAESIZY - INTERFACE_RATIO(78);
 		ARX_INTERFACE_DrawItem(ITC.empty_gauge_red, px, py, 0.001f);
@@ -10287,7 +10277,7 @@ void DrawAllInterface()
 		}
 	}
 	
-	danaeApp.EnableZBuffer();
+	g_pRenderApp->renderer->SetZWrite(true);
 #ifndef ARX_OPENGL
 	GDevice->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTFN_LINEAR );
 	GDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTFG_LINEAR );

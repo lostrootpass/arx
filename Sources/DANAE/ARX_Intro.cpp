@@ -159,6 +159,8 @@ void ARX_INTERFACE_ShowFISHTANK(LPDIRECT3DDEVICE7 pd3dDevice)
 void ARX_INTERFACE_ShowARKANE(LPDIRECT3DDEVICE7 pd3dDevice)
 {
 #ifdef ARX_OPENGL
+	g_pRenderApp->renderer->SetZWrite(true);
+
 	if(danaeGLApp.DANAEStartRender())
 	{
 		if(ARKANE_img == NULL)
@@ -178,9 +180,7 @@ void ARX_INTERFACE_ShowARKANE(LPDIRECT3DDEVICE7 pd3dDevice)
 		pd3dDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFP_POINT);
 		pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP); 
 		pd3dDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, FALSE);
-		SETZWRITE(pd3dDevice, true);
-
-		danaeApp.EnableZBuffer();
+		g_pRenderApp->renderer->SetZWrite(true);
 
 		Project.vsync = 0;
 
@@ -203,7 +203,7 @@ void ARX_INTERFACE_ShowARKANE(LPDIRECT3DDEVICE7 pd3dDevice)
 
 		Project.vsync = 1;
 
-		SETZWRITE(pd3dDevice, TRUE);
+		g_pRenderApp->renderer->SetZWrite(true);
 		pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
 		pd3dDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, TRUE);
 		pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFP_LINEAR);
@@ -293,6 +293,9 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 #ifdef ARX_OPENGL
 		if(danaeGLApp.DANAEStartRender())
 		{
+			g_pRenderApp->renderer->SetZWrite(true);
+			g_pRenderApp->renderer->SetAlphaBlend(false);
+
 			long old = GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE;
 			GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = -1;
 
@@ -387,9 +390,8 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 
 				GDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, false);
 
-				danaeApp.EnableZBuffer();
 				GDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
-				SETZWRITE(GDevice, true);
+				g_pRenderApp->renderer->SetZWrite(true);
 				GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 				g_pRenderApp->renderer->SetAlphaBlend(false);
 

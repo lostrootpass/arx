@@ -457,7 +457,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 
 			g_pRenderApp->renderer->SetAlphaBlend(true);
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-			if(m_pd3dDevice) m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
+			g_pRenderApp->renderer->SetZFunc(EERIEZFunc::Always);
 			SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
 
 			if (fl2)
@@ -731,9 +731,8 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 		{
 #ifndef ARX_OPENGL
 			m_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
-			m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
 #endif
-
+			g_pRenderApp->renderer->SetZFunc(EERIEZFunc::LEqual);
 			g_pRenderApp->renderer->SetAlphaBlend(false);
 
 			if ((SHOWLEVEL == ARX_LEVELS_GetRealNum(CURRENTLEVEL)))

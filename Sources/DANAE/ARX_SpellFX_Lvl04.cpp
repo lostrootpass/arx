@@ -135,7 +135,7 @@ float CBless::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	}
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
-	SETZWRITE(_pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	D3DTLVERTEX v[4];
@@ -225,7 +225,7 @@ float CBless::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	}
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
-	SETZWRITE(_pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	return 1;
@@ -275,7 +275,7 @@ float CDispellField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return 0.f;
 	}
 
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	for (i = 0; i < inter.nbmax; i++)
@@ -499,7 +499,7 @@ float CTelekinesis::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	//SETTC(m_pd3dDevice,NULL);
 	//SETCULL(m_pd3dDevice,D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	//g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
@@ -753,7 +753,7 @@ float CCurse::Render(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D * pos)
 	}
 
 	SETCULL(m_pd3dDevice, D3DCULL_CW);
-	SETZWRITE(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	x = pos->x;
 	y = pos->y;

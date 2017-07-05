@@ -1743,10 +1743,10 @@ void ARXInputHandlerDI::DrawCursor()
 
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 
-	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
+	g_pRenderApp->renderer->SetZWrite(false);
 	DrawOneCursor(iMouseAX, iMouseAY, -1);
 
-	danaeApp.EnableZBuffer();
+	g_pRenderApp->renderer->SetZWrite(true);
 
 
 	ARX_CHECK_LONG(ARXDiffTimeMenu);

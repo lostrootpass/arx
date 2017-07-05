@@ -2154,8 +2154,7 @@ static void DrawCredits(void)
 
 		g_pRenderApp->renderer->SetAlphaBlend(false);
 		GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
-		SETZWRITE(GDevice,true);
-		GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
+		g_pRenderApp->renderer->SetZWrite(false);
 
 		//Draw Background
 		if(ARXmenu.mda->pTexCredits)
@@ -2251,8 +2250,7 @@ static void DrawCredits(void)
 
 	danaeApp.DANAEEndRender();
 
-	SETZWRITE(GDevice,true);
-	danaeApp.EnableZBuffer();	
+	g_pRenderApp->renderer->SetZWrite(true);
 }
 //-----------------------------------------------------------------------------
 
@@ -2317,15 +2315,14 @@ D3DTLVERTEX d3dvertex[4];
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-	SETZWRITE(GDevice, false);
+	g_pRenderApp->renderer->SetZWrite(false);
 	SETCULL(GDevice, D3DCULL_NONE);
 
 	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, d3dvertex, 4, 0, EERIE_NOCOUNT );
 
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(GDevice, true);
+	g_pRenderApp->renderer->SetZWrite(true);
 
-	danaeApp.EnableZBuffer();
 	SETCULL(GDevice, D3DCULL_CCW);
 }
 
@@ -2422,10 +2419,10 @@ bool Menu2_Render()
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_CLAMP);
 
 	GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
-	SETZWRITE(GDevice, false);
-	GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
 #endif
+
+	g_pRenderApp->renderer->SetZWrite(false);
 	
 	MENUSTATE eOldMenuState=NOP;
 	MENUSTATE eM;
@@ -2561,8 +2558,7 @@ int iDecMenuPrincipaleY=50;
 
 			g_pRenderApp->renderer->SetAlphaBlend(false);
 			GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
-			SETZWRITE(GDevice, true);
-			danaeApp.EnableZBuffer();
+			g_pRenderApp->renderer->SetZWrite(true);
 			danaeApp.DANAEEndRender();
 
 			return true;
@@ -3873,10 +3869,10 @@ int iDecMenuPrincipaleY=50;
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_CLAMP);
 
 	GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
-	SETZWRITE(GDevice, false);
-	GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE,false);
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
 #endif
+	g_pRenderApp->renderer->SetZWrite(false);
+
 	pInputHandler->DrawCursor();
 
 	if(pMenu->bReInitAll)
@@ -3892,7 +3888,7 @@ int iDecMenuPrincipaleY=50;
 
 	if (pTextureLoadRender)
 	{
-		SETZWRITE(GDevice, false);
+		g_pRenderApp->renderer->SetZWrite(false);
 
 		int iOffsetX = 0;
 		int iOffsetY=0;
@@ -3962,6 +3958,8 @@ int iDecMenuPrincipaleY=50;
 	}
 
 	g_pRenderApp->renderer->SetAlphaBlend(false);
+	g_pRenderApp->renderer->SetZWrite(true);
+
 #ifdef ARX_OPENGL
 	danaeGLApp.DANAEEndRender();
 #else
@@ -3969,9 +3967,6 @@ int iDecMenuPrincipaleY=50;
 	GDevice->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
 
-	SETZWRITE(GDevice, true);
-
-	danaeApp.EnableZBuffer();
 	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_CCW);
 
 	danaeApp.DANAEEndRender();
@@ -6457,18 +6452,12 @@ int CWindowMenuConsole::Render()
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 
-#ifndef ARX_OPENGL
-	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
-#endif
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->DrawQuad(ARX_CLEAN_WARN_CAST_FLOAT(iPosX), ARX_CLEAN_WARN_CAST_FLOAT(iSavePosY),
 		RATIO_X(pTexBackground->m_dwWidth), RATIO_Y(pTexBackground->m_dwHeight),
 		0, pTexBackground, 0, ARX_OPAQUE_WHITE);
 
-
-#ifndef ARX_OPENGL
-	danaeApp.EnableZBuffer();
-#endif
-
+	g_pRenderApp->renderer->SetZWrite(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 

@@ -706,10 +706,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 #ifndef ARX_OPENGL
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 #endif
-			SETZWRITE(GDevice, false);
-#ifndef ARX_OPENGL
-			GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, D3DZB_FALSE);
-#endif
+			g_pRenderApp->renderer->SetZWrite(false);
 
 			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.9f, ARXmenu.mda->BookBackground, 0, D3DCOLORWHITE);
 		}
@@ -939,10 +936,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 #ifndef ARX_OPENGL
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 #endif
-			SETZWRITE(GDevice, false);
-#ifndef ARX_OPENGL
-			GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, D3DZB_FALSE);
-#endif
+			g_pRenderApp->renderer->SetZWrite(false);
 
 			g_pRenderApp->renderer->DrawQuad(0, 0, ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZX), ARX_CLEAN_WARN_CAST_FLOAT(DANAESIZY), 0.9f, ARXmenu.mda->BookBackground, 0, D3DCOLORWHITE);
 		}

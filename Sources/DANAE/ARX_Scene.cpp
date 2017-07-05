@@ -1616,13 +1616,14 @@ void ARX_PORTALS_Frustrum_RenderRoom_TransparencyT(long room_num);
 void ARX_PORTALS_Frustrum_RenderRoom_TransparencyTSoftCull(long room_num);
 void ARX_PORTALS_Frustrum_RenderRooms_TransparencyT()
 {
+	g_pRenderApp->renderer->SetZWrite(false);
+
 #ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
 
 	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,TRUE);
 
 	SETCULL(GDevice,D3DCULL_NONE);
-	SETZWRITE(GDevice,FALSE);
 
 	for (long i=0;i<NbRoomDrawList;i++)
 	{
@@ -1648,7 +1649,7 @@ void ARX_PORTALS_Frustrum_RenderRooms_TransparencyT()
 
 	SetZBias(GDevice,8);
 
-	SETZWRITE(GDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	//render all fx!!
 	SETCULL(GDevice,D3DCULL_CW);
@@ -3251,10 +3252,9 @@ SMY_D3DVERTEX *pMyVertex;
 		//ZMapp
 #ifndef ARX_OPENGL
 		GDevice->SetTextureStageState(0,D3DTSS_COLOROP,D3DTOP_MODULATE);
-
-		GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,TRUE);
-		GDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,FALSE);
 #endif
+		g_pRenderApp->renderer->SetAlphaBlend(true);
+		g_pRenderApp->renderer->SetZWrite(false);
 
 		iNbTex=portals->room[room_num].usNbTextures;
 		ppTexCurr=portals->room[room_num].ppTextureContainer;
@@ -3612,10 +3612,8 @@ SMY_D3DVERTEX *pMyVertex;
 			vPolyVoodooMetal.clear();
 		}
 
-#ifndef ARX_OPENGL
-		GDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE,TRUE);
-		GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,FALSE);
-#endif
+		g_pRenderApp->renderer->SetZWrite(true);
+		g_pRenderApp->renderer->SetAlphaBlend(false);
 	}
 }
 
@@ -4839,7 +4837,7 @@ else
 			ARXDRAW_DrawEyeBall(pd3dDevice);
 
 		
-		SETZWRITE(pd3dDevice, FALSE );
+		g_pRenderApp->renderer->SetZWrite(false);
 
 		if (BoomCount) 
 			ARXDRAW_DrawPolyBoom(pd3dDevice);
@@ -4867,7 +4865,7 @@ if (HALOCUR>0)
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcColor, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);			
 	SETCULL(pd3dDevice,D3DCULL_NONE);
-	SETZWRITE(pd3dDevice,FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	for (i=0;i<HALOCUR;i++)
 	{
@@ -4890,7 +4888,7 @@ if (HALOCUR>0)
 
 	SETCULL(pd3dDevice,D3DCULL_CCW);
 	g_pRenderApp->renderer->SetAlphaBlend(false);	
-	SETZWRITE(pd3dDevice, TRUE );
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	if (EDITION==EDITION_LIGHTS)
 		ARXDRAW_DrawAllLights(pd3dDevice,x0,z0,x1,z1);

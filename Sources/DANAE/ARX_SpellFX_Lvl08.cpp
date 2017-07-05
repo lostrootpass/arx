@@ -219,7 +219,7 @@ float CExplosion::Render(LPDIRECT3DDEVICE7 device)
 	if (this->key > 1) return 0;
 
 	g_pRenderApp->renderer->SetAlphaBlend(true);
-	SETZWRITE(device, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
@@ -422,7 +422,7 @@ float CExplosion::Render(LPDIRECT3DDEVICE7 device)
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(device, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	return 0;
 }

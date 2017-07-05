@@ -8131,7 +8131,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 					g_pRenderApp->renderer->SetAlphaBlend(true);
-					SETZWRITE(GDevice, FALSE );
+					g_pRenderApp->renderer->SetZWrite(false);
 					cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
 					spells[i].fdata=cabalangle.b;
 
@@ -8160,7 +8160,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 							cabalcolor.r = 0.15f;
 					DrawEERIEObjEx(GDevice,cabal,&cabalangle,&cabalpos,&cabalscale,&cabalcolor);	
 					g_pRenderApp->renderer->SetAlphaBlend(false);		
-					SETZWRITE(GDevice, TRUE );	
+					g_pRenderApp->renderer->SetZWrite(true);	
 				}
 			}
 			break;				
@@ -9268,7 +9268,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						g_pRenderApp->renderer->SetAlphaBlend(true);
-						SETZWRITE(GDevice, FALSE );
+						g_pRenderApp->renderer->SetZWrite(false);
 						cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
 						spells[i].fdata=cabalangle.b;
 
@@ -9317,7 +9317,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 						DrawEERIEObjEx(GDevice,cabal,&cabalangle,&cabalpos,&cabalscale,&cabalcolor);	
 						cabalangle.b=-cabalangle.b;
 						g_pRenderApp->renderer->SetAlphaBlend(false);		
-						SETZWRITE(GDevice, TRUE );	
+						g_pRenderApp->renderer->SetZWrite(true);	
 
 						ARX_SOUND_RefreshPosition(spells[i].snd_loop, &cabalpos);
 					}
@@ -9367,7 +9367,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 						SETCULL(GDevice,D3DCULL_NONE);
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						g_pRenderApp->renderer->SetAlphaBlend(true);
-						SETZWRITE(GDevice, FALSE );
+						g_pRenderApp->renderer->SetZWrite(false);
 						cabalangle.b=spells[i].fdata+(float)FrameDiff*0.1f;
 						spells[i].fdata=cabalangle.b;
 							cabalangle.g = 0.f;
@@ -9414,7 +9414,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 						DrawEERIEObjEx(GDevice,cabal,&cabalangle,&cabalpos,&cabalscale,&cabalcolor);	
 						cabalangle.b=-cabalangle.b;
 						g_pRenderApp->renderer->SetAlphaBlend(false);		
-						SETZWRITE(GDevice, TRUE );	
+						g_pRenderApp->renderer->SetZWrite(true);	
 
 						ARX_SOUND_RefreshPosition(spells[i].snd_loop, &cabalpos);
 						}

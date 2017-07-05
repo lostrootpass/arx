@@ -29,4 +29,10 @@ enum class EERIEBlendType
 	OneMinusConstantAlpha
 };
 
+enum class EERIEZFunc
+{
+	Always,
+	LEqual
+};
+
 #endif // !EERIE_RENDERER_TYPES_H_

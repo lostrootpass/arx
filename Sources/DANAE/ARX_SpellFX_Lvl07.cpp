@@ -582,7 +582,7 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	// rendu
 
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	cnodetab[0].fx = frand2() * 1.5f * fMySize; //5
 	cnodetab[0].fy = frand2() * 1.5f * fMySize; //5
@@ -796,7 +796,7 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		                             &v2[3]);
 	}
 
-	SETZWRITE(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 	return falpha;
 }
@@ -901,7 +901,7 @@ float CConfuse::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return 0.f;
 	}
 
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
@@ -1178,11 +1178,11 @@ float CFireField::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	if (this->key > 1) return 0;
 
 	g_pRenderApp->renderer->SetAlphaBlend(true);
-	SETZWRITE(_pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
-	SETZWRITE(_pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	pPSStream.Render(_pD3DDevice, EERIEBlendType::One, EERIEBlendType::One);
@@ -1190,7 +1190,7 @@ float CFireField::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(_pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	return 0;
 }
@@ -1349,7 +1349,7 @@ float CIceField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	int i = 0;
 
 	
-	SETZWRITE(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 

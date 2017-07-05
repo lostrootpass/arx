@@ -5812,7 +5812,7 @@ HRESULT DANAE_NoRenderEnd()
 		if(danaeApp.DANAEStartRender())
 #endif
 		{
-			SETZWRITE(GDevice, TRUE);
+			g_pRenderApp->renderer->SetZWrite(true);
 			g_pRenderApp->renderer->SetAlphaBlend(false);
 
 			iVPOS = 0;
@@ -6862,7 +6862,7 @@ HRESULT DANAE::Render()
 			return E_FAIL;
 	}
 	
-	SETZWRITE(m_pd3dDevice, TRUE );
+	g_pRenderApp->renderer->SetZWrite(true);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	if ( (inter.iobj[0]) && (inter.iobj[0]->animlayer[0].cur_anim) )
@@ -7163,8 +7163,7 @@ HRESULT DANAE::Render()
 
 	// SUBJECTIVE VIEW UPDATE START  *********************************************************
 	SetFilteringMode(m_pd3dDevice,Bilinear);		
-	SETZWRITE(m_pd3dDevice, TRUE );
-	danaeApp.EnableZBuffer();
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	if (FirstFrame==0)
 	{
@@ -7213,7 +7212,7 @@ HRESULT DANAE::Render()
 		}
 
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-		SETZWRITE(m_pd3dDevice, FALSE );
+		g_pRenderApp->renderer->SetZWrite(false);
 		g_pRenderApp->renderer->SetAlphaBlend(true);
 		ARX_FOGS_Render(0);
 
@@ -7290,7 +7289,7 @@ HRESULT DANAE::Render()
 		DanaeItemAdd();
 	    
 	g_pRenderApp->renderer->SetAlphaBlend(true);
-	SETZWRITE(danaeApp.m_pd3dDevice, FALSE );
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	// Checks some specific spell FX
 	CheckMr();
@@ -7315,14 +7314,14 @@ HRESULT DANAE::Render()
 
 		if (PLAYER_PARALYSED)
 	{
-		SETZWRITE(m_pd3dDevice, FALSE );
+		g_pRenderApp->renderer->SetZWrite(false);
 		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 		
 		g_pRenderApp->renderer->DrawQuad(0.f,0.f,(float)DANAESIZX,(float)DANAESIZY,0.0001f,
 				NULL, 0, EERIERGB(0.2f,0.2f,1.f));		
 		g_pRenderApp->renderer->SetAlphaBlend(false);
-		SETZWRITE(m_pd3dDevice, TRUE );
+		g_pRenderApp->renderer->SetZWrite(true);
 	}
 
 	if (FADEDIR)
@@ -7331,7 +7330,7 @@ HRESULT DANAE::Render()
 	}
 
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(danaeApp.m_pd3dDevice, TRUE );
+	g_pRenderApp->renderer->SetZWrite(true);
 	
 	// Reset Last Key
 	danaeApp.kbd.lastkey=-1;	
@@ -7373,9 +7372,9 @@ HRESULT DANAE::Render()
 			&&	flarenum
 			)
 		{
-			GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE, false);
+			g_pRenderApp->renderer->SetZWrite(false);
 			ARX_MAGICAL_FLARES_Draw(m_pd3dDevice,FRAMETICKS);
-			EnableZBuffer();
+			g_pRenderApp->renderer->SetZWrite(true);
 					FRAMETICKS = ARXTimeUL();
 		}
 	}
@@ -7705,9 +7704,8 @@ void DANAE::GoFor2DFX()
 		{
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			g_pRenderApp->renderer->SetAlphaBlend(true);		
-			SETZWRITE(GDevice, FALSE );
+			g_pRenderApp->renderer->SetZWrite(false);
 			SETCULL(GDevice,D3DCULL_NONE);
-			GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE, FALSE);
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,  0);
 
 			for (int i=0;i<TOTPDL;i++) 
@@ -7745,11 +7743,11 @@ void DANAE::GoFor2DFX()
 				}
 			}
 
-			GDevice->SetRenderState( D3DRENDERSTATE_ZENABLE, TRUE);
+			g_pRenderApp->renderer->SetZWrite(true);
 		}
 	}	
 
-	SETZWRITE(GDevice, TRUE );
+	g_pRenderApp->renderer->SetZWrite(true);
 }
 
 
@@ -8103,6 +8101,9 @@ HRESULT DANAEGL::Render()
 	}
 
 	///Subjective view start
+	g_pRenderApp->renderer->SetZWrite(true);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
+
 	if((inter.iobj[0]) && (inter.iobj[0]->animlayer[0].cur_anim))
 	{
 		ManageNONCombatModeAnimations();
@@ -8396,8 +8397,7 @@ HRESULT DANAEGL::Render()
 
 	// SUBJECTIVE VIEW UPDATE START  *********************************************************
 	//SetFilteringMode(m_pd3dDevice, Bilinear);
-	//SETZWRITE(m_pd3dDevice, TRUE);
-	//danaeGLApp.EnableZBuffer();
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	if (FirstFrame == 0)
 	{
@@ -8446,7 +8446,7 @@ HRESULT DANAEGL::Render()
 		}
 
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-		SETZWRITE(0, FALSE);
+		g_pRenderApp->renderer->SetZWrite(false);
 		g_pRenderApp->renderer->SetAlphaBlend(true);
 		ARX_FOGS_Render(0);
 
@@ -8515,7 +8515,7 @@ HRESULT DANAEGL::Render()
 		DanaeItemAdd();
 
 	g_pRenderApp->renderer->SetAlphaBlend(true);
-	SETZWRITE(0, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	// Checks some specific spell FX
 	CheckMr();
@@ -8540,14 +8540,14 @@ HRESULT DANAEGL::Render()
 
 	if (PLAYER_PARALYSED)
 	{
-		SETZWRITE(0, FALSE);
+		g_pRenderApp->renderer->SetZWrite(false);
 		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 		g_pRenderApp->renderer->DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
 			NULL, 0, EERIERGB(0.2f, 0.2f, 1.f));
 		g_pRenderApp->renderer->SetAlphaBlend(false);
-		SETZWRITE(0, TRUE);
+		g_pRenderApp->renderer->SetZWrite(true);
 	}
 
 	if (FADEDIR)
@@ -8556,7 +8556,7 @@ HRESULT DANAEGL::Render()
 	}
 
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(0, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	// Reset Last Key
 	danaeGLApp.kbd.lastkey = -1;
@@ -8598,9 +8598,9 @@ finish:; //----------------------------------------------------------------
 				&& flarenum
 				)
 			{
-				//GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, false);
+				g_pRenderApp->renderer->SetZWrite(false);
 				ARX_MAGICAL_FLARES_Draw(0, FRAMETICKS);
-				//EnableZBuffer();
+				g_pRenderApp->renderer->SetZWrite(true);
 				FRAMETICKS = ARXTimeUL();
 			}
 		}
@@ -8935,7 +8935,7 @@ void DANAEGL::GoFor2DFX()
 		{
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			g_pRenderApp->renderer->SetAlphaBlend(true);
-			SETZWRITE(GDevice, FALSE);
+			g_pRenderApp->renderer->SetZWrite(false);
 			SETCULL(GDevice, D3DCULL_NONE);
 
 			for (int i = 0; i < TOTPDL; i++)
@@ -8972,8 +8972,12 @@ void DANAEGL::GoFor2DFX()
 					}
 				}
 			}
+
+			g_pRenderApp->renderer->SetZWrite(true);
 		}
 	}
+
+	g_pRenderApp->renderer->SetZWrite(true);
 }
 
 HRESULT DANAEGL::BeforeRun()
@@ -9404,7 +9408,7 @@ HRESULT DANAE::InitDeviceObjects()
 	// Enable texture perspective RenderState
     m_pd3dDevice->SetRenderState( D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE );
 	// Enable Z-buffering RenderState
-	EnableZBuffer();
+	g_pRenderApp->renderer->SetZWrite(true);
 	// Setup Ambient Color RenderState
     m_pd3dDevice->SetRenderState( D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a );
     // Restore All Textures RenderState
@@ -9441,7 +9445,7 @@ HRESULT DANAE::InitDeviceObjects()
 	}
 
 	SetZBias(m_pd3dDevice,0);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
+	g_pRenderApp->renderer->SetZFunc(EERIEZFunc::LEqual);
 
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LOCALVIEWER,FALSE);
 	m_pd3dDevice->SetTextureStageState(1,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);

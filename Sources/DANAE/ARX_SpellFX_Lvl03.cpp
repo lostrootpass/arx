@@ -447,7 +447,7 @@ float CFireBall::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	pPSFire.Render(m_pd3dDevice, EERIEBlendType::One, EERIEBlendType::One);
@@ -676,7 +676,7 @@ float CIceProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	if (ulCurrentTime >= ulDuration) return 0.f;
 
 	SETCULL(m_pd3dDevice, D3DCULL_CW);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);

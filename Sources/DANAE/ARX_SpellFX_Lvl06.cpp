@@ -226,7 +226,7 @@ float CCreateField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	if (falpha > 1.f) falpha = 1.f;
 
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
@@ -341,7 +341,7 @@ float CCreateField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	RenderSubDivFace(m_pd3dDevice, b, t, 0, 3, 3, 0);
 	RenderSubDivFace(m_pd3dDevice, b, t, 2, 1, 1, 2);
 
-	SETZWRITE(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 
 	if (lLightId != -1)
@@ -477,7 +477,7 @@ float CSlowDown::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return 0.f;
 	}
 
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	for (i = 0; i < inter.nbmax; i++)
@@ -1228,7 +1228,7 @@ float CRiseDead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETTC(m_pd3dDevice, NULL);
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
@@ -1286,13 +1286,13 @@ float CRiseDead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		this->AddStone(&pos);
 	}
 
-	SETZWRITE(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcAlpha, EERIEBlendType::OneMinusSrcAlpha);
 	this->DrawStone(m_pd3dDevice);
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_WRAP);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
 	return (fSizeIntro / end);
 }
@@ -1725,7 +1725,7 @@ float CParalyse::Render(LPDIRECT3DDEVICE7 pD3DDevice)
 	if (key > 1) return 0;
 
 	g_pRenderApp->renderer->SetAlphaBlend(true);
-	SETZWRITE(pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
@@ -2102,7 +2102,7 @@ float CParalyse::Render(LPDIRECT3DDEVICE7 pD3DDevice)
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(pD3DDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	return 0;
 }
@@ -2222,7 +2222,7 @@ float CDisarmTrap::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 

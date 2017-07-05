@@ -735,7 +735,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 						SETTC(GDevice, NULL);
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 						g_pRenderApp->renderer->SetAlphaBlend(true);
-						SETZWRITE(GDevice, false);
+						g_pRenderApp->renderer->SetZWrite(false);
 						EERIEDrawFill2DRectDegrad(GDevice,
 						                          0.f,
 						                          fZoneClippY - 1.f, 
@@ -755,10 +755,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 						                          RGBA_MAKE(255, 255, 255, 255));
 
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
-				
-#ifndef ARX_OPENGL
-						danaeApp.EnableZBuffer();
-#endif
+						g_pRenderApp->renderer->SetZWrite(true);
 						g_pRenderApp->renderer->SetAlphaBlend(false);
 
 

@@ -1607,16 +1607,6 @@ bool CD3DApplication::Unlock()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-void CD3DApplication::EnableZBuffer()
-{
-	if (m_pd3dDevice)
-	{
-		m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, D3DZB_TRUE);
-	}
-	bZBUFFER = true;
-}
-
 //******************************************************************************
 // MESSAGE BOXES
 //******************************************************************************

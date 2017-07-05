@@ -425,7 +425,7 @@ float CRuneOfGuarding::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	float y = eSrc.y - 20;
 	float z = eSrc.z;
 
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
@@ -867,7 +867,7 @@ float CPoisonProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	//-------------------------------------------------------------------------
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
@@ -993,7 +993,7 @@ float CPoisonProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	return 1;
@@ -1305,7 +1305,7 @@ float CRepelUndead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return 0.f;
 	}
 
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
@@ -1695,7 +1695,7 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 	if (this->key > 1) return 0;
 
 	g_pRenderApp->renderer->SetAlphaBlend(true);
-	SETZWRITE(device, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	//calcul du cone
 	D3DTLVERTEX d3dvs, *d3dv;
@@ -1949,7 +1949,7 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(device, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	return 0;
 }

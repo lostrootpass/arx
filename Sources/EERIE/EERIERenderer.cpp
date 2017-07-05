@@ -944,6 +944,34 @@ void EERIERendererGL::SetViewport(int x, int y, int w, int h)
 
 }
 
+void EERIERendererGL::SetZFunc(EERIEZFunc func)
+{
+	GLuint glFunc = GL_LEQUAL;
+
+	switch (func)
+	{
+	case EERIEZFunc::Always:
+		glFunc = GL_ALWAYS;
+		break;
+	case EERIEZFunc::LEqual:
+		glFunc = GL_LEQUAL;
+		break;
+	default:
+		glFunc = GL_LEQUAL;
+		break;
+	}
+
+	glDepthFunc(glFunc);
+}
+
+void EERIERendererGL::SetZWrite(bool enableZWrite)
+{
+	if (enableZWrite)
+		glEnable(GL_DEPTH_TEST);
+	else
+		glDisable(GL_DEPTH_TEST);
+}
+
 void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, float sy, const float* uvs)
 {
 	//Top-left is (0,0); bottom right is (1,1) - legacy Arx assumptions.
@@ -1206,7 +1234,7 @@ void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 {
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
 	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
-	SETZWRITE(GDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	SetAlphaBlend(true);
 
 	DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
@@ -1218,7 +1246,7 @@ void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 	DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
 		0, 0, EERIERGB(col*FADECOLOR.r, col*FADECOLOR.g, col*FADECOLOR.b));
 	SetAlphaBlend(false);
-	SETZWRITE(GDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 }
 
 void EERIERendererD3D7::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
@@ -1273,6 +1301,33 @@ void EERIERendererD3D7::SetViewport(int x, int y, int w, int h)
 	D3DVIEWPORT7 vp = { (unsigned long)x, (unsigned long)y, (unsigned long)w, (unsigned long)h, 0.f, 1.f };
 
 	GDevice->SetViewport(&vp);
+}
+
+void EERIERendererD3D7::SetZFunc(EERIEZFunc func)
+{
+	D3DCMPFUNC f = D3DCMP_LESSEQUAL;
+
+	switch (func)
+	{
+	case EERIEZFunc::Always:
+		f = D3DCMP_ALWAYS;
+		break;
+
+	case EERIEZFunc::LEqual:
+		f = D3DCMP_LESSEQUAL;
+		break;
+
+	default:
+		f = D3DCMP_LESSEQUAL;
+		break;
+	}
+
+	GDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, f);
+}
+
+void EERIERendererD3D7::SetZWrite(bool enableZWrite)
+{
+	GDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, enableZWrite ? TRUE : FALSE);
 }
 
 D3DPRIMITIVETYPE EERIERendererD3D7::_toD3DPT(EERIEPrimType primType)

@@ -545,7 +545,7 @@ float CSummonCreature::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SETTC(m_pd3dDevice, NULL);
 	SETCULL(m_pd3dDevice, D3DCULL_NONE);
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
@@ -592,7 +592,7 @@ float CSummonCreature::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 	RenderFissure(m_pd3dDevice);
 
-	SETZWRITE(m_pd3dDevice, TRUE);
+	g_pRenderApp->renderer->SetZWrite(true);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_WRAP);
 
@@ -835,7 +835,7 @@ float CIncinerate::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	int i = 0;
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
-	SETZWRITE(_pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 	
 	iMax ++;
@@ -876,7 +876,7 @@ float CIncinerate::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	stitecolor.b = 1;
 
 	SETCULL(_pD3DDevice, D3DCULL_NONE);
-	SETZWRITE(_pD3DDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	pPSStream.Render(_pD3DDevice, EERIEBlendType::One, EERIEBlendType::One);
@@ -977,7 +977,7 @@ float CNegateMagic::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return 0.f;
 	}
 
-	SETZWRITE(m_pd3dDevice, FALSE);
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	if (tex_sol && tex_sol->m_pddsSurface)

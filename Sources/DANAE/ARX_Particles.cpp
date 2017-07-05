@@ -1083,7 +1083,7 @@ void ManageTorch()
 void ARX_MAGICAL_FLARES_Draw(LPDIRECT3DDEVICE7  m_pd3dDevice,long FRAMETICKS)
 {
 	/////////FLARE
-	SETZWRITE(m_pd3dDevice, FALSE );
+	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 	g_pRenderApp->renderer->SetAlphaBlend(true);
@@ -1222,11 +1222,11 @@ void ARX_MAGICAL_FLARES_Draw(LPDIRECT3DDEVICE7  m_pd3dDevice,long FRAMETICKS)
 
 						if (!flare[i].io) 
 						{
-							GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,FALSE);
+							g_pRenderApp->renderer->SetZWrite(false);
 						}
 						else
 						{
-							GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,TRUE);
+							g_pRenderApp->renderer->SetZWrite(true);
 						}
 
 						if(flare[i].bDrawBitmap)
@@ -1252,8 +1252,7 @@ void ARX_MAGICAL_FLARES_Draw(LPDIRECT3DDEVICE7  m_pd3dDevice,long FRAMETICKS)
 
 	if (DynLight[0].rgb.b>1.f) DynLight[0].rgb.b=1.f;
 
-	SETZWRITE(m_pd3dDevice, TRUE );
-	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, TRUE); 
+	g_pRenderApp->renderer->SetZWrite(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -1529,7 +1528,7 @@ void UpdateObjFx(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_CAMERA * cam)
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
-	SETZWRITE(pd3dDevice, FALSE );
+	g_pRenderApp->renderer->SetZWrite(false);
 	
 
 	for (long i=0;i<MAX_OBJFX;i++)
@@ -2263,16 +2262,14 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 				in.sy=inn.sy;
 			}
 			
-#ifndef ARX_OPENGL
 			if (part->special & PARTICLE_NOZBUFFER) 
 			{
-				GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,FALSE);
+				g_pRenderApp->renderer->SetZWrite(false);
 			}
 			else
 			{
-				GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,TRUE);
+				g_pRenderApp->renderer->SetZWrite(true);
 			}
-#endif
 
 			if (part->special & FADE_IN_AND_OUT) 
 			{
@@ -2579,8 +2576,8 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 
 #ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);
-	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE,TRUE);
 #endif
+	g_pRenderApp->renderer->SetZWrite(true);
 }
 
 //-----------------------------------------------------------------------------

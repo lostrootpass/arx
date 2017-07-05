@@ -2756,7 +2756,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 			{
 				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 				g_pRenderApp->renderer->SetAlphaBlend(true);
-				SETZWRITE(pd3dDevice, FALSE);
+				g_pRenderApp->renderer->SetZWrite(false);
 				SETTC(pd3dDevice, NULL);
 				unsigned long v = _EERIERGB(special_color.r);
 
@@ -2767,7 +2767,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG  );
 				g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , &tv, 3,  0, EERIE_FLAG  );//duplicate ???? @TBR ?
 				g_pRenderApp->renderer->SetAlphaBlend(false);
-				SETZWRITE(pd3dDevice, TRUE);
+				g_pRenderApp->renderer->SetZWrite(true);
 			}
 
 		// Add a little bit of Fake Metal Specular if needed
@@ -2807,10 +2807,10 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 				{
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::One);
 					g_pRenderApp->renderer->SetAlphaBlend(true);
-					SETZWRITE(pd3dDevice, FALSE);
+					g_pRenderApp->renderer->SetZWrite(false);
 					g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, &tv, 3, 0, EERIE_FLAG );
 					g_pRenderApp->renderer->SetAlphaBlend(false);
-					SETZWRITE(pd3dDevice, TRUE);
+					g_pRenderApp->renderer->SetZWrite(true);
 				}
 			}
 		}

@@ -1464,8 +1464,7 @@ void ARX_THROWN_OBJECT_Manage(unsigned long time_offset)
 {
 	if (Thrown_Count <= 0) return;
 
-	SETZWRITE(GDevice, TRUE);
-	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, true);
+	g_pRenderApp->renderer->SetZWrite(true);
 
 	for (long i = 0; i < MAX_THROWN_OBJECTS; i++)
 	{

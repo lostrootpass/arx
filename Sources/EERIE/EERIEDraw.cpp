@@ -366,7 +366,7 @@ void DRAWLATER_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 
 		D3DTLVERTEX verts[4];
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-		SETZWRITE(pd3dDevice,FALSE); 
+		g_pRenderApp->renderer->SetZWrite(false); 
 		g_pRenderApp->renderer->SetAlphaBlend(true);					
 		SETCULL( pd3dDevice, D3DCULL_NONE );
 		long to;
@@ -445,7 +445,7 @@ void DRAWLATER_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 
 		EERIEDrawnPolys+=curdrawlater;
 		g_pRenderApp->renderer->SetAlphaBlend(false); 
-		SETZWRITE(pd3dDevice,TRUE); 
+		g_pRenderApp->renderer->SetZWrite(true); 
 
 	SETTC(pd3dDevice,NULL);
 }
@@ -609,7 +609,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 				if (ptcTexture->delayed_nb)
 				{
 					g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-					SETZWRITE(pd3dDevice,FALSE); 
+					g_pRenderApp->renderer->SetZWrite(false); 
 					g_pRenderApp->renderer->SetAlphaBlend(true);					
 					D3DTLVERTEX verts[4];
 					SETTC(pd3dDevice,ptcTexture->TextureRefinement); 
@@ -681,7 +681,7 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 
 				EERIEDrawnPolys+=ptcTexture->delayed_nb;
 				g_pRenderApp->renderer->SetAlphaBlend(false); 
-				SETZWRITE(pd3dDevice,TRUE);
+				g_pRenderApp->renderer->SetZWrite(true);
 			}
 
 			EERIEDrawnPolys+=ptcTexture->delayed_nb;
@@ -878,7 +878,7 @@ int			nb;
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	g_pRenderApp->renderer->SetAlphaBlend(false); 
-	SETZWRITE(pd3dDevice,TRUE); 
+	g_pRenderApp->renderer->SetZWrite(true); 
 }
 
 //*************************************************************************************
@@ -1255,15 +1255,6 @@ void SETCULL(LPDIRECT3DDEVICE7 pd3dDevice,DWORD state)
 	pd3dDevice->SetRenderState( D3DRENDERSTATE_CULLMODE , state);
 #endif
 }
-
-//*************************************************************************************
-
-void SETZWRITE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD _dwState)
-{
-#ifndef ARX_OPENGL
-		pd3dDevice->SetRenderState( D3DRENDERSTATE_ZWRITEENABLE , _dwState);
-#endif
-}	
 
 //*************************************************************************************
 //*************************************************************************************

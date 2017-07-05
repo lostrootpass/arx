@@ -335,8 +335,7 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 	m_pd3dDevice->SetMaterial(&mtrl);
 
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, FALSE);
-	SETZWRITE(GDevice, false);
+	g_pRenderApp->renderer->SetZWrite(false);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
@@ -418,8 +417,7 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 	D3DUtil_InitMaterial(mtrl, 1.f, 1.f, 1.f);
 	m_pd3dDevice->SetMaterial(&mtrl);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE);
-	danaeApp.EnableZBuffer();
-	SETZWRITE(GDevice, true);
+	g_pRenderApp->renderer->SetZWrite(true);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a);
 	// Setup Dither Mode
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE);

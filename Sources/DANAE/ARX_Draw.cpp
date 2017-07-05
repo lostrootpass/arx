@@ -188,7 +188,7 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 							if (first)
 							{
 								first=0;
-								SETZWRITE(pd3dDevice, FALSE );
+								g_pRenderApp->renderer->SetZWrite(false);
 								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 								g_pRenderApp->renderer->SetAlphaBlend(true);
 								SETTC(pd3dDevice,Boom);
@@ -245,7 +245,7 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 							if (first)
 							{
 								first=0;
-								SETZWRITE(pd3dDevice, FALSE );
+								g_pRenderApp->renderer->SetZWrite(false);
 								g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 								g_pRenderApp->renderer->SetAlphaBlend(true);
 								SETTC(pd3dDevice,Boom);
@@ -274,7 +274,7 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 		}
 
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETZWRITE(pd3dDevice, TRUE );
+	g_pRenderApp->renderer->SetZWrite(true);
 	SetZBias(pd3dDevice,0);
 #ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);
