@@ -381,6 +381,91 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 		glDisable(GL_BLEND);
 }
 
+void EERIERendererGL::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags /*= 0*/)
+{
+	GLuint program = EERIEGetGLProgramID("orthoprim");
+	glUseProgram(program);
+
+	static GLuint vtxBuffer = -1;
+	static GLuint attribBuffer = -1;
+
+	if (vtxBuffer == -1)
+	{
+		glGenBuffers(1, &vtxBuffer);
+		glGenBuffers(1, &attribBuffer);
+	}
+
+	std::vector<glm::vec3> vtxData;
+	std::vector<VtxAttrib> attribData;
+
+	D3DTLVERTEX* vertices = static_cast<D3DTLVERTEX*>(lpvVertices);
+		
+	for (DWORD i = 0; i < dwVertexCount; ++i)
+	{
+		D3DTLVERTEX vtx = vertices[i];
+		VtxAttrib attrib;
+
+		attrib.texId = eerieFlags;
+		
+		attrib.uv.s = vtx.tu;
+		attrib.uv.t = vtx.tv;
+
+		attrib.color.a = (vtx.color >> 24 & 0xFF) / 255.0f;
+		attrib.color.r = (vtx.color >> 16 & 0xFF) / 255.0f;
+		attrib.color.g = (vtx.color >> 8 & 0xFF) / 255.0f;
+		attrib.color.b = (vtx.color >> 0 & 0xFF) / 255.0f;
+
+		attribData.push_back(attrib);
+
+		/////
+
+		glm::vec3 pos;
+		pos.x = vtx.sx;
+		pos.y = vtx.sy;
+		pos.z = 0.0f;// vtx.sz;
+
+		vtxData.push_back(pos);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, vtxBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * dwVertexCount, vtxData.data(), GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vtxBuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, attribBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VtxAttrib) * dwVertexCount, attribData.data(), GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, uv));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, texId));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
+
+	if (eerieFlags)
+	{
+		//TODO: store uniforms instead of looking up every frame
+		GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, eerieFlags);
+		glUniform1i(uniformLocation, 0);
+	}
+
+	glm::mat4 proj = glm::ortho(0.0f, (float)DANAESIZX, (float)DANAESIZY, 0.0f, -1.0f, 1.0f);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
+
+	glDrawArrays(_toGLType(primType), 0, dwVertexCount);
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
+}
+
 void EERIERendererGL::DrawQuad(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs, unsigned long color)
 {
 	const float w = (float)DANAESIZX, h = (float)DANAESIZY;
@@ -400,11 +485,14 @@ void EERIERendererGL::DrawQuad(float x, float y, float sx, float sy, float z, Te
 	GLuint program = EERIEGetGLProgramID("bitmap");
 	glUseProgram(program);
 
-	//TODO: store uniforms instead of looking up every frame
-	GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tex->textureID);
-	glUniform1i(uniformLocation, 0);
+	if (tex)
+	{
+		//TODO: store uniforms instead of looking up every frame
+		GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex->textureID);
+		glUniform1i(uniformLocation, 0);
+	}
 
 	glm::vec3 col;
 	col.r = ((color >> 16) & 0xFF) / 255.0f;
@@ -1017,6 +1105,26 @@ GLenum EERIERendererGL::_nativeBlendType(EERIEBlendType type)
 	}
 
 	return GL_ONE;
+}
+
+GLenum EERIERendererGL::_toGLType(EERIEPrimType type)
+{
+	GLenum prim = GL_TRIANGLES;
+
+	switch (type)
+	{
+	case EERIEPrimType::TriangleList:
+		prim = GL_TRIANGLES;
+		break;
+	case EERIEPrimType::TriangleStrip:
+		prim = GL_TRIANGLE_STRIP;
+		break;
+	case EERIEPrimType::TriangleFan:
+		prim = GL_TRIANGLE_FAN;
+		break;
+	}
+
+	return prim;
 }
 
 /************************************************************/

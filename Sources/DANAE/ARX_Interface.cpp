@@ -6612,9 +6612,11 @@ void ARX_INTERFACE_DrawDamagedEquipment()
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 		danaeApp.EnableZBuffer();
-		GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
+		SETCULL(GDevice,D3DCULL_NONE);
 		SETZWRITE(GDevice, true);
+#ifndef ARX_OPENGL
 		GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
+#endif
 	
 		float px = INTERFACE_RATIO(InventoryX) + INTERFACE_RATIO(10 + 32 + 100);
 

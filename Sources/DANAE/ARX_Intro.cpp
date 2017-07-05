@@ -347,7 +347,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 						0.0f, 1.0f,
 						ratio, 1.0f
 					};
-					g_pRenderApp->renderer->DrawQuad(px, py, px2, py2, 0.f, pbar, uvs);
+					g_pRenderApp->renderer->DrawQuad(px, py, px2, py2, 0.f, pbar, uvs, 0xFFFFFFFF);
 
 				}
 				else
@@ -370,7 +370,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 						0.0f, 1.0f,
 						ratio, 1.0f
 					};
-					g_pRenderApp->renderer->DrawQuad(px, py, px2, py2, 0.f, pbar, uvs);
+					g_pRenderApp->renderer->DrawQuad(px, py, px2, py2, 0.f, pbar, uvs, 0xFFFFFFFF);
 				}
 
 			}

@@ -163,7 +163,11 @@ void ARX_MINIMAP_ValidatePos(EERIE_3D * pos)
 			ARX_MINIMAP_GetData(CURRENTLEVEL);
 		}
 
+#ifdef ARX_OPENGL
+		if ((minimap[SHOWLEVEL].tc))
+#else
 		if ((minimap[SHOWLEVEL].tc) && (minimap[SHOWLEVEL].tc->m_pddsSurface))
+#endif
 		{
 			ARX_MINIMAP_Show(GDevice, ARX_LEVELS_GetRealNum(CURRENTLEVEL), 2);
 		}
@@ -315,7 +319,11 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 		ARX_MINIMAP_GetData(SHOWLEVEL);
 	}
 
+#ifdef ARX_OPENGL
+	if ((minimap[SHOWLEVEL].tc))
+#else
 	if ((minimap[SHOWLEVEL].tc) && (minimap[SHOWLEVEL].tc->m_pddsSurface))
+#endif
 	{
 		float startx, starty, casex, casey, ratiooo;
 		float mod_x = (float)MAX_BKGX / (float)MINIMAP_MAX_X;
@@ -449,7 +457,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 
 			SETALPHABLEND(m_pd3dDevice, TRUE);
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-			m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
+			if(m_pd3dDevice) m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_ALWAYS);
 			SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
 
 			if (fl2)
@@ -708,7 +716,11 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 								verts[3].sy += DECALY * Yratio;
 							}
 
+#ifdef ARX_OPENGL
+							g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, 0, verts, 4, 0, tc->textureID);
+#else
 							g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, verts, 4, 0);
+#endif
 						}
 					}
 				}
@@ -717,8 +729,10 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 
 		if (flag != 2)
 		{
+#ifndef ARX_OPENGL
 			m_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
 			m_pd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL);
+#endif
 
 			SETALPHABLEND(m_pd3dDevice, FALSE);
 

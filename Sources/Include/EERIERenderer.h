@@ -126,6 +126,7 @@ public:
 	void DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND) override;
 	void DrawFade(const EERIE_RGB& color, float visibility) override;
 	void DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io) override;
+	void DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags = 0) override;
 	void DrawQuad(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs = 0, unsigned long color = 0) override;
 	void DrawRoom(EERIE_ROOM_DATA* room) override;
 	void DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex) override;
@@ -155,6 +156,8 @@ private:
 	EERIEFont* _loadFontData(int size);
 
 	GLenum _nativeBlendType(EERIEBlendType type);
+
+	GLenum _toGLType(EERIEPrimType type);
 };
 
 
