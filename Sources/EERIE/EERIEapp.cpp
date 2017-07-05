@@ -606,8 +606,6 @@ INT CD3DApplication::Run()
 {
 	BeforeRun();
 
-	renderer = new EERIERendererD3D7();
-	
 	// Load keyboard accelerators
 	HACCEL hAccel = NULL;
 

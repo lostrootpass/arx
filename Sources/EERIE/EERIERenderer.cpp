@@ -1365,6 +1365,7 @@ void EERIERendererD3D7::SetZFunc(EERIEZFunc func)
 
 void EERIERendererD3D7::SetZWrite(bool enableZWrite)
 {
+	GDevice->SetRenderState(D3DRENDERSTATE_ZENABLE, enableZWrite ? TRUE : FALSE);
 	GDevice->SetRenderState(D3DRENDERSTATE_ZWRITEENABLE, enableZWrite ? TRUE : FALSE);
 }
 

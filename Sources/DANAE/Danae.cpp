@@ -9399,6 +9399,8 @@ HRESULT DANAE::InitDeviceObjects()
 {    
 	GDevice=m_pd3dDevice;
 
+	g_pRenderApp->renderer = new EERIERendererD3D7();
+
 	// Setup Base Material
 	D3DMATERIAL7 mtrl;
 	D3DUtil_InitMaterial( mtrl, 1.f, 0.f, 0.f );

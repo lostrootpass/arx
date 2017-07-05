@@ -390,7 +390,7 @@ void LoadLevelScreen(LPDIRECT3DDEVICE7 _pd3dDevice, long num, float ratio)
 
 				GDevice->SetRenderState(D3DRENDERSTATE_COLORKEYENABLE, false);
 
-				GDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 				g_pRenderApp->renderer->SetZWrite(true);
 				GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, false);
 				g_pRenderApp->renderer->SetAlphaBlend(false);

@@ -342,7 +342,7 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LASTPIXEL, TRUE); 
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_CLIPPING , TRUE);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LIGHTING  , FALSE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_CULLMODE , D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_CLAMP);
 
 	D3DDEVICEDESC7 devicedesc;
@@ -430,7 +430,7 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 	// Disable Lighting RenderState
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LIGHTING  , FALSE);
 
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_CULLMODE , D3DCULL_CCW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
 
 	D3DDEVICEDESC7 devicedesc;

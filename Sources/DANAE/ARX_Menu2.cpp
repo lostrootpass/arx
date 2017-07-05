@@ -2419,9 +2419,8 @@ bool Menu2_Render()
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_CLAMP);
 
 	GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
-	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
 #endif
-
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	
 	MENUSTATE eOldMenuState=NOP;
@@ -3869,8 +3868,8 @@ int iDecMenuPrincipaleY=50;
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_CLAMP);
 
 	GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
-	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_NONE);
 #endif
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 
 	pInputHandler->DrawCursor();
@@ -3959,6 +3958,7 @@ int iDecMenuPrincipaleY=50;
 
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetZWrite(true);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 
 #ifdef ARX_OPENGL
 	danaeGLApp.DANAEEndRender();
@@ -3966,8 +3966,6 @@ int iDecMenuPrincipaleY=50;
 	GDevice->SetTextureStageState(0,D3DTSS_MINFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_MAGFILTER,D3DTFP_LINEAR);
 	GDevice->SetTextureStageState(0,D3DTSS_ADDRESS,D3DTADDRESS_WRAP);
-
-	GDevice->SetRenderState( D3DRENDERSTATE_CULLMODE,D3DCULL_CCW);
 
 	danaeApp.DANAEEndRender();
 #endif
@@ -5072,8 +5070,7 @@ void CMenuAllZone::DrawZone()
 	return;
 #endif
 	
-	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
+	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 	vector<CMenuZone*>::iterator i;
@@ -6968,8 +6965,7 @@ void CMenuButton::Render()
 		_TCHAR *pText=vText[iPos];
 
 		g_pRenderApp->renderer->SetAlphaBlend(true);
-		GDevice->SetRenderState( D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE);
-		GDevice->SetRenderState( D3DRENDERSTATE_DESTBLEND,  D3DBLEND_ONE);
+		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 		EERIE_3D ePos;
 		ePos.x = (float)rZone.left;
