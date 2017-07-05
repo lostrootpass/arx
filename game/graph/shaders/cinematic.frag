@@ -4,7 +4,7 @@
 layout(location = 0) in vec2 uv;
 layout(location = 1) in vec3 fragPos;
 
-out vec3 color;
+out vec4 color;
 
 struct Light
 {
@@ -27,7 +27,7 @@ void main()
 
     if(ra > light.fallend)
     {
-        color = base * 0.1;
+		color = vec4(0.0);
     }
     else
     {
@@ -38,6 +38,6 @@ void main()
         
         adj *= t;
 
-        color = base * adj;
+        color = vec4(base * adj, t);
     }
 }

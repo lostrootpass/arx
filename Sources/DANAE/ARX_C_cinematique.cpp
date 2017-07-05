@@ -324,6 +324,10 @@ HRESULT CINEMATIQUE::New()
 //*************************************************************************************
 HRESULT CINEMATIQUE::InitDeviceObjects()
 {
+	g_pRenderApp->renderer->SetZWrite(false);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
+
 #ifdef ARX_OPENGL
 	return S_OK;
 #endif
@@ -335,14 +339,12 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 	m_pd3dDevice->SetMaterial(&mtrl);
 
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE);
-	g_pRenderApp->renderer->SetZWrite(false);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LASTPIXEL, TRUE); 
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_CLIPPING , TRUE);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LIGHTING  , FALSE);
-	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_CLAMP);
 
 	D3DDEVICEDESC7 devicedesc;
@@ -396,7 +398,6 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_LINEAR);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, (DWORD)(0));
-	g_pRenderApp->renderer->SetAlphaBlend(true);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE);
 
 	EditLight = FALSE;
@@ -406,6 +407,10 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 
 HRESULT CINEMATIQUE::DeleteDeviceObjects()
 {
+	g_pRenderApp->renderer->SetZWrite(true);
+	g_pRenderApp->renderer->SetAlphaBlend(false);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
+
 #ifdef ARX_OPENGL
 	return S_OK;
 #endif
@@ -417,7 +422,6 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 	D3DUtil_InitMaterial(mtrl, 1.f, 1.f, 1.f);
 	m_pd3dDevice->SetMaterial(&mtrl);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE);
-	g_pRenderApp->renderer->SetZWrite(true);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a);
 	// Setup Dither Mode
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE);
@@ -430,7 +434,6 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 	// Disable Lighting RenderState
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LIGHTING  , FALSE);
 
-	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
 
 	D3DDEVICEDESC7 devicedesc;
@@ -463,7 +466,6 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_LINEAR);
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, (DWORD)(0));
 
-	g_pRenderApp->renderer->SetAlphaBlend(false);
 	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, TRUE);
 
 	m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
