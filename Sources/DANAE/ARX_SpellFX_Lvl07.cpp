@@ -581,7 +581,7 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	//-------------------------------------------------------------------------
 	// rendu
 
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 
 	cnodetab[0].fx = frand2() * 1.5f * fMySize; //5
@@ -1181,7 +1181,7 @@ float CFireField::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
-	SETCULL(_pD3DDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 

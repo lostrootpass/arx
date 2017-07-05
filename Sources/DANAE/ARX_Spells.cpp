@@ -8327,7 +8327,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 				
 				curse->Render(m_pd3dDevice, &target);
-				SETCULL(GDevice,D3DCULL_NONE);
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 			}
 
 			break;
@@ -8433,7 +8433,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 				{
 					pCSpellFX->Update(FrameDiff);
 					pCSpellFX->Render(m_pd3dDevice);
-					SETCULL(GDevice,D3DCULL_NONE);
+					g_pRenderApp->renderer->SetCull(EERIECull::None);
 				}
 			}
 			break;
@@ -8749,7 +8749,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 					}
 				}
 
-				SETCULL(GDevice,D3DCULL_NONE);
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 			}
 			break;
 			//-----------------------------------------------------------------------------------------
@@ -9364,7 +9364,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 							DynLight[spells[i].longinfo2].fallstart=Es*1.5f;
 						}
 
-						SETCULL(GDevice,D3DCULL_NONE);
+						g_pRenderApp->renderer->SetCull(EERIECull::None);
 						g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 						g_pRenderApp->renderer->SetAlphaBlend(true);
 						g_pRenderApp->renderer->SetZWrite(false);

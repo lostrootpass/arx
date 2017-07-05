@@ -948,7 +948,7 @@ void PopOneTriangleList(TextureContainer *_pTex,bool _bUpdate)
 		return;
 	}
 
-	SETCULL(GDevice,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	SETTC(GDevice,_pTex);
 	float val;
 
@@ -996,7 +996,7 @@ void PopOneTriangleListTransparency(TextureContainer *_pTex)
 
 	bool bUseVertexBuffer = bSoftRender; //use bSoftRender with allow or not fix for bGATI8500 flag with VB.
 
-	SETCULL(GDevice,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	SETTC(GDevice,_pTex);
 
 	if(	_pTex->ulNbVertexListCull_TNormalTrans||
@@ -3389,10 +3389,10 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 
 	
 		if (eobj->facelist[i].facetype & POLY_DOUBLESIDED)
-			SETCULL( pd3dDevice, D3DCULL_NONE );
+			g_pRenderApp->renderer->SetCull(EERIECull::None);
 		else
 		{
-			SETCULL( pd3dDevice, D3DCULL_CW );
+			g_pRenderApp->renderer->SetCull(EERIECull::CW);
 		}
 
 ////////////////////////////////////////////////////////////////////////

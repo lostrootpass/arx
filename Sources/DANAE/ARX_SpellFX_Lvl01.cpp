@@ -386,7 +386,7 @@ float CMagicMissile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	}
 
 	// Set Appropriate Renderstates -------------------------------------------
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
@@ -1106,7 +1106,7 @@ void DrawArcElectrique(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D * tabdef, int nb
 	//-------------------------------------------------------------------------
 	// rendu
 	//	SETTC(m_pd3dDevice,NULL);
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 	if (tex && tex->m_pddsSurface)
 	{
@@ -1399,7 +1399,7 @@ float CPortal::Render(LPDIRECT3DDEVICE7 device)
 
 
 	//affichage de la sphere back
-	SETCULL(device, D3DCULL_CW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CW);
 	device->SetTexture(0, NULL);
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->sphered3d, this->spherenbpt, (unsigned short *)this->sphereind, this->spherenbfaces * 3, 0);
 
@@ -1443,13 +1443,13 @@ float CPortal::Render(LPDIRECT3DDEVICE7 device)
 	}
 
 	//affichage de la sphere front
-	SETCULL(device, D3DCULL_CCW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 	device->SetTexture(0, NULL);
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->sphered3d, this->spherenbpt, (unsigned short *)this->sphereind, this->spherenbfaces * 3, 0);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETCULL(device, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(true);
 
 	return 0;

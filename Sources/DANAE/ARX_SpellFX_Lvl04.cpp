@@ -134,7 +134,7 @@ float CBless::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 		return 0.f;
 	}
 
-	SETCULL(_pD3DDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
@@ -224,7 +224,7 @@ float CBless::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 		}
 	}
 
-	SETCULL(_pD3DDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
@@ -498,7 +498,7 @@ float CTelekinesis::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	//DumpMap();
 
 	//SETTC(m_pd3dDevice,NULL);
-	//SETCULL(m_pd3dDevice,D3DCULL_NONE);
+	//g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	//g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
@@ -752,7 +752,7 @@ float CCurse::Render(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D * pos)
 		*/
 	}
 
-	SETCULL(m_pd3dDevice, D3DCULL_CW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CW);
 	g_pRenderApp->renderer->SetZWrite(true);
 
 	x = pos->x;
@@ -1176,7 +1176,7 @@ void CFieldProtectionPentagram::Render(LPDIRECT3DDEVICE7 device)
 	if(this->currduration>this->duration) return;
 
 	g_pRenderApp->renderer->SetAlphaBlend(true);
-	SETCULL(device,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	device->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	device->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
 
@@ -1856,17 +1856,17 @@ void CFieldProtection::Render(LPDIRECT3DDEVICE7 device)
 	if(this->tf) device->SetTexture(0,this->tf->m_pddsSurface);
 	else device->SetTexture(0,NULL);
 
-	SETCULL(device,D3DCULL_CCW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 //	device->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP,D3DFVF_TLVERTEX,this->vcylinder,this->nbvertexcyl,(unsigned short *)this->icylinder,this->nbvertexcyl+2,0);
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,D3DFVF_TLVERTEX,this->vcylinder,this->nbvertexcyl,(unsigned short *)this->icylinder,this->nbfacecyl*3,0);
-	SETCULL(device,D3DCULL_CW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CW);
 //	device->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP,D3DFVF_TLVERTEX,this->vcylinder,this->nbvertexcyl,(unsigned short *)this->icylinder,this->nbvertexcyl+2,0);
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,D3DFVF_TLVERTEX,this->vcylinder,this->nbvertexcyl,(unsigned short *)this->icylinder,this->nbfacecyl*3,0);
 
 	device->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	device->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ZERO);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
-	SETCULL(device,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 }
 /*--------------------------------------------------------------------------*/
 
@@ -2106,7 +2106,7 @@ int numsuiv;
 //-----------------------------------------------------------------------------
 float CFireProtection::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 {
-	SETCULL(_pD3DDevice,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 	_pD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 	_pD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);

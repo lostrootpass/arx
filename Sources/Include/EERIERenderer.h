@@ -110,6 +110,7 @@ public:
 
 	virtual void SetAlphaBlend(bool enableAlphaBlending) {};
 	virtual void SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor) {};
+	virtual void SetCull(EERIECull mode) {};
 	virtual void SetViewport(int x, int y, int w, int h) {};
 	virtual void SetZFunc(EERIEZFunc func) {};
 	virtual void SetZWrite(bool enableZWrite) {};
@@ -145,6 +146,7 @@ public:
 
 	void SetAlphaBlend(bool enableAlphaBlending) override;
 	void SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor) override;
+	void SetCull(EERIECull mode) override;
 	void SetViewport(int x, int y, int w, int h) override;
 	void SetZFunc(EERIEZFunc func) override;
 	void SetZWrite(bool enableZWrite) override;
@@ -183,6 +185,7 @@ public:
 
 	void SetAlphaBlend(bool enableAlphaBlending) override;
 	void SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstFactor) override;
+	void SetCull(EERIECull mode) override;
 	void SetViewport(int x, int y, int w, int h) override;
 	void SetZFunc(EERIEZFunc func) override;
 	void SetZWrite(bool enableZWrite) override;

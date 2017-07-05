@@ -368,7 +368,7 @@ void DRAWLATER_Render(LPDIRECT3DDEVICE7 pd3dDevice)
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 		g_pRenderApp->renderer->SetZWrite(false); 
 		g_pRenderApp->renderer->SetAlphaBlend(true);					
-		SETCULL( pd3dDevice, D3DCULL_NONE );
+		g_pRenderApp->renderer->SetCull(EERIECull::None);
 		long to;
 
 		for (long j=0;j<curdrawlater;j++)
@@ -476,9 +476,9 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 				EERIEPOLY * ep=del[i].data;
 
 				if (!(ep->type & POLY_DOUBLESIDED))
-					SETCULL( pd3dDevice, D3DCULL_CW );			
+					g_pRenderApp->renderer->SetCull(EERIECull::CW);			
 				else 
-					SETCULL( pd3dDevice, D3DCULL_NONE );
+					g_pRenderApp->renderer->SetCull(EERIECull::None);
 				
 				if (ep->type & POLY_QUAD)
 					to=4;
@@ -638,8 +638,8 @@ void Delayed_FlushAll(LPDIRECT3DDEVICE7 pd3dDevice)
 						}					
 
 						if (!(ep->type & POLY_DOUBLESIDED))
-							SETCULL( pd3dDevice, D3DCULL_CW );			
-						else SETCULL( pd3dDevice, D3DCULL_NONE );
+							g_pRenderApp->renderer->SetCull(EERIECull::CW);			
+						else g_pRenderApp->renderer->SetCull(EERIECull::None);
 						
 						
 						register long tmp;
@@ -1249,16 +1249,6 @@ void SETTEXTUREWRAPMODE(LPDIRECT3DDEVICE7 pd3dDevice,DWORD mode)
 //*************************************************************************************
 //*************************************************************************************
 
-void SETCULL(LPDIRECT3DDEVICE7 pd3dDevice,DWORD state)
-{
-#ifndef ARX_OPENGL
-	pd3dDevice->SetRenderState( D3DRENDERSTATE_CULLMODE , state);
-#endif
-}
-
-//*************************************************************************************
-//*************************************************************************************
-
 void EERIEPOLY_DrawWired(LPDIRECT3DDEVICE7 pd3dDevice, EERIEPOLY *ep,long col)
 {
 	D3DTLVERTEX ltv[5];
@@ -1392,10 +1382,10 @@ void EERIEDrawBitmap2DecalY(LPDIRECT3DDEVICE7 pd3dDevice,float x,float y,float s
 
 #ifdef ARX_OPENGL
 	const float uvs[] = {
-		0.0f, 0.0f,
 		1.0f, 0.0f,
-		0.0f, 1.0f - _fDeltaY,
+		0.0f, 0.0f,
 		1.0f, 1.0f - _fDeltaY,
+		0.0f, 1.0f - _fDeltaY
 	};
 	g_pRenderApp->renderer->DrawQuad(x, y + fDy, sx, sy, 1.f, tex, uvs, col);
 #else

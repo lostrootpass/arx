@@ -416,7 +416,7 @@ float CExplosion::Render(LPDIRECT3DDEVICE7 device)
 	}
 
 	//tracé du disque
-	SETCULL(device, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	device->SetTexture(0, NULL);
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, D3DFVF_TLVERTEX, disqued3d, disquenbvertex, (unsigned short *)disqueind, disquenbvertex + 2, 0);
 

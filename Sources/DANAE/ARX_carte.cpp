@@ -524,7 +524,7 @@ void DANAE_Manage_CreateMap()
 {
 	if (FINAL_RELEASE) return;
 
-	SETCULL(GDevice,D3DCULL_CCW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 	iCreateMap++;
 
 	if (iCreateMap==1)

@@ -2316,14 +2316,14 @@ D3DTLVERTEX d3dvertex[4];
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 	g_pRenderApp->renderer->SetZWrite(false);
-	SETCULL(GDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, d3dvertex, 4, 0, EERIE_NOCOUNT );
 
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetZWrite(true);
 
-	SETCULL(GDevice, D3DCULL_CCW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 }
 
 //-----------------------------------------------------------------------------

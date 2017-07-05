@@ -866,7 +866,7 @@ float CPoisonProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return 0.f;
 	}
 
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	//-------------------------------------------------------------------------
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
@@ -992,7 +992,7 @@ float CPoisonProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		LaunchPoisonExplosion(&lastpos);
 	}
 
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
@@ -1895,7 +1895,7 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 	if (this->tsouffle) device->SetTexture(0, this->tsouffle->m_pddsSurface);
 	else device->SetTexture(0, NULL);
 
-	SETCULL(device, D3DCULL_CW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CW);
 	int i = cone[1].conenbfaces - 2;
 	int j = 0;
 
@@ -1919,7 +1919,7 @@ float CLevitate::Render(LPDIRECT3DDEVICE7 device)
 	}
 
 	//tracé du cone front
-	SETCULL(device, D3DCULL_CCW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 	
 	i = cone[1].conenbfaces - 2;
 	j = 0;

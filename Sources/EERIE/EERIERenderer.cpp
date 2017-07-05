@@ -854,10 +854,10 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 		stbtt_GetPackedQuad(font->fontData, font->bitmapWidth, font->bitmapHeight, idx, &offsetX, &offsetY, &quad, 0);
 
 		const float uvs[] = {
-			quad.s0, quad.t0,	//Top Left
 			quad.s1, quad.t0,	//Top Right
-			quad.s0, quad.t1,	//Bot Left
-			quad.s1, quad.t1	//Bot Right
+			quad.s0, quad.t0,	//Top Left
+			quad.s1, quad.t1,	//Bot Right
+			quad.s0, quad.t1	//Bot Left
 		};
 
 		float adv = font->fontData[idx].xadvance * glyphScale;
@@ -934,6 +934,24 @@ void EERIERendererGL::SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType dstF
 	glBlendFunc(_nativeBlendType(srcFactor), _nativeBlendType(dstFactor));
 }
 
+void EERIERendererGL::SetCull(EERIECull mode)
+{
+	switch (mode)
+	{
+	case EERIECull::None:
+		glDisable(GL_CULL_FACE);
+		break;
+	case EERIECull::CW:
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CW);
+		break;
+	case EERIECull::CCW:
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CCW);
+		break;
+	}
+}
+
 float EERIE_TransformOldFocalToNewFocal(float _fOldFocal);
 void EERIERendererGL::SetViewport(int x, int y, int w, int h)
 {
@@ -977,10 +995,10 @@ void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, floa
 	//Top-left is (0,0); bottom right is (1,1) - legacy Arx assumptions.
 
 	static const GLfloat uvData[] = {
-		0.0f, 0.0f,	//Top Left
 		1.0f, 0.0f,	//Top Right
-		0.0f, 1.0f,	//Bot Left
-		1.0f, 1.0f	//Bot Right
+		0.0f, 0.0f,	//Top Left
+		1.0f, 1.0f,	//Bot Right
+		0.0f, 1.0f	//Bot Left
 	};
 
 	static GLuint vertexbuffer = -1;
@@ -1006,17 +1024,17 @@ void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, floa
 		glBufferData(GL_ARRAY_BUFFER, sizeof(uvData), uvData, GL_DYNAMIC_DRAW);
 
 	const GLfloat quadData[] = {
-		//Top left
-		(x), (y), 0.0f,
-
 		//Top right
 		(x + sx), (y), 0.0f,
 
-		//Bot left
-		(x), (y + sy), 0.0f,
+		//Top left
+		(x), (y), 0.0f,
 
 		//Bot right
-		(x + sx), (y + sy), 0.0f
+		(x + sx), (y + sy), 0.0f,
+
+		//Bot left
+		(x), (y + sy), 0.0f
 	};
 
 
@@ -1230,11 +1248,31 @@ void EERIERendererD3D7::SetBlendFunc(EERIEBlendType srcFactor, EERIEBlendType ds
 	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, _nativeBlendType(dstFactor));
 }
 
+void EERIERendererD3D7::SetCull(EERIECull mode)
+{
+	D3DCULL cull = D3DCULL_NONE;
+
+	switch (mode)
+	{
+	case EERIECull::None:
+		cull = D3DCULL_NONE;
+		break;
+	case EERIECull::CW:
+		cull = D3DCULL_CW;
+		break;
+	case EERIECull::CCW:
+		cull = D3DCULL_CCW;
+		break;
+	}
+
+	GDevice->SetRenderState(D3DRENDERSTATE_CULLMODE, cull);
+}
+
 void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 {
 	GDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
 	GDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCCOLOR);
-	g_pRenderApp->renderer->SetZWrite(false);
+	SetZWrite(false);
 	SetAlphaBlend(true);
 
 	DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
@@ -1246,7 +1284,7 @@ void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 	DrawQuad(0.f, 0.f, (float)DANAESIZX, (float)DANAESIZY, 0.0001f,
 		0, 0, EERIERGB(col*FADECOLOR.r, col*FADECOLOR.g, col*FADECOLOR.b));
 	SetAlphaBlend(false);
-	g_pRenderApp->renderer->SetZWrite(true);
+	SetZWrite(true);
 }
 
 void EERIERendererD3D7::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)

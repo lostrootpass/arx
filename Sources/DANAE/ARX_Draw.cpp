@@ -294,7 +294,7 @@ void EERIEDrawLight(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_LIGHT * el)
  
 	D3DTLVERTEX in;
 	D3DTLVERTEX center;
-	SETCULL(pd3dDevice,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	
 	if (el!=NULL)
 	if (el->treat) 
@@ -722,8 +722,8 @@ void ARXDRAW_DrawAllInterTransPolyPos(LPDIRECT3DDEVICE7 pd3dDevice)
 		if (InterTransFace[i]->texid<0) continue;
 
 		if (InterTransFace[i]->facetype & POLY_DOUBLESIDED) 
-				SETCULL(pd3dDevice,D3DCULL_NONE);
-		else	SETCULL(pd3dDevice,D3DCULL_CW);
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
+		else	g_pRenderApp->renderer->SetCull(EERIECull::CW);
 
 		SETTC(pd3dDevice,InterTransTC[i]);
 		EERIE_FACE * ef=InterTransFace[i];
@@ -780,8 +780,8 @@ void ARXDRAW_DrawAllTransPolysPos( LPDIRECT3DDEVICE7 pd3dDevice, long MODIF )
 
 		if ( ( !( Project.hide & HIDE_BACKGROUND ) ) )
 		{
-			if ( ep->type & POLY_DOUBLESIDED ) SETCULL( pd3dDevice, D3DCULL_NONE );
-			else SETCULL( pd3dDevice, D3DCULL_CW );
+			if ( ep->type & POLY_DOUBLESIDED ) g_pRenderApp->renderer->SetCull(EERIECull::None);
+			else g_pRenderApp->renderer->SetCull(EERIECull::CW);
 		
 			if ( ViewMode & VIEWMODE_FLAT ) SETTC( pd3dDevice, NULL );
 			else	SETTC( pd3dDevice, ep->tex );

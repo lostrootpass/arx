@@ -566,7 +566,7 @@ void CParticleSystem::Update(long _lTime)
 //-----------------------------------------------------------------------------
 void CParticleSystem::Render(LPDIRECT3DDEVICE7 _lpD3DDevice, EERIEBlendType _iSRCBLEND, EERIEBlendType _iDESTBLEND)
 {
-	SETCULL(_lpD3DDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 
 	g_pRenderApp->renderer->SetBlendFunc(_iSRCBLEND, _iDESTBLEND);

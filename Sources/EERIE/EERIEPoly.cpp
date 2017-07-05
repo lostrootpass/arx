@@ -3568,8 +3568,8 @@ void DrawEERIEObjEx(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj,
 		}
 
 		if (eobj->facelist[i].facetype & POLY_DOUBLESIDED)
-			SETCULL(pd3dDevice, D3DCULL_NONE);
-		else SETCULL(pd3dDevice, D3DCULL_CW);
+			g_pRenderApp->renderer->SetCull(EERIECull::None);
+		else g_pRenderApp->renderer->SetCull(EERIECull::CW);
 
 		ARX_DrawPrimitive_SoftClippZ(&vert_list[0],
 		                             &vert_list[1],
@@ -3649,8 +3649,8 @@ void DrawEERIEObjExEx(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj,
 		}
 
 		if (eobj->facelist[i].facetype & POLY_DOUBLESIDED)
-			SETCULL(pd3dDevice, D3DCULL_NONE);
-		else SETCULL(pd3dDevice, D3DCULL_CW);
+			g_pRenderApp->renderer->SetCull(EERIECull::None);
+		else g_pRenderApp->renderer->SetCull(EERIECull::CW);
 
 		ARX_DrawPrimitive_SoftClippZ(&vert_list[0],
 		                             &vert_list[1],

@@ -2102,7 +2102,7 @@ void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERI
 						tv[o].color = (0xFF000000L | (((lfr) & 255) << 16) |	(((lfg) & 255) << 8) | (lfb) & 255);
 					}
 
-					//SETCULL(pd3dDevice,D3DCULL_NONE);
+					//g_pRenderApp->renderer->SetCull(EERIECull::None);
 					if (tot > 260)   //260.f)
 					{
 						long first;
@@ -2436,6 +2436,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 	if (bRenderInterList)
 	{
 #ifdef ARX_OPENGL
+		g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 		g_pRenderApp->renderer->DrawObj(eobj->vertexlist3, eobj->nbvertex, eobj, io);
 #else
 		Cedric_RenderObject2(pd3dDevice,
@@ -2452,7 +2453,7 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 	int			i;
 
 	// Finally we can draw polys !!!
-	SETCULL(pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 	// Sets IO BBox to calculated BBox :)
 	if (io)
@@ -2712,9 +2713,9 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 
 			// Backface culling if required
 			if (eface->facetype & POLY_DOUBLESIDED)
-				SETCULL(pd3dDevice, D3DCULL_NONE);
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 			else
-				SETCULL(pd3dDevice, D3DCULL_CW);
+				g_pRenderApp->renderer->SetCull(EERIECull::CW);
 
 			// Is Transparent?
 			if (eface->facetype & POLY_TRANS)

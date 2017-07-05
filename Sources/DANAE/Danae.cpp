@@ -7343,7 +7343,7 @@ HRESULT DANAE::Render()
 	finish:; //----------------------------------------------------------------
 	// Update spells
 	ARX_SPELLS_Update(m_pd3dDevice);
-	SETCULL(GDevice,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, true);
 
 	// Manage Death visual & Launch menu...
@@ -7703,7 +7703,7 @@ void DANAE::GoFor2DFX()
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			g_pRenderApp->renderer->SetAlphaBlend(true);		
 			g_pRenderApp->renderer->SetZWrite(false);
-			SETCULL(GDevice,D3DCULL_NONE);
+			g_pRenderApp->renderer->SetCull(EERIECull::None);
 			GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,  0);
 
 			for (int i=0;i<TOTPDL;i++) 
@@ -8569,7 +8569,7 @@ HRESULT DANAEGL::Render()
 finish:; //----------------------------------------------------------------
 		 // Update spells
 	ARX_SPELLS_Update(0);
-	//SETCULL(GDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	//GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, true);
 
 	// Manage Death visual & Launch menu...
@@ -8934,7 +8934,7 @@ void DANAEGL::GoFor2DFX()
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 			g_pRenderApp->renderer->SetAlphaBlend(true);
 			g_pRenderApp->renderer->SetZWrite(false);
-			SETCULL(GDevice, D3DCULL_NONE);
+			g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 			for (int i = 0; i < TOTPDL; i++)
 			{

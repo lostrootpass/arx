@@ -1595,7 +1595,7 @@ void UpdateObjFx(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_CAMERA * cam)
 			if (objfx[i].special & SPECIAL_RAYZ)
 			{
 
-				SETCULL(pd3dDevice,D3DCULL_NONE);
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 				for (long k=0;k<8;k++)
 				{
@@ -2083,7 +2083,7 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 	
 	tim = ARXTimeUL();//treat warning C4244 conversion from 'float' to 'unsigned long'	
 	
-	SETCULL(pd3dDevice,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 #ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
@@ -2325,7 +2325,7 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 						}
 					}
 
-					SETCULL(pd3dDevice,D3DCULL_NONE);
+					g_pRenderApp->renderer->SetCull(EERIECull::None);
 					EERIE_3D vect;
 					vect.x=part->oldpos.x-in.sx;
 					vect.y=part->oldpos.y-in.sy;

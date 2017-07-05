@@ -1989,7 +1989,7 @@ void CRuban::DrawRuban(LPDIRECT3DDEVICE7 device, int num, float size, int dec, f
 //-----------------------------------------------------------------------------
 float CRuban::Render(LPDIRECT3DDEVICE7 device)
 {
-	SETCULL(device, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 

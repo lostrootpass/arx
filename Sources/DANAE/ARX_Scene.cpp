@@ -1617,13 +1617,11 @@ void ARX_PORTALS_Frustrum_RenderRoom_TransparencyTSoftCull(long room_num);
 void ARX_PORTALS_Frustrum_RenderRooms_TransparencyT()
 {
 	g_pRenderApp->renderer->SetZWrite(false);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
+	g_pRenderApp->renderer->SetAlphaBlend(true);
 
 #ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,0);
-
-	GDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,TRUE);
-
-	SETCULL(GDevice,D3DCULL_NONE);
 
 	for (long i=0;i<NbRoomDrawList;i++)
 	{
@@ -1652,7 +1650,7 @@ void ARX_PORTALS_Frustrum_RenderRooms_TransparencyT()
 	g_pRenderApp->renderer->SetZWrite(false);
 
 	//render all fx!!
-	SETCULL(GDevice,D3DCULL_CW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CW);
 
 	if(danaeApp.m_pDeviceInfo->wNbTextureSimultaneous>3) danaeApp.m_pDeviceInfo->wNbTextureSimultaneous=3;
 
@@ -2415,7 +2413,7 @@ void ARX_PORTALS_RenderRoom(long room_num,EERIE_2D_BBOX * bbox,long prec,long ti
 			
 			// GO for 3D Backface Culling
 			if (ep->type & POLY_DOUBLESIDED)
-				SETCULL( GDevice, D3DCULL_NONE );
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 			else
 			{
 				EERIE_3D nrm;
@@ -2432,7 +2430,7 @@ void ARX_PORTALS_RenderRoom(long room_num,EERIE_2D_BBOX * bbox,long prec,long ti
 				else if ( DOTPRODUCT( ep->norm , nrm )>0.f)
 						continue;
 
-				SETCULL( GDevice, D3DCULL_CW );
+				g_pRenderApp->renderer->SetCull(EERIECull::CW);
 			}
 			 
 			if (!EERIERTPPoly(ep)) // RotTransProject Vertices
@@ -2578,7 +2576,7 @@ void ARX_PORTALS_Frustrum_RenderRoom(long room_num,EERIE_FRUSTRUM_DATA * frustru
 
 			// GO for 3D Backface Culling
 			if (ep->type & POLY_DOUBLESIDED)
-				SETCULL( GDevice, D3DCULL_NONE );
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 			else
 			{
 				EERIE_3D nrm;
@@ -2595,7 +2593,7 @@ void ARX_PORTALS_Frustrum_RenderRoom(long room_num,EERIE_FRUSTRUM_DATA * frustru
 				else if ( DOTPRODUCT( ep->norm , nrm )>0.f)
 						continue;
 
-				SETCULL( GDevice, D3DCULL_CW );
+				g_pRenderApp->renderer->SetCull(EERIECull::CW);
 			}
 			 
 			if (!EERIERTPPoly(ep)) // RotTransProject Vertices
@@ -3205,7 +3203,7 @@ SMY_D3DVERTEX *pMyVertex;
 #endif
 	
 		//render opaque
-		SETCULL(GDevice,D3DCULL_NONE);
+		g_pRenderApp->renderer->SetCull(EERIECull::None);
 		int iNbTex=portals->room[room_num].usNbTextures;
 		TextureContainer **ppTexCurr=portals->room[room_num].ppTextureContainer;
 
@@ -4649,7 +4647,7 @@ else
 			
 			// GO for 3D Backface Culling
 			if (ep->type & POLY_DOUBLESIDED)
-				SETCULL( pd3dDevice, D3DCULL_NONE );
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 			else
 			{
 				
@@ -4666,7 +4664,7 @@ else
 				else if ( DOTPRODUCT( ep->norm , nrm )>0.f)
 						continue;
 
-				SETCULL( pd3dDevice, D3DCULL_CW );
+				g_pRenderApp->renderer->SetCull(EERIECull::CW);
 			}
 			 
 							if (!EERIERTPPoly(ep)) 
@@ -4864,7 +4862,7 @@ if (HALOCUR>0)
 	SETTC(pd3dDevice,NULL);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcColor, EERIEBlendType::One);
 	g_pRenderApp->renderer->SetAlphaBlend(true);			
-	SETCULL(pd3dDevice,D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 
 	for (i=0;i<HALOCUR;i++)
@@ -4886,7 +4884,7 @@ if (HALOCUR>0)
 	g_pRenderApp->renderer->SetAlphaBlend(false);			
 }
 
-	SETCULL(pd3dDevice,D3DCULL_CCW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 	g_pRenderApp->renderer->SetAlphaBlend(false);	
 	g_pRenderApp->renderer->SetZWrite(true);
 

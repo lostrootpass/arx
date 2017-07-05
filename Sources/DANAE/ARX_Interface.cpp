@@ -6612,7 +6612,7 @@ void ARX_INTERFACE_DrawDamagedEquipment()
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 
 		g_pRenderApp->renderer->SetZWrite(true);
-		SETCULL(GDevice,D3DCULL_NONE);
+		g_pRenderApp->renderer->SetCull(EERIECull::None);
 #ifndef ARX_OPENGL
 		GDevice->SetRenderState( D3DRENDERSTATE_FOGENABLE, false);
 #endif
@@ -7182,7 +7182,7 @@ void ARX_INTERFACE_ManageOpenedBook_Finish()
 
 			g_pRenderApp->renderer->SetZWrite(true);
 			
-			SETCULL( GDevice, D3DCULL_CCW);
+			g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 
 			if (!found2) LastRune=-1;
 			
@@ -8893,7 +8893,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 		g_pRenderApp->renderer->SetViewport(0, 0, DANAESIZX, DANAESIZY);
 
 		g_pRenderApp->renderer->SetAlphaBlend(false);
-		SETCULL(GDevice,D3DCULL_NONE);
+		g_pRenderApp->renderer->SetCull(EERIECull::None);
 		SetActiveCamera(oldcam);		
 		
 		INTERACTIVE_OBJ * io=inter.iobj[0];
@@ -8911,7 +8911,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 				}
 			}
 
-			SETCULL(GDevice,D3DCULL_NONE);
+			g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 			if (	(player.equiped[EQUIP_SLOT_ARMOR]!=0)
 				&&	ValidIONum(player.equiped[EQUIP_SLOT_ARMOR]	))
@@ -9017,7 +9017,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 			
 			TextureContainer * tc;
 			TextureContainer * tc2=NULL;
-			SETCULL(GDevice,D3DCULL_NONE);
+			g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 			if (	(player.equiped[EQUIP_SLOT_RING_LEFT]!=0)
 				&&	ValidIONum(player.equiped[EQUIP_SLOT_RING_LEFT]	))
@@ -9158,7 +9158,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 				SETTC(GDevice,NULL);
 				g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcColor, EERIEBlendType::One);
 				g_pRenderApp->renderer->SetAlphaBlend(true);			
-				SETCULL(GDevice,D3DCULL_NONE);
+				g_pRenderApp->renderer->SetCull(EERIECull::None);
 				g_pRenderApp->renderer->SetZWrite(false);
 
 				for (int i=0;i<HALOCUR;i++)
@@ -10647,7 +10647,7 @@ long Manage3DCursor(long flags)
 							}
 						}
 
-						SETCULL(GDevice,D3DCULL_NONE);
+						g_pRenderApp->renderer->SetCull(EERIECull::None);
 						return 1;
 					}
 					else 
@@ -10734,7 +10734,7 @@ void ARX_INTERFACE_RenderCursor(long flag)
 		RECT rect;
 
 		if (!SPECIAL_DRAGINTER_RENDER)
-			SETCULL(GDevice,D3DCULL_NONE);
+			g_pRenderApp->renderer->SetCull(EERIECull::None);
 
 		if ((COMBINE) || (COMBINEGOLD))
 		{

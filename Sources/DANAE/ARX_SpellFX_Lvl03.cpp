@@ -446,7 +446,7 @@ float CFireBall::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		return 0.f;
 	}
 
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
@@ -675,7 +675,7 @@ float CIceProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	if (ulCurrentTime >= ulDuration) return 0.f;
 
-	SETCULL(m_pd3dDevice, D3DCULL_CW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CW);
 	g_pRenderApp->renderer->SetZWrite(false);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::OneMinusDstColor, EERIEBlendType::One);
@@ -1032,7 +1032,7 @@ void CSpeed::DrawRuban(LPDIRECT3DDEVICE7 device, int num, float size, int dec, f
 //-----------------------------------------------------------------------------
 float CSpeed::Render(LPDIRECT3DDEVICE7 device)
 {
-	SETCULL(device, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
 

@@ -35,4 +35,11 @@ enum class EERIEZFunc
 	LEqual
 };
 
+enum class EERIECull
+{
+	None,
+	CW,
+	CCW
+};
+
 #endif // !EERIE_RENDERER_TYPES_H_

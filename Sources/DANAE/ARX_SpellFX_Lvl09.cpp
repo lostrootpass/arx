@@ -544,7 +544,7 @@ float CSummonCreature::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	if (ulCurrentTime >= (ulDurationIntro + ulDurationRender + ulDurationOuttro)) return 0.f;
 
 	SETTC(m_pd3dDevice, NULL);
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
@@ -834,7 +834,7 @@ float CIncinerate::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 {
 	int i = 0;
 
-	SETCULL(_pD3DDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 	
@@ -875,7 +875,7 @@ float CIncinerate::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	stitecolor.g = 1;
 	stitecolor.b = 1;
 
-	SETCULL(_pD3DDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 

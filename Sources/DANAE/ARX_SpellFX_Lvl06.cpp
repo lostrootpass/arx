@@ -225,7 +225,7 @@ float CCreateField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	if (falpha > 1.f) falpha = 1.f;
 
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
@@ -1227,7 +1227,7 @@ float CRiseDead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	if (ulCurrentTime >= (ulDurationIntro + ulDurationRender + ulDurationOuttro)) return 0.f;
 
 	SETTC(m_pd3dDevice, NULL);
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_CLAMP);
@@ -1293,7 +1293,7 @@ float CRiseDead::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	SETTEXTUREWRAPMODE(m_pd3dDevice, D3DTADDRESS_WRAP);
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetZWrite(true);
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	return (fSizeIntro / end);
 }
 
@@ -1787,9 +1787,9 @@ float CParalyse::Render(LPDIRECT3DDEVICE7 pD3DDevice)
 					nb--;
 				}
 
-				SETCULL(pD3DDevice, D3DCULL_CW);
+				g_pRenderApp->renderer->SetCull(EERIECull::CW);
 				pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->prismd3d, this->prismnbpt, this->prismind, this->prismnbface * 3, 0);
-				SETCULL(pD3DDevice, D3DCULL_CCW);
+				g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 				pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->prismd3d, this->prismnbpt, this->prismind, this->prismnbface * 3, 0);
 
 				vertex = this->tabprism[nb2].vertex;
@@ -1849,9 +1849,9 @@ float CParalyse::Render(LPDIRECT3DDEVICE7 pD3DDevice)
 					nb--;
 				}
 
-				SETCULL(pD3DDevice, D3DCULL_CW);
+				g_pRenderApp->renderer->SetCull(EERIECull::CW);
 				pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->prismd3d, this->prismnbpt, this->prismind, this->prismnbface * 3, 0);
-				SETCULL(pD3DDevice, D3DCULL_CCW);
+				g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 				pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->prismd3d, this->prismnbpt, this->prismind, this->prismnbface * 3, 0);
 			}
 
@@ -1976,9 +1976,9 @@ float CParalyse::Render(LPDIRECT3DDEVICE7 pD3DDevice)
 					nb--;
 				}
 
-				SETCULL(pD3DDevice, D3DCULL_CW);
+				g_pRenderApp->renderer->SetCull(EERIECull::CW);
 				pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->prismd3d, this->prismnbpt, this->prismind, this->prismnbface * 3, 0);
-				SETCULL(pD3DDevice, D3DCULL_CCW);
+				g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 				pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->prismd3d, this->prismnbpt, this->prismind, this->prismnbface * 3, 0);
 			}
 
@@ -2006,9 +2006,9 @@ float CParalyse::Render(LPDIRECT3DDEVICE7 pD3DDevice)
 			break;
 	}
 
-	SETCULL(pD3DDevice, D3DCULL_CW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CW);
 	pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->prismd3d, this->prismnbpt, this->prismind, this->prismnbface * 3, 0);
-	SETCULL(pD3DDevice, D3DCULL_CCW);
+	g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 	pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, this->prismd3d, this->prismnbpt, this->prismind, this->prismnbface * 3, 0);
 
 

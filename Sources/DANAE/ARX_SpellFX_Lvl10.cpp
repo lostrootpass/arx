@@ -254,7 +254,7 @@ float CControlTarget::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 {
 	int i = 0;
 
-	SETCULL(m_pd3dDevice, D3DCULL_NONE);
+	g_pRenderApp->renderer->SetCull(EERIECull::None);
 	g_pRenderApp->renderer->SetZWrite(false);
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
