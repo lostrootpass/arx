@@ -64,6 +64,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "EERIEPhysicsBox.h"
 #include "EERIECollisionSpheres.h"
 #include "EERIELinkedObj.h"
+#include "EERIE_GL.h"
 
 #include "HERMESMain.h"
 
@@ -1939,6 +1940,12 @@ void ReleaseEERIE3DObj(EERIE_3DOBJ * eerie)
 	        (eerie->linked))
 	{
 		free((void *)eerie->linked);
+	}
+
+	//TODO: move
+	if (eerie->glVtxBuffer)
+	{
+		glDeleteBuffers(4, &eerie->glVtxBuffer);
 	}
 
 	free(eerie);

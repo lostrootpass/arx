@@ -223,9 +223,16 @@ typedef struct
  
 typedef struct
 {
+	/* Projected vertex - sent to GPU in D3D7 */
 	D3DTLVERTEX vert;
+
+	/* Unprojected vertex position (world space) */
 	EERIE_3D	v;
+
+	/* Normal data */
 	EERIE_3D	norm;
+
+	/* Vertex position in camera space (modelview) */
 	EERIE_3D	vworld;
 } EERIE_VERTEX; // Aligned 1 2 4
 
@@ -582,14 +589,25 @@ typedef struct
 	long				nbgroups;
 	long				nbaction;
 	long				nbselections;
+	long				nbindices;
 	unsigned long		drawflags;
+
+	/* DO NOT MOVE/REARRANGE THESE GL BUFFER HANDLES */
 
 	unsigned int glVtxBuffer;
 	unsigned int glIdxBuffer;
 	unsigned int glAttribBuffer;
+	unsigned int glBoneBuffer;
 
+	/* Indices of these vertex lists are guaranteed to map to each other 1:1 */
+
+	//Model vertices in local space
 	EERIE_3DPAD 	*	vertexlocal;
+
+	//Model vertices pre-transform (i.e. T-pose)
 	EERIE_VERTEX 	*	vertexlist;
+
+	//Model vertices post-transform (animation data applied) - used for D3D7
 	EERIE_VERTEX 	*	vertexlist3;
 
 	EERIE_FACE 	*	facelist;

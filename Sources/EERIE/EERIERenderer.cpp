@@ -11,7 +11,7 @@
 #include "ARX_C_cinematique.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-
+#include <glm/gtx/quaternion.hpp>
 
 #define STB_RECT_PACK_IMPLEMENTATION
 #include <stb/stb_rect_pack.h>
@@ -30,6 +30,16 @@ struct VtxAttrib
 	glm::vec3 normal;
 	glm::vec2 uv;
 	GLint texId;
+	GLint boneId;
+};
+
+struct Bone
+{
+	glm::mat4 rotate;
+	glm::vec4 translate;
+	glm::vec4 scale;
+	int parentID;
+	float ___pad[3];
 };
 
 //TODO: move/improve
@@ -94,16 +104,43 @@ glm::vec4 unpackARGB(long color)
 	return c;
 }
 
-void EERIERenderer::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
+glm::vec3 eerieToGLM(EERIE_3D* eerie)
 {
+	glm::vec3 v;
 
+	v.x = eerie->x;
+	v.y = eerie->y;
+	v.z = eerie->z;
+
+	return v;
 }
 
-void EERIERenderer::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
+glm::mat4 eerieToGLM(EERIEMATRIX* eerie)
 {
+	glm::mat4 m;
 
+	m[0][0] = eerie->_11;
+	m[0][1] = eerie->_12;
+	m[0][2] = eerie->_13;
+	m[0][3] = eerie->_14;
+
+	m[1][0] = eerie->_21;
+	m[1][1] = eerie->_22;
+	m[1][2] = eerie->_23;
+	m[1][3] = eerie->_24;
+
+	m[2][0] = eerie->_31;
+	m[2][1] = eerie->_32;
+	m[2][2] = eerie->_33;
+	m[2][3] = eerie->_34;
+
+	m[3][0] = eerie->_41;
+	m[3][1] = eerie->_42;
+	m[3][2] = eerie->_43;
+	m[3][3] = eerie->_44;
+
+	return glm::transpose(m);
 }
-
 
 /************************************************************/
 /*							GL								*/
@@ -201,12 +238,18 @@ void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
 	glDisable(GL_BLEND);
 }
 
-void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
+void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, EERIE_3D* pos, EERIE_3D* angle, EERIE_MOD_INFO* modinfo, EERIEMATRIX* matrix)
 {
-	GLenum type = GL_TRIANGLES;
 	bool useAlphaBlending = false;
 
-	EERIE_VERTEX* vtxArray = static_cast<EERIE_VERTEX*>(lpvVertices);
+	//TODO: legacy Arx data separates these data sets, they can be combined.
+
+	/* Vertices in bone space - this is what gets sent to the GPU */
+	EERIE_3DPAD* vtxArray = eobj->vertexlocal;
+
+	/* Vertices in world space - needed for normals, colours, etc. */
+	EERIE_VERTEX* vtxList = eobj->vertexlist;
+
 	std::vector<GLfloat> vtx;
 
 	if (ioVAO == -1)
@@ -216,26 +259,21 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 
 	glBindVertexArray(ioVAO);
 
-	//TODO: only update vertex buffers when necessary, not every tick.
-	{
-		//LEAK
-		if(eobj->glVtxBuffer == 0)
-			glGenBuffers(1, &eobj->glVtxBuffer);
-	}
+	GLuint program = EERIEGetGLProgramID("animpoly");
 
-	GLuint program = EERIEGetGLProgramID("poly");
 	glUseProgram(program);
 
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(EERIE_PRIM_RESTART_IDX);
 
-	if (io)
-	{
-		//vertexlist3 has already been put in to world space for us, so just pass in an identity matrix.
-		glm::mat4 modelMatrix = glm::mat4();
-		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
-	}
+	glm::mat4 modelMatrix = glm::mat4();
 
+	//Bone translation accounts for world position, but we need to invert the Y-axis
+	//because of the move from D3D to OpenGL maths.
+	//TODO: we can make this more sensibile and have bone translation be in model space.
+	modelMatrix[1][1] *= -1;
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &_view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &_projection[0][0]);
 
@@ -244,69 +282,99 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 
 	std::unordered_map<short, short>& texMapBindings = _texMapBindings[eobj];
 
-	const bool genAttribs = (eobj->glAttribBuffer == 0);
-	const bool genIdx = (eobj->glIdxBuffer == 0);
-
+	const bool genVertices = (eobj->glVtxBuffer == 0);
 	
-	if (eobj->glAttribBuffer == 0)
+	if (eobj->glVtxBuffer == 0)
 	{
-		glGenBuffers(1, &eobj->glAttribBuffer);
+		//vtx, attrib, idx, bone
+		glGenBuffers(4, &eobj->glVtxBuffer);
 	}
 
-	if (eobj->glIdxBuffer == 0)
+	const size_t primCount = eobj->nbfaces * 3;
+	vtxAttribs.reserve(primCount);
+
+	if (genVertices)
 	{
-		glGenBuffers(1, &eobj->glIdxBuffer);
+		indices.reserve(primCount);
+		vtx.reserve(primCount * 3);
 	}
 
-	//if (genUVs || genIdx)
+	long* boneCache = nullptr;
+	Bone* boneBuffer = nullptr;
+
 	{
-		
-		short binding = 0;
+		if (genVertices)
+			boneCache = new long[eobj->nbvertex];
 
+		if (eobj->c_data && eobj->c_data->nb_bones > 0)
+			boneBuffer = new Bone[eobj->c_data->nb_bones];
 
-		//TODO: huge amount of data duplication here caused by how facelist handles UVs
-		for (long i = 0; i < eobj->nbfaces; ++i)
+		EERIEMATRIX eerieMatrix;
+
+		//Update the bone matrix for this frame.
+		for (long boneIdx = 0; boneIdx < eobj->c_data->nb_bones; ++boneIdx)
 		{
-			EERIE_FACE face = eobj->facelist[i];
+			EERIE_BONE& bone = eobj->c_data->bones[boneIdx];
+
+			Bone& b = boneBuffer[boneIdx];
+
+			MatrixFromQuat(&eerieMatrix, &bone.quatanim);
+			b.rotate = glm::scale(eerieToGLM(&eerieMatrix), eerieToGLM(&bone.scaleanim));
+			b.translate = glm::vec4(eerieToGLM(&bone.transanim), 1.0);
+			b.scale = glm::vec4(eerieToGLM(&bone.scaleanim), 1.0);
+			b.parentID = (int)bone.father;
+
+			//Match up the bone data to the vertex data
+			//Do this even if the model isn't animated on the first frame -
+			// it may end up being animated later, so this avoids redoing the attrib buffer
+			//TODO: can do this elsewhere, possibly earlier in the pipeline
+			if (boneCache)
+			{
+				for (long v = 0; v < bone.nb_idxvertices; ++v)
+				{
+					boneCache[bone.idxvertices[v]] = boneIdx;
+				}
+			}
+		}
+	}
+
+	if (genVertices)
+	{
+		short binding = 0;
+		//TODO: huge amount of data duplication here caused by how facelist handles UVs
+		for (long f = 0; f < eobj->nbfaces; ++f)
+		{
+			const EERIE_FACE& face = eobj->facelist[f];
 
 			short b = -1;
-			if (genAttribs)
+			if (face.texid != -1 && texMapBindings.find(face.texid) == texMapBindings.end())
 			{
-				if (face.texid != -1 && texMapBindings.find(face.texid) == texMapBindings.end())
-				{
-					texMapBindings[face.texid] = binding;
-					binding++;
-				}
-
-				b = (face.texid == -1) ? -1 : texMapBindings[face.texid];
-
+				texMapBindings[face.texid] = binding;
+				binding++;
 			}
 
+			b = (face.texid == -1) ? -1 : texMapBindings[face.texid];
+
 			unsigned short fv;
-			int faceVtxCount = (face.facetype & POLY_QUAD) ? 4 : 3;
-			for (int i = 0; i < faceVtxCount; ++i)
+			for (int i = 0; i < 3; ++i)
 			{
 				fv = face.vid[i];
 
-				if(genIdx)
-					indices.push_back(fv);
+				vtx.push_back(vtxArray[fv].x);
+				vtx.push_back(vtxArray[fv].y);
+				vtx.push_back(vtxArray[fv].z);
+
+				indices.push_back(fv);
 
 				VtxAttrib attrib;
 
-				if (genAttribs)
-				{
-					attrib.uv.x = face.u[i];
-					attrib.uv.y = face.v[i];
-				}
-
-				vtx.push_back(vtxArray[fv].v.x);
-				vtx.push_back(-vtxArray[fv].v.y);
-				vtx.push_back(vtxArray[fv].v.z);
+				attrib.uv.x = face.u[i];
+				attrib.uv.y = face.v[i];
 
 				attrib.texId = b;
-				attrib.normal = glm::vec3(vtxArray[fv].norm.x, vtxArray[fv].norm.y, -vtxArray[fv].norm.z);
+				attrib.normal = glm::vec3(vtxList[fv].norm.x, vtxList[fv].norm.y, -vtxList[fv].norm.z);
 
-				float alpha = (vtxArray[fv].vert.color >> 24 & 0xFF) / 255.0f;
+				float alpha = (vtxList[fv].vert.color >> 24 & 0xFF) / 255.0f;
 				if (face.transval > 0.0f)
 				{
 					if (!useAlphaBlending)
@@ -324,37 +392,45 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 					}
 				}
 
-				attrib.color = glm::vec4(unpackRGB(vtxArray[fv].vert.color), alpha);
+				attrib.color = glm::vec4(unpackRGB(vtxList[fv].vert.color), alpha);
+
+				if (boneCache)
+					attrib.boneId = boneCache[fv];
+				else
+					attrib.boneId = -1;
 
 				vtxAttribs.push_back(attrib);
 			}
-
-			if (faceVtxCount == 4)
-			{
-				indices.push_back(face.vid[3]);
-				indices.push_back(face.vid[2]);
-				indices.push_back(face.vid[1]);
-			}
 		}
 
-		if (genAttribs)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, eobj->glAttribBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vtxAttribs[0]) * vtxAttribs.size(), vtxAttribs.data(), GL_STATIC_DRAW);
-		}
+		glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_STATIC_DRAW);
 
-		if (genIdx)
-		{
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_STATIC_DRAW);
-		}
+		glBindBuffer(GL_ARRAY_BUFFER, eobj->glAttribBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vtxAttribs[0]) * vtxAttribs.size(), vtxAttribs.data(), GL_STATIC_DRAW);
+
+		//TODO: the vertex duplication above is messing with the index buffer.
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_STATIC_DRAW);
+
+		eobj->nbindices = (long)indices.size();
 	}
 
+	if (boneBuffer)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, eobj->glBoneBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Bone) * eobj->c_data->nb_bones, boneBuffer, GL_DYNAMIC_DRAW);
+
+		delete[] boneCache;
+		delete[] boneBuffer;
+	}
+
+	//Lights. TODO: don't update for every object.
 	{
 		std::vector<LightData> lightData;
 		addLights(lightData, llights, MAX_LLIGHTS);
 		addLights(lightData, IO_PDL, MAX_LLIGHTS);
-		
+
 		UpdateLights(lightData);
 	}
 
@@ -371,8 +447,43 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 		glUniform1i(uniformLocation, 0 + pair.second);
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
+	//Some inter objects don't have their absolute position buried in bone data,
+	//or the io, but get it from DrawEERIEInter's params.
+	//TODO: unify codepaths and simplify.
+	glm::vec4 modelAngleUniform = glm::vec4(0.0f);
+	if (angle)
+	{
+		modelAngleUniform += glm::vec4(eerieToGLM(angle), 1.0f);
+	}
+	
+	if (modinfo)
+	{
+		modelAngleUniform += glm::vec4(eerieToGLM(&modinfo->rot), 1.0f);
+	}
+
+	glUniform4fv(glGetUniformLocation(program, "modelAngle"), 1, &modelAngleUniform[0]);
+
+	glm::vec4 modelOffsetUniform = glm::vec4(0.0f);
+	if (pos)
+	{
+		modelOffsetUniform = glm::vec4(eerieToGLM(pos), 1.0f);
+	}
+	glUniform4fv(glGetUniformLocation(program, "modelOffset"), 1, &modelOffsetUniform[0]);
+	
+	//Data for linked/attached objects (e.g. weapons)
+	glm::vec4 linkedObjectOffset = glm::vec4(0.0f);
+	if (matrix && modinfo && !angle)
+	{
+		linkedObjectOffset = glm::vec4(eerieToGLM(&modinfo->link_position), 1.0f);
+	}
+	glUniform4fv(glGetUniformLocation(program, "linkedObjectOffset"), 1, &linkedObjectOffset[0]);
+
+	glm::mat4 linkedObjectMatrix = glm::mat4();
+	if (matrix)
+	{
+		linkedObjectMatrix = eerieToGLM(matrix);
+	}
+	glUniformMatrix4fv(glGetUniformLocation(program, "linkedObjectMatrix"), 1, GL_FALSE, &linkedObjectMatrix[0][0]);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, eobj->glVtxBuffer);
@@ -392,20 +503,22 @@ void EERIERendererGL::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DO
 	glEnableVertexAttribArray(4);
 	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
 
+	GLuint block = glGetUniformBlockIndex(program, "BoneData");
+	glUniformBlockBinding(program, block, 1);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 1, eobj->glBoneBuffer);
+
+	glUniform1i(glGetUniformLocation(program, "numBones"), eobj->c_data->nb_bones);
+
+	glEnableVertexAttribArray(5);
+	glVertexAttribIPointer(5, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, boneId));
+
 	if (useAlphaBlending)
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
 	}
 
-	//glDrawElements(type, eobj->nbfaces * 3, GL_UNSIGNED_INT, 0);
-	glDrawArrays(type, 0, eobj->nbfaces * 3);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(3);
-	glDisableVertexAttribArray(4);
+	glDrawArrays(GL_TRIANGLES, 0, eobj->nbfaces * 3);
 
 	if(useAlphaBlending)
 		glDisable(GL_BLEND);
@@ -486,11 +599,6 @@ void EERIERendererGL::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, L
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
 
 	glDrawArrays(_toGLType(primType), 0, dwVertexCount);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(3);
 }
 
 void EERIERendererGL::DrawQuad(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs, unsigned long color)
@@ -574,6 +682,8 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 
 	glm::mat4 modelMatrix = glm::mat4();
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &_view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &_projection[0][0]);
 
 	std::vector<GLuint> indices;
 	std::vector<VtxAttrib> vtxAttribs;
@@ -685,14 +795,6 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 
 	//TODO: break up the draw command in to smaller commands? Some rooms use a lot of textures.
 	glDrawElements(type, room->nb_indices, GL_UNSIGNED_SHORT, 0);
-	
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(3);
-	glDisableVertexAttribArray(4);
-
-	glUseProgram(0);
 }
 
 void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount, TextureContainer* tex)
@@ -719,8 +821,6 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 			glGenBuffers(1, &glVtxBuffer);
 	}
 
-	GLint oldProgram;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &oldProgram);
 	GLuint program = EERIEGetGLProgramID("particle");
 	glUseProgram(program);
 
@@ -790,13 +890,6 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
 
 	glDrawArrays(type, 0, dwVertexCount);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(3);
-
-	glUseProgram(oldProgram);
 }
 
 void EERIERendererGL::DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer * tex)
@@ -895,7 +988,8 @@ void EERIERendererGL::MeasureText(char* text, int size, int* width, int* height)
 
 void EERIERendererGL::UpdateLights(const std::vector<LightData>& lightData)
 {
-	GLuint program = EERIEGetGLProgramID("poly");
+	GLint program;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 	
 	//TODO: don't call this for every object.
 	//Has to be done this way for now because legacy Arx updates lights between objects
@@ -922,17 +1016,11 @@ void EERIERendererGL::UpdateLights(const std::vector<LightData>& lightData)
 void EERIERendererGL::setProj(const glm::mat4& proj)
 {
 	EERIERenderer::setProj(proj);
-
-	GLuint program = EERIEGetGLProgramID("poly");
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
 }
 
 void EERIERendererGL::setView(const glm::mat4& view)
 {
 	EERIERenderer::setView(view);
-
-	GLuint program = EERIEGetGLProgramID("poly");
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &view[0][0]);
 }
 
 void EERIERendererGL::SetAlphaBlend(bool enableAlphaBlending)
@@ -1067,9 +1155,6 @@ void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, floa
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
 }
 
 
@@ -1299,11 +1384,6 @@ void EERIERendererD3D7::DrawFade(const EERIE_RGB& color, float visibility)
 		0, 0, EERIERGB(col*FADECOLOR.r, col*FADECOLOR.g, col*FADECOLOR.b));
 	SetAlphaBlend(false);
 	SetZWrite(true);
-}
-
-void EERIERendererD3D7::DrawObj(LPVOID lpvVertices, DWORD dwVertexCount, EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io)
-{
-
 }
 
 bool bForce_NoVB = false;

@@ -743,7 +743,11 @@ void DrawEERIEInterMatrix(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 
 	if (BIGMAT==NULL) return;
 	
+#ifdef ARX_OPENGL
+	g_pRenderApp->renderer->DrawObj(eobj, poss, angle, modinfo, mat);
+#else
 	DrawEERIEInter(pd3dDevice,eobj,NULL,poss,io,modinfo);
+#endif
 	BIGMAT=NULL;
 }
 // List of TO-TREAT vertex for MIPMESHING
@@ -2785,15 +2789,16 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 
 	if(bRenderInterList)
 	{
-		DrawEERIEInter2(	pd3dDevice,
-							eobj,
-							angle,
-							poss,
-							io,
-							modinfo);
+		DrawEERIEInter2(pd3dDevice,
+			eobj,
+			angle,
+			poss,
+			io,
+			modinfo);
 #ifdef ARX_OPENGL
-		g_pRenderApp->renderer->DrawObj(io->obj->vertexlist3, io->obj->nbvertex, io->obj, io);
-		return;
+		//still need to call DrawEERIEInter2 for now.
+		//TODO: fix.
+		g_pRenderApp->renderer->DrawObj(eobj, poss, angle, modinfo);
 #endif
 	 return;
 	}
