@@ -240,7 +240,7 @@ void EERIE_CreateMatriceProj(float _fWidth, float _fHeight, float _fFOV, float _
 	ProjectionMatrix._33 = -(fFarPlane * fNearPlane) / (fFarPlane - fNearPlane);	//HYPERBOLIC
 	ProjectionMatrix._43 = Q;
 
-	g_pRenderApp->renderer->SetViewport(0, 0, _fWidth, _fHeight);
+	g_pRenderApp->renderer->SetViewport(0, 0, (int)_fWidth, (int)_fHeight);
 }
 
 void specialEE_RTP(D3DTLVERTEX * in, D3DTLVERTEX * out)

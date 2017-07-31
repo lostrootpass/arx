@@ -441,14 +441,14 @@ void ARX_SPEECH_ClearIOSpeech(INTERACTIVE_OBJ * io)
 		        &&	(aspeech[i].io == io))
 		{
 			EERIE_SCRIPT * es = aspeech[i].es;
-			INTERACTIVE_OBJ * io = aspeech[i].ioscript;
+			INTERACTIVE_OBJ * ioscr = aspeech[i].ioscript;
 			long scrpos = aspeech[i].scrpos;
 			ARX_SPEECH_Release(i);
 
 			if ((es)
-			        &&	(ValidIOAddress(io)))
+			        &&	(ValidIOAddress(ioscr)))
 			{
-				SendScriptEvent(es, SM_EXECUTELINE, "", io, NULL, scrpos);
+				SendScriptEvent(es, SM_EXECUTELINE, "", ioscr, NULL, scrpos);
 			}
 		}
 	}

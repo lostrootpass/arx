@@ -51,7 +51,7 @@ extern TILE_LIGHTS tilelights[MAX_BKGX][MAX_BKGZ];
 
 void addLights(std::vector<LightData>& data, EERIE_LIGHT** sources, size_t count)
 {
-	for (int i = 0; i < count; ++i)
+	for (size_t i = 0; i < count; ++i)
 	{
 		EERIE_LIGHT* light = sources[i];
 		LightData ld;
@@ -733,7 +733,7 @@ void EERIERendererGL::DrawRoom(EERIE_ROOM_DATA* room)
 
 		short binding = 0;
 
-		for (long i = 0; i < dwVertexCount; ++i)
+		for (DWORD i = 0; i < dwVertexCount; ++i)
 		{
 			VtxAttrib attrib;
 
@@ -865,7 +865,7 @@ void EERIERendererGL::DrawRotatedSprite(LPVOID lpvVertices, DWORD dwVertexCount,
 		glGenBuffers(1, &glAttribBuffer);
 	}
 
-	for (int i = 0; i < dwVertexCount; ++i)
+	for (DWORD i = 0; i < dwVertexCount; ++i)
 	{
 		VtxAttrib attrib;
 
@@ -1220,7 +1220,7 @@ EERIEFont* EERIERendererGL::_loadFontData(int size)
 	stbtt_pack_context context;
 	stbtt_PackBegin(&context, font->bitmap, font->bitmapWidth, font->bitmapHeight, 0, 1, nullptr);
 	stbtt_PackSetOversampling(&context, 2, 2);
-	stbtt_PackFontRange(&context, font->ttf, 0, font->fontSize, font->info.fontstart, font->info.numGlyphs, font->fontData);
+	stbtt_PackFontRange(&context, font->ttf, 0, (float)font->fontSize, font->info.fontstart, font->info.numGlyphs, font->fontData);
 	stbtt_PackEnd(&context);
 
 	font->bind();

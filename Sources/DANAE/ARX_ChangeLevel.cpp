@@ -1417,20 +1417,22 @@ long ARX_CHANGELEVEL_Push_IO(INTERACTIVE_OBJ * io)
 	else strcpy(ais.id_targetinfo, "NONE");
 
 	// Save Local Timers ?
-	long count = 0;
-
-	for (int i = 0; i < MAX_TIMER_SCRIPT; i++)
 	{
-		if (scr_timer[i].exist)
+		long count = 0;
+
+		for (int i = 0; i < MAX_TIMER_SCRIPT; i++)
 		{
-			if (scr_timer[i].io == io)
+			if (scr_timer[i].exist)
 			{
-				count++;
+				if (scr_timer[i].io == io)
+				{
+					count++;
+				}
 			}
 		}
-	}
 
-	ais.nbtimers = count;
+		ais.nbtimers = count;
+	}
 
 	long allocsize =
 	    sizeof(ARX_CHANGELEVEL_IO_SAVE)
@@ -2429,7 +2431,7 @@ long ARX_CHANGELEVEL_Pop_IO(char * ident)
 	if (!dat)
 	{
 		char tcText[256];
-		sprintf(tcText, "%s", ident, 0);
+		sprintf(tcText, "%s", ident);
 		MessageBox(NULL, tcText, "Error while loading...", 0);
 		return -1;
 	}
@@ -2466,9 +2468,7 @@ long ARX_CHANGELEVEL_Pop_IO(char * ident)
 	dli.angle.a = ais->angle.a;
 	dli.angle.b = ais->angle.b;
 	dli.angle.g = ais->angle.g;
-	long num = atoi(ident + strlen(ident) - 4);
-
-	dli.ident = num;
+	dli.ident = atoi(ident + strlen(ident) - 4);
 	strcpy(dli.name, ais->filename);
 	dli.pos.x = ais->pos.x;
 	dli.pos.y = ais->pos.y;

@@ -35,12 +35,12 @@ namespace ATHENA
 {
 
 	// Status flags                                                              //
-	static enum ATHENAInstance
+	static enum 
 	{
 		IS_IDLED     = 0x00000001,
 		IS_PAUSED    = 0x00000002,
 		IS_TOOFAR    = 0x00000004
-	};
+	} ATHENAInstance;
 
 	static aalVoid InstanceDebugLog(Instance * instance, const char * _text)
 	{

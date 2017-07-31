@@ -1294,7 +1294,6 @@ void ARX_INTERACTIVE_USEMESH(INTERACTIVE_OBJ * io, char * temp)
 			io->obj = NULL;
 		}
 
-		char tex2[256];
 		sprintf(tex2, "%sGraph\\Obj3D\\Textures\\", Project.workingdir);
 		File_Standardize(tex2, tex1);
 

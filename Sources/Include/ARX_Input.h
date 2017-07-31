@@ -122,7 +122,7 @@ extern long GameImpulses[MAX_IMPULSES][MAX_IMPULSES_NB];
 
 //-----------------------------------------------------------------------------
 void ARX_INPUT_Init_Game_Impulses();
-BOOL ARX_INPUT_Init(HINSTANCE hInst, HWND hWnd);
+BOOL ARX_INPUT_Init(HINSTANCE instance, HWND hWnd);
 void ARX_INPUT_Release();
 BOOL ARX_INPUT_GetSCIDAxis(int * jx, int * jy, int * jz);
  

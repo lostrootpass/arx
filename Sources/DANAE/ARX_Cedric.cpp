@@ -835,13 +835,13 @@ bool	Cedric_ApplyLighting(EERIE_3DOBJ * eobj, EERIE_C_DATA * obj, INTERACTIVE_OB
 								if (num >= 0)
 								{
 									spells[num].tolive = 0;
-									float damages = 20 * spells[num].caster_level;
-									damages = ARX_SPELLS_ApplyFireProtection(io, damages);
+									float damage = 20 * spells[num].caster_level;
+									damage = ARX_SPELLS_ApplyFireProtection(io, damage);
 
 									if (ValidIONum(spells[num].caster))
-										ARX_DAMAGES_DamageNPC(io, damages, spells[num].caster, 1, &inter.iobj[spells[num].caster]->pos);
+										ARX_DAMAGES_DamageNPC(io, damage, spells[num].caster, 1, &inter.iobj[spells[num].caster]->pos);
 									else
-										ARX_DAMAGES_DamageNPC(io, damages, spells[num].caster, 1, &io->pos);
+										ARX_DAMAGES_DamageNPC(io, damage, spells[num].caster, 1, &io->pos);
 
 									ARX_SOUND_PlaySFX(SND_SPELL_FIRE_HIT, &io->pos);
 								}
@@ -1663,7 +1663,6 @@ extern long IN_BOOK_DRAW;
 /* Render object */
 void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE_C_DATA * obj, INTERACTIVE_OBJ * io, EERIE_3D * pos, EERIE_3D & ftr, float invisibility)
 {
-	int			i;
 	float		MAX_ZEDE = 0.f;
 
 	// Sets IO BBox to calculated BBox :)
@@ -1771,7 +1770,7 @@ void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERI
 
 		bBumpOnIO		= ( bALLOW_BUMP ) && ( io ) && ( io->ioflags & IO_BUMP ) && ( fDist < __min( __max( 0.f, ( ACTIVECAM->cdepth * fZFogStart ) - 200.f ), 600.f ) ) ? true : false ;
 
-		for (i = 0 ; i < eobj->nbfaces ; i++)
+		for (long i = 0 ; i < eobj->nbfaces ; i++)
 		{
 			D3DTLVERTEX		tv_static[3];
 			ARX_D3DVERTEX	* tv			= NULL;
@@ -2436,8 +2435,11 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 	if (bRenderInterList)
 	{
 #ifdef ARX_OPENGL
+		//if (io == inter.iobj[0]) return;
+
 		g_pRenderApp->renderer->SetCull(EERIECull::CCW);
-		g_pRenderApp->renderer->DrawObj(eobj->vertexlist3, eobj->nbvertex, eobj, io);
+		g_pRenderApp->renderer->DrawObj(eobj, io , 0, &ftr);
+		g_pRenderApp->renderer->SetCull(EERIECull::None);
 #else
 		Cedric_RenderObject2(pd3dDevice,
 		                     eobj,
@@ -3025,7 +3027,7 @@ void	Cedric_AnimateDrawEntity(LPDIRECT3DDEVICE7 pd3dDevice,
 
 					float old = 0.f;
 					INTERACTIVE_OBJ * ioo = (INTERACTIVE_OBJ *)eobj->linked[k].io;
-					EERIE_3DOBJ * obj = (EERIE_3DOBJ *) eobj->linked[k].obj;
+					EERIE_3DOBJ * linkedObj = (EERIE_3DOBJ *) eobj->linked[k].obj;
 
 					// Store item invisibility flag
 					if (io && ioo)
@@ -3068,9 +3070,9 @@ void	Cedric_AnimateDrawEntity(LPDIRECT3DDEVICE7 pd3dDevice,
 						continue;
 
 					long ll = eobj->linked[k].lidx2;
-					eobj->linked[k].modinfo.link_position.x = obj->vertexlist[ll].v.x - obj->vertexlist[obj->origin].v.x;
-					eobj->linked[k].modinfo.link_position.y = obj->vertexlist[ll].v.y - obj->vertexlist[obj->origin].v.y;
-					eobj->linked[k].modinfo.link_position.z = obj->vertexlist[ll].v.z - obj->vertexlist[obj->origin].v.z;
+					eobj->linked[k].modinfo.link_position.x = linkedObj->vertexlist[ll].v.x - linkedObj->vertexlist[linkedObj->origin].v.x;
+					eobj->linked[k].modinfo.link_position.y = linkedObj->vertexlist[ll].v.y - linkedObj->vertexlist[linkedObj->origin].v.y;
+					eobj->linked[k].modinfo.link_position.z = linkedObj->vertexlist[ll].v.z - linkedObj->vertexlist[linkedObj->origin].v.z;
 
 					EERIE_QUAT quat;
 					ll = eobj->linked[k].lidx;
@@ -3079,7 +3081,7 @@ void	Cedric_AnimateDrawEntity(LPDIRECT3DDEVICE7 pd3dDevice,
 					
 					EERIEMATRIX	 matrix;
 					MatrixFromQuat(&matrix, &quat);
-					DrawEERIEInterMatrix(pd3dDevice, obj, &matrix, posi, ioo, NULL, &eobj->linked[k].modinfo);
+					DrawEERIEInterMatrix(pd3dDevice, linkedObj, &matrix, posi, ioo, NULL, &eobj->linked[k].modinfo);
 					INVISIBILITY_OVERRIDE = 0.f;
 
 					// Restore item invisibility flag

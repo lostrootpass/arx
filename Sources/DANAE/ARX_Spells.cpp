@@ -489,10 +489,10 @@ void LaunchAntiMagicField(EERIE_3D * pos,long ident)
 			&&	(spells[ident].caster_level >= spells[n].caster_level)
 			&&	(n!=ident)	)
 		{
-			EERIE_3D pos; 
-			GetSpellPosition(&pos,n);
+			EERIE_3D position; 
+			GetSpellPosition(&position,n);
 
-			if (EEDistance3D(&pos,&inter.iobj[spells[ident].caster]->pos)<600.f)
+			if (EEDistance3D(&position,&inter.iobj[spells[ident].caster]->pos)<600.f)
 			{
 				if (spells[n].type==SPELL_CREATE_FIELD)
 				{

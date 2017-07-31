@@ -94,13 +94,13 @@ extern CMenuConfig * pMenuConfig;
 extern long STOP_KEYBOARD_INPUT;
 
 //-----------------------------------------------------------------------------
-BOOL ARX_INPUT_Init(HINSTANCE hInst, HWND hWnd)
+BOOL ARX_INPUT_Init(HINSTANCE instance, HWND hWnd)
 {
 #ifdef NO_DIRECT_INPUT
 	return TRUE;
 #endif
 	memset((void *)&InputInit, 0, sizeof(DXI_INIT));
-	DXI_Init(hInst, &InputInit);
+	DXI_Init(instance, &InputInit);
 
 	if (DXI_FAIL == DXI_GetKeyboardInputDevice(hWnd, DXI_KEYBOARD1, DXI_MODE_NONEXCLUSIF_OURMSG)) 
 		return FALSE;
@@ -1136,7 +1136,7 @@ void ARXInputHandlerSDL::GetInput()
 	ARX_CHECK_INT(ARX_TIME_Get(false));
 	const int iArxTime = ARX_CLEAN_WARN_CAST_INT(ARX_TIME_Get(false));
 
-	const bool masks[] = { 
+	const Uint32 masks[] = { 
 		mask & SDL_BUTTON_LMASK,
 		mask & SDL_BUTTON_MMASK,
 		mask & SDL_BUTTON_RMASK

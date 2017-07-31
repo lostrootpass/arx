@@ -471,9 +471,9 @@ float oldposx,oldposz;
 
 		while(nby--)
 		{
-			int nbx=ddsd.lPitch>>2;
+			int nbx2=ddsd.lPitch>>2;
 
-			while(nbx--)
+			while(nbx2--)
 			{	
 				int col=*mems++;
 				*memc++=(unsigned char)((col&dwBMask)>>dwBShiftR);

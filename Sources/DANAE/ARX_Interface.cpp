@@ -3376,7 +3376,7 @@ BOOL ManageEditorControls()
 				g_pRenderApp->kbd.inkey[INKEY_U]=0;
 			}
 
-			float val=10.f;
+			val=10.f;
 
 			if ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT])) 
 			{
@@ -3666,7 +3666,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PAD2]) 
 		{
-			EERIE_3D trans;
 			trans.x=(float)EEsin(DEG2RAD(player.angle.b))*val;
 			trans.y=0.f;
 			trans.z=-(float)EEcos(DEG2RAD(player.angle.b))*val;
@@ -3676,7 +3675,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PAD6]) 
 		{
-			EERIE_3D trans;
 			trans.x=-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b-90.f)))*val;
 			trans.y=0.f;
 			trans.z=(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b-90.f)))*val;
@@ -3686,7 +3684,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PAD4]) 
 		{
-			EERIE_3D trans;
 			trans.x=-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b+90.f)))*val;
 			trans.y=0.f;
 			trans.z=(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b+90.f)))*val;
@@ -3696,7 +3693,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PADADD]) 
 		{
-			EERIE_3D trans;
 			trans.x=0.f;
 			trans.y=-val;
 			trans.z=0.f;
@@ -3706,7 +3702,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PADMINUS]) 
 		{
-			EERIE_3D trans;
 			trans.x=0.f;
 			trans.y=val;
 			trans.z=0.f;
@@ -3719,8 +3714,6 @@ BOOL ManageEditorControls()
 	// IO Edition Key/Mouse Management -------------------------------	
 	if (EDITMODE)
 	{ 
-		float val;
-
 		if ((g_pRenderApp->kbd.inkey[INKEY_LEFTSHIFT]) || (g_pRenderApp->kbd.inkey[INKEY_RIGHTSHIFT]))
 		{
 			val=1.f;		
@@ -3762,7 +3755,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PAD8]) 
 		{
-			EERIE_3D trans;
 			float ag=GetNearestSnappedAngle(player.angle.b);
 			ag=DEG2RAD(ag);
 			trans.x=-(float)EEsin(ag)*val;
@@ -3774,7 +3766,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PAD2]) 
 		{
-			EERIE_3D trans;
 			float ag=GetNearestSnappedAngle(player.angle.b);
 			ag=DEG2RAD(ag);
 			trans.x=(float)EEsin(ag)*val;
@@ -3786,7 +3777,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PAD6]) 
 		{
-			EERIE_3D trans;
 			float ag=GetNearestSnappedAngle(MAKEANGLE(player.angle.b-90.f));
 			ag=DEG2RAD(ag);
 			trans.x=-(float)EEsin(ag)*val;
@@ -3798,7 +3788,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PAD4]) 
 		{
-			EERIE_3D trans;
 			float ag=GetNearestSnappedAngle(MAKEANGLE(player.angle.b+90.f));
 			ag=DEG2RAD(ag);
 			trans.x=-(float)EEsin(ag)*val;
@@ -3810,7 +3799,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PADADD]) 
 		{
-			EERIE_3D trans;
 			trans.x=0.f;
 			trans.y=-val;
 			trans.z=0.f;
@@ -3820,7 +3808,6 @@ BOOL ManageEditorControls()
 
 		if (g_pRenderApp->kbd.inkey[INKEY_PADMINUS]) 
 		{
-			EERIE_3D trans;
 			trans.x=0.f;
 			trans.y=val;
 			trans.z=0.f;
@@ -5961,7 +5948,6 @@ void ManageKeyMouse()
 				///////
 		if ((EERIEMouseButton & 4) && (EDITMODE))
 				{
-					INTERACTIVE_OBJ * t;
 					
 			t = FlyingOverIO; 
 
@@ -7201,16 +7187,16 @@ void ARX_INTERFACE_ManageOpenedBook_Finish()
 				{
 					// check if player can cast it
 					bool bOk = true;
-					long j = 0;
+					long j1 = 0;
 
-					while ((j < 4) && (spellicons[i].symbols[j] != 255))
+					while ((j1 < 4) && (spellicons[i].symbols[j1] != 255))
 					{
-						if (!(player.rune_flags & (1<<spellicons[i].symbols[j])))
+						if (!(player.rune_flags & (1<<spellicons[i].symbols[j1])))
 						{
 							bOk = false;
 						}
 
-						j++;
+						j1++;
 					}
 
 					if (bOk)
@@ -8180,7 +8166,6 @@ void ARX_INTERFACE_ManageOpenedBook()
 
 				if (FLYING_OVER == WND_XP)
 				{
-					_TCHAR tex[512];
 					_stprintf(tex, _T("%s %8d"), ARXmenu.mda->flyover[WND_XP], GetXPforLevel(player.level+1)-player.xp);
 					UNICODE_ARXDrawTextCenteredScroll(	(DANAESIZX*0.5f),
 						4,
@@ -8704,7 +8689,7 @@ void ARX_INTERFACE_ManageOpenedBook()
 #endif
 
 			if (ARXmenu.currentmode!=AMCM_OFF)
-				g_pRenderApp->renderer->SetViewport(139.f*Xratio,0,139.f*Xratio,310.f*Yratio);
+				g_pRenderApp->renderer->SetViewport((int)(139.f*Xratio),0,(int)(139.f*Xratio),(int)(310.f*Yratio));
 		}
 		else
 		{
@@ -10596,7 +10581,7 @@ long Manage3DCursor(long flags)
 						{
 				if (EEfabs(lastanything) > __min(EEfabs(height), 12))
 							{
-								INTERACTIVE_OBJ * io=DRAGINTER;
+								io=DRAGINTER;
 								ARX_PLAYER_Remove_Invisibility();
 								io->obj->pbox->active=1;
 								io->obj->pbox->stopcount=0;
@@ -10995,8 +10980,8 @@ void ARX_INTERFACE_RenderCursor(long flag)
 
 					surf=ITC.magic;
 
-					float POSX=DANAEMouse.x;
-					float POSY=DANAEMouse.y;
+					POSX=DANAEMouse.x;
+					POSY=DANAEMouse.y;
 
 					if (TRUE_PLAYER_MOUSELOOK_ON)
 					{

@@ -33,10 +33,10 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 namespace ATHENA
 {
 
-	static enum MixerFlag
+	static enum 
 	{
 		IS_PAUSED = 0x00000001
-	};
+	} MixerFlag;
 
 	///////////////////////////////////////////////////////////////////////////////
 	//                                                                           //
@@ -120,18 +120,18 @@ namespace ATHENA
 		return AAL_OK;
 	}
 
-	aalError Mixer::SetParent(const Mixer * _mixer)
+	aalError Mixer::SetParent(const Mixer * mixer)
 	{
-		const Mixer * mixer = _mixer;
+		const Mixer * m = mixer;
 
-		while (mixer)
+		while (m)
 		{
-			if (mixer == this) return AAL_ERROR;
+			if (m == this) return AAL_ERROR;
 
-			mixer = mixer->parent;
+			m = m->parent;
 		}
 
-		parent = _mixer;
+		parent = mixer;
 		return AAL_OK;
 	}
 

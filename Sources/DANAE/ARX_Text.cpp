@@ -133,6 +133,8 @@ int GetSizeForHFont(HFONT f)
 	{
 		return 16;
 	}
+
+	return -1;
 }
 
 long ARX_UNICODE_ForceFormattingInRect(HFONT _hFont, _TCHAR * _lpszUText, int _iSpacingY, RECT _rRect)
@@ -1039,7 +1041,7 @@ void CARXTextManager::Render()
 #ifdef ARX_OPENGL
 			char text[MAX_PATH];
 			wcstombs(text, pArxText->lpszUText, wcslen(pArxText->lpszUText) + 1);
-			g_pRenderApp->renderer->DrawText(text, pArxText->rRect.left, pArxText->rRect.top - pArxText->fDeltaY, pArxText->lCol, pArxText->iFontSize);
+			g_pRenderApp->renderer->DrawText(text, (float)pArxText->rRect.left, (float)pArxText->rRect.top - pArxText->fDeltaY, pArxText->lCol, pArxText->iFontSize);
 #else
 			HRGN hRgn = NULL;
 			hRgn = CreateRectRgn(pArxText->rRectClipp.left,

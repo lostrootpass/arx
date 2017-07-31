@@ -581,15 +581,15 @@ CMultiMagicMissile::~CMultiMagicMissile()
 }
 
 //-----------------------------------------------------------------------------
-void CMultiMagicMissile::Create(EERIE_3D aePos, EERIE_3D angles)
+void CMultiMagicMissile::Create(EERIE_3D aePos, EERIE_3D angle)
 {
 	long lMax = 0;
 
 	if (pTab)
 	{
 
-		float afAlpha = angles.a;
-		float afBeta = angles.b;
+		float afAlpha = angle.a;
+		float afBeta = angle.b;
 		spells[spellinstance].hand_group = GetActionPointIdx(inter.iobj[spells[spellinstance].caster]->obj, "PRIMARY_ATTACH");
 
 		if (spells[spellinstance].hand_group != -1)

@@ -1613,7 +1613,7 @@ void CheckForIgnition(EERIE_3D * pos, float radius, long mode, long flag)
 		        &&	(io->obj->fastaccess.fire >= 0)
 		   )
 		{
-			float dist = EEDistance3D(pos, &io->obj->vertexlist3[io->obj->fastaccess.fire].v);
+			dist = EEDistance3D(pos, &io->obj->vertexlist3[io->obj->fastaccess.fire].v);
 
 			if (dist < radius)
 			{
@@ -1888,9 +1888,9 @@ void ARX_DAMAGES_DurabilityLoss(INTERACTIVE_OBJ * io, float loss)
 		SendIOScriptEvent(io, SM_BREAK, "", NULL);
 	}
 }
-void ARX_DAMAGES_DamagePlayerEquipment(float damages)
+void ARX_DAMAGES_DamagePlayerEquipment(float d)
 {
-	float ratio = damages * DIV20;
+	float ratio = d * DIV20;
 
 	if (ratio > 1.f) ratio = 1.f;
 

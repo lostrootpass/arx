@@ -1267,11 +1267,12 @@ BOOL CheckAnythingInSphere(EERIE_SPHERE * sphere,long source,long flags,long * n
 	F2L(sphere->origin.x*ACTIVEBKG->Xmul,&px);	
 	F2L(sphere->origin.z*ACTIVEBKG->Zmul,&pz);
 
-	EERIEPOLY * ep;
 	FAST_BKG_DATA * feg;
 
 	if (!(flags & CAS_NO_BACKGROUND_COL))
 	{
+		EERIEPOLY * ep;
+
 		long spz=__max(pz-rad,0);
 		long epz=__min(pz+rad,ACTIVEBKG->Zsize-1); 
 		long spx=__max(px-rad,0);
@@ -1595,16 +1596,16 @@ BOOL AttemptValidCylinderPos(EERIE_CYLINDER * cyl,INTERACTIVE_OBJ * io,long flag
 			EERIE_CYLINDER tmpp;
 			memcpy(&tmpp,cyl,sizeof(EERIE_CYLINDER));
 			tmpp.radius*=0.7f;
-			float tmp=CheckAnythingInCylinder(&tmpp,io,flags | CFLAG_JUST_TEST);
+			float inCylinder=CheckAnythingInCylinder(&tmpp,io,flags | CFLAG_JUST_TEST);
 
-			if ((tmp > 50.f))
+			if ((inCylinder > 50.f))
 			{		
 				tmpp.radius=cyl->radius*1.4f;
 					tmpp.origin.y-=30.f;
-					float tmp=CheckAnythingInCylinder(&tmpp,io,flags | CFLAG_JUST_TEST);
+					inCylinder=CheckAnythingInCylinder(&tmpp,io,flags | CFLAG_JUST_TEST);
 
-					if (tmp<0)
-				return FALSE;
+					if (inCylinder<0.0f)
+						return FALSE;
 			}
 		}
 

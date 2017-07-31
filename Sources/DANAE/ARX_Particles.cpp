@@ -1827,12 +1827,12 @@ int ARX_GenereOneEtincelle(EERIE_3D *pos,EERIE_3D *dir)
 }
 
 //-----------------------------------------------------------------------------
-void ARX_GenereSpheriqueEtincelles(EERIE_3D *pos,float r,TextureContainer *tc,float rr,float g,float b,int mask)
+void ARX_GenereSpheriqueEtincelles(EERIE_3D *pos,float r,TextureContainer *tc,float red,float green,float blue,int mask)
 {
 	GTC=tc;
-	ET_R=rr;
-	ET_G=g;
-	ET_B=b;
+	ET_R=red;
+	ET_G=green;
+	ET_B=blue;
 	ET_MASK=mask;
 	int nb=rand()&0x1F;
 
