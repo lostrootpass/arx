@@ -36,6 +36,7 @@ struct VtxAttrib
 struct Bone
 {
 	glm::mat4 rotate;
+	glm::vec4 quat;
 	glm::vec4 translate;
 	glm::vec4 scale;
 	int parentID;
@@ -139,7 +140,12 @@ glm::mat4 eerieToGLM(EERIEMATRIX* eerie)
 	m[3][2] = eerie->_43;
 	m[3][3] = eerie->_44;
 
-	return glm::transpose(m);
+	return m;
+}
+
+glm::vec4 eerieToGLM(EERIE_QUAT* quat)
+{
+	return glm::vec4(quat->x, quat->y, quat->z, quat->w);
 }
 
 /************************************************************/
@@ -238,7 +244,7 @@ void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
 	glDisable(GL_BLEND);
 }
 
-void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, EERIE_3D* pos, EERIE_3D* angle, EERIE_MOD_INFO* modinfo, EERIEMATRIX* matrix)
+void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, EERIE_3D* pos, EERIE_3D* angle, EERIE_MOD_INFO* modinfo, EERIEMATRIX* matrix)
 {
 	bool useAlphaBlending = false;
 
@@ -270,8 +276,46 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, EERIE_3D* pos, EERIE_3D* angle,
 
 	//Bone translation accounts for world position, but we need to invert the Y-axis
 	//because of the move from D3D to OpenGL maths.
-	//TODO: we can make this more sensibile and have bone translation be in model space.
 	modelMatrix[1][1] *= -1;
+
+	if (io)
+	{
+		modelMatrix = glm::translate(modelMatrix, eerieToGLM(&io->pos));
+	}
+	
+	if (pos)
+	{
+		modelMatrix = glm::translate(modelMatrix, eerieToGLM(pos));
+	}
+
+	{
+		glm::vec3 a = glm::vec3(0.0f);
+		if (angle)
+			a += eerieToGLM(angle);
+
+		if (io)
+		{
+			glm::vec3 temp = eerieToGLM(&io->angle);
+
+			//Logic borrowed from RenderInter, should be elsewhere.
+			if (io != inter.iobj[0])
+			{
+				if (io->ioflags & IO_NPC)
+					temp.y = MAKEANGLE(180.f - io->angle.y);
+				else
+					temp.y = MAKEANGLE(270.f - io->angle.y);
+			}
+
+			a += temp;
+		}
+
+		if (eobj)
+			a += eerieToGLM(&eobj->angle);
+
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(a.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(a.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(a.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	}
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &_view[0][0]);
@@ -318,10 +362,12 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, EERIE_3D* pos, EERIE_3D* angle,
 
 			Bone& b = boneBuffer[boneIdx];
 
-			MatrixFromQuat(&eerieMatrix, &bone.quatanim);
-			b.rotate = glm::scale(eerieToGLM(&eerieMatrix), eerieToGLM(&bone.scaleanim));
-			b.translate = glm::vec4(eerieToGLM(&bone.transanim), 1.0);
-			b.scale = glm::vec4(eerieToGLM(&bone.scaleanim), 1.0);
+			MatrixFromQuat(&eerieMatrix, &bone.quatinit);
+			glm::vec3 scaleVec = eerieToGLM(&bone.scaleinit) +glm::vec3(1.0f, 1.0f, 1.0f);
+			b.quat = eerieToGLM(&bone.quatinit);
+			b.rotate = glm::scale(eerieToGLM(&eerieMatrix), scaleVec);
+			b.translate = glm::vec4(eerieToGLM(&bone.transinit), 1.0);
+			b.scale = glm::vec4(scaleVec, 1.0);
 			b.parentID = (int)bone.father;
 
 			//Match up the bone data to the vertex data
@@ -447,29 +493,6 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, EERIE_3D* pos, EERIE_3D* angle,
 		glUniform1i(uniformLocation, 0 + pair.second);
 	}
 
-	//Some inter objects don't have their absolute position buried in bone data,
-	//or the io, but get it from DrawEERIEInter's params.
-	//TODO: unify codepaths and simplify.
-	glm::vec4 modelAngleUniform = glm::vec4(0.0f);
-	if (angle)
-	{
-		modelAngleUniform += glm::vec4(eerieToGLM(angle), 1.0f);
-	}
-	
-	if (modinfo)
-	{
-		modelAngleUniform += glm::vec4(eerieToGLM(&modinfo->rot), 1.0f);
-	}
-
-	glUniform4fv(glGetUniformLocation(program, "modelAngle"), 1, &modelAngleUniform[0]);
-
-	glm::vec4 modelOffsetUniform = glm::vec4(0.0f);
-	if (pos)
-	{
-		modelOffsetUniform = glm::vec4(eerieToGLM(pos), 1.0f);
-	}
-	glUniform4fv(glGetUniformLocation(program, "modelOffset"), 1, &modelOffsetUniform[0]);
-	
 	//Data for linked/attached objects (e.g. weapons)
 	glm::vec4 linkedObjectOffset = glm::vec4(0.0f);
 	if (matrix && modinfo && !angle)

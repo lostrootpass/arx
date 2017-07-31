@@ -744,7 +744,7 @@ void DrawEERIEInterMatrix(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 	if (BIGMAT==NULL) return;
 	
 #ifdef ARX_OPENGL
-	g_pRenderApp->renderer->DrawObj(eobj, poss, angle, modinfo, mat);
+	g_pRenderApp->renderer->DrawObj(eobj, 0, poss, angle, modinfo, mat);
 #else
 	DrawEERIEInter(pd3dDevice,eobj,NULL,poss,io,modinfo);
 #endif
@@ -2798,7 +2798,7 @@ void DrawEERIEInter(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_3DOBJ * eobj,
 #ifdef ARX_OPENGL
 		//still need to call DrawEERIEInter2 for now.
 		//TODO: fix.
-		g_pRenderApp->renderer->DrawObj(eobj, poss, angle, modinfo);
+		g_pRenderApp->renderer->DrawObj(eobj, 0, poss, angle, modinfo);
 #endif
 	 return;
 	}

@@ -21,6 +21,7 @@ uniform mat4 proj;
 struct Bone
 {
 	mat4 rotate;
+    vec4 quat;
 	vec4 translate;
 	vec4 scale;
 	int parentID;
@@ -33,64 +34,99 @@ layout(std140) uniform BoneData
 
 uniform int numBones;
 
-uniform vec4 modelAngle;
-uniform vec4 modelOffset;
-
 uniform vec4 linkedObjectOffset;
 uniform mat4 linkedObjectMatrix;
 
-vec3 rotateX(vec3 inVec, float angle)
+vec4 QuatMultiply(vec4 q1, vec4 q2)
 {
-    float c = cos(radians(angle));
-    float s = sin(radians(angle));
+    vec4 outQuat;
 
-    vec3 outVec;
+    outQuat.x = q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y;
+	outQuat.y = q1.w * q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z;
+	outQuat.z = q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x;
+	outQuat.w = q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z;
 
-    outVec.x = inVec.x;
-    outVec.y = (inVec.y * c) - (inVec.z * s);
-    outVec.z = (inVec.y * s) + (inVec.z * c);
+    return outQuat;
+}
+
+vec3 TransformVertexQuat(vec4 quat, vec3 inVec)
+{
+    vec3 outVec = inVec;
+
+	float rx = inVec.x * quat.w - inVec.y * quat.z + inVec.z * quat.y;
+	float ry = inVec.y * quat.w - inVec.z * quat.x + inVec.x * quat.z;
+	float rz = inVec.z * quat.w - inVec.x * quat.y + inVec.y * quat.x;
+	float rw = inVec.x * quat.x + inVec.y * quat.y + inVec.z * quat.z;
+
+	outVec.x = quat.w * rx + quat.x * rw + quat.y * rz - quat.z * ry;
+	outVec.y = quat.w * ry + quat.y * rw + quat.z * rx - quat.x * rz;
+	outVec.z = quat.w * rz + quat.z * rw + quat.x * ry - quat.y * rx;
 
     return outVec;
 }
 
-vec3 rotateY(vec3 inVec, float angle)
+mat4 MatrixFromQuat(vec4 quat)
 {
-    float c = cos(radians(angle));
-    float s = sin(radians(angle));
+    mat4 m;
+	float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
 
-    vec3 outVec;
+	// calculate coefficients
+	x2 = quat.x + quat.x;
+	y2 = quat.y + quat.y;
+	z2 = quat.z + quat.z;
+	xx = quat.x * x2;
+	xy = quat.x * y2;
+	xz = quat.x * z2;
+	yy = quat.y * y2;
+	yz = quat.y * z2;
+	zz = quat.z * z2;
+	wx = quat.w * x2;
+	wy = quat.w * y2;
+	wz = quat.w * z2;
 
-    outVec.x = (inVec.x * c) + (inVec.z * s);
-    outVec.y = inVec.y;
-    outVec.z = (inVec.z * c) - (inVec.x * s);
+	m[0][0] = 1.0 - (yy + zz);
+	m[1][0] = xy - wz;
+	m[2][0] = xz + wy;
+	m[3][0] = 0.0;
 
-    return outVec;
-}
+	m[0][1] = xy + wz;
+	m[1][1] = 1.0 - (xx + zz);
+	m[2][1] = yz - wx;
+	m[3][1] = 0.0;
 
-vec3 rotateZ(vec3 inVec, float angle)
-{
-    float c = cos(radians(angle));
-    float s = sin(radians(angle));
+	m[0][2] = xz - wy;
+	m[1][2] = yz + wx;
+	m[2][2] = 1.0 - (xx + yy);
+	m[3][2] = 0.0;
 
-    vec3 outVec;
-
-    outVec.x = (inVec.x * c) + (inVec.y * s);
-    outVec.y = (inVec.y * c) - (inVec.x * s);
-    outVec.z = inVec.z;
-
-    return outVec;
+    return m;
 }
 
 vec3 animate(vec3 start, int boneId)
 {
 	vec3 outVec = start;
-	
-	Bone b = bones[boneId];
 
-    outVec -= linkedObjectOffset.xyz;
-    outVec *= mat3(linkedObjectMatrix);
-	outVec *= mat3(b.rotate);
-	outVec += b.translate.xyz;
+    int boneNum = boneId;
+    const int TREE_MAX_SIZE = 32;
+    int tree[TREE_MAX_SIZE];
+    int treeSize = -1;
+
+    do
+    {
+        treeSize++;
+        tree[treeSize] = boneNum;
+        boneNum = bones[boneNum].parentID;
+    } while(boneNum > -1 && treeSize < TREE_MAX_SIZE);
+
+    vec4 quat = bones[0].quat;
+    vec3 transVec = bones[0].translate.xyz;
+    for(int i = treeSize-1; i >= 0; --i)
+    {
+        transVec += TransformVertexQuat(quat, bones[tree[i]].translate.xyz);
+        quat = QuatMultiply(quat, bones[tree[i]].quat);
+    }
+    outVec *= transpose(mat3(MatrixFromQuat(quat)));
+    outVec += transVec;
 	
 	return outVec;
 }
@@ -104,17 +140,12 @@ void main()
     outColor = inColor;
 
     vec3 adjPos = pos;
-    if(boneId > -1 && boneId < numBones)
-    {
-		adjPos = animate(adjPos, boneId);
-		
-		{
-			adjPos = rotateY(adjPos, modelAngle.y);
-            adjPos = rotateX(adjPos, modelAngle.x);
-            adjPos = rotateZ(adjPos, modelAngle.z);
-        }
+    adjPos -= linkedObjectOffset.xyz;
+    adjPos *= mat3(linkedObjectMatrix);
 
-        adjPos += modelOffset.xyz;
+    if(boneId > -1 && boneId < numBones)
+    {    
+		adjPos = animate(adjPos, boneId);
     }
 
     gl_Position = proj * view * model * vec4(adjPos, 1.0);
