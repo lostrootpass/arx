@@ -65,7 +65,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #define C_LANGUAGE_SPANISH		2
 #define C_LANGUAGE_ENGLISH		3
 /*-----------------------------------------------------------*/
-void DeleteAllBitmap(LPDIRECT3DDEVICE7 device);
+void DeleteAllBitmap();
 void DeleteAllSound(void);
 BOOL DeleteTrack(void);
 /*-----------------------------------------------------------*/
@@ -330,7 +330,6 @@ class CINEMATIQUE
  
 		HRESULT DeleteDeviceObjects();
 	public:
-		LPDIRECT3DDEVICE7 m_pd3dDevice;
 
 		EERIE_3D	pos;
 		float		angz;
@@ -367,7 +366,7 @@ class CINEMATIQUE
 		float		flTime;
 		float		m_flIntensityRND;
 
-		CINEMATIQUE(LPDIRECT3DDEVICE7, int, int);
+		CINEMATIQUE(int, int);
 		BOOL ActiveTexture(int id);
 		HRESULT InitDeviceObjects();
 		HRESULT OneTimeSceneReInit(void);
@@ -402,18 +401,18 @@ void UpDateAllKeyLight(void);
 void InitMapLoad(CINEMATIQUE * c);
 C_BITMAP * GetFreeBitmap(int * num);
 BOOL DeleteFreeBitmap(int num);
-BOOL KillTexture(LPDIRECT3DDEVICE7 device, int num);
+BOOL KillTexture(int num);
 int CreateAllMapsForBitmap(char * dir, char * name, CINEMATIQUE * c, int num, int pos);
 BOOL ActiveAllTexture(CINEMATIQUE * c);
 
-BOOL ReCreateAllMapsForBitmap(int id, int nmax, CINEMATIQUE * c, LPDIRECT3DDEVICE7 device);
+BOOL ReCreateAllMapsForBitmap(int id, int nmax, CINEMATIQUE * c);
 
 int FX_FadeIN(float a, int color, int colord);
 int FX_FadeOUT(float a, int color, int colord);
-BOOL FX_FlashBlanc(LPDIRECT3DDEVICE7 device, float w, float h, float speed, int color, float fps, float currfps);
-BOOL FX_Blur(CINEMATIQUE * c, LPDIRECT3DDEVICE7 device, C_BITMAP * tb);
-BOOL SpecialFade(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, float h, float speed, float fps, float fpscurr);
-BOOL SpecialFadeR(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, float h, float speed, float fps, float fpscurr);
+BOOL FX_FlashBlanc(float w, float h, float speed, int color, float fps, float currfps);
+BOOL FX_Blur(CINEMATIQUE * c, C_BITMAP * tb);
+BOOL SpecialFade(TextureContainer * mask, float ws, float h, float speed, float fps, float fpscurr);
+BOOL SpecialFadeR(TextureContainer * mask, float ws, float h, float speed, float fps, float fpscurr);
 void FX_DreamPrecalc(C_BITMAP * bi, float amp, float fps);
 
 void GetPathDirectory(char * dirfile);
@@ -434,7 +433,7 @@ BOOL AddSoundToList(char * dir, char * name, int id, int pos);
 BOOL PlaySoundKeyFramer(int id);
 void StopSoundKeyFramer(void);
 
-void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_LIGHT * light, EERIE_3D * posgrillesuiv, float angzgrillesuiv);
+void DrawGrille(C_GRILLE * grille, int col, int fx, C_LIGHT * light, EERIE_3D * posgrillesuiv, float angzgrillesuiv);
 void FillKeyTemp(EERIE_3D * pos, float az, int frame, int numbitmap, int numfx, short ti, int color, int colord, int colorf, float speed, int idsound, short force, C_LIGHT * light, EERIE_3D * posgrille, float angzgrille, float speedtrack);
 
 void ReInitStandardCam(EERIE_CAMERA * cam);

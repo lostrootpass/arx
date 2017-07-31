@@ -154,12 +154,10 @@ void AddDirectory(char * pT, char * dir)
 }
 
 /*---------------------------------------------------------------------------------*/
-CINEMATIQUE::CINEMATIQUE(LPDIRECT3DDEVICE7 _m_pd3dDevice, int _w, int _h)
+CINEMATIQUE::CINEMATIQUE(int _w, int _h)
 {
 	LargeurRender = _w;
 	HauteurRender = _h;
-
-	m_pd3dDevice = _m_pd3dDevice;
 
 	numbitmap = -1;
 	numbitmapsuiv = -1;
@@ -214,7 +212,7 @@ void CINEMATIQUE::ReInitMapp(int id)
 
 	if (TabBitmap[id].actif)
 	{
-		ReCreateAllMapsForBitmap(id, TabBitmap[id].grille.echelle, this, GDevice);
+		ReCreateAllMapsForBitmap(id, TabBitmap[id].grille.echelle, this);
 	}
 }
 
@@ -291,7 +289,7 @@ HRESULT CINEMATIQUE::New()
 	LeftButton = RightButton = FALSE;
 
 	DeleteTrack();
-	DeleteAllBitmap(GDevice);
+	DeleteAllBitmap();
 	DeleteAllSound();
 
 	AllocTrack(0, 100, 30.f);
@@ -332,23 +330,23 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 	return S_OK;
 #endif
 
-	m_pd3dDevice = GDevice;
+	GDevice = GDevice;
 
 	D3DMATERIAL7 mtrl;
 	D3DUtil_InitMaterial(mtrl, 1.f, 1.f, 1.f);
-	m_pd3dDevice->SetMaterial(&mtrl);
+	GDevice->SetMaterial(&mtrl);
 
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LASTPIXEL, TRUE); 
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_CLIPPING , TRUE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LIGHTING  , FALSE);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_CLAMP);
+	GDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE);
+	GDevice->SetRenderState(D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a);
+	GDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, TRUE);
+	GDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
+	GDevice->SetRenderState(D3DRENDERSTATE_LASTPIXEL, TRUE); 
+	GDevice->SetRenderState(D3DRENDERSTATE_CLIPPING , TRUE);
+	GDevice->SetRenderState(D3DRENDERSTATE_LIGHTING  , FALSE);
+	GDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_CLAMP);
 
 	D3DDEVICEDESC7 devicedesc;
-	this->m_pd3dDevice->GetCaps(&devicedesc);
+	GDevice->GetCaps(&devicedesc);
 	DWORD f;
 	bool bAnisotropicOk = false;
 
@@ -369,7 +367,7 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 		}
 	}
 
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, f);
+	GDevice->SetTextureStageState(0, D3DTSS_MINFILTER, f);
 
 	if (devicedesc.dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MAGFANISOTROPIC)
 	{
@@ -388,17 +386,17 @@ HRESULT CINEMATIQUE::InitDeviceObjects()
 		}
 	}
 
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, f);
+	GDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, f);
 
 	if (bAnisotropicOk)
 	{
-		m_pd3dDevice->SetTextureStageState(0, D3DTSS_MAXANISOTROPY, 0);
+		GDevice->SetTextureStageState(0, D3DTSS_MAXANISOTROPY, 0);
 	}
 
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_LINEAR);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, (DWORD)(0));
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE);
+	GDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
+	GDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_LINEAR);
+	GDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, (DWORD)(0));
+	GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, FALSE);
 
 	EditLight = FALSE;
 
@@ -415,29 +413,29 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 	return S_OK;
 #endif
 
-	m_pd3dDevice = GDevice;		
+	GDevice = GDevice;		
 
 	// Setup Base Material
 	D3DMATERIAL7 mtrl;
 	D3DUtil_InitMaterial(mtrl, 1.f, 1.f, 1.f);
-	m_pd3dDevice->SetMaterial(&mtrl);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE);
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a);
+	GDevice->SetMaterial(&mtrl);
+	GDevice->SetRenderState(D3DRENDERSTATE_TEXTUREPERSPECTIVE , TRUE);
+	GDevice->SetRenderState(D3DRENDERSTATE_AMBIENT,  0x0a0a0a0a);
 	// Setup Dither Mode
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE);
+	GDevice->SetRenderState(D3DRENDERSTATE_DITHERENABLE, FALSE);
 	// Setup Specular RenderState
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
+	GDevice->SetRenderState(D3DRENDERSTATE_SPECULARENABLE, FALSE);
 	// Setup LastPixel RenderState
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LASTPIXEL, TRUE); 
+	GDevice->SetRenderState(D3DRENDERSTATE_LASTPIXEL, TRUE); 
 	// Setup Clipping RenderState
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_CLIPPING , TRUE);
+	GDevice->SetRenderState(D3DRENDERSTATE_CLIPPING , TRUE);
 	// Disable Lighting RenderState
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_LIGHTING  , FALSE);
+	GDevice->SetRenderState(D3DRENDERSTATE_LIGHTING  , FALSE);
 
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
+	GDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
 
 	D3DDEVICEDESC7 devicedesc;
-	this->m_pd3dDevice->GetCaps(&devicedesc);
+	GDevice->GetCaps(&devicedesc);
 	DWORD f;
 
 	if (devicedesc.dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR)
@@ -449,7 +447,7 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 		f = D3DTFG_POINT;
 	}
 	
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, f);
+	GDevice->SetTextureStageState(0, D3DTSS_MINFILTER, f);
 
 	if (devicedesc.dpcTriCaps.dwTextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR)
 	{
@@ -460,20 +458,20 @@ HRESULT CINEMATIQUE::DeleteDeviceObjects()
 		f = D3DTFG_POINT;
 	}
 	
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, f);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MAXANISOTROPY, 1);
+	GDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, f);
+	GDevice->SetTextureStageState(0, D3DTSS_MAXANISOTROPY, 1);
 
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_LINEAR);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, (DWORD)(0));
+	GDevice->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFP_LINEAR);
+	GDevice->SetTextureStageState(0, D3DTSS_MIPMAPLODBIAS, (DWORD)(0));
 
-	m_pd3dDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, TRUE);
+	GDevice->SetRenderState(D3DRENDERSTATE_FOGENABLE, TRUE);
 
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-	m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 
 	return S_OK;
 }
@@ -535,7 +533,7 @@ void TransformLocalVertex(EERIE_3D * vbase, D3DTLVERTEX * d3dv)
 	d3dv->sz = vbase->z + LocalPos.z;
 }
 /*---------------------------------------------------------------*/
-void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_LIGHT * light, EERIE_3D * posgrille, float angzgrille)
+void DrawGrille(C_GRILLE * grille, int col, int fx, C_LIGHT * light, EERIE_3D * posgrille, float angzgrille)
 {
 	int nb = grille->nbvertexs;
 	EERIE_3D * v = grille->vertexs;
@@ -665,9 +663,9 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 	while (nb--)
 	{
 		if (mat->tex)
-			SETTC(device, mat->tex);
+			SETTC(GDevice, mat->tex);
 		else
-			SETTC(device, NULL);
+			SETTC(GDevice, NULL);
 
 		int	nb2 = mat->nbvertexs;
 
@@ -678,7 +676,7 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 			uvs++;
 		}
 
-		if (FAILED(device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
+		if (FAILED(GDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
 		                                        D3DFVF_TLVERTEX,
 		                                        AllD3DTLVertex,
 		                                        grille->nbvertexs,
@@ -691,16 +689,16 @@ void DrawGrille(LPDIRECT3DDEVICE7 device, C_GRILLE * grille, int col, int fx, C_
 
 		if (DrawLine)
 		{
-			SETTC(device, NULL);
-			device->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME);
-			device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
+			SETTC(GDevice, NULL);
+			GDevice->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME);
+			GDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
 			                             D3DFVF_TLVERTEX,
 			                             AllD3DTLVertex,
 			                             grille->nbvertexs,
 			                             ((unsigned short *)grille->inds) + mat->startind,
 			                             mat->nbind,
 			                             0);
-			device->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID);
+			GDevice->SetRenderState(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID);
 		}
 
 		mat++;
@@ -713,7 +711,7 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 	C_BITMAP	* tb;
 
 
-	m_pd3dDevice = GDevice;
+	GDevice = GDevice;
 
 	LargeurRender = DANAESIZX;
 	HauteurRender = DANAESIZY;
@@ -723,7 +721,7 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 #ifdef ARX_OPENGL
 		danaeGLApp.DANAEStartRender();
 #else
-		m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L);
+		GDevice->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0L);
 		danaeApp.DANAEStartRender();
 #endif
 		InRender = TRUE;
@@ -751,13 +749,13 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 		g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcAlpha, EERIEBlendType::OneMinusSrcAlpha);
 
 #ifndef ARX_OPENGL
-		m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-		m_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-		m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-		m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-		m_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+		GDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+		GDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+		GDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+		GDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+		GDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+		GDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+		GDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 #endif
 
 		//image key
@@ -775,7 +773,7 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 				col = FX_FadeOUT(a, color, colord);
 				break;
 			case FX_BLUR:
-				FX_Blur(this, m_pd3dDevice, tb);
+				FX_Blur(this, tb);
 				nb = 0;
 				break;
 			default:
@@ -847,7 +845,7 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 			l = &lightt;
 		}
 
-		if (tb->grille.nbvertexs) DrawGrille(this->m_pd3dDevice, &tb->grille, col, fx, l, &posgrille, angzgrille);
+		if (tb->grille.nbvertexs) DrawGrille(&tb->grille, col, fx, l, &posgrille, angzgrille);
 
 		//PASS #2
 		if (force & 1)
@@ -888,7 +886,7 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 				l = &lightt;
 			}
 
-			if (tb->grille.nbvertexs) DrawGrille(this->m_pd3dDevice, &tb->grille, col, fx, l, &posgrillesuiv, angzgrillesuiv);
+			if (tb->grille.nbvertexs) DrawGrille(&tb->grille, col, fx, l, &posgrillesuiv, angzgrillesuiv);
 		}
 
 		//effets qui continuent avec le temps
@@ -940,16 +938,16 @@ HRESULT CINEMATIQUE::Render(float FDIFF)
 		switch (fx & 0x00FF0000)
 		{
 			case FX_FLASH:
-				FlashBlancEnCours = FX_FlashBlanc(m_pd3dDevice, (float)LargeurRender, (float)HauteurRender, speed, colorflash, GetTrackFPS(), FPS);
+				FlashBlancEnCours = FX_FlashBlanc((float)LargeurRender, (float)HauteurRender, speed, colorflash, GetTrackFPS(), FPS);
 				break;
 			case FX_APPEAR:
 
-				if (FxTexture[0]) SpecialFadeEnCours = SpecialFade(m_pd3dDevice, FxTexture[0], (float)LargeurRender, (float)HauteurRender, speed, GetTrackFPS(), FPS);
+				if (FxTexture[0]) SpecialFadeEnCours = SpecialFade(FxTexture[0], (float)LargeurRender, (float)HauteurRender, speed, GetTrackFPS(), FPS);
 
 				break;
 			case FX_APPEAR2:
 
-				if (FxTexture[0]) SpecialFadeEnCours = SpecialFadeR(m_pd3dDevice, FxTexture[0], (float)LargeurRender, (float)HauteurRender, speed, GetTrackFPS(), FPS);
+				if (FxTexture[0]) SpecialFadeEnCours = SpecialFadeR(FxTexture[0], (float)LargeurRender, (float)HauteurRender, speed, GetTrackFPS(), FPS);
 
 				break;
 			default:

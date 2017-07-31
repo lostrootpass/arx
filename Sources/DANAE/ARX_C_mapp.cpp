@@ -48,7 +48,7 @@ void AddDirectory(char * pT, char * dir);
 
 /*-----------------------------------------------------------*/
 void FreeGrille(C_GRILLE * grille);
-void ReajustUV(LPDIRECT3DDEVICE7 device, int id);
+void ReajustUV(int id);
 /*-----------------------------------------------------------*/
 void InitMapLoad(CINEMATIQUE * c)
 {
@@ -118,7 +118,7 @@ BOOL DeleteFreeBitmap(int num)
 	return TRUE;
 }
 /*-----------------------------------------------------------*/
-BOOL KillTexture(LPDIRECT3DDEVICE7 device, int num)
+BOOL KillTexture(int num)
 {
 	C_BITMAP	* cb;
 
@@ -136,7 +136,7 @@ BOOL KillTexture(LPDIRECT3DDEVICE7 device, int num)
 	return TRUE;
 }
 /*-----------------------------------------------------------*/
-void DeleteAllBitmap(LPDIRECT3DDEVICE7 device)
+void DeleteAllBitmap()
 {
 	int			nb;
 
@@ -144,7 +144,7 @@ void DeleteAllBitmap(LPDIRECT3DDEVICE7 device)
 
 	while (nb)
 	{
-		KillTexture(device, MAX_BITMAP - nb);
+		KillTexture(MAX_BITMAP - nb);
 		DeleteFreeBitmap(MAX_BITMAP - nb);
 		nb--;
 	}
@@ -635,7 +635,7 @@ int CreateAllMapsForBitmap(char * dir, char * name, CINEMATIQUE * c, int n, int 
 		if (bi->dir) free((void *)bi->dir);
 
 		DeleteObject(bi->hbitmap);
-		KillTexture(GDevice, n);
+		KillTexture(n);
 		FreeGrille(&bi->grille);
 		NbBitmap--;
 
@@ -802,12 +802,12 @@ int CreateAllMapsForBitmap(char * dir, char * name, CINEMATIQUE * c, int n, int 
 	}
 
 	c->ActiveTexture(id);
-	ReajustUV(GDevice, id);
+	ReajustUV(id);
 
 	return id;
 }
 /*-----------------------------------------------------------*/
-BOOL ReCreateAllMapsForBitmap(int id, int nmax, CINEMATIQUE * c, LPDIRECT3DDEVICE7 device)
+BOOL ReCreateAllMapsForBitmap(int id, int nmax, CINEMATIQUE * c)
 {
 	int			nbx, nby, w, h, num;
 	C_BITMAP	* bi;
@@ -883,7 +883,7 @@ BOOL ReCreateAllMapsForBitmap(int id, int nmax, CINEMATIQUE * c, LPDIRECT3DDEVIC
 		nby--;
 	}
 
-	ReajustUV(GDevice, id);
+	ReajustUV(id);
 
 	return TRUE;
 }
@@ -923,7 +923,7 @@ BOOL CINEMATIQUE::ActiveTexture(int id)
 	return TRUE;
 }
 /*-----------------------------------------------------------*/
-void ReajustUV(LPDIRECT3DDEVICE7 device, int id)
+void ReajustUV(int id)
 {
 	TextureContainer	* tc;
 	C_BITMAP		*	cb;

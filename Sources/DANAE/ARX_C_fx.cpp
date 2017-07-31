@@ -94,7 +94,7 @@ int FX_FadeOUT(float a, int color, int colord)
 
 float LastTime;
 /*---------------------------------------------------------------------------------*/
-BOOL FX_Blur(CINEMATIQUE * c, LPDIRECT3DDEVICE7 device, C_BITMAP * tb)
+BOOL FX_Blur(CINEMATIQUE * c, C_BITMAP * tb)
 {
 	int			nb;
 	EERIE_3D	* pos;
@@ -135,7 +135,7 @@ BOOL FX_Blur(CINEMATIQUE * c, LPDIRECT3DDEVICE7 device, C_BITMAP * tb)
 
 		col = (int)alpha;
 		col = (col << 24) | 0x00FFFFFF;
-		DrawGrille(device, &tb->grille, col, 0, NULL, &c->posgrille, c->angzgrille);
+		DrawGrille(&tb->grille, col, 0, NULL, &c->posgrille, c->angzgrille);
 		alpha += dalpha;
 		pos++;
 		az++;
@@ -147,7 +147,7 @@ BOOL FX_Blur(CINEMATIQUE * c, LPDIRECT3DDEVICE7 device, C_BITMAP * tb)
 /*---------------------------------------------------------------------------------*/
 //POST FX
 /*---------------------------------------------------------------------------------*/
-BOOL FX_FlashBlanc(LPDIRECT3DDEVICE7 device, float w, float h, float speed, int color, float fps, float currfps)
+BOOL FX_FlashBlanc(float w, float h, float speed, int color, float fps, float currfps)
 {
 	D3DTLVERTEX	v[4];
 	int			col;
@@ -159,10 +159,10 @@ BOOL FX_FlashBlanc(LPDIRECT3DDEVICE7 device, float w, float h, float speed, int 
 
 	if (FlashAlpha == 0.f) FlashAlpha = 1.f;
 
-	device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-	device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-	device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
-	device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcAlpha, EERIEBlendType::One);
 
@@ -198,7 +198,7 @@ BOOL FX_FlashBlanc(LPDIRECT3DDEVICE7 device, float w, float h, float speed, int 
 	return TRUE;
 }
 /*---------------------------------------------------------------------------------*/
-BOOL SpecialFade(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, float h, float speed, float fps, float fpscurr)
+BOOL SpecialFade(TextureContainer * mask, float ws, float h, float speed, float fps, float fpscurr)
 {
 	D3DTLVERTEX	v[4];
 	float		w, dv;
@@ -210,17 +210,17 @@ BOOL SpecialFade(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, fl
 	dv = (float)0.99999f * (h - 1) / mask->m_dwHeight;
 
 	//tracer du mask
-	device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-	device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-	device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::Zero);
 
-	device->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
+	GDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
 
 	//SETTC(device,mask->m_pddsSurface);
-	SETTC(device, mask);
+	SETTC(GDevice, mask);
 
 	v[0].sx = SpecialFadeDx - w;
 	v[0].sy = 0;
@@ -254,13 +254,13 @@ BOOL SpecialFade(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, fl
 	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 
 	//empty
-	device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-	device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-	device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 
-	SETTC(device, NULL);
+	SETTC(GDevice, NULL);
 
 	v[0].sx = w - 1.f + SpecialFadeDx - w;
 	v[0].sy = 0;
@@ -295,12 +295,12 @@ BOOL SpecialFade(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, fl
 		SpecialFadeDx = -1.f;
 	}
 
-	device->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_CLAMP);
+	GDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_CLAMP);
 
 	return TRUE;
 }
 /*---------------------------------------------------------------------------------*/
-BOOL SpecialFadeR(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, float h, float speed, float fps, float fpscurr)
+BOOL SpecialFadeR(TextureContainer * mask, float ws, float h, float speed, float fps, float fpscurr)
 {
 	D3DTLVERTEX	v[4];
 	float		w, dv;
@@ -312,16 +312,16 @@ BOOL SpecialFadeR(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, f
 	dv = (float)0.99999f * (h - 1) / mask->m_dwHeight;
 
 	//tracer du mask
-	device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-	device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-	device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::DstColor, EERIEBlendType::Zero);
 
-	device->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
+	GDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_WRAP);
 
-	SETTC(device, mask);
+	SETTC(GDevice, mask);
 
 	v[0].sx = ws + 1.f - SpecialFadeDx + w;
 	v[0].sy = 0;
@@ -354,13 +354,13 @@ BOOL SpecialFadeR(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, f
 
 	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleStrip, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE, v, 4, 0);
 
-	device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-	device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-	device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
+	GDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	GDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
 	g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::Zero);
 
-	SETTC(device, NULL);
+	SETTC(GDevice, NULL);
 
 	v[0].sx = 0.f;
 	v[0].sy = 0;
@@ -395,7 +395,7 @@ BOOL SpecialFadeR(LPDIRECT3DDEVICE7 device, TextureContainer * mask, float ws, f
 		SpecialFadeDx = -1.f;
 	}
 
-	device->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_CLAMP);
+	GDevice->SetTextureStageState(0, D3DTSS_ADDRESS , D3DTADDRESS_CLAMP);
 
 	return TRUE;
 }

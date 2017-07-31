@@ -184,7 +184,6 @@ void ARXMenu_Private_Options_Video_SetResolution(int _iWidth, int _iHeight, int 
 
 	if (ControlCinematique)
 	{
-		ControlCinematique->m_pd3dDevice = GDevice;
 		ActiveAllTexture(ControlCinematique);
 	}
 
@@ -206,7 +205,6 @@ void ARXMenu_Options_Video_SetFullscreen(bool _bEnable)
 
 	if (ControlCinematique)
 	{
-		ControlCinematique->m_pd3dDevice = GDevice;
 		ActiveAllTexture(ControlCinematique);
 	}
 }

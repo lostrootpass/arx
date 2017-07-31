@@ -3268,7 +3268,7 @@ HRESULT DANAE::BeforeRun()
 
 	GDevice=m_pd3dDevice;
 
-	ControlCinematique = new CINEMATIQUE(danaeApp.m_pFramework->GetD3DDevice(), danaeApp.m_pFramework->m_dwRenderWidth, danaeApp.m_pFramework->m_dwRenderHeight);
+	ControlCinematique = new CINEMATIQUE(danaeApp.m_pFramework->m_dwRenderWidth, danaeApp.m_pFramework->m_dwRenderHeight);
 	memset(&necklace,0,sizeof(ARX_NECKLACE));
 	long old=GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE;
 	GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE=-1;
@@ -6529,7 +6529,6 @@ HRESULT DANAE::Render()
 
 		if(ControlCinematique)
 		{
-			ControlCinematique->m_pd3dDevice=GDevice;
 			ActiveAllTexture(ControlCinematique);
 		}
 
@@ -8971,7 +8970,7 @@ HRESULT DANAEGL::BeforeRun()
 
 	long i;
 
-	ControlCinematique = new CINEMATIQUE(0, DANAESIZX, DANAESIZY);
+	ControlCinematique = new CINEMATIQUE(DANAESIZX, DANAESIZY);
 	memset(&necklace, 0, sizeof(ARX_NECKLACE));
 	long old = GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE;
 	GLOBAL_EERIETEXTUREFLAG_LOADSCENE_RELEASE = -1;
