@@ -1098,20 +1098,6 @@ void InitializeDanae()
 void Dbg_str(char * txt)
 {
 }
-__forceinline void LaunchCDROMCheck(long param)
-{
-	return;
-
-	if (param==0)
-	{
-		// Randomize Check 5% chance per call.
-		if (rnd()<0.95f)
-			return;
-	}
-
-	//Place CDROM Checking code here...
-}
-
 //*************************************************************************************
 // DANAEApp EntryPoint
 //*************************************************************************************
@@ -1932,8 +1918,6 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	g_pRenderApp->m_bReady = TRUE;
 	char fic[256];
 	sprintf(fic,"%sGraph\\Obj3D\\Interactive\\Player\\G.ASL",Project.workingdir);
-
-	LaunchCDROMCheck(0);
 
 	HRESULT hr = g_pRenderApp->Run();
 
@@ -6496,7 +6480,6 @@ HRESULT DANAE::Render()
 	// Clicked on New Quest ? (TODO:need certainly to be moved somewhere else...)
 	if (START_NEW_QUEST)
 	{
-		LaunchCDROMCheck(0);
 		DANAE_StartNewQuest();
 	}
 
@@ -6557,7 +6540,6 @@ HRESULT DANAE::Render()
 	if ((TELEPORT_TO_LEVEL[0]) && (CHANGE_LEVEL_ICON==200))
 	{
 		CHANGE_LEVEL_ICON=-1;
-		LaunchCDROMCheck(0);
 		ARX_CHANGELEVEL_Change(TELEPORT_TO_LEVEL, TELEPORT_TO_POSITION, TELEPORT_TO_ANGLE, 0);
 		memset(TELEPORT_TO_LEVEL,0,64);
 		memset(TELEPORT_TO_POSITION,0,64);
@@ -6762,7 +6744,6 @@ HRESULT DANAE::Render()
 
 		if (WILL_QUICKSAVE>=2)
 		{
-			LaunchCDROMCheck(0);
 			ARX_QuickSave();
 			WILL_QUICKSAVE=0;
 		}
@@ -6772,7 +6753,6 @@ HRESULT DANAE::Render()
 	if (WILL_QUICKLOAD)
 	{
 		WILL_QUICKLOAD=0;
-		LaunchCDROMCheck(0);
 
 		if (ARX_QuickLoad())
 			NEED_SPECIAL_RENDEREND=1;
@@ -7842,7 +7822,6 @@ HRESULT DANAEGL::Render()
 	if((TELEPORT_TO_LEVEL[0]) && (CHANGE_LEVEL_ICON == 200))
 	{
 		CHANGE_LEVEL_ICON = -1;
-		LaunchCDROMCheck(0);
 		ARX_CHANGELEVEL_Change(TELEPORT_TO_LEVEL, TELEPORT_TO_POSITION, TELEPORT_TO_ANGLE, 0);
 		memset(TELEPORT_TO_LEVEL, 0, 64);
 		memset(TELEPORT_TO_POSITION, 0, 64);
@@ -8031,7 +8010,6 @@ HRESULT DANAEGL::Render()
 
 		if(WILL_QUICKSAVE >= 2)
 		{
-			LaunchCDROMCheck(0);
 			ARX_QuickSave();
 			WILL_QUICKSAVE = 0;
 		}
@@ -8041,8 +8019,7 @@ HRESULT DANAEGL::Render()
 	if(WILL_QUICKLOAD)
 	{
 		WILL_QUICKLOAD = 0;
-		LaunchCDROMCheck(0);
-
+		
 		if(ARX_QuickLoad())
 			NEED_SPECIAL_RENDEREND = 1;
 	}
