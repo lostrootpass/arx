@@ -504,7 +504,7 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, EERIE_3D* 
 	glm::mat4 linkedObjectMatrix = glm::mat4();
 	if (matrix)
 	{
-		linkedObjectMatrix = eerieToGLM(matrix);
+		linkedObjectMatrix = glm::transpose(eerieToGLM(matrix));
 	}
 	glUniformMatrix4fv(glGetUniformLocation(program, "linkedObjectMatrix"), 1, GL_FALSE, &linkedObjectMatrix[0][0]);
 
