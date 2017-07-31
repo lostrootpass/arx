@@ -42,7 +42,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <ARX_Player.h>
 #include <ARX_Script.h>
 #include <ARX_Particles.h>
-#include <../danae/arx_menu2.h>
+#include <../danae/Arx_MainMenu.h>
 #include <Athena.h>
 
 #include "eerieapp.h"

@@ -99,9 +99,6 @@
     <ClCompile Include="ARX_Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ARX_Menu2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ARX_MenuPublic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -222,6 +219,9 @@
     <ClCompile Include="Arx_Config.cpp">
       <Filter>Localisation\Config popup</Filter>
     </ClCompile>
+    <ClCompile Include="ARX_MainMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DANAE.rc">
@@ -281,9 +281,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\ARX_Menu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ARX_Menu2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ARX_MenuPublic.h">
@@ -417,6 +414,9 @@
     </ClInclude>
     <ClInclude Include="Arx_Config.h">
       <Filter>Localisation\Config popup</Filter>
+    </ClInclude>
+    <ClInclude Include="ARX_MainMenu.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -409,7 +409,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NDEBUG;WIN32;_WINDOWS;_UNICODE</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="ARX_Menu2.cpp">
+    <ClCompile Include="ARX_MainMenu.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_DEBUG;WIN32;_WINDOWS;_UNICODE;NODEFAULTLIB:</PreprocessorDefinitions>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EnableFastChecks</BasicRuntimeChecks>
@@ -741,7 +741,7 @@
     <ClInclude Include="ARX_HWTransform.h" />
     <ClInclude Include="ARX_Loc.h" />
     <ClInclude Include="ARX_LocHash.h" />
-    <ClInclude Include="ARX_Menu2.h" />
+    <ClInclude Include="ARX_MainMenu.h" />
     <ClInclude Include="ARX_MenuPublic.h" />
     <ClInclude Include="ARX_SnapShot.h" />
     <ClInclude Include="ARX_SpellFx.h" />

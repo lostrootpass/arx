@@ -57,7 +57,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 
 #include "ARX_Input.h"
-#include "Arx_menu2.h" //controls
+#include "Arx_MainMenu.h" //controls
 #include "ARX_Loc.h"
 #include "Mercury_dx_input.h"
 #include "ARX_Common.h"

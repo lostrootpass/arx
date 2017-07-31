@@ -66,7 +66,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_CParticles.h"
 #include "ARX_CParticleParams.h"
 #include "ARX_Loc.h"
-#include "ARX_Menu2.h"
+#include "Arx_MainMenu.h"
 #include "ARX_Text.h"
 #include "ARX_Time.h"
 #include "ARX_Equipment.h"
@@ -575,7 +575,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	FRAME_COUNT = 0;
 
-	bool br = Menu2_Render();
+	bool br = MainMenu_Render();
 
 	if (br)
 	{

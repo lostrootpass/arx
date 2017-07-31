@@ -29,7 +29,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <tchar.h>
 #include "danae.h"
 #include "arx_menu.h"
-#include "arx_menu2.h"
+#include "Arx_MainMenu.h"
 #include "ARX_MenuPublic.h"
 #include "ARX_Sound.h"
 #include "ARX_Loc.h"
@@ -2360,7 +2360,7 @@ bool ProcessFadeInOut(bool _bFadeIn,float _fspeed)
 
 //-----------------------------------------------------------------------------
 
-bool Menu2_Render()
+bool MainMenu_Render()
 {
 	ARXOldTimeMenu = ARXTimeMenu;
 	ARXTimeMenu = ARX_TIME_Get( false );
@@ -7642,7 +7642,7 @@ void CMenuSlider::RenderMouseOver()
 
 //-----------------------------------------------------------------------------
 
-void Menu2_Close()
+void MainMenu_Close()
 {
 	ARXmenu.currentmode = AMCM_OFF;
 

@@ -25,7 +25,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "ARX_GlobalMods.h"
 #include "ARX_Interface.h"
 #include "EERIEMath.h"
-#include "arx_menu2.h"
+#include "Arx_MainMenu.h"
 #include "arx_time.h"
 
 #include <stdio.h>

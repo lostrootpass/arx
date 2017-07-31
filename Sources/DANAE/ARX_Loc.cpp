@@ -29,7 +29,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "Arx_Config.h"
 #include <tchar.h>
 #include <list>
-#include "Arx_menu2.h"
+#include "Arx_MainMenu.h"
 #include "EerieTexture.h"
 
 #define _CRTDBG_MAP_ALLOC

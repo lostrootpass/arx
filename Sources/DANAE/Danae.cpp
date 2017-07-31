@@ -98,7 +98,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include <ARX_Levels.h>
 #include "ARX_Loc.h"
 #include <ARX_Menu.h>
-#include "ARX_Menu2.h"
+#include "Arx_MainMenu.h"
 #include <ARX_Network.h>
 #include <ARX_NPC.h>
 #include <ARX_Particles.h>
@@ -10289,7 +10289,7 @@ void ClearGameDEVICE()
 
 	KillInterfaceTextureContainers();
 
-	Menu2_Close();
+	MainMenu_Close();
 
 	DanaeClearLevel(2);
 

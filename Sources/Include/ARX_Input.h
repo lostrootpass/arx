@@ -64,7 +64,7 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 
 
 #include <SDL.h>
-#include "..\DANAE\ARX_Menu2.h"
+#include "..\DANAE\Arx_MainMenu.h"
 #include "EERIETexture.h"
 
 

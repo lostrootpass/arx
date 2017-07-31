@@ -45,8 +45,8 @@ ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 // ARX_Menu
 //////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef ARX_MENU2_H
-#define ARX_MENU2_H
+#ifndef ARX_MAINMENU_H
+#define ARX_MAINMENU_H
 
 #include <windows.h>
 #include <vector>
@@ -879,8 +879,8 @@ static void CalculTextPosition( HDC& _hDC, wstring& phrase, CreditsTextInformati
 
 
 //-----------------------------------------------------------------------------
-bool Menu2_Render();
-void Menu2_Close();
+bool MainMenu_Render();
+void MainMenu_Close();
 
 bool ProcessFadeInOut(bool _bFadeIn, float _fspeed);
 
