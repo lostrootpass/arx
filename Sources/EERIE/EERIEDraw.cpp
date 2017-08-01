@@ -1382,12 +1382,12 @@ void EERIEDrawBitmap2DecalY(LPDIRECT3DDEVICE7 pd3dDevice,float x,float y,float s
 
 #ifdef ARX_OPENGL
 	const float uvs[] = {
-		1.0f, 0.0f,
-		0.0f, 0.0f,
 		1.0f, 1.0f - _fDeltaY,
-		0.0f, 1.0f - _fDeltaY
+		0.0f, 1.0f - _fDeltaY,
+		1.0f, 0.0f,
+		0.0f, 0.0f
 	};
-	g_pRenderApp->renderer->DrawQuad(x, y + fDy, sx, sy, 1.f, tex, uvs, col);
+	g_pRenderApp->renderer->DrawQuad(x, y + fDy, sx, sy - fDy, 1.f, tex, uvs, col);
 #else
 	SETTC(pd3dDevice,tex);
 	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE, v, 4, 0  );
