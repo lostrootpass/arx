@@ -4729,14 +4729,14 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 			if (spells[i].longinfo!=-1)
 			{
-				damages[spells[i].longinfo].radius=150.f;
-				damages[spells[i].longinfo].damages=4.f;//2.f;
-				damages[spells[i].longinfo].area=DAMAGE_FULL;
-				damages[spells[i].longinfo].duration=100000000;
-				damages[spells[i].longinfo].source=spells[i].caster;
-				damages[spells[i].longinfo].flags=DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_FOLLOW_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
-				damages[spells[i].longinfo].type=DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL;
-				damages[spells[i].longinfo].exist=TRUE;
+				gDamageInfo[spells[i].longinfo].radius=150.f;
+				gDamageInfo[spells[i].longinfo].damages=4.f;//2.f;
+				gDamageInfo[spells[i].longinfo].area=DAMAGE_FULL;
+				gDamageInfo[spells[i].longinfo].duration=100000000;
+				gDamageInfo[spells[i].longinfo].source=spells[i].caster;
+				gDamageInfo[spells[i].longinfo].flags=DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_FOLLOW_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
+				gDamageInfo[spells[i].longinfo].type=DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL;
+				gDamageInfo[spells[i].longinfo].exist=TRUE;
 			}
 
 			spells[i].longinfo2=GetFreeDynLight();
@@ -6240,17 +6240,17 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 				if ( spells[i].longinfo != -1 )
 				{
-					damages[spells[i].longinfo].radius  = 150.f;
-					damages[spells[i].longinfo].damages = 10.f;
-					damages[spells[i].longinfo].area	= DAMAGE_FULL;
-					damages[spells[i].longinfo].duration= 100000000;
-					damages[spells[i].longinfo].source	= spells[i].caster;
-					damages[spells[i].longinfo].flags	= 0;
-					damages[spells[i].longinfo].type	= DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_FIRE | DAMAGE_TYPE_FIELD;
-					damages[spells[i].longinfo].exist	= TRUE;
-					damages[spells[i].longinfo].pos.x	= target.x;
-					damages[spells[i].longinfo].pos.y	= target.y;
-					damages[spells[i].longinfo].pos.z	= target.z;
+					gDamageInfo[spells[i].longinfo].radius  = 150.f;
+					gDamageInfo[spells[i].longinfo].damages = 10.f;
+					gDamageInfo[spells[i].longinfo].area	= DAMAGE_FULL;
+					gDamageInfo[spells[i].longinfo].duration= 100000000;
+					gDamageInfo[spells[i].longinfo].source	= spells[i].caster;
+					gDamageInfo[spells[i].longinfo].flags	= 0;
+					gDamageInfo[spells[i].longinfo].type	= DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_FIRE | DAMAGE_TYPE_FIELD;
+					gDamageInfo[spells[i].longinfo].exist	= TRUE;
+					gDamageInfo[spells[i].longinfo].pos.x	= target.x;
+					gDamageInfo[spells[i].longinfo].pos.y	= target.y;
+					gDamageInfo[spells[i].longinfo].pos.z	= target.z;
 				}
 
 				pFireField->Create( 200.f, &target, spells[i].tolive );
@@ -6344,17 +6344,17 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 				if ( spells[i].longinfo != -1 )
 				{
-					damages[spells[i].longinfo].radius  = 150.f;
-					damages[spells[i].longinfo].damages = 10.f;
-					damages[spells[i].longinfo].area	= DAMAGE_FULL;
-					damages[spells[i].longinfo].duration= 100000000;
-					damages[spells[i].longinfo].source	= spells[i].caster;
-					damages[spells[i].longinfo].flags	= 0;
-					damages[spells[i].longinfo].type	= DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_COLD | DAMAGE_TYPE_FIELD;
-					damages[spells[i].longinfo].exist	= TRUE;
-					damages[spells[i].longinfo].pos.x	= target.x;
-					damages[spells[i].longinfo].pos.y	= target.y;
-					damages[spells[i].longinfo].pos.z	= target.z;
+					gDamageInfo[spells[i].longinfo].radius  = 150.f;
+					gDamageInfo[spells[i].longinfo].damages = 10.f;
+					gDamageInfo[spells[i].longinfo].area	= DAMAGE_FULL;
+					gDamageInfo[spells[i].longinfo].duration= 100000000;
+					gDamageInfo[spells[i].longinfo].source	= spells[i].caster;
+					gDamageInfo[spells[i].longinfo].flags	= 0;
+					gDamageInfo[spells[i].longinfo].type	= DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_COLD | DAMAGE_TYPE_FIELD;
+					gDamageInfo[spells[i].longinfo].exist	= TRUE;
+					gDamageInfo[spells[i].longinfo].pos.x	= target.x;
+					gDamageInfo[spells[i].longinfo].pos.y	= target.y;
+					gDamageInfo[spells[i].longinfo].pos.z	= target.z;
 				}
 
 				pCSpellFx->Create( target, MAKEANGLE( player.angle.b ) );
@@ -6519,14 +6519,14 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 			if (spells[i].longinfo!=-1)
 			{
-				damages[spells[i].longinfo].radius=150.f;
-				damages[spells[i].longinfo].damages = 8.f;
-				damages[spells[i].longinfo].area=DAMAGE_FULL;
-				damages[spells[i].longinfo].duration=100000000;
-				damages[spells[i].longinfo].source=spells[i].caster;
-				damages[spells[i].longinfo].flags=DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_FOLLOW_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
-				damages[spells[i].longinfo].type=DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_DRAIN_MANA;
-				damages[spells[i].longinfo].exist=TRUE;
+				gDamageInfo[spells[i].longinfo].radius=150.f;
+				gDamageInfo[spells[i].longinfo].damages = 8.f;
+				gDamageInfo[spells[i].longinfo].area=DAMAGE_FULL;
+				gDamageInfo[spells[i].longinfo].duration=100000000;
+				gDamageInfo[spells[i].longinfo].source=spells[i].caster;
+				gDamageInfo[spells[i].longinfo].flags=DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_FOLLOW_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
+				gDamageInfo[spells[i].longinfo].type=DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_DRAIN_MANA;
+				gDamageInfo[spells[i].longinfo].exist=TRUE;
 			}
 
 			spells[i].longinfo2=GetFreeDynLight();
@@ -6576,17 +6576,17 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 			if (spells[i].longinfo!=-1)
 			{
-				damages[spells[i].longinfo].radius=350.f;
-				damages[spells[i].longinfo].damages=10.f;
-				damages[spells[i].longinfo].area = 0; 
-				damages[spells[i].longinfo].duration=spells[i].tolive;
-				damages[spells[i].longinfo].source=spells[i].caster;
-				damages[spells[i].longinfo].flags=DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_FOLLOW_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
-				damages[spells[i].longinfo].type=DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL;
-				damages[spells[i].longinfo].exist=TRUE;
-				damages[spells[i].longinfo].pos.x=target.x;
-				damages[spells[i].longinfo].pos.y=target.y;
-				damages[spells[i].longinfo].pos.z=target.z;
+				gDamageInfo[spells[i].longinfo].radius=350.f;
+				gDamageInfo[spells[i].longinfo].damages=10.f;
+				gDamageInfo[spells[i].longinfo].area = 0; 
+				gDamageInfo[spells[i].longinfo].duration=spells[i].tolive;
+				gDamageInfo[spells[i].longinfo].source=spells[i].caster;
+				gDamageInfo[spells[i].longinfo].flags=DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_FOLLOW_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
+				gDamageInfo[spells[i].longinfo].type=DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL;
+				gDamageInfo[spells[i].longinfo].exist=TRUE;
+				gDamageInfo[spells[i].longinfo].pos.x=target.x;
+				gDamageInfo[spells[i].longinfo].pos.y=target.y;
+				gDamageInfo[spells[i].longinfo].pos.z=target.z;
 			}
 
 			spells[i].longinfo2=GetFreeDynLight();
@@ -6702,14 +6702,14 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			if (spells[i].longinfo!=-1)
 			{
 				long id=spells[i].longinfo;
-				damages[id].radius=150.f;
-				damages[id].damages=spells[i].caster_level*DIV10*.8f;
-				damages[id].area = 0; 
-				damages[id].duration=100000000;
-				damages[id].source=spells[i].caster;
-				damages[id].flags=DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_FOLLOW_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
-				damages[id].type=DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_DRAIN_LIFE;
-				damages[id].exist=TRUE;
+				gDamageInfo[id].radius=150.f;
+				gDamageInfo[id].damages=spells[i].caster_level*DIV10*.8f;
+				gDamageInfo[id].area = 0; 
+				gDamageInfo[id].duration=100000000;
+				gDamageInfo[id].source=spells[i].caster;
+				gDamageInfo[id].flags=DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_FOLLOW_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
+				gDamageInfo[id].type=DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_DRAIN_LIFE;
+				gDamageInfo[id].exist=TRUE;
 			}
 
 			spells[i].longinfo2=GetFreeDynLight();
@@ -7370,7 +7370,7 @@ void ARX_SPELLS_Kill(const long &i)
 		case SPELL_LIFE_DRAIN :
 		case SPELL_MANA_DRAIN :
 
-			if (spells[i].longinfo!=-1) damages[spells[i].longinfo].exist=FALSE;	
+			if (spells[i].longinfo!=-1) gDamageInfo[spells[i].longinfo].exist=FALSE;	
 
 			if (spells[i].longinfo2!=-1) 
 			{
@@ -7865,13 +7865,13 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 				case SPELL_ICE_FIELD:
 
 					if (spells[i].longinfo!=-1)
-						damages[spells[i].longinfo].exist=FALSE;					
+						gDamageInfo[spells[i].longinfo].exist=FALSE;					
 
 				break;
 				case SPELL_FIRE_FIELD:
 
 					if (spells[i].longinfo!=-1)
-						damages[spells[i].longinfo].exist=FALSE;					
+						gDamageInfo[spells[i].longinfo].exist=FALSE;					
 
 				break;
 				//----------------------------------------------------------------------------

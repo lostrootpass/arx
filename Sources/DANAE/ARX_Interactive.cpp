@@ -1623,7 +1623,7 @@ void RestoreInitialIOStatusOfIO(INTERACTIVE_OBJ * io)
 		io->lastanimtime = 1;
 		io->secretvalue = -1;
 
-		if (io->damagedata >= 0) damages[io->damagedata].exist = 0;
+		if (io->damagedata >= 0) gDamageInfo[io->damagedata].exist = 0;
 
 		io->damagedata = -1;
 		io->poisonous = 0;
@@ -2317,7 +2317,7 @@ void ReleaseInter(INTERACTIVE_OBJ * io)
 		free(io->inventory_skin);
 
 	if (io->damagedata >= 0)
-		damages[io->damagedata].exist = 0;
+		gDamageInfo[io->damagedata].exist = 0;
 
 	ARX_IOGROUP_Release(io);
 

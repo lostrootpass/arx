@@ -97,7 +97,7 @@ typedef struct
 } SCREEN_SPLATS;
 
 #define MAX_SCREEN_SPLATS 12
-DAMAGE_INFO	damages[MAX_DAMAGES];
+DAMAGE_INFO	gDamageInfo[MAX_DAMAGES];
 extern long ParticleCount;
 extern EERIE_3D PUSH_PLAYER_FORCE;
 
@@ -1061,7 +1061,7 @@ float ARX_DAMAGES_DamageNPC(INTERACTIVE_OBJ * io, float dmg, long source, long f
 //*************************************************************************************
 void ARX_DAMAGES_Reset()
 {
-	memset(damages, 0, sizeof(DAMAGE_INFO)*MAX_DAMAGES);
+	memset(gDamageInfo, 0, sizeof(DAMAGE_INFO)*MAX_DAMAGES);
 }
 
 //*************************************************************************************
@@ -1070,21 +1070,21 @@ long ARX_DAMAGES_GetFree()
 {
 	for (long i = 0; i < MAX_DAMAGES; i++)
 	{
-		if (!damages[i].exist)
+		if (!gDamageInfo[i].exist)
 		{
-			damages[i].radius = 100.f;
-			damages[i].start_time = ARXTimeUL(); 
-			damages[i].duration = 1000;
-			damages[i].area = 0;
-			damages[i].flags = 0;
-			damages[i].type = 0;
-			damages[i].special = 0;
-			damages[i].special_ID = 0;
-			damages[i].lastupd = 0;
-			damages[i].active = 1;
+			gDamageInfo[i].radius = 100.f;
+			gDamageInfo[i].start_time = ARXTimeUL(); 
+			gDamageInfo[i].duration = 1000;
+			gDamageInfo[i].area = 0;
+			gDamageInfo[i].flags = 0;
+			gDamageInfo[i].type = 0;
+			gDamageInfo[i].special = 0;
+			gDamageInfo[i].special_ID = 0;
+			gDamageInfo[i].lastupd = 0;
+			gDamageInfo[i].active = 1;
 
 			for (long j = 0; j < 10; j++)
-				damages[i].except[j] = -1;
+				gDamageInfo[i].except[j] = -1;
 
 			return i;
 		}
@@ -1095,7 +1095,7 @@ long ARX_DAMAGES_GetFree()
 long InExceptList(long dmg, long num)
 {
 	for (long j = 0; j < 10; j++)
-		if (damages[dmg].except[j] == num) return 1;
+		if (gDamageInfo[dmg].except[j] == num) return 1;
 
 	return 0;
 }
@@ -1197,44 +1197,44 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 	float dmg, dist;
 	EERIE_3D sub;
 
-	if (damages[j].exist)
+	if (gDamageInfo[j].exist)
 	{
-		if (!damages[j].active) return;
+		if (!gDamageInfo[j].active) return;
 
-		if (damages[j].flags & DAMAGE_FLAG_FOLLOW_SOURCE)
+		if (gDamageInfo[j].flags & DAMAGE_FLAG_FOLLOW_SOURCE)
 		{
-			if (damages[j].source == 0)
+			if (gDamageInfo[j].source == 0)
 			{
-				damages[j].pos.x = player.pos.x;
-				damages[j].pos.y = player.pos.y;
-				damages[j].pos.z = player.pos.z;
+				gDamageInfo[j].pos.x = player.pos.x;
+				gDamageInfo[j].pos.y = player.pos.y;
+				gDamageInfo[j].pos.z = player.pos.z;
 			}
 			else
 			{
-				if (ValidIONum(damages[j].source))
+				if (ValidIONum(gDamageInfo[j].source))
 				{
-					damages[j].pos.x = inter.iobj[damages[j].source]->pos.x;
-					damages[j].pos.y = inter.iobj[damages[j].source]->pos.y;
-					damages[j].pos.z = inter.iobj[damages[j].source]->pos.z;
+					gDamageInfo[j].pos.x = inter.iobj[gDamageInfo[j].source]->pos.x;
+					gDamageInfo[j].pos.y = inter.iobj[gDamageInfo[j].source]->pos.y;
+					gDamageInfo[j].pos.z = inter.iobj[gDamageInfo[j].source]->pos.z;
 				}
 			}
 		}
 
-		if (damages[j].flags & DAMAGE_NOT_FRAME_DEPENDANT)
-			dmg = damages[j].damages;
-		else if (damages[j].duration == -1) dmg = damages[j].damages;
+		if (gDamageInfo[j].flags & DAMAGE_NOT_FRAME_DEPENDANT)
+			dmg = gDamageInfo[j].damages;
+		else if (gDamageInfo[j].duration == -1) dmg = gDamageInfo[j].damages;
 		else
 		{
 			float FD = (float)FrameDiff;
 
-			if (tim > damages[j].start_time + damages[j].duration)
-				FD -= damages[j].start_time + damages[j].duration - tim;
+			if (tim > gDamageInfo[j].start_time + gDamageInfo[j].duration)
+				FD -= gDamageInfo[j].start_time + gDamageInfo[j].duration - tim;
 
-			dmg = damages[j].damages * FD * DIV1000;
+			dmg = gDamageInfo[j].damages * FD * DIV1000;
 		}
 
-		long validsource = ValidIONum(damages[j].source);
-		float divradius = 1.f / damages[j].radius;
+		long validsource = ValidIONum(gDamageInfo[j].source);
+		float divradius = 1.f / gDamageInfo[j].radius;
 
 		// checking for IO damages
 		for (long i = 0; i < inter.nbmax; i++)
@@ -1245,31 +1245,31 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 			        &&	(io->GameFlags & GFLAG_ISINTREATZONE)
 			        &&	(io->show == SHOW_FLAG_IN_SCENE)
 			        &&	(!InExceptList(j, i))
-			        && ( (damages[j].source != i)
-			            || ((damages[j].source == i)
-			                && (!(damages[j].flags & DAMAGE_FLAG_DONT_HURT_SOURCE))))
+			        && ( (gDamageInfo[j].source != i)
+			            || ((gDamageInfo[j].source == i)
+			                && (!(gDamageInfo[j].flags & DAMAGE_FLAG_DONT_HURT_SOURCE))))
 			   )
 			{
 				if (io->ioflags & IO_NPC) 
 				{
-					if ((i != 0) && (damages[j].source != 0)
-					        && validsource && (HaveCommonGroup(io, inter.iobj[damages[j].source])))
+					if ((i != 0) && (gDamageInfo[j].source != 0)
+					        && validsource && (HaveCommonGroup(io, inter.iobj[gDamageInfo[j].source])))
 						continue;
 
 					EERIE_SPHERE sphere;
-					sphere.origin.x = damages[j].pos.x;
-					sphere.origin.y = damages[j].pos.y;
-					sphere.origin.z = damages[j].pos.z;
-					sphere.radius = damages[j].radius - 10.f;
+					sphere.origin.x = gDamageInfo[j].pos.x;
+					sphere.origin.y = gDamageInfo[j].pos.y;
+					sphere.origin.z = gDamageInfo[j].pos.z;
+					sphere.radius = gDamageInfo[j].radius - 10.f;
 
 					if (CheckIOInSphere(&sphere, i, IIS_NO_NOCOL))
 					{
 						sub.x = io->pos.x;
 						sub.y = io->pos.y - 60.f;
 						sub.z = io->pos.z;
-						dist = EEDistance3D(&damages[j].pos, &sub);
+						dist = EEDistance3D(&gDamageInfo[j].pos, &sub);
 
-						if (damages[j].type & DAMAGE_TYPE_FIELD)
+						if (gDamageInfo[j].type & DAMAGE_TYPE_FIELD)
 						{
 							if (ARXTime > io->collide_door_time + 500) 
 							{
@@ -1278,10 +1278,10 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 								char param[64];
 								param[0] = 0;
 
-								if (damages[j].type & DAMAGE_TYPE_FIRE)
+								if (gDamageInfo[j].type & DAMAGE_TYPE_FIRE)
 									strcpy(param, "FIRE");
 
-								if (damages[j].type & DAMAGE_TYPE_COLD)
+								if (gDamageInfo[j].type & DAMAGE_TYPE_COLD)
 									strcpy(param, "COLD");
 
 								SendIOScriptEvent(io, SM_COLLIDE_FIELD, param, NULL);
@@ -1289,11 +1289,11 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 							}
 						}
 
-						switch (damages[j].area)
+						switch (gDamageInfo[j].area)
 						{
 							case DAMAGE_AREA:
 							{
-								float ratio = (damages[j].radius - dist) * divradius;
+								float ratio = (gDamageInfo[j].radius - dist) * divradius;
 
 								if (ratio > 1.f) ratio = 1.f;
 								else if (ratio < 0.f) ratio = 0.f;
@@ -1303,7 +1303,7 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 							break;
 							case DAMAGE_AREAHALF:
 							{
-								float ratio = (damages[j].radius - (dist * DIV2)) * divradius;
+								float ratio = (gDamageInfo[j].radius - (dist * DIV2)) * divradius;
 
 								if (ratio > 1.f) ratio = 1.f;
 								else if (ratio < 0.f) ratio = 0.f;
@@ -1315,14 +1315,14 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 
 						if (dmg <= 0.f) continue;
 
-						if (damages[j].flags & DAMAGE_FLAG_ADD_VISUAL_FX)
+						if (gDamageInfo[j].flags & DAMAGE_FLAG_ADD_VISUAL_FX)
 						{
 							if ((inter.iobj[i]->ioflags & IO_NPC)
 							        &&	(inter.iobj[i]->_npcdata->life > 0.f))
-								ARX_DAMAGES_AddVisual(&damages[j], &sub, dmg, inter.iobj[i]);
+								ARX_DAMAGES_AddVisual(&gDamageInfo[j], &sub, dmg, inter.iobj[i]);
 						}
 
-						if (damages[j].type & DAMAGE_TYPE_DRAIN_MANA)
+						if (gDamageInfo[j].type & DAMAGE_TYPE_DRAIN_MANA)
 						{
 							float manadrained;
 
@@ -1342,15 +1342,15 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 								}
 							}
 
-							if (damages[j].source == 0)
+							if (gDamageInfo[j].source == 0)
 							{
 								player.mana = __min(player.mana + manadrained, player.Full_maxmana);
 							}
 							else
 							{
-								if (ValidIONum(damages[j].source) && (inter.iobj[damages[j].source]->_npcdata))
+								if (ValidIONum(gDamageInfo[j].source) && (inter.iobj[gDamageInfo[j].source]->_npcdata))
 								{
-									inter.iobj[damages[j].source]->_npcdata->mana = __min(inter.iobj[damages[j].source]->_npcdata->mana + manadrained, inter.iobj[damages[j].source]->_npcdata->maxmana);
+									inter.iobj[gDamageInfo[j].source]->_npcdata->mana = __min(inter.iobj[gDamageInfo[j].source]->_npcdata->mana + manadrained, inter.iobj[gDamageInfo[j].source]->_npcdata->maxmana);
 								}
 							}
 						}
@@ -1361,7 +1361,7 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 							if (i == 0)
 							{
 
-								if (damages[j].type & DAMAGE_TYPE_POISON)
+								if (gDamageInfo[j].type & DAMAGE_TYPE_POISON)
 								{
 									if (rnd() * 100.f > player.resist_poison)
 									{
@@ -1374,33 +1374,33 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 								}
 								else
 								{
-									if ((damages[j].type & DAMAGE_TYPE_MAGICAL)
-									        &&	(!(damages[j].type & DAMAGE_TYPE_FIRE))
-									        &&	(!(damages[j].type & DAMAGE_TYPE_COLD))
+									if ((gDamageInfo[j].type & DAMAGE_TYPE_MAGICAL)
+									        &&	(!(gDamageInfo[j].type & DAMAGE_TYPE_FIRE))
+									        &&	(!(gDamageInfo[j].type & DAMAGE_TYPE_COLD))
 									   )
 									{
 										dmg -= player.Full_resist_magic * DIV100 * dmg;
 										dmg = __max(0, dmg);
 									}
 
-									if (damages[j].type & DAMAGE_TYPE_FIRE)
+									if (gDamageInfo[j].type & DAMAGE_TYPE_FIRE)
 									{
 										dmg = ARX_SPELLS_ApplyFireProtection(inter.iobj[0], dmg);
 										ARX_DAMAGES_IgnitIO(inter.iobj[0], dmg);
 									}
 
-									if (damages[j].type & DAMAGE_TYPE_COLD)
+									if (gDamageInfo[j].type & DAMAGE_TYPE_COLD)
 									{
 										dmg = ARX_SPELLS_ApplyColdProtection(inter.iobj[0], dmg);
 									}
 
-									damagesdone = ARX_DAMAGES_DamagePlayer(dmg, damages[j].type, damages[j].source, &damages[j].pos);
+									damagesdone = ARX_DAMAGES_DamagePlayer(dmg, gDamageInfo[j].type, gDamageInfo[j].source, &gDamageInfo[j].pos);
 								}
 							}
 							else
 							{
 								if ((inter.iobj[i]->ioflags & IO_NPC)
-								        && (damages[j].type & DAMAGE_TYPE_POISON))
+								        && (gDamageInfo[j].type & DAMAGE_TYPE_POISON))
 								{
 									if (rnd() * 100.f > inter.iobj[i]->_npcdata->resist_poison)
 									{
@@ -1412,72 +1412,72 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 								}
 								else
 								{
-									if (damages[j].type & DAMAGE_TYPE_FIRE)
+									if (gDamageInfo[j].type & DAMAGE_TYPE_FIRE)
 									{
 										dmg = ARX_SPELLS_ApplyFireProtection(inter.iobj[i], dmg);
 										ARX_DAMAGES_IgnitIO(inter.iobj[i], dmg);
 									}
 
-									if ((damages[j].type & DAMAGE_TYPE_MAGICAL)
-									        && (!(damages[j].type & DAMAGE_TYPE_FIRE))
-									        && (!(damages[j].type & DAMAGE_TYPE_COLD))
+									if ((gDamageInfo[j].type & DAMAGE_TYPE_MAGICAL)
+									        && (!(gDamageInfo[j].type & DAMAGE_TYPE_FIRE))
+									        && (!(gDamageInfo[j].type & DAMAGE_TYPE_COLD))
 									   )
 									{
 										dmg -= inter.iobj[i]->_npcdata->resist_magic * DIV100 * dmg;
 										dmg = __max(0, dmg);
 									}
 
-									if (damages[j].type & DAMAGE_TYPE_COLD)
+									if (gDamageInfo[j].type & DAMAGE_TYPE_COLD)
 									{
 										dmg = ARX_SPELLS_ApplyColdProtection(inter.iobj[i], dmg);
 									}
 
-									damagesdone = ARX_DAMAGES_DamageNPC(inter.iobj[i], dmg, damages[j].source, 1, &damages[j].pos);
+									damagesdone = ARX_DAMAGES_DamageNPC(inter.iobj[i], dmg, gDamageInfo[j].source, 1, &gDamageInfo[j].pos);
 								}
 
-								if ((damagesdone > 0) && (damages[j].flags & DAMAGE_SPAWN_BLOOD))
+								if ((damagesdone > 0) && (gDamageInfo[j].flags & DAMAGE_SPAWN_BLOOD))
 								{
 									EERIE_3D vector;
-									vector.x = damages[j].pos.x - inter.iobj[i]->pos.x;
-									vector.y = (damages[j].pos.y - inter.iobj[i]->pos.y) * DIV2;
-									vector.z = damages[j].pos.z - inter.iobj[i]->pos.z;
+									vector.x = gDamageInfo[j].pos.x - inter.iobj[i]->pos.x;
+									vector.y = (gDamageInfo[j].pos.y - inter.iobj[i]->pos.y) * DIV2;
+									vector.z = gDamageInfo[j].pos.z - inter.iobj[i]->pos.z;
 									float t = 1.f / TRUEVector_Magnitude(&vector);
 									vector.x *= t;
 									vector.y *= t;
 									vector.z *= t;
-									ARX_PARTICLES_Spawn_Blood(&damages[j].pos, &vector, damagesdone, damages[j].source);
+									ARX_PARTICLES_Spawn_Blood(&gDamageInfo[j].pos, &vector, damagesdone, gDamageInfo[j].source);
 								}
 							}
 
-							if (damages[j].type & DAMAGE_TYPE_DRAIN_LIFE) 
+							if (gDamageInfo[j].type & DAMAGE_TYPE_DRAIN_LIFE) 
 							{
-								if (ValidIONum(damages[j].source))
-									ARX_DAMAGES_HealInter(inter.iobj[damages[j].source], damagesdone);
+								if (ValidIONum(gDamageInfo[j].source))
+									ARX_DAMAGES_HealInter(inter.iobj[gDamageInfo[j].source], damagesdone);
 							}
 						}
 					}
 
 				}
 				else if ((io->ioflags & IO_FIX)
-				         &&	(!(damages[j].type & DAMAGE_TYPE_NO_FIX)))
+				         &&	(!(gDamageInfo[j].type & DAMAGE_TYPE_NO_FIX)))
 				{
 					EERIE_SPHERE sphere;
-					sphere.origin.x = damages[j].pos.x;
-					sphere.origin.y = damages[j].pos.y;
-					sphere.origin.z = damages[j].pos.z;
-					sphere.radius = damages[j].radius + 15.f;
+					sphere.origin.x = gDamageInfo[j].pos.x;
+					sphere.origin.y = gDamageInfo[j].pos.y;
+					sphere.origin.z = gDamageInfo[j].pos.z;
+					sphere.radius = gDamageInfo[j].radius + 15.f;
 
 					if (CheckIOInSphere(&sphere, i))
 					{
-						ARX_DAMAGES_DamageFIX(io, dmg, damages[j].source, 1);
+						ARX_DAMAGES_DamageFIX(io, dmg, gDamageInfo[j].source, 1);
 					}
 				}
 			}
 		}
 
-		if (damages[j].duration == -1) damages[j].exist = FALSE;
-		else if (tim > damages[j].start_time + damages[j].duration)
-			damages[j].exist = FALSE;
+		if (gDamageInfo[j].duration == -1) gDamageInfo[j].exist = FALSE;
+		else if (tim > gDamageInfo[j].start_time + gDamageInfo[j].duration)
+			gDamageInfo[j].exist = FALSE;
 	}
 }
 void ARX_DAMAGES_UpdateAll()

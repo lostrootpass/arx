@@ -1109,9 +1109,9 @@ void ARX_PHYSICS_Apply()
 				{
 					if (io->damagedata >= 0)
 					{
-						damages[io->damagedata].active = 1;
+						gDamageInfo[io->damagedata].active = 1;
 						ARX_DAMAGES_UpdateDamage(io->damagedata, (float)ARXTime);
-						damages[io->damagedata].exist = 0;
+						gDamageInfo[io->damagedata].exist = 0;
 						io->damagedata = -1;
 					}
 				}

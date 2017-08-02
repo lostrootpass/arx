@@ -777,17 +777,17 @@ void CMultiMagicMissile::CheckCollision(float _fPlayer_Magic_Level)
 
 						if (ttt != -1)
 						{
-							damages[ttt].pos.x	= pMM->eCurPos.x;
-							damages[ttt].pos.y	= pMM->eCurPos.y;
-							damages[ttt].pos.z	= pMM->eCurPos.z;
-							damages[ttt].radius	= 80.f;
-							damages[ttt].damages = (4 + spells[spellinstance].caster_level * DIV5) * .8f; 
-							damages[ttt].area	= DAMAGE_FULL;
-							damages[ttt].duration = -1;
-							damages[ttt].source	= spells[spellinstance].caster;
-							damages[ttt].flags	= DAMAGE_FLAG_DONT_HURT_SOURCE;
-							damages[ttt].type	= DAMAGE_TYPE_MAGICAL;
-							damages[ttt].exist	= TRUE;
+							gDamageInfo[ttt].pos.x	= pMM->eCurPos.x;
+							gDamageInfo[ttt].pos.y	= pMM->eCurPos.y;
+							gDamageInfo[ttt].pos.z	= pMM->eCurPos.z;
+							gDamageInfo[ttt].radius	= 80.f;
+							gDamageInfo[ttt].damages = (4 + spells[spellinstance].caster_level * DIV5) * .8f; 
+							gDamageInfo[ttt].area	= DAMAGE_FULL;
+							gDamageInfo[ttt].duration = -1;
+							gDamageInfo[ttt].source	= spells[spellinstance].caster;
+							gDamageInfo[ttt].flags	= DAMAGE_FLAG_DONT_HURT_SOURCE;
+							gDamageInfo[ttt].type	= DAMAGE_TYPE_MAGICAL;
+							gDamageInfo[ttt].exist	= TRUE;
 						}
 
 						EERIE_RGB rgb;

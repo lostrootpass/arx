@@ -635,17 +635,17 @@ void CIceProjectile::Create(EERIE_3D aeSrc, float afBeta)
 
 		if (ttt != -1)
 		{
-			damages[ttt].pos.x = tPos[i].x;
-			damages[ttt].pos.y = tPos[i].y;
-			damages[ttt].pos.z = tPos[i].z;
-			damages[ttt].radius = 60.f;
-			damages[ttt].damages = 0.1f * spells[spellinstance].caster_level;
-			damages[ttt].area = DAMAGE_FULL;
-			damages[ttt].duration = ulDuration;
-			damages[ttt].source = spells[spellinstance].caster;
-			damages[ttt].flags = DAMAGE_FLAG_DONT_HURT_SOURCE;
-			damages[ttt].type = DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_COLD;
-			damages[ttt].exist = TRUE;
+			gDamageInfo[ttt].pos.x = tPos[i].x;
+			gDamageInfo[ttt].pos.y = tPos[i].y;
+			gDamageInfo[ttt].pos.z = tPos[i].z;
+			gDamageInfo[ttt].radius = 60.f;
+			gDamageInfo[ttt].damages = 0.1f * spells[spellinstance].caster_level;
+			gDamageInfo[ttt].area = DAMAGE_FULL;
+			gDamageInfo[ttt].duration = ulDuration;
+			gDamageInfo[ttt].source = spells[spellinstance].caster;
+			gDamageInfo[ttt].flags = DAMAGE_FLAG_DONT_HURT_SOURCE;
+			gDamageInfo[ttt].type = DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_COLD;
+			gDamageInfo[ttt].exist = TRUE;
 		}
 	}
 

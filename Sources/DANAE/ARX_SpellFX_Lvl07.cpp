@@ -669,15 +669,15 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 				if (si != -1)
 				{
-					Vector_Copy(&damages[si].pos, &sphere.origin);
-					damages[si].radius = sphere.radius;
-					damages[si].damages = fDamage * spells[spellinstance].caster_level * DIV3; 
-					damages[si].area = DAMAGE_FULL;
-					damages[si].duration = 1; 
-					damages[si].source = spells[spellinstance].caster;
-					damages[si].flags = DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
-					damages[si].type = DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_LIGHTNING;
-					damages[si].exist = TRUE;
+					Vector_Copy(&gDamageInfo[si].pos, &sphere.origin);
+					gDamageInfo[si].radius = sphere.radius;
+					gDamageInfo[si].damages = fDamage * spells[spellinstance].caster_level * DIV3; 
+					gDamageInfo[si].area = DAMAGE_FULL;
+					gDamageInfo[si].duration = 1; 
+					gDamageInfo[si].source = spells[spellinstance].caster;
+					gDamageInfo[si].flags = DAMAGE_FLAG_DONT_HURT_SOURCE | DAMAGE_FLAG_ADD_VISUAL_FX;
+					gDamageInfo[si].type = DAMAGE_TYPE_FAKEFIRE | DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_LIGHTNING;
+					gDamageInfo[si].exist = TRUE;
 				}
 			}
 		}

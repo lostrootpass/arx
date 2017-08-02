@@ -6105,7 +6105,6 @@ void ManageKeyMouse()
 						
 						if(ControlCinematique)
 						{
-							ControlCinematique->m_pd3dDevice=GDevice;
 							ActiveAllTexture(ControlCinematique);
 						}
 						

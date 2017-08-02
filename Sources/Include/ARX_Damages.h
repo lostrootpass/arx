@@ -115,7 +115,7 @@ typedef struct
 #define MAX_DAMAGES	200
 
 //-----------------------------------------------------------------------------
-extern	DAMAGE_INFO	damages[MAX_DAMAGES];
+extern	DAMAGE_INFO	gDamageInfo[MAX_DAMAGES];
 
 //-----------------------------------------------------------------------------
 void	CheckForIgnition(EERIE_3D * pos, float radius, long mode, long flag = 0);

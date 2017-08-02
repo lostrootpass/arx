@@ -1171,19 +1171,19 @@ float CMultiPoisonProjectile::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		if ((t != -1)
 		        &&	(spells[pTab[i]->spellinstance].timcreation + 1600 < ARXTimeUL()))
 		{
-			damages[t].pos.x  = pPoisonProjectile->eCurPos.x;
-			damages[t].pos.y  = pPoisonProjectile->eCurPos.y;
-			damages[t].pos.z  = pPoisonProjectile->eCurPos.z;
-			damages[t].radius = 120.f;
+			gDamageInfo[t].pos.x  = pPoisonProjectile->eCurPos.x;
+			gDamageInfo[t].pos.y  = pPoisonProjectile->eCurPos.y;
+			gDamageInfo[t].pos.z  = pPoisonProjectile->eCurPos.z;
+			gDamageInfo[t].radius = 120.f;
 			float v = spells[spellinstance].caster_level;
 			v = 4.f + v * DIV10 * 6.f ;
-			damages[t].damages	= v * DIV1000 * _framedelay;
-			damages[t].area		= DAMAGE_FULL;
-			damages[t].duration	= ARX_CLEAN_WARN_CAST_LONG(FrameDiff);
-			damages[t].source	= spells[spellinstance].caster;
-			damages[t].flags	= 0;
-			damages[t].type		= DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_POISON;
-			damages[t].exist	= TRUE;
+			gDamageInfo[t].damages	= v * DIV1000 * _framedelay;
+			gDamageInfo[t].area		= DAMAGE_FULL;
+			gDamageInfo[t].duration	= ARX_CLEAN_WARN_CAST_LONG(FrameDiff);
+			gDamageInfo[t].source	= spells[spellinstance].caster;
+			gDamageInfo[t].flags	= 0;
+			gDamageInfo[t].type		= DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_POISON;
+			gDamageInfo[t].exist	= TRUE;
 		}
 	}
 

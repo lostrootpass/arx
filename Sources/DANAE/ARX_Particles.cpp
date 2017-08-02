@@ -2639,17 +2639,17 @@ void TreatBackgroundActions()
 
 				if (id!=-1)
 				{
-				damages[id].radius = gl->ex_radius; 
-				damages[id].damages = gl->ex_radius * DIV7; 
-					damages[id].area=DAMAGE_FULL;
-					damages[id].duration=1;
-					damages[id].source=-5;
-				damages[id].flags = 0; 
-					damages[id].type=DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_FIRE | DAMAGE_TYPE_NO_FIX;
-					damages[id].exist=TRUE;
-					damages[id].pos.x=gl->pos.x;
-					damages[id].pos.y=gl->pos.y;
-					damages[id].pos.z=gl->pos.z;
+				gDamageInfo[id].radius = gl->ex_radius; 
+				gDamageInfo[id].damages = gl->ex_radius * DIV7; 
+					gDamageInfo[id].area=DAMAGE_FULL;
+					gDamageInfo[id].duration=1;
+					gDamageInfo[id].source=-5;
+				gDamageInfo[id].flags = 0; 
+					gDamageInfo[id].type=DAMAGE_TYPE_MAGICAL | DAMAGE_TYPE_FIRE | DAMAGE_TYPE_NO_FIX;
+					gDamageInfo[id].exist=TRUE;
+					gDamageInfo[id].pos.x=gl->pos.x;
+					gDamageInfo[id].pos.y=gl->pos.y;
+					gDamageInfo[id].pos.z=gl->pos.z;
 				}
 			}
 
