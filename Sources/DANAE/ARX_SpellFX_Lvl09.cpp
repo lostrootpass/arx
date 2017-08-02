@@ -957,9 +957,9 @@ float CNegateMagic::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	if (spells[spellinstance].caster == 0)
 	{
-		eSrc.x = player.pos.x;
-		eSrc.y = player.pos.y + 170.f;
-		eSrc.z = player.pos.z;
+		eSrc.x = playerCharacter.pos.x;
+		eSrc.y = playerCharacter.pos.y + 170.f;
+		eSrc.z = playerCharacter.pos.z;
 	}
 	else
 	{

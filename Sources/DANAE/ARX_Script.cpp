@@ -853,7 +853,7 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 			{
 				if (io)
 				{
-					*fcontent = (float)EEDistance3D(&player.pos, &io->pos);
+					*fcontent = (float)EEDistance3D(&playerCharacter.pos, &io->pos);
 					return TYPE_FLOAT;
 				}
 			}
@@ -865,7 +865,7 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 			{
 				if (io != NULL)
 				{
-					F2L(EEDistance3D(&player.pos, &io->pos), lcontent);
+					F2L(EEDistance3D(&playerCharacter.pos, &io->pos), lcontent);
 					return TYPE_LONG;
 				}
 			}
@@ -1068,9 +1068,9 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 						if (io->room_flags & 1)
 							UpdateIORoom(io);
 
-						long Player_Room = ARX_PORTALS_GetRoomNumForPosition(&player.pos, 1);
+						long Player_Room = ARX_PORTALS_GetRoomNumForPosition(&playerCharacter.pos, 1);
 
-						*fcontent = SP_GetRoomDist(&io->pos, &player.pos, io->room, Player_Room);
+						*fcontent = SP_GetRoomDist(&io->pos, &playerCharacter.pos, io->room, Player_Room);
 
 						return TYPE_FLOAT;
 					}
@@ -1142,102 +1142,102 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 
 				if (!stricmp(temp, "AAM"))
 				{
-					*lcontent = player.rune_flags & FLAG_AAM;
+					*lcontent = playerCharacter.rune_flags & FLAG_AAM;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "CETRIUS"))
 				{
-					*lcontent = player.rune_flags & FLAG_CETRIUS;
+					*lcontent = playerCharacter.rune_flags & FLAG_CETRIUS;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "COMUNICATUM"))
 				{
-					*lcontent = player.rune_flags & FLAG_COMUNICATUM;
+					*lcontent = playerCharacter.rune_flags & FLAG_COMUNICATUM;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "COSUM"))
 				{
-					*lcontent = player.rune_flags & FLAG_COSUM;
+					*lcontent = playerCharacter.rune_flags & FLAG_COSUM;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "FOLGORA"))
 				{
-					*lcontent = player.rune_flags & FLAG_FOLGORA;
+					*lcontent = playerCharacter.rune_flags & FLAG_FOLGORA;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "FRIDD"))
 				{
-					*lcontent = player.rune_flags & FLAG_FRIDD;
+					*lcontent = playerCharacter.rune_flags & FLAG_FRIDD;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "KAOM"))
 				{
-					*lcontent = player.rune_flags & FLAG_KAOM;
+					*lcontent = playerCharacter.rune_flags & FLAG_KAOM;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "MEGA"))
 				{
-					*lcontent = player.rune_flags & FLAG_MEGA;
+					*lcontent = playerCharacter.rune_flags & FLAG_MEGA;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "MORTE"))
 				{
-					*lcontent = player.rune_flags & FLAG_MORTE;
+					*lcontent = playerCharacter.rune_flags & FLAG_MORTE;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "MOVIS"))
 				{
-					*lcontent = player.rune_flags & FLAG_MOVIS;
+					*lcontent = playerCharacter.rune_flags & FLAG_MOVIS;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "NHI"))
 				{
-					*lcontent = player.rune_flags & FLAG_NHI;
+					*lcontent = playerCharacter.rune_flags & FLAG_NHI;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "RHAA"))
 				{
-					*lcontent = player.rune_flags & FLAG_RHAA;
+					*lcontent = playerCharacter.rune_flags & FLAG_RHAA;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "SPACIUM"))
 				{
-					*lcontent = player.rune_flags & FLAG_SPACIUM;
+					*lcontent = playerCharacter.rune_flags & FLAG_SPACIUM;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "STREGUM"))
 				{
-					*lcontent = player.rune_flags & FLAG_STREGUM;
+					*lcontent = playerCharacter.rune_flags & FLAG_STREGUM;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "TAAR"))
 				{
-					*lcontent = player.rune_flags & FLAG_TAAR;
+					*lcontent = playerCharacter.rune_flags & FLAG_TAAR;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "TEMPUS"))
 				{
-					*lcontent = player.rune_flags & FLAG_TEMPUS;
+					*lcontent = playerCharacter.rune_flags & FLAG_TEMPUS;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "TERA"))
 				{
-					*lcontent = player.rune_flags & FLAG_TERA;
+					*lcontent = playerCharacter.rune_flags & FLAG_TERA;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "VISTA"))
 				{
-					*lcontent = player.rune_flags & FLAG_VISTA;
+					*lcontent = playerCharacter.rune_flags & FLAG_VISTA;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "VITAE"))
 				{
-					*lcontent = player.rune_flags & FLAG_VITAE;
+					*lcontent = playerCharacter.rune_flags & FLAG_VITAE;
 					return TYPE_LONG;
 				}
 				else if (!stricmp(temp, "YOK"))
 				{
-					*lcontent = player.rune_flags & FLAG_YOK;
+					*lcontent = playerCharacter.rune_flags & FLAG_YOK;
 					return TYPE_LONG;
 				}
 
@@ -1552,7 +1552,7 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 
 					if (!strcmp(obj, "PLAYER"))
 					{
-						*fcontent = (float)Distance3D(player.pos.x, player.pos.y, player.pos.z,
+						*fcontent = (float)Distance3D(playerCharacter.pos.x, playerCharacter.pos.y, playerCharacter.pos.z,
 						                              io->pos.x, io->pos.y, io->pos.z);
 						return TYPE_FLOAT;
 					}
@@ -1617,7 +1617,7 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 
 			if (!specialstrcmp(name, "^PLAYER_ZONE"))
 			{
-				ARX_PATH * op = (ARX_PATH *)player.inzone;
+				ARX_PATH * op = (ARX_PATH *)playerCharacter.inzone;
 
 				if (op == NULL)
 				{
@@ -1631,7 +1631,7 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 
 			if (!specialstrcmp(name, "^PLAYER_LIFE"))
 			{
-				*fcontent = player.Full_life;
+				*fcontent = playerCharacter.Full_life;
 				return TYPE_FLOAT;
 			}
 
@@ -1674,7 +1674,7 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 
 					for (long i = 0; i < MAX_EQUIPED; i++)
 					{
-						if (player.equiped[i] == t)
+						if (playerCharacter.equiped[i] == t)
 						{
 							*lcontent = 2;
 							return TYPE_LONG;
@@ -1688,103 +1688,103 @@ long GetSystemVar(EERIE_SCRIPT * es,INTERACTIVE_OBJ * io,char * name,char * txtc
 
 			if (!specialstrcmp(name, "^PLAYER_GOLD"))
 			{
-				*fcontent = ARX_CLEAN_WARN_CAST_FLOAT(player.gold);
+				*fcontent = ARX_CLEAN_WARN_CAST_FLOAT(playerCharacter.gold);
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_MAXLIFE"))
 			{
-				*fcontent = player.Full_maxlife;
+				*fcontent = playerCharacter.Full_maxlife;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_ATTRIBUTE_STRENGTH"))
 			{
-				*fcontent = player.Full_Attribute_Strength;
+				*fcontent = playerCharacter.Full_Attribute_Strength;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_ATTRIBUTE_DEXTERITY"))
 			{
-				*fcontent = player.Full_Attribute_Dexterity;
+				*fcontent = playerCharacter.Full_Attribute_Dexterity;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_ATTRIBUTE_CONSTITUTION"))
 			{
-				*fcontent = player.Full_Attribute_Constitution;
+				*fcontent = playerCharacter.Full_Attribute_Constitution;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_ATTRIBUTE_MIND"))
 			{
-				*fcontent = player.Full_Attribute_Mind;
+				*fcontent = playerCharacter.Full_Attribute_Mind;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_STEALTH"))
 			{
-				*fcontent = player.Full_Skill_Stealth;
+				*fcontent = playerCharacter.Full_Skill_Stealth;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_MECANISM"))
 			{
-				*fcontent = player.Full_Skill_Mecanism;
+				*fcontent = playerCharacter.Full_Skill_Mecanism;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_INTUITION"))
 			{
-				*fcontent = player.Full_Skill_Intuition;
+				*fcontent = playerCharacter.Full_Skill_Intuition;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_ETHERAL_LINK"))
 			{
-				*fcontent = player.Full_Skill_Etheral_Link;
+				*fcontent = playerCharacter.Full_Skill_Etheral_Link;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_OBJECT_KNOWLEDGE"))
 			{
-				*fcontent = player.Full_Skill_Object_Knowledge;
+				*fcontent = playerCharacter.Full_Skill_Object_Knowledge;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_CASTING"))
 			{
-				*fcontent = player.Full_Skill_Casting;
+				*fcontent = playerCharacter.Full_Skill_Casting;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_PROJECTILE"))
 			{
-				*fcontent = player.Full_Skill_Projectile;
+				*fcontent = playerCharacter.Full_Skill_Projectile;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_CLOSE_COMBAT"))
 			{
-				*fcontent = player.Full_Skill_Close_Combat;
+				*fcontent = playerCharacter.Full_Skill_Close_Combat;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_SKILL_DEFENSE"))
 			{
-				*fcontent = player.Full_Skill_Defense;
+				*fcontent = playerCharacter.Full_Skill_Defense;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_HUNGER"))
 			{
-				*fcontent = player.hunger;
+				*fcontent = playerCharacter.hunger;
 				return TYPE_FLOAT;
 			}
 
 			if (!specialstrcmp(name, "^PLAYER_POISON"))
 			{
-				*fcontent = player.poison;
+				*fcontent = playerCharacter.poison;
 				return TYPE_FLOAT;
 			}
 
@@ -3255,9 +3255,9 @@ void GetTargetPos(INTERACTIVE_OBJ * io, unsigned long smoothing)
 
 	if ((io->targetinfo == TARGET_PLAYER) || (io->targetinfo == -1))
 	{
-		io->target.x = player.pos.x;
-		io->target.y = player.pos.y + player.size.y;
-		io->target.z = player.pos.z;
+		io->target.x = playerCharacter.pos.x;
+		io->target.y = playerCharacter.pos.y + playerCharacter.size.y;
+		io->target.z = playerCharacter.pos.z;
 		return;
 	}
 	else
@@ -6000,14 +6000,14 @@ void ManageCasseDArme(INTERACTIVE_OBJ * io)
 	        (io->type_flags & OBJECT_TYPE_2H) ||
 	        (io->type_flags & OBJECT_TYPE_BOW))
 	{
-		if (player.bag)
+		if (playerCharacter.bag)
 		{
 			INTERACTIVE_OBJ * pObjMin = NULL;
 			INTERACTIVE_OBJ * pObjMax = NULL;
 			INTERACTIVE_OBJ * pObjFIX = NULL;
 			bool bStop = false;
 
-			for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+			for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			{
 				for (int j = 0; j < INVENTORY_Y; j++)
 				{
@@ -7096,10 +7096,10 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 
 								for (int i = 0; i < MAX_EQUIPED; i++)
 								{
-									if	((player.equiped[i] != 0)
-									        &&	ValidIONum(player.equiped[i]))
+									if	((playerCharacter.equiped[i] != 0)
+									        &&	ValidIONum(playerCharacter.equiped[i]))
 									{
-										INTERACTIVE_OBJ * equiped = inter.iobj[player.equiped[i]];
+										INTERACTIVE_OBJ * equiped = inter.iobj[playerCharacter.equiped[i]];
 
 										if	(equiped == io)
 										{
@@ -7677,7 +7677,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 				{
 					if ((io) && (io->ioflags & IO_NPC))
 					{
-						if (player.Interface & INTER_STEAL)
+						if (playerCharacter.Interface & INTER_STEAL)
 						{
 							INTERACTIVE_OBJ * pio = NULL;
 
@@ -7685,7 +7685,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 							{
 								pio = (INTERACTIVE_OBJ *)SecondaryInventory->io;
 							}
-							else if (player.Interface & INTER_STEAL)
+							else if (playerCharacter.Interface & INTER_STEAL)
 							{
 								pio = ioSteal;
 							}
@@ -7759,7 +7759,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 
 					pos = GetNextWord(es, pos, temp);
 
-					if (player.Interface & INTER_NOTE)
+					if (playerCharacter.Interface & INTER_NOTE)
 						ARX_INTERFACE_NoteClose();
 					else
 					{
@@ -8770,7 +8770,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 				else if (!strcmp(temp, "SETHUNGER"))
 				{
 					pos = GetNextWord(es, pos, temp);
-					player.hunger = GetVarValueInterpretedAsFloat(temp, esss, io);
+					playerCharacter.hunger = GetVarValueInterpretedAsFloat(temp, esss, io);
 #ifdef NEEDING_DEBUG
 
 					if (NEED_DEBUG) sprintf(cmd, "SET_HUNGER %s", temp);
@@ -9689,7 +9689,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 						}
 
 						BLOCK_PLAYER_CONTROLS = 1;
-						player.Interface &= ~INTER_COMBATMODE;
+						playerCharacter.Interface &= ~INTER_COMBATMODE;
 					}
 
 					EVENT_SENDER = oes;
@@ -10012,12 +10012,12 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 				}
 				else if (!strcmp(temp, "STEALNPC"))
 				{
-					if (player.Interface & INTER_STEAL)
+					if (playerCharacter.Interface & INTER_STEAL)
 					{
 						SendIOScriptEvent(ioSteal, SM_STEAL, "OFF");
 					}
 
-					player.Interface |= INTER_STEAL;
+					playerCharacter.Interface |= INTER_STEAL;
 					InventoryDir = 1;
 					ioSteal = io;
 				}
@@ -10057,11 +10057,11 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 #endif
 
 						if (!BLOCK_PLAYER_CONTROLS)
-							player.life += (float)atof(temp1);
+							playerCharacter.life += (float)atof(temp1);
 
-						if (player.life > player.Full_maxlife) player.life = player.Full_maxlife;
+						if (playerCharacter.life > playerCharacter.Full_maxlife) playerCharacter.life = playerCharacter.Full_maxlife;
 
-						if (player.life < 0.f) player.life = 0.f;
+						if (playerCharacter.life < 0.f) playerCharacter.life = 0.f;
 					}
 					else if (!strcmp(temp1, "MANA"))
 					{
@@ -10075,11 +10075,11 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 						}
 
 #endif
-						player.mana += (float)atof(temp1);
+						playerCharacter.mana += (float)atof(temp1);
 
-						if (player.mana > player.Full_maxmana) player.mana = player.Full_maxmana;
+						if (playerCharacter.mana > playerCharacter.Full_maxmana) playerCharacter.mana = playerCharacter.Full_maxmana;
 
-						if (player.mana < 0.f) player.mana = 0.f;
+						if (playerCharacter.mana < 0.f) playerCharacter.mana = 0.f;
 					}
 					else if (!strcmp(temp1, "NEWSPELL"))
 					{
@@ -10222,7 +10222,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 						if (!stricmp(temp, "RGB"))
 						{
 							pos = GetNextWord(es, pos, temp);
-							desired.depthcolor.r = GetVarValueInterpretedAsFloat(temp, esss, io);
+							gDesiredMod.depthcolor.r = GetVarValueInterpretedAsFloat(temp, esss, io);
 #ifdef NEEDING_DEBUG
 
 							if (NEED_DEBUG)
@@ -10233,7 +10233,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 
 #endif
 							pos = GetNextWord(es, pos, temp);
-							desired.depthcolor.g = GetVarValueInterpretedAsFloat(temp, esss, io);
+							gDesiredMod.depthcolor.g = GetVarValueInterpretedAsFloat(temp, esss, io);
 #ifdef NEEDING_DEBUG
 
 							if (NEED_DEBUG)
@@ -10244,7 +10244,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 
 #endif
 							pos = GetNextWord(es, pos, temp);
-							desired.depthcolor.b = GetVarValueInterpretedAsFloat(temp, esss, io);
+							gDesiredMod.depthcolor.b = GetVarValueInterpretedAsFloat(temp, esss, io);
 #ifdef NEEDING_DEBUG
 
 							if (NEED_DEBUG)
@@ -10254,12 +10254,12 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 							}
 
 #endif
-							desired.flags |= GMOD_DCOLOR;
+							gDesiredMod.flags |= GMOD_DCOLOR;
 						}
 						else if (!stricmp(temp, "ZCLIP"))
 						{
 							pos = GetNextWord(es, pos, temp);
-							desired.zclip = GetVarValueInterpretedAsFloat(temp, esss, io);
+							gDesiredMod.zclip = GetVarValueInterpretedAsFloat(temp, esss, io);
 #ifdef NEEDING_DEBUG
 
 							if (NEED_DEBUG)
@@ -10269,7 +10269,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 							}
 
 #endif
-							desired.flags |= GMOD_ZCLIP;
+							gDesiredMod.flags |= GMOD_ZCLIP;
 						}
 						else if (!stricmp(temp, "AMBIANCE"))
 						{
@@ -10500,9 +10500,9 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 					pos = GetNextWord(es, pos, temp);
 
 					if (!stricmp(temp, "ON"))
-						player.playerflags &= ~PLAYERFLAGS_NO_MANA_DRAIN;
+						playerCharacter.playerflags &= ~PLAYERFLAGS_NO_MANA_DRAIN;
 					else
-						player.playerflags |= PLAYERFLAGS_NO_MANA_DRAIN;
+						playerCharacter.playerflags |= PLAYERFLAGS_NO_MANA_DRAIN;
 				}
 				else if (!strcmp(temp, "PATHFIND"))
 				{
@@ -12137,7 +12137,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 								F2L(fangle, &angle);
 
 								if (!iCharIn(temp, 'L'))
-									player.desiredangle.b = player.angle.b = fangle;
+									playerCharacter.desiredangle.b = playerCharacter.angle.b = fangle;
 
 
 							}
@@ -12172,7 +12172,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 #endif
 								strcpy(TELEPORT_TO_POSITION, temp);
 
-								if (angle == -1) TELEPORT_TO_ANGLE	=	ARX_CLEAN_WARN_CAST_LONG(player.angle.b);
+								if (angle == -1) TELEPORT_TO_ANGLE	=	ARX_CLEAN_WARN_CAST_LONG(playerCharacter.angle.b);
 								else TELEPORT_TO_ANGLE = angle;
 
 								CHANGE_LEVEL_ICON = 1;
@@ -12221,7 +12221,7 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 									        &&	(io->show != SHOW_FLAG_KILLED))
 										io->show = SHOW_FLAG_IN_SCENE;
 
-									ARX_INTERACTIVE_Teleport(io, &player.pos);
+									ARX_INTERACTIVE_Teleport(io, &playerCharacter.pos);
 								}
 								else
 								{
@@ -12808,9 +12808,9 @@ long SendScriptEvent(EERIE_SCRIPT * es, long msg, char * params, INTERACTIVE_OBJ
 					{
 						if (io->ioflags & IO_ITEM)
 						{
-							player.hunger += io->_itemdata->food_value * 4;
+							playerCharacter.hunger += io->_itemdata->food_value * 4;
 
-							if (player.hunger > 100.f) player.hunger = 100.f;
+							if (playerCharacter.hunger > 100.f) playerCharacter.hunger = 100.f;
 						}
 
 						if ((io->ioflags & IO_ITEM) && (io->_itemdata->count > 1))

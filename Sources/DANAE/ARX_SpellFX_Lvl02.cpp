@@ -95,13 +95,13 @@ CHeal::~CHeal()
 //-----------------------------------------------------------------------------
 void CHeal::Create()
 {
-	SetAngle(MAKEANGLE(player.angle.b));
+	SetAngle(MAKEANGLE(playerCharacter.angle.b));
 
 	if (spells[spellinstance].caster == 0)
 	{
-		eSrc.x = player.pos.x;
-		eSrc.y = player.pos.y;
-		eSrc.z = player.pos.z;
+		eSrc.x = playerCharacter.pos.x;
+		eSrc.y = playerCharacter.pos.y;
+		eSrc.z = playerCharacter.pos.z;
 	}
 	else
 	{
@@ -190,9 +190,9 @@ void CHeal::Update(unsigned long aulTime)
 
 	if (spells[spellinstance].caster == 0)
 	{
-		eSrc.x = player.pos.x;
-		eSrc.y = player.pos.y;
-		eSrc.z = player.pos.z;
+		eSrc.x = playerCharacter.pos.x;
+		eSrc.y = playerCharacter.pos.y;
+		eSrc.z = playerCharacter.pos.z;
 	}
 	else
 	{

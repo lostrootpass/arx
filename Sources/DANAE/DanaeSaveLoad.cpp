@@ -381,9 +381,9 @@ long DanaeSaveLevel(char * fic)
 		dlh.pos_edit.z = subj.pos.z;
 	}
 
-	dlh.angle_edit.a = player.angle.a;
-	dlh.angle_edit.b = player.angle.b;
-	dlh.angle_edit.g = player.angle.g;
+	dlh.angle_edit.a = playerCharacter.angle.a;
+	dlh.angle_edit.b = playerCharacter.angle.b;
+	dlh.angle_edit.g = playerCharacter.angle.g;
 	dlh.lighting = FALSE; // MUST BE FALSE !!!!
 
 	_time32(&dlh.time);
@@ -1123,9 +1123,9 @@ long DanaeLoadLevel(LPDIRECT3DDEVICE7 pd3dDevice, char * fic)
 	loddpos.x = subj.pos.x = dlh.pos_edit.x;
 	loddpos.y = subj.pos.y = dlh.pos_edit.y;
 	loddpos.z = subj.pos.z = dlh.pos_edit.z;
-	player.desiredangle.a = player.angle.a = subj.angle.a = dlh.angle_edit.a;
-	player.desiredangle.b = player.angle.b = subj.angle.b = dlh.angle_edit.b;
-	player.desiredangle.g = player.angle.g = subj.angle.g = dlh.angle_edit.g;
+	playerCharacter.desiredangle.a = playerCharacter.angle.a = subj.angle.a = dlh.angle_edit.a;
+	playerCharacter.desiredangle.b = playerCharacter.angle.b = subj.angle.b = dlh.angle_edit.b;
+	playerCharacter.desiredangle.g = playerCharacter.angle.g = subj.angle.g = dlh.angle_edit.g;
 
 	if (strcmp(dlh.ident, "DANAE_FILE"))
 	{
@@ -1183,9 +1183,9 @@ long DanaeLoadLevel(LPDIRECT3DDEVICE7 pd3dDevice, char * fic)
 		trans.x = Mscenepos.x;
 		trans.y = Mscenepos.y;
 		trans.z = Mscenepos.z;
-		player.pos.x = loddpos.x + trans.x;
-		player.pos.y = loddpos.y + trans.y;
-		player.pos.z = loddpos.z + trans.z;
+		playerCharacter.pos.x = loddpos.x + trans.x;
+		playerCharacter.pos.y = loddpos.y + trans.y;
+		playerCharacter.pos.z = loddpos.z + trans.z;
 	}
 	else if (mse != NULL)
 	{
@@ -1201,11 +1201,11 @@ long DanaeLoadLevel(LPDIRECT3DDEVICE7 pd3dDevice, char * fic)
 		mse->pos.x = Mscenepos.x = Mscenepos.x + BKG_SIZX - t1;
 		mse->pos.z = Mscenepos.z = Mscenepos.z + BKG_SIZZ - t2;
 		Mscenepos.y = mse->pos.y = -mse->cub.ymin - 100.f - mse->point0.y;
-		lastteleport.x = map.pos.x = player.pos.x = subj.pos.x = moveto.x = mse->pos.x + mse->point0.x;
-		lastteleport.z = map.pos.z = player.pos.z = subj.pos.z = moveto.z = mse->pos.z + mse->point0.z;
-		lastteleport.y         = player.pos.y = subj.pos.y = moveto.y = mse->pos.y + mse->point0.y;
+		lastteleport.x = map.pos.x = playerCharacter.pos.x = subj.pos.x = moveto.x = mse->pos.x + mse->point0.x;
+		lastteleport.z = map.pos.z = playerCharacter.pos.z = subj.pos.z = moveto.z = mse->pos.z + mse->point0.z;
+		lastteleport.y         = playerCharacter.pos.y = subj.pos.y = moveto.y = mse->pos.y + mse->point0.y;
 		lastteleport.y -= 180.f;
-		player.pos.y = subj.pos.y -= 180.f;
+		playerCharacter.pos.y = subj.pos.y -= 180.f;
 		trans.x = mse->pos.x;
 		trans.y = mse->pos.y;
 		trans.z = mse->pos.z;

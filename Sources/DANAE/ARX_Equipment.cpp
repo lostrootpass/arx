@@ -153,9 +153,9 @@ void ARX_EQUIPMENT_Release(long id)
 	{
 		for (long i = 0; i < MAX_EQUIPED; i++)
 		{
-			if (player.equiped[i] == id)
+			if (playerCharacter.equiped[i] == id)
 			{
-				player.equiped[i] = 0;
+				playerCharacter.equiped[i] = 0;
 			}
 		}
 	}
@@ -198,10 +198,10 @@ void ARX_EQUIPMENT_RecreatePlayerMesh()
 	long i;
 	char pathh[256];
 
-	if ((player.equiped[EQUIP_SLOT_HELMET] != 0)
-	        &&	ValidIONum(player.equiped[EQUIP_SLOT_HELMET]))
+	if ((playerCharacter.equiped[EQUIP_SLOT_HELMET] != 0)
+	        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_HELMET]))
 	{
-		INTERACTIVE_OBJ * tweaker = inter.iobj[player.equiped[EQUIP_SLOT_HELMET]];
+		INTERACTIVE_OBJ * tweaker = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_HELMET]];
 
 		if (tweaker)
 		{
@@ -254,10 +254,10 @@ void ARX_EQUIPMENT_RecreatePlayerMesh()
 		}
 	}
 
-	if ((player.equiped[EQUIP_SLOT_ARMOR] != 0)
-	        &&	ValidIONum(player.equiped[EQUIP_SLOT_ARMOR]))
+	if ((playerCharacter.equiped[EQUIP_SLOT_ARMOR] != 0)
+	        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_ARMOR]))
 	{
-		INTERACTIVE_OBJ * tweaker = inter.iobj[player.equiped[EQUIP_SLOT_ARMOR]];
+		INTERACTIVE_OBJ * tweaker = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_ARMOR]];
 
 		if (tweaker)
 		{
@@ -310,10 +310,10 @@ void ARX_EQUIPMENT_RecreatePlayerMesh()
 		}
 	}
 
-	if ((player.equiped[EQUIP_SLOT_LEGGINGS] != 0)
-	        &&	ValidIONum(player.equiped[EQUIP_SLOT_LEGGINGS]))
+	if ((playerCharacter.equiped[EQUIP_SLOT_LEGGINGS] != 0)
+	        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_LEGGINGS]))
 	{
-		INTERACTIVE_OBJ * tweaker = inter.iobj[player.equiped[EQUIP_SLOT_LEGGINGS]];
+		INTERACTIVE_OBJ * tweaker = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_LEGGINGS]];
 
 		if (tweaker)
 		{
@@ -374,10 +374,10 @@ void ARX_EQUIPMENT_RecreatePlayerMesh()
 
 	for (i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0)
-		        &&	ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[i]))
 		{
-			toequip = inter.iobj[player.equiped[i]];
+			toequip = inter.iobj[playerCharacter.equiped[i]];
 
 			if (toequip)
 			{
@@ -386,7 +386,7 @@ void ARX_EQUIPMENT_RecreatePlayerMesh()
 				                           |	OBJECT_TYPE_2H
 				                           |	OBJECT_TYPE_BOW))
 				{
-					if (player.Interface & INTER_COMBATMODE)	
+					if (playerCharacter.Interface & INTER_COMBATMODE)	
 					{
 						ARX_EQUIPMENT_AttachPlayerWeaponToHand();
 					}
@@ -397,7 +397,7 @@ void ARX_EQUIPMENT_RecreatePlayerMesh()
 				}
 				else if (toequip->type_flags & OBJECT_TYPE_SHIELD)
 				{
-					if (player.equiped[EQUIP_SLOT_SHIELD] != 0)
+					if (playerCharacter.equiped[EQUIP_SLOT_SHIELD] != 0)
 					{
 						EERIE_LINKEDOBJ_LinkObjectToObject(target->obj, toequip->obj, "SHIELD_ATTACH", "SHIELD_ATTACH", toequip);
 					}
@@ -430,9 +430,9 @@ void ARX_EQUIPMENT_UnEquipAllPlayer()
 {
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i]) && (ValidIONum(player.equiped[i])))
+		if ((playerCharacter.equiped[i]) && (ValidIONum(playerCharacter.equiped[i])))
 		{
-			ARX_EQUIPMENT_UnEquip(inter.iobj[0], inter.iobj[player.equiped[i]]);
+			ARX_EQUIPMENT_UnEquip(inter.iobj[0], inter.iobj[playerCharacter.equiped[i]]);
 		}
 	}
 
@@ -450,10 +450,10 @@ bool ARX_EQUIPMENT_IsPlayerEquip(INTERACTIVE_OBJ * _pIO)
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0) &&
-		        ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i] != 0) &&
+		        ValidIONum(playerCharacter.equiped[i]))
 		{
-			INTERACTIVE_OBJ * toequip = inter.iobj[player.equiped[i]];
+			INTERACTIVE_OBJ * toequip = inter.iobj[playerCharacter.equiped[i]];
 
 			if (toequip == _pIO)
 			{
@@ -479,12 +479,12 @@ void ARX_EQUIPMENT_UnEquip(INTERACTIVE_OBJ * target, INTERACTIVE_OBJ * tounequip
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0)
-		        &&	ValidIONum(player.equiped[i])
-		        &&	(inter.iobj[player.equiped[i]] == tounequip))
+		if ((playerCharacter.equiped[i] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[i])
+		        &&	(inter.iobj[playerCharacter.equiped[i]] == tounequip))
 		{
 			EERIE_LINKEDOBJ_UnLinkObjectFromObject(target->obj, tounequip->obj);
-			ARX_EQUIPMENT_Release(player.equiped[i]);
+			ARX_EQUIPMENT_Release(playerCharacter.equiped[i]);
 			target->bbox1.x = 9999;
 			target->bbox2.x = -9999;
 
@@ -524,10 +524,10 @@ void ARX_EQUIPMENT_AttachPlayerWeaponToHand()
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0)
-		        &&	ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[i]))
 		{
-			toequip = inter.iobj[player.equiped[i]];
+			toequip = inter.iobj[playerCharacter.equiped[i]];
 
 			if (toequip)
 			{
@@ -556,10 +556,10 @@ void ARX_EQUIPMENT_AttachPlayerWeaponToBack()
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0)
-		        &&	ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[i]))
 		{
-			toequip = inter.iobj[player.equiped[i]];
+			toequip = inter.iobj[playerCharacter.equiped[i]];
 
 			if (toequip)
 			{
@@ -592,10 +592,10 @@ long ARX_EQUIPMENT_GetPlayerWeaponType()
 
 	if (!io) return WEAPON_BARE;
 
-	if ((player.equiped[EQUIP_SLOT_WEAPON] != 0)
-	        &&	ValidIONum(player.equiped[EQUIP_SLOT_WEAPON]))
+	if ((playerCharacter.equiped[EQUIP_SLOT_WEAPON] != 0)
+	        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_WEAPON]))
 	{
-		INTERACTIVE_OBJ * toequip = inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]];
+		INTERACTIVE_OBJ * toequip = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]];
 
 		if (toequip)
 		{
@@ -667,7 +667,7 @@ float ARX_EQUIPMENT_ComputeDamages(INTERACTIVE_OBJ * io_source, INTERACTIVE_OBJ 
 		if (io_target->ioflags & IO_FIX)
 		{
 			if (io_source == inter.iobj[0])
-				ARX_DAMAGES_DamageFIX(io_target, player.Full_damages, 0, 0);
+				ARX_DAMAGES_DamageFIX(io_target, playerCharacter.Full_damages, 0, 0);
 			else if (io_source->ioflags & IO_NPC)
 				ARX_DAMAGES_DamageFIX(io_target, io_source->_npcdata->damages, GetInterNum(io_source), 0);
 			else
@@ -690,10 +690,10 @@ float ARX_EQUIPMENT_ComputeDamages(INTERACTIVE_OBJ * io_source, INTERACTIVE_OBJ 
 
 	if (io_source == inter.iobj[0]) 
 	{
-		if ((player.equiped[EQUIP_SLOT_WEAPON] != 0)
-		        &&	ValidIONum(player.equiped[EQUIP_SLOT_WEAPON]))
+		if ((playerCharacter.equiped[EQUIP_SLOT_WEAPON] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_WEAPON]))
 		{
-			INTERACTIVE_OBJ * io = inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]];
+			INTERACTIVE_OBJ * io = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]];
 
 			if ((io) && (io->weaponmaterial))
 			{
@@ -701,9 +701,9 @@ float ARX_EQUIPMENT_ComputeDamages(INTERACTIVE_OBJ * io_source, INTERACTIVE_OBJ 
 			}
 		}
 
-		attack = player.Full_damages;
+		attack = playerCharacter.Full_damages;
 
-		if (rnd() * 100 <= (float)(player.Full_Attribute_Dexterity - 9) * 2.f + (float)(player.Full_Skill_Close_Combat * DIV5))
+		if (rnd() * 100 <= (float)(playerCharacter.Full_Attribute_Dexterity - 9) * 2.f + (float)(playerCharacter.Full_Skill_Close_Combat * DIV5))
 		{
 			if (SendIOScriptEvent(io_source, SM_CRITICAL, "", NULL) != REFUSE)
 				critical = TRUE;
@@ -714,7 +714,7 @@ float ARX_EQUIPMENT_ComputeDamages(INTERACTIVE_OBJ * io_source, INTERACTIVE_OBJ 
 
 		if (io_target->_npcdata->npcflags & NPCFLAG_BACKSTAB)
 		{
-			if (rnd() * 100.f <= player.Full_Skill_Stealth * DIV2)
+			if (rnd() * 100.f <= playerCharacter.Full_Skill_Stealth * DIV2)
 			{
 				if (SendIOScriptEvent(io_source, SM_BACKSTAB, "", NULL) != REFUSE)
 					backstab = 1.5f; 
@@ -769,8 +769,8 @@ float ARX_EQUIPMENT_ComputeDamages(INTERACTIVE_OBJ * io_source, INTERACTIVE_OBJ 
 
 	if (io_target == inter.iobj[0])
 	{
-		ac = player.Full_armor_class;
-		absorb = player.Full_Skill_Defense * DIV2;
+		ac = playerCharacter.Full_armor_class;
+		absorb = playerCharacter.Full_Skill_Defense * DIV2;
 	}
 	else
 	{
@@ -794,10 +794,10 @@ float ARX_EQUIPMENT_ComputeDamages(INTERACTIVE_OBJ * io_source, INTERACTIVE_OBJ 
 
 	if (io_target == inter.iobj[0])
 	{
-		if ((player.equiped[EQUIP_SLOT_ARMOR] > 0)
-		        &&	ValidIONum(player.equiped[EQUIP_SLOT_ARMOR]))
+		if ((playerCharacter.equiped[EQUIP_SLOT_ARMOR] > 0)
+		        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_ARMOR]))
 		{
-			INTERACTIVE_OBJ * io = inter.iobj[player.equiped[EQUIP_SLOT_ARMOR]];
+			INTERACTIVE_OBJ * io = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_ARMOR]];
 
 			if ((io) && (io->armormaterial))
 			{
@@ -849,9 +849,9 @@ float ARX_EQUIPMENT_ComputeDamages(INTERACTIVE_OBJ * io_source, INTERACTIVE_OBJ 
 			if (io_target == inter.iobj[0])
 			{
 				EERIE_3D ppos;
-				ppos.x = io_source->pos.x - player.pos.x;
-				ppos.y = io_source->pos.y - player.pos.y - PLAYER_BASE_HEIGHT;
-				ppos.z = io_source->pos.z - player.pos.z;
+				ppos.x = io_source->pos.x - playerCharacter.pos.x;
+				ppos.y = io_source->pos.y - playerCharacter.pos.y - PLAYER_BASE_HEIGHT;
+				ppos.z = io_source->pos.z - playerCharacter.pos.z;
 				Vector_Normalize(&ppos);
 
 				//------- player push START
@@ -1233,13 +1233,13 @@ void ARX_EQUIPMENT_LaunchPlayerReadyWeapon()
 			break;
 		case WEAPON_2H:
 
-			if (player.equiped[EQUIP_SLOT_SHIELD] == 0)
+			if (playerCharacter.equiped[EQUIP_SLOT_SHIELD] == 0)
 				anim = io->anims[ANIM_2H_READY_PART_1];
 
 			break;
 		case WEAPON_BOW:
 
-			if (player.equiped[EQUIP_SLOT_SHIELD] == 0)
+			if (playerCharacter.equiped[EQUIP_SLOT_SHIELD] == 0)
 				anim = io->anims[ANIM_MISSILE_READY_PART_1];
 
 			break;
@@ -1258,21 +1258,21 @@ void ARX_EQUIPMENT_LaunchPlayerReadyWeapon()
 
 void ARX_EQUIPMENT_UnEquipPlayerWeapon()
 {
-	if ((player.equiped[EQUIP_SLOT_WEAPON] != 0)
-	        &&	ValidIONum(player.equiped[EQUIP_SLOT_WEAPON]))
+	if ((playerCharacter.equiped[EQUIP_SLOT_WEAPON] != 0)
+	        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_WEAPON]))
 	{
 		INTERACTIVE_OBJ * pioOldDragInter;
 		pioOldDragInter = DRAGINTER;
-		DRAGINTER = inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]];
+		DRAGINTER = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]];
 
 		if (DRAGINTER)
 			ARX_SOUND_PlayInterface(SND_INVSTD);
 
-		ARX_EQUIPMENT_UnEquip(inter.iobj[0], inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]);
+		ARX_EQUIPMENT_UnEquip(inter.iobj[0], inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]);
 		DRAGINTER = pioOldDragInter;
 	}
 
-	player.equiped[EQUIP_SLOT_WEAPON] = 0;
+	playerCharacter.equiped[EQUIP_SLOT_WEAPON] = 0;
 }
 
 bool bRing = false;
@@ -1313,13 +1313,13 @@ void ARX_EQUIPMENT_Equip(INTERACTIVE_OBJ * target, INTERACTIVE_OBJ * toequip)
 	        ||	(toequip->type_flags & OBJECT_TYPE_BOW)
 	   )
 	{
-		if ((player.equiped[EQUIP_SLOT_WEAPON] != 0)
-		        &&	ValidIONum(player.equiped[EQUIP_SLOT_WEAPON]))
+		if ((playerCharacter.equiped[EQUIP_SLOT_WEAPON] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_WEAPON]))
 		{
-			ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]);
+			ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]);
 		}
 
-		player.equiped[EQUIP_SLOT_WEAPON] = (short)validid;
+		playerCharacter.equiped[EQUIP_SLOT_WEAPON] = (short)validid;
 
 		if (toequip->type_flags & OBJECT_TYPE_BOW)
 		{
@@ -1332,58 +1332,58 @@ void ARX_EQUIPMENT_Equip(INTERACTIVE_OBJ * target, INTERACTIVE_OBJ * toequip)
 
 		if ((toequip->type_flags & OBJECT_TYPE_2H) || (toequip->type_flags & OBJECT_TYPE_BOW))
 		{
-			if (player.equiped[EQUIP_SLOT_SHIELD] != 0)
+			if (playerCharacter.equiped[EQUIP_SLOT_SHIELD] != 0)
 			{
-				ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_SHIELD]]);
+				ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_SHIELD]]);
 			}
 		}
 	}
 	else if (toequip->type_flags & OBJECT_TYPE_SHIELD)
 	{
-		if ((player.equiped[EQUIP_SLOT_SHIELD] != 0)
-		        &&	ValidIONum(player.equiped[EQUIP_SLOT_SHIELD]))
+		if ((playerCharacter.equiped[EQUIP_SLOT_SHIELD] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_SHIELD]))
 		{
-			ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_SHIELD]]);
+			ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_SHIELD]]);
 		}
 
-		player.equiped[EQUIP_SLOT_SHIELD] = (short)validid;
+		playerCharacter.equiped[EQUIP_SLOT_SHIELD] = (short)validid;
 		EERIE_LINKEDOBJ_LinkObjectToObject(target->obj, toequip->obj, "SHIELD_ATTACH", "SHIELD_ATTACH", toequip);
 
-		if ((player.equiped[EQUIP_SLOT_WEAPON] != 0)
-		        &&	ValidIONum(player.equiped[EQUIP_SLOT_WEAPON]))
+		if ((playerCharacter.equiped[EQUIP_SLOT_WEAPON] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_WEAPON]))
 		{
-			if ((inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->type_flags & OBJECT_TYPE_2H) ||
-			        (inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->type_flags & OBJECT_TYPE_BOW))
+			if ((inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->type_flags & OBJECT_TYPE_2H) ||
+			        (inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->type_flags & OBJECT_TYPE_BOW))
 			{
-				ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]);
+				ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]);
 			}
 		}
 	}
 	else if (toequip->type_flags & OBJECT_TYPE_RING)
 	{
 		// check first, if not already equiped
-		if (!((ValidIONum(player.equiped[EQUIP_SLOT_RING_LEFT]) && (toequip == inter.iobj[player.equiped[EQUIP_SLOT_RING_LEFT]]))
-		        ||	(ValidIONum(player.equiped[EQUIP_SLOT_RING_RIGHT]) && (toequip == inter.iobj[player.equiped[EQUIP_SLOT_RING_RIGHT]]))))
+		if (!((ValidIONum(playerCharacter.equiped[EQUIP_SLOT_RING_LEFT]) && (toequip == inter.iobj[playerCharacter.equiped[EQUIP_SLOT_RING_LEFT]]))
+		        ||	(ValidIONum(playerCharacter.equiped[EQUIP_SLOT_RING_RIGHT]) && (toequip == inter.iobj[playerCharacter.equiped[EQUIP_SLOT_RING_RIGHT]]))))
 		{
 			long willequip = -1;
 
-			if (player.equiped[EQUIP_SLOT_RING_LEFT] == 0) willequip = EQUIP_SLOT_RING_LEFT;
+			if (playerCharacter.equiped[EQUIP_SLOT_RING_LEFT] == 0) willequip = EQUIP_SLOT_RING_LEFT;
 
-			if (player.equiped[EQUIP_SLOT_RING_RIGHT] == 0) willequip = EQUIP_SLOT_RING_RIGHT;
+			if (playerCharacter.equiped[EQUIP_SLOT_RING_RIGHT] == 0) willequip = EQUIP_SLOT_RING_RIGHT;
 
 			if (willequip == -1)
 			{
 				if (bRing)
 				{
-					if (ValidIONum(player.equiped[EQUIP_SLOT_RING_RIGHT]))
-						ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_RING_RIGHT]]);
+					if (ValidIONum(playerCharacter.equiped[EQUIP_SLOT_RING_RIGHT]))
+						ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_RING_RIGHT]]);
 
 					willequip = EQUIP_SLOT_RING_RIGHT;
 				}
 				else
 				{
-					if (ValidIONum(player.equiped[EQUIP_SLOT_RING_LEFT]))
-						ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_RING_LEFT]]);
+					if (ValidIONum(playerCharacter.equiped[EQUIP_SLOT_RING_LEFT]))
+						ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_RING_LEFT]]);
 
 					willequip = EQUIP_SLOT_RING_LEFT;
 				}
@@ -1391,38 +1391,38 @@ void ARX_EQUIPMENT_Equip(INTERACTIVE_OBJ * target, INTERACTIVE_OBJ * toequip)
 				bRing = !bRing;
 			}
 
-			player.equiped[willequip] = (short)validid;
+			playerCharacter.equiped[willequip] = (short)validid;
 		}
 	}
 	else if (toequip->type_flags & OBJECT_TYPE_ARMOR)
 	{
-		if ((player.equiped[EQUIP_SLOT_ARMOR] != 0)
-		        &&	ValidIONum(player.equiped[EQUIP_SLOT_ARMOR]))
+		if ((playerCharacter.equiped[EQUIP_SLOT_ARMOR] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_ARMOR]))
 		{
-			ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_ARMOR]]);
+			ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_ARMOR]]);
 		}
 
-		player.equiped[EQUIP_SLOT_ARMOR] = (short)validid;
+		playerCharacter.equiped[EQUIP_SLOT_ARMOR] = (short)validid;
 	}
 	else if (toequip->type_flags & OBJECT_TYPE_LEGGINGS)
 	{
-		if ((player.equiped[EQUIP_SLOT_LEGGINGS] != 0)
-		        &&	ValidIONum(player.equiped[EQUIP_SLOT_LEGGINGS]))
+		if ((playerCharacter.equiped[EQUIP_SLOT_LEGGINGS] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_LEGGINGS]))
 		{
-			ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_LEGGINGS]]);
+			ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_LEGGINGS]]);
 		}
 
-		player.equiped[EQUIP_SLOT_LEGGINGS] = (short)validid;
+		playerCharacter.equiped[EQUIP_SLOT_LEGGINGS] = (short)validid;
 	}
 	else if (toequip->type_flags & OBJECT_TYPE_HELMET)
 	{
-		if ((player.equiped[EQUIP_SLOT_HELMET] != 0)
-		        &&	(ValidIONum(player.equiped[EQUIP_SLOT_HELMET])))
+		if ((playerCharacter.equiped[EQUIP_SLOT_HELMET] != 0)
+		        &&	(ValidIONum(playerCharacter.equiped[EQUIP_SLOT_HELMET])))
 		{
-			ARX_EQUIPMENT_UnEquip(target, inter.iobj[player.equiped[EQUIP_SLOT_HELMET]]);
+			ARX_EQUIPMENT_UnEquip(target, inter.iobj[playerCharacter.equiped[EQUIP_SLOT_HELMET]]);
 		}
 
-		player.equiped[EQUIP_SLOT_HELMET] = (short)validid;
+		playerCharacter.equiped[EQUIP_SLOT_HELMET] = (short)validid;
 	}
 
 	if ((toequip->type_flags & OBJECT_TYPE_HELMET)
@@ -1534,10 +1534,10 @@ float ARX_EQUIPMENT_Apply(INTERACTIVE_OBJ * io, long ident, float trueval)
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0)
-		        &&	ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[i]))
 		{
-			INTERACTIVE_OBJ * toequip = inter.iobj[player.equiped[i]];
+			INTERACTIVE_OBJ * toequip = inter.iobj[playerCharacter.equiped[i]];
 
 			if ((toequip) && (toequip->ioflags & IO_ITEM) && (toequip->_itemdata->equipitem))
 			{
@@ -1562,10 +1562,10 @@ float ARX_EQUIPMENT_ApplyPercent(INTERACTIVE_OBJ * io, long ident, float trueval
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0)
-		        &&	ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[i]))
 		{
-			INTERACTIVE_OBJ * toequip = inter.iobj[player.equiped[i]];
+			INTERACTIVE_OBJ * toequip = inter.iobj[playerCharacter.equiped[i]];
 
 			if ((toequip) && (toequip->ioflags & IO_ITEM) && (toequip->_itemdata->equipitem))
 			{
@@ -1662,14 +1662,14 @@ void ARX_EQUIPMENT_IdentifyAll()
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0)
-		        &&	ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[i]))
 		{
-			INTERACTIVE_OBJ * toequip = inter.iobj[player.equiped[i]];
+			INTERACTIVE_OBJ * toequip = inter.iobj[playerCharacter.equiped[i]];
 
 			if ((toequip) && (toequip->ioflags & IO_ITEM) && (toequip->_itemdata->equipitem))
 			{
-				if (player.Full_Skill_Object_Knowledge + player.Full_Attribute_Mind
+				if (playerCharacter.Full_Skill_Object_Knowledge + playerCharacter.Full_Attribute_Mind
 				        >= toequip->_itemdata->equipitem->elements[IO_EQUIPITEM_ELEMENT_Identify_Value].value)
 				{
 					SendIOScriptEvent(toequip, SM_IDENTIFY, "");

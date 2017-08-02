@@ -725,9 +725,9 @@ void InterTreeViewGotoPosition(HTREEITEM hitem)
 			{
 				if (tvv[i]->io != NULL)
 				{
-					TVCONTROLEDplayerpos.x = tvv[i]->io->pos.x + (float)EEsin(DEG2RAD(player.angle.b)) * 100.f;
+					TVCONTROLEDplayerpos.x = tvv[i]->io->pos.x + (float)EEsin(DEG2RAD(playerCharacter.angle.b)) * 100.f;
 					TVCONTROLEDplayerpos.y = tvv[i]->io->pos.y - 80.f;
-					TVCONTROLEDplayerpos.z = tvv[i]->io->pos.z - (float)EEcos(DEG2RAD(player.angle.b)) * 100.f;
+					TVCONTROLEDplayerpos.z = tvv[i]->io->pos.z - (float)EEcos(DEG2RAD(playerCharacter.angle.b)) * 100.f;
 					TVCONTROLED = 1;
 				}
 			}
@@ -744,9 +744,9 @@ void InterTreeViewGotoPosition(HTREEITEM hitem)
 
 				if (ap != NULL)
 				{
-					TVCONTROLEDplayerpos.x = ap->initpos.x + (float)EEsin(DEG2RAD(player.angle.b)) * 100.f;
+					TVCONTROLEDplayerpos.x = ap->initpos.x + (float)EEsin(DEG2RAD(playerCharacter.angle.b)) * 100.f;
 					TVCONTROLEDplayerpos.y = ap->initpos.y - 80.f;
-					TVCONTROLEDplayerpos.z = ap->initpos.z - (float)EEcos(DEG2RAD(player.angle.b)) * 100.f;
+					TVCONTROLEDplayerpos.z = ap->initpos.z - (float)EEcos(DEG2RAD(playerCharacter.angle.b)) * 100.f;
 					TVCONTROLED = 1;
 				}
 			}
@@ -1676,7 +1676,7 @@ BOOL CALLBACK PrecalcProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if (ID_AROUND == LOWORD(wParam))
 			{
-				RecalcLightZone(player.pos.x, player.pos.y, player.pos.z, 2);
+				RecalcLightZone(playerCharacter.pos.x, playerCharacter.pos.y, playerCharacter.pos.z, 2);
 			}
 
 			break;
@@ -2538,9 +2538,9 @@ BOOL CALLBACK OptionsProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (IsChecked(hWnd, IDC_PLAYERCOLLISIONS))
 					{
 						USE_PLAYERCOLLISIONS = 1;
-						EERIEPOLY * ep = BCCheckInPoly(player.pos.x, player.pos.y, player.pos.z);
+						EERIEPOLY * ep = BCCheckInPoly(playerCharacter.pos.x, playerCharacter.pos.y, playerCharacter.pos.z);
 
-						if (ep != NULL) player.pos.y = ep->max.y + PLAYER_BASE_HEIGHT;
+						if (ep != NULL) playerCharacter.pos.y = ep->max.y + PLAYER_BASE_HEIGHT;
 					}
 					else USE_PLAYERCOLLISIONS = 0;
 

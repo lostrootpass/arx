@@ -216,7 +216,7 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetZWrite(false);
 
-		if (player.poison > 1.f)
+		if (playerCharacter.poison > 1.f)
 			color = D3DRGB(Blood_Pos - 1.f, 1.f, Blood_Pos - 1.f);
 		else
 			color = D3DRGB(1.f, Blood_Pos - 1.f, Blood_Pos - 1.f);
@@ -231,7 +231,7 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 		g_pRenderApp->renderer->SetAlphaBlend(true);
 		g_pRenderApp->renderer->SetZWrite(false);
 
-		if (player.poison > 1.f)
+		if (playerCharacter.poison > 1.f)
 			color = D3DRGB(1.f - Blood_Pos, 1.f, 1.f - Blood_Pos);
 		else
 			color = D3DRGB(1.f, 1.f - Blood_Pos, 1.f - Blood_Pos);
@@ -266,15 +266,15 @@ void ARX_DAMAGE_Show_Hit_Blood(LPDIRECT3DDEVICE7 pd3dDevice)
 //*************************************************************************************
 float ARX_DAMAGES_DamagePlayer(float dmg, long type, long source, EERIE_3D * pos)
 {
-	if (player.playerflags & PLAYERFLAGS_INVULNERABILITY)
+	if (playerCharacter.playerflags & PLAYERFLAGS_INVULNERABILITY)
 		return 0;
 
 	float damagesdone = 0.f;
 
-	if (player.life == 0.f) return damagesdone;
+	if (playerCharacter.life == 0.f) return damagesdone;
 
-	if (dmg > player.life) damagesdone = dmg;
-	else damagesdone = player.life;
+	if (dmg > playerCharacter.life) damagesdone = dmg;
+	else damagesdone = playerCharacter.life;
 
 	inter.iobj[0]->dmg_sum += dmg;
 
@@ -292,7 +292,7 @@ float ARX_DAMAGES_DamagePlayer(float dmg, long type, long source, EERIE_3D * pos
 		sprintf(tex, "%5.2f", inter.iobj[0]->dmg_sum);
 		SendIOScriptEvent(inter.iobj[0], SM_OUCH, tex, NULL);
 		EVENT_SENDER = oes;
-		float power = inter.iobj[0]->dmg_sum / player.maxlife * 220.f;
+		float power = inter.iobj[0]->dmg_sum / playerCharacter.maxlife * 220.f;
 		AddQuakeFX(power * 3.5f, 500 + power * 3, rnd() * 100.f + power + 200, 0);
 		inter.iobj[0]->dmg_sum = 0.f;
 	}
@@ -315,9 +315,9 @@ float ARX_DAMAGES_DamagePlayer(float dmg, long type, long source, EERIE_3D * pos
 
 			if (pio && pio->poisonous && (pio->poisonous_count != 0))
 			{
-				if (rnd() * 100.f > player.resist_poison)
+				if (rnd() * 100.f > playerCharacter.resist_poison)
 				{
-					player.poison += pio->poisonous;
+					playerCharacter.poison += pio->poisonous;
 				}
 
 				if (pio->poisonous_count != -1)
@@ -327,15 +327,15 @@ float ARX_DAMAGES_DamagePlayer(float dmg, long type, long source, EERIE_3D * pos
 
 		long alive;
 
-		if (player.life > 0) alive = 1;
+		if (playerCharacter.life > 0) alive = 1;
 		else alive = 0;
 
 		if (!BLOCK_PLAYER_CONTROLS)
-			player.life -= dmg;
+			playerCharacter.life -= dmg;
 
-		if (player.life <= 0.f)
+		if (playerCharacter.life <= 0.f)
 		{
-			player.life = 0.f;
+			playerCharacter.life = 0.f;
 
 			if (alive) 
 			{
@@ -379,9 +379,9 @@ float ARX_DAMAGES_DamagePlayer(float dmg, long type, long source, EERIE_3D * pos
 			}
 		}
 
-		if (player.maxlife <= 0.f) return damagesdone;
+		if (playerCharacter.maxlife <= 0.f) return damagesdone;
 
-		float t = dmg / player.maxlife;
+		float t = dmg / playerCharacter.maxlife;
 
 		if (Blood_Pos == 0.f)
 		{
@@ -404,14 +404,14 @@ float ARX_DAMAGES_DamagePlayer(float dmg, long type, long source, EERIE_3D * pos
 
 void ARX_DAMAGES_HealPlayer(float dmg)
 {
-	if (player.life == 0.f) return;
+	if (playerCharacter.life == 0.f) return;
 
 	if (dmg > 0.f)
 	{
 		if (!BLOCK_PLAYER_CONTROLS)
-			player.life += dmg;
+			playerCharacter.life += dmg;
 
-		if (player.life > player.Full_maxlife) player.life = player.Full_maxlife;
+		if (playerCharacter.life > playerCharacter.Full_maxlife) playerCharacter.life = playerCharacter.Full_maxlife;
 	}
 }
 void ARX_DAMAGES_HealInter(INTERACTIVE_OBJ * io, float dmg)
@@ -433,13 +433,13 @@ void ARX_DAMAGES_HealInter(INTERACTIVE_OBJ * io, float dmg)
 }
 void ARX_DAMAGES_HealManaPlayer(float dmg)
 {
-	if (player.life == 0.f) return;
+	if (playerCharacter.life == 0.f) return;
 
 	if (dmg > 0.f)
 	{
-		player.mana += dmg;
+		playerCharacter.mana += dmg;
 
-		if (player.mana > player.Full_maxmana) player.mana = player.Full_maxmana;
+		if (playerCharacter.mana > playerCharacter.Full_maxmana) playerCharacter.mana = playerCharacter.Full_maxmana;
 	}
 }
 void ARX_DAMAGES_HealManaInter(INTERACTIVE_OBJ * io, float dmg)
@@ -467,17 +467,17 @@ float ARX_DAMAGES_DrainMana(INTERACTIVE_OBJ * io, float dmg)
 
 	if (io == inter.iobj[0])
 	{
-		if (player.playerflags & PLAYERFLAGS_NO_MANA_DRAIN)
+		if (playerCharacter.playerflags & PLAYERFLAGS_NO_MANA_DRAIN)
 			return 0;
 
-		if (player.mana >= dmg)
+		if (playerCharacter.mana >= dmg)
 		{
-			player.mana -= dmg;
+			playerCharacter.mana -= dmg;
 			return dmg;
 		}
 
-		float d = player.mana;
-		player.mana = 0;
+		float d = playerCharacter.mana;
+		playerCharacter.mana = 0;
 		return d;
 	}
 
@@ -743,10 +743,10 @@ float ARX_DAMAGES_DealDamages(long target, float dmg, long source, long flags, E
 	{
 		if (flags & DAMAGE_TYPE_POISON)
 		{
-			if (rnd() * 100.f > player.resist_poison)
+			if (rnd() * 100.f > playerCharacter.resist_poison)
 			{
 				damagesdone = dmg;
-				player.poison += damagesdone;
+				playerCharacter.poison += damagesdone;
 			}
 			else damagesdone = 0;
 
@@ -787,7 +787,7 @@ float ARX_DAMAGES_DealDamages(long target, float dmg, long source, long flags, E
 		if ((flags & DAMAGE_TYPE_MAGICAL)
 		        && !(flags & (DAMAGE_TYPE_FIRE | DAMAGE_TYPE_COLD)))
 		{
-			damagesdone -= player.Full_resist_magic * DIV100 * damagesdone;
+			damagesdone -= playerCharacter.Full_resist_magic * DIV100 * damagesdone;
 			damagesdone = __max(0, damagesdone);
 		}
 
@@ -875,7 +875,7 @@ float ARX_DAMAGES_DamageNPC(INTERACTIVE_OBJ * io, float dmg, long source, long f
 	if (io->_npcdata->life <= 0.f)
 	{
 		if ((source != 0)
-		        ||	((source == 0) &&	(player.equiped[EQUIP_SLOT_WEAPON] > 0)))
+		        ||	((source == 0) &&	(playerCharacter.equiped[EQUIP_SLOT_WEAPON] > 0)))
 		{
 			if ((dmg >= io->_npcdata->maxlife * 0.4f) && pos)
 				ARX_NPC_TryToCutSomething(io, pos);
@@ -927,10 +927,10 @@ float ARX_DAMAGES_DamageNPC(INTERACTIVE_OBJ * io, float dmg, long source, long f
 
 			if (source == 0)
 			{
-				if ((player.equiped[EQUIP_SLOT_WEAPON] != 0)
-				        &&	ValidIONum(player.equiped[EQUIP_SLOT_WEAPON]))
+				if ((playerCharacter.equiped[EQUIP_SLOT_WEAPON] != 0)
+				        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_WEAPON]))
 				{
-					pio = inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]];
+					pio = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]];
 
 					if ((pio) && ((pio->poisonous == 0) || (pio->poisonous_count == 0))
 					        || (flags & 1))
@@ -1036,7 +1036,7 @@ float ARX_DAMAGES_DamageNPC(INTERACTIVE_OBJ * io, float dmg, long source, long f
 			io->_npcdata->life = 0.f;
 
 			if ((source != 0)
-			        ||	((source == 0) &&	(player.equiped[EQUIP_SLOT_WEAPON] > 0)))
+			        ||	((source == 0) &&	(playerCharacter.equiped[EQUIP_SLOT_WEAPON] > 0)))
 			{
 				if ((dmg >= io->_npcdata->maxlife * DIV2) && pos)
 					ARX_NPC_TryToCutSomething(io, pos);
@@ -1205,9 +1205,9 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 		{
 			if (gDamageInfo[j].source == 0)
 			{
-				gDamageInfo[j].pos.x = player.pos.x;
-				gDamageInfo[j].pos.y = player.pos.y;
-				gDamageInfo[j].pos.z = player.pos.z;
+				gDamageInfo[j].pos.x = playerCharacter.pos.x;
+				gDamageInfo[j].pos.y = playerCharacter.pos.y;
+				gDamageInfo[j].pos.z = playerCharacter.pos.z;
 			}
 			else
 			{
@@ -1328,8 +1328,8 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 
 							if (i == 0)
 							{
-								manadrained = __min(dmg, player.mana);
-								player.mana -= manadrained;
+								manadrained = __min(dmg, playerCharacter.mana);
+								playerCharacter.mana -= manadrained;
 							}
 							else
 							{
@@ -1344,7 +1344,7 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 
 							if (gDamageInfo[j].source == 0)
 							{
-								player.mana = __min(player.mana + manadrained, player.Full_maxmana);
+								playerCharacter.mana = __min(playerCharacter.mana + manadrained, playerCharacter.Full_maxmana);
 							}
 							else
 							{
@@ -1363,11 +1363,11 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 
 								if (gDamageInfo[j].type & DAMAGE_TYPE_POISON)
 								{
-									if (rnd() * 100.f > player.resist_poison)
+									if (rnd() * 100.f > playerCharacter.resist_poison)
 									{
 										// Failed Saving Throw
 										damagesdone = dmg; 
-										player.poison += damagesdone;
+										playerCharacter.poison += damagesdone;
 
 									}
 									else damagesdone = 0;
@@ -1379,7 +1379,7 @@ void ARX_DAMAGES_UpdateDamage(long j, float tim)
 									        &&	(!(gDamageInfo[j].type & DAMAGE_TYPE_COLD))
 									   )
 									{
-										dmg -= player.Full_resist_magic * DIV100 * dmg;
+										dmg -= playerCharacter.Full_resist_magic * DIV100 * dmg;
 										dmg = __max(0, dmg);
 									}
 
@@ -1657,9 +1657,9 @@ BOOL DoSphericDamage(EERIE_3D * pos, float dmg, float radius, long flags, long t
 {
 	BOOL damagesdone = FALSE;
 	EERIE_3D sub;
-	sub.x = player.pos.x;
-	sub.y = player.pos.y + 90.f;
-	sub.z = player.pos.z;
+	sub.x = playerCharacter.pos.x;
+	sub.y = playerCharacter.pos.y + 90.f;
+	sub.z = playerCharacter.pos.z;
 	float dist;
 	dist = EEDistance3D(pos, &sub);
 
@@ -1896,9 +1896,9 @@ void ARX_DAMAGES_DamagePlayerEquipment(float d)
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if (player.equiped[i] != 0)
+		if (playerCharacter.equiped[i] != 0)
 		{
-			INTERACTIVE_OBJ * todamage = inter.iobj[player.equiped[i]];
+			INTERACTIVE_OBJ * todamage = inter.iobj[playerCharacter.equiped[i]];
 			ARX_DAMAGES_DurabilityCheck(todamage, ratio);
 		}
 	}

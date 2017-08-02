@@ -37,8 +37,8 @@ bool bUSE_D3DFOG_INTER;
 float fZFogStartWorld;
 float fZFogEndWorld;
 
-GLOBAL_MODS current;
-GLOBAL_MODS desired;
+GLOBAL_MODS gCurrentMod;
+GLOBAL_MODS gDesiredMod;
 GLOBAL_MODS stacked;
 extern long USE_D3DFOG;
 extern long EDITMODE;
@@ -57,16 +57,16 @@ extern unsigned long ulBKGColor = 0;
 
 void ARX_GLOBALMODS_Reset()
 {
-	memset(&desired, 0, sizeof(GLOBAL_MODS));	
-	memset(&current, 0, sizeof(GLOBAL_MODS));
-	current.zclip = DEFAULT_ZCLIP;
+	memset(&gDesiredMod, 0, sizeof(GLOBAL_MODS));	
+	memset(&gCurrentMod, 0, sizeof(GLOBAL_MODS));
+	gCurrentMod.zclip = DEFAULT_ZCLIP;
 	memset(&stacked, 0, sizeof(GLOBAL_MODS));
 	stacked.zclip = DEFAULT_ZCLIP;
 
-	desired.zclip = DEFAULT_ZCLIP;
-	desired.depthcolor.r = 0.f;
-	desired.depthcolor.g = 0.f;
-	desired.depthcolor.b = 0.f;
+	gDesiredMod.zclip = DEFAULT_ZCLIP;
+	gDesiredMod.depthcolor.r = 0.f;
+	gDesiredMod.depthcolor.g = 0.f;
+	gDesiredMod.depthcolor.b = 0.f;
 }
 float Approach(float current, float desired, float increment)
 {
@@ -89,16 +89,16 @@ float Approach(float current, float desired, float increment)
 }
 void ARX_GLOBALMODS_Stack()
 {
-	memcpy(&stacked, &desired, sizeof(GLOBAL_MODS));
+	memcpy(&stacked, &gDesiredMod, sizeof(GLOBAL_MODS));
 
-	desired.depthcolor.r = 0.f;
-	desired.depthcolor.g = 0.f;
-	desired.depthcolor.b = 0.f;
-	desired.zclip = DEFAULT_ZCLIP;
+	gDesiredMod.depthcolor.r = 0.f;
+	gDesiredMod.depthcolor.g = 0.f;
+	gDesiredMod.depthcolor.b = 0.f;
+	gDesiredMod.zclip = DEFAULT_ZCLIP;
 }
 void ARX_GLOBALMODS_UnStack()
 {
-	memcpy(&desired, &stacked, sizeof(GLOBAL_MODS));
+	memcpy(&gDesiredMod, &stacked, sizeof(GLOBAL_MODS));
 }
 
 void ARX_GLOBALMODS_Apply()
@@ -108,27 +108,27 @@ void ARX_GLOBALMODS_Apply()
 	float baseinc = _framedelay;
 	float incdiv1000 = _framedelay * DIV1000;
 
-	if (desired.flags & GMOD_ZCLIP)
+	if (gDesiredMod.flags & GMOD_ZCLIP)
 	{
-		current.zclip = Approach(current.zclip, desired.zclip, baseinc * 2);
+		gCurrentMod.zclip = Approach(gCurrentMod.zclip, gDesiredMod.zclip, baseinc * 2);
 	}
 	else // return to default...
 	{
-		desired.zclip = current.zclip = Approach(current.zclip, DEFAULT_ZCLIP, baseinc * 2);
+		gDesiredMod.zclip = gCurrentMod.zclip = Approach(gCurrentMod.zclip, DEFAULT_ZCLIP, baseinc * 2);
 	}
 
 	// Now goes for RGB mods
-	if (desired.flags & GMOD_DCOLOR)
+	if (gDesiredMod.flags & GMOD_DCOLOR)
 	{
-		current.depthcolor.r = Approach(current.depthcolor.r, desired.depthcolor.r, incdiv1000);
-		current.depthcolor.g = Approach(current.depthcolor.g, desired.depthcolor.g, incdiv1000);
-		current.depthcolor.b = Approach(current.depthcolor.b, desired.depthcolor.b, incdiv1000);
+		gCurrentMod.depthcolor.r = Approach(gCurrentMod.depthcolor.r, gDesiredMod.depthcolor.r, incdiv1000);
+		gCurrentMod.depthcolor.g = Approach(gCurrentMod.depthcolor.g, gDesiredMod.depthcolor.g, incdiv1000);
+		gCurrentMod.depthcolor.b = Approach(gCurrentMod.depthcolor.b, gDesiredMod.depthcolor.b, incdiv1000);
 	}
 	else
 	{
-		current.depthcolor.r = Approach(current.depthcolor.r, 0, incdiv1000);
-		current.depthcolor.g = Approach(current.depthcolor.g, 0, incdiv1000);
-		current.depthcolor.b = Approach(current.depthcolor.b, 0, incdiv1000);
+		gCurrentMod.depthcolor.r = Approach(gCurrentMod.depthcolor.r, 0, incdiv1000);
+		gCurrentMod.depthcolor.g = Approach(gCurrentMod.depthcolor.g, 0, incdiv1000);
+		gCurrentMod.depthcolor.b = Approach(gCurrentMod.depthcolor.b, 0, incdiv1000);
 	}
 
 	ModeLight &= ~MODE_DEPTHCUEING;
@@ -137,11 +137,11 @@ void ARX_GLOBALMODS_Apply()
 	{
 		float fZclipp = ((((float)pMenuConfig->iFogDistance) * 1.2f) * (DEFAULT_ZCLIP - DEFAULT_MINZCLIP) / 10.f) + DEFAULT_MINZCLIP;
 		fZclipp += (ACTIVECAM->focal - 310.f) * 5.f;
-		SetCameraDepth(__min(current.zclip, fZclipp));
+		SetCameraDepth(__min(gCurrentMod.zclip, fZclipp));
 	}
 	else
 	{
-		SetCameraDepth(current.zclip);
+		SetCameraDepth(gCurrentMod.zclip);
 	}
 
 #ifndef ARX_OPENGL
@@ -151,7 +151,7 @@ void ARX_GLOBALMODS_Apply()
 		GDevice->GetCaps(&d3dDeviceDesc);
 #define PERCENT_FOG (.6f)
 
-		ulBKGColor = D3DRGB(current.depthcolor.r, current.depthcolor.g, current.depthcolor.b);
+		ulBKGColor = D3DRGB(gCurrentMod.depthcolor.r, gCurrentMod.depthcolor.g, gCurrentMod.depthcolor.b);
 		
 		//pour compatibilité ATI, etc...
 		GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR, ulBKGColor);
@@ -192,7 +192,7 @@ void ARX_GLOBALMODS_Apply()
 	}
 	else
 	{
-		GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR, D3DRGB(current.depthcolor.r, current.depthcolor.g, current.depthcolor.b));
+		GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR, D3DRGB(gCurrentMod.depthcolor.r, gCurrentMod.depthcolor.g, gCurrentMod.depthcolor.b));
 		GDevice->SetRenderState(D3DRENDERSTATE_FOGVERTEXMODE,  D3DFOG_NONE);
 		GDevice->SetRenderState(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE);
 	}

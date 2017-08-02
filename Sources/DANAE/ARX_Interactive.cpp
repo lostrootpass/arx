@@ -137,7 +137,7 @@ float STARTED_ANGLE = 0;
 void Set_DragInter(INTERACTIVE_OBJ * io)
 {
 	if (io != DRAGINTER)
-		STARTED_ANGLE = player.angle.b;
+		STARTED_ANGLE = playerCharacter.angle.b;
 
 	DRAGINTER = io;
 
@@ -244,12 +244,12 @@ void ARX_INTERACTIVE_DestroyDynamicInfo(INTERACTIVE_OBJ * io)
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i])
-		        &&	(player.equiped[i] == n)
-		        &&	ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i])
+		        &&	(playerCharacter.equiped[i] == n)
+		        &&	ValidIONum(playerCharacter.equiped[i]))
 		{
-			ARX_EQUIPMENT_UnEquip(inter.iobj[0], inter.iobj[player.equiped[i]], 1);
-			player.equiped[i] = 0;
+			ARX_EQUIPMENT_UnEquip(inter.iobj[0], inter.iobj[playerCharacter.equiped[i]], 1);
+			playerCharacter.equiped[i] = 0;
 		}
 	}
 
@@ -721,7 +721,7 @@ void PrepareIOTreatZone(long flag)
 
 	TREATZONE_Clear();
 	long Cam_Room = ARX_PORTALS_GetRoomNumForPosition(&ACTIVECAM->pos, 1);
-	GLOBAL_Player_Room = ARX_PORTALS_GetRoomNumForPosition(&player.pos, 1);
+	GLOBAL_Player_Room = ARX_PORTALS_GetRoomNumForPosition(&playerCharacter.pos, 1);
 	TREATZONE_AddIO(inter.iobj[0], 0, 0);
 
 
@@ -731,10 +731,10 @@ void PrepareIOTreatZone(long flag)
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0)
-		        &&	ValidIONum(player.equiped[i]))
+		if ((playerCharacter.equiped[i] != 0)
+		        &&	ValidIONum(playerCharacter.equiped[i]))
 		{
-			INTERACTIVE_OBJ * toequip = inter.iobj[player.equiped[i]];
+			INTERACTIVE_OBJ * toequip = inter.iobj[playerCharacter.equiped[i]];
 
 			if (toequip)
 			{
@@ -2135,9 +2135,9 @@ void ARX_INTERACTIVE_Teleport(INTERACTIVE_OBJ * io, EERIE_3D * target, long flag
 
 	if (io == inter.iobj[0])
 	{
-		moveto.x = player.pos.x = target->x;
-		moveto.y = player.pos.y = target->y + PLAYER_BASE_HEIGHT;
-		moveto.z = player.pos.z = target->z;
+		moveto.x = playerCharacter.pos.x = target->x;
+		moveto.y = playerCharacter.pos.y = target->y + PLAYER_BASE_HEIGHT;
+		moveto.z = playerCharacter.pos.z = target->z;
 	}
 
 	translate.x = target->x - io->pos.x;
@@ -2616,9 +2616,9 @@ INTERACTIVE_OBJ * AddFix(LPDIRECT3DDEVICE7 pd3dDevice, char * file, long flags)
 		SendIOScriptEvent(io, SM_LOAD, "", NULL);
 
 	io->spellcast_data.castingspell = -1;
-	io->lastpos.x = io->initpos.x = io->pos.x = player.pos.x - (float)EEsin(DEG2RAD(player.angle.b)) * 140.f;
-	io->lastpos.y = io->initpos.y = io->pos.y = player.pos.y;
-	io->lastpos.z = io->initpos.z = io->pos.z = player.pos.z + (float)EEcos(DEG2RAD(player.angle.b)) * 140.f;
+	io->lastpos.x = io->initpos.x = io->pos.x = playerCharacter.pos.x - (float)EEsin(DEG2RAD(playerCharacter.angle.b)) * 140.f;
+	io->lastpos.y = io->initpos.y = io->pos.y = playerCharacter.pos.y;
+	io->lastpos.z = io->initpos.z = io->pos.z = playerCharacter.pos.z + (float)EEcos(DEG2RAD(playerCharacter.angle.b)) * 140.f;
 	io->lastpos.x = io->initpos.x = (float)((long)(io->initpos.x / 20)) * 20.f;
 	io->lastpos.z = io->initpos.z = (float)((long)(io->initpos.z / 20)) * 20.f;
 
@@ -2633,7 +2633,7 @@ INTERACTIVE_OBJ * AddFix(LPDIRECT3DDEVICE7 pd3dDevice, char * file, long flags)
 			io->lastpos.y = io->initpos.y = io->pos.y = tempo;
 	}
 
-	ep = CheckInPoly(io->pos.x, player.pos.y, io->pos.z);
+	ep = CheckInPoly(io->pos.x, playerCharacter.pos.y, io->pos.z);
 
 	if (ep)
 	{
@@ -2729,9 +2729,9 @@ INTERACTIVE_OBJ * AddCamera(LPDIRECT3DDEVICE7 pd3dDevice, char * file)
 
 	GetIOScript(io, texscript);
 
-	io->lastpos.x = io->initpos.x = io->pos.x = player.pos.x - (float)EEsin(DEG2RAD(player.angle.b)) * 140.f;
-	io->lastpos.y = io->initpos.y = io->pos.y = player.pos.y;
-	io->lastpos.z = io->initpos.z = io->pos.z = player.pos.z + (float)EEcos(DEG2RAD(player.angle.b)) * 140.f;
+	io->lastpos.x = io->initpos.x = io->pos.x = playerCharacter.pos.x - (float)EEsin(DEG2RAD(playerCharacter.angle.b)) * 140.f;
+	io->lastpos.y = io->initpos.y = io->pos.y = playerCharacter.pos.y;
+	io->lastpos.z = io->initpos.z = io->pos.z = playerCharacter.pos.z + (float)EEcos(DEG2RAD(playerCharacter.angle.b)) * 140.f;
 	io->lastpos.x = io->initpos.x = (float)((long)(io->initpos.x / 20)) * 20.f;
 	io->lastpos.z = io->initpos.z = (float)((long)(io->initpos.z / 20)) * 20.f;
 	float tempo;
@@ -2742,7 +2742,7 @@ INTERACTIVE_OBJ * AddCamera(LPDIRECT3DDEVICE7 pd3dDevice, char * file)
 		io->lastpos.y = io->initpos.y = io->pos.y = tempo;
 	}
 
-	ep = CheckInPoly(io->pos.x, player.pos.y, io->pos.z);
+	ep = CheckInPoly(io->pos.x, playerCharacter.pos.y, io->pos.z);
 
 	if (ep)
 	{
@@ -2801,9 +2801,9 @@ INTERACTIVE_OBJ * AddMarker(LPDIRECT3DDEVICE7 pd3dDevice, char * file)
 
 	GetIOScript(io, texscript);
 	
-	io->lastpos.x = io->initpos.x = io->pos.x = player.pos.x - (float)EEsin(DEG2RAD(player.angle.b)) * 140.f;
-	io->lastpos.y = io->initpos.y = io->pos.y = player.pos.y;
-	io->lastpos.z = io->initpos.z = io->pos.z = player.pos.z + (float)EEcos(DEG2RAD(player.angle.b)) * 140.f;
+	io->lastpos.x = io->initpos.x = io->pos.x = playerCharacter.pos.x - (float)EEsin(DEG2RAD(playerCharacter.angle.b)) * 140.f;
+	io->lastpos.y = io->initpos.y = io->pos.y = playerCharacter.pos.y;
+	io->lastpos.z = io->initpos.z = io->pos.z = playerCharacter.pos.z + (float)EEcos(DEG2RAD(playerCharacter.angle.b)) * 140.f;
 	io->lastpos.x = io->initpos.x = (float)((long)(io->initpos.x / 20)) * 20.f;
 	io->lastpos.z = io->initpos.z = (float)((long)(io->initpos.z / 20)) * 20.f;
 	ep = CheckInPoly(io->pos.x, io->pos.y + PLAYER_BASE_HEIGHT, io->pos.z);
@@ -2816,7 +2816,7 @@ INTERACTIVE_OBJ * AddMarker(LPDIRECT3DDEVICE7 pd3dDevice, char * file)
 			io->lastpos.y = io->initpos.y = io->pos.y = tempo;
 	}
 
-	ep = CheckInPoly(io->pos.x, player.pos.y, io->pos.z);
+	ep = CheckInPoly(io->pos.x, playerCharacter.pos.y, io->pos.z);
 
 	if (ep)
 	{
@@ -3099,9 +3099,9 @@ INTERACTIVE_OBJ * AddNPC(LPDIRECT3DDEVICE7 pd3dDevice, char * file, long flags)
 	if (!(flags & NO_ON_LOAD))
 		SendIOScriptEvent(io, SM_LOAD, "", NULL);
 
-	io->lastpos.x = io->initpos.x = io->pos.x = player.pos.x - (float)EEsin(DEG2RAD(player.angle.b)) * 140.f;
-	io->lastpos.y = io->initpos.y = io->pos.y = player.pos.y;
-	io->lastpos.z = io->initpos.z = io->pos.z = player.pos.z + (float)EEcos(DEG2RAD(player.angle.b)) * 140.f;
+	io->lastpos.x = io->initpos.x = io->pos.x = playerCharacter.pos.x - (float)EEsin(DEG2RAD(playerCharacter.angle.b)) * 140.f;
+	io->lastpos.y = io->initpos.y = io->pos.y = playerCharacter.pos.y;
+	io->lastpos.z = io->initpos.z = io->pos.z = playerCharacter.pos.z + (float)EEcos(DEG2RAD(playerCharacter.angle.b)) * 140.f;
 	io->lastpos.x = io->initpos.x = (float)((long)(io->initpos.x / 20)) * 20.f;
 	io->lastpos.z = io->initpos.z = (float)((long)(io->initpos.z / 20)) * 20.f;
 	ep = CheckInPoly(io->pos.x, io->pos.y + PLAYER_BASE_HEIGHT, io->pos.z);
@@ -3114,7 +3114,7 @@ INTERACTIVE_OBJ * AddNPC(LPDIRECT3DDEVICE7 pd3dDevice, char * file, long flags)
 			io->lastpos.y = io->initpos.y = io->pos.y = tempo; 
 	}
 
-	ep = CheckInPoly(io->pos.x, player.pos.y, io->pos.z);
+	ep = CheckInPoly(io->pos.x, playerCharacter.pos.y, io->pos.z);
 
 	if (ep)
 	{
@@ -3448,9 +3448,9 @@ INTERACTIVE_OBJ * AddItem(LPDIRECT3DDEVICE7 pd3dDevice, char * fil, long flags)
 		SendIOScriptEvent(io, SM_LOAD, "", NULL);
 
 	io->spellcast_data.castingspell = -1;
-	io->lastpos.x = io->initpos.x = io->pos.x = player.pos.x - (float)EEsin(DEG2RAD(player.angle.b)) * 140.f;
-	io->lastpos.y = io->initpos.y = io->pos.y = player.pos.y;
-	io->lastpos.z = io->initpos.z = io->pos.z = player.pos.z + (float)EEcos(DEG2RAD(player.angle.b)) * 140.f;
+	io->lastpos.x = io->initpos.x = io->pos.x = playerCharacter.pos.x - (float)EEsin(DEG2RAD(playerCharacter.angle.b)) * 140.f;
+	io->lastpos.y = io->initpos.y = io->pos.y = playerCharacter.pos.y;
+	io->lastpos.z = io->initpos.z = io->pos.z = playerCharacter.pos.z + (float)EEcos(DEG2RAD(playerCharacter.angle.b)) * 140.f;
 	io->lastpos.x = io->initpos.x = (float)((long)(io->initpos.x / 20)) * 20.f;
 	io->lastpos.z = io->initpos.z = (float)((long)(io->initpos.z / 20)) * 20.f;
 
@@ -3464,7 +3464,7 @@ INTERACTIVE_OBJ * AddItem(LPDIRECT3DDEVICE7 pd3dDevice, char * fil, long flags)
 			io->lastpos.y = io->initpos.y = io->pos.y = tempo; 
 	}
 
-	ep = CheckInPoly(io->pos.x, player.pos.y, io->pos.z);
+	ep = CheckInPoly(io->pos.x, playerCharacter.pos.y, io->pos.z);
 
 	if (ep)
 	{
@@ -3607,11 +3607,11 @@ INTERACTIVE_OBJ * GetFirstInterAtPos(EERIE_S2D * pos, long flag, EERIE_3D * _pRe
 
 		// Is Object in TreatZone ??
 		if (
-		    ((bPlayerEquiped = IsEquipedByPlayer(io))  && (player.Interface & INTER_MAP))
+		    ((bPlayerEquiped = IsEquipedByPlayer(io))  && (playerCharacter.Interface & INTER_MAP))
 		    || (io->GameFlags & GFLAG_ISINTREATZONE))
 
 			// Is Object Displayed on screen ???
-			if ((io->show == SHOW_FLAG_IN_SCENE) || (bPlayerEquiped && flag) || (bPlayerEquiped  && (player.Interface & INTER_MAP) && (Book_Mode == 0))) //((io->show==9) && (player.Interface & INTER_MAP)) )
+			if ((io->show == SHOW_FLAG_IN_SCENE) || (bPlayerEquiped && flag) || (bPlayerEquiped  && (playerCharacter.Interface & INTER_MAP) && (Book_Mode == 0))) //((io->show==9) && (player.Interface & INTER_MAP)) )
 			{
 				if ((flag == 2) && _pTable && _pnNbInTable && ((*_pnNbInTable) < 256))
 				{
@@ -3630,7 +3630,7 @@ INTERACTIVE_OBJ * GetFirstInterAtPos(EERIE_S2D * pos, long flag, EERIE_3D * _pRe
 						bPass = bPlayerEquiped || (flDistanceToIO < flDistanceToRef);
 					}
 
-					float fp = EEDistance3D(&io->pos, &player.pos);
+					float fp = EEDistance3D(&io->pos, &playerCharacter.pos);
 
 					if ((!flag && (fp <= fMaxDist)) && ((foundBB == NULL) || (fp < fdistBB)))
 					{
@@ -3644,7 +3644,7 @@ INTERACTIVE_OBJ * GetFirstInterAtPos(EERIE_S2D * pos, long flag, EERIE_3D * _pRe
 						if (bPlayerEquiped)
 							fp = 0.f;
 						else
-							fp = EEDistance3D(&io->pos, &player.pos);
+							fp = EEDistance3D(&io->pos, &playerCharacter.pos);
 
 						if ((fp < fdistBB) || (foundBB == NULL))
 						{
@@ -3676,7 +3676,7 @@ INTERACTIVE_OBJ * GetFirstInterAtPos(EERIE_S2D * pos, long flag, EERIE_3D * _pRe
 							if (bPlayerEquiped)
 								fp = 0.f;
 							else
-								fp = EEDistance3D(&io->pos, &player.pos);
+								fp = EEDistance3D(&io->pos, &playerCharacter.pos);
 
 							if ((bPass && (fp <= fMaxDist)) && ((fp < fdist) || (foundPixel == NULL)))
 							{
@@ -3712,7 +3712,7 @@ bool IsEquipedByPlayer(INTERACTIVE_OBJ * io)
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		if ((player.equiped[i] != 0) && (player.equiped[i] == num)) return true;
+		if ((playerCharacter.equiped[i] != 0) && (playerCharacter.equiped[i] == num)) return true;
 	}
 
 	return FALSE;
@@ -3741,7 +3741,7 @@ INTERACTIVE_OBJ * InterClick(EERIE_S2D * pos, long flag)
 	{
 		if (io->ioflags & IO_NPC)
 		{
-			if (Distance3D(player.pos.x, player.pos.y, player.pos.z, io->pos.x,
+			if (Distance3D(playerCharacter.pos.x, playerCharacter.pos.y, playerCharacter.pos.z, io->pos.x,
 			               io->pos.y, io->pos.z) < dist_Threshold)
 			{
 				LASTINTERCLICKNB = INTERNMB;
@@ -3754,7 +3754,7 @@ INTERACTIVE_OBJ * InterClick(EERIE_S2D * pos, long flag)
 			return io;
 		}
 		else if (IsEquipedByPlayer(io)
-		         || (Distance3D(player.pos.x, player.pos.y, player.pos.z, io->pos.x,
+		         || (Distance3D(playerCharacter.pos.x, playerCharacter.pos.y, playerCharacter.pos.z, io->pos.x,
 		                        io->pos.y, io->pos.z) < dist_Threshold))
 		{
 			LASTINTERCLICKNB = INTERNMB;
@@ -4428,7 +4428,7 @@ void RenderInter(LPDIRECT3DDEVICE7 pd3dDevice, float from, float to, long flags)
 		        &&	(io != DRAGINTER)
 		        &&	(io->GameFlags & GFLAG_ISINTREATZONE))
 		{
-			if ((i == 0) && ((player.Interface & INTER_MAP) && (!(player.Interface & INTER_COMBATMODE)))
+			if ((i == 0) && ((playerCharacter.Interface & INTER_MAP) && (!(playerCharacter.Interface & INTER_COMBATMODE)))
 			        && (Book_Mode == 0)) continue;
 
 			if (io->show != SHOW_FLAG_IN_SCENE) continue;

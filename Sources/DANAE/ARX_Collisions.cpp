@@ -392,7 +392,7 @@ void PushIO_ON_Top(INTERACTIVE_OBJ * ioo,float ydec)
 				float posy;
 
 				if (io==inter.iobj[0])
-					posy=player.pos.y-PLAYER_BASE_HEIGHT;					
+					posy=playerCharacter.pos.y-PLAYER_BASE_HEIGHT;					
 				else 
 					posy=io->pos.y;
 
@@ -434,31 +434,31 @@ void PushIO_ON_Top(INTERACTIVE_OBJ * ioo,float ydec)
 							{
 								if (ydec<=0)
 								{
-									player.pos.y+=ydec;
+									playerCharacter.pos.y+=ydec;
 									moveto.y+=ydec;
-									cyl.origin.x=player.pos.x;
-									cyl.origin.y=player.pos.y+170.f+ydec;
-									cyl.origin.z=player.pos.z;	
+									cyl.origin.x=playerCharacter.pos.x;
+									cyl.origin.y=playerCharacter.pos.y+170.f+ydec;
+									cyl.origin.z=playerCharacter.pos.z;	
 									cyl.height=PLAYER_BASE_HEIGHT;
 									cyl.radius=PLAYER_BASE_RADIUS;
 									float vv;
 
 									if ((vv=CheckAnythingInCylinder(&cyl,inter.iobj[0],0))<0)
 									{
-										player.pos.y+=ydec+vv;
+										playerCharacter.pos.y+=ydec+vv;
 									}
 								}
 								else
 								{
-									cyl.origin.x=player.pos.x;
-									cyl.origin.y=player.pos.y+170.f+ydec;
-									cyl.origin.z=player.pos.z;	
+									cyl.origin.x=playerCharacter.pos.x;
+									cyl.origin.y=playerCharacter.pos.y+170.f+ydec;
+									cyl.origin.z=playerCharacter.pos.z;	
 									cyl.height=PLAYER_BASE_HEIGHT;
 									cyl.radius=PLAYER_BASE_RADIUS;
 
 									if (CheckAnythingInCylinder(&cyl,inter.iobj[0],0)>=0)
 									{
-										player.pos.y+=ydec;
+										playerCharacter.pos.y+=ydec;
 										moveto.y+=ydec;
 									}
 								}
@@ -1562,7 +1562,7 @@ BOOL AttemptValidCylinderPos(EERIE_CYLINDER * cyl,INTERACTIVE_OBJ * io,long flag
 			float tolerate;
 			
 			if ((flags & CFLAG_PLAYER)
-				&&	(player.jumpphase)	)
+				&&	(playerCharacter.jumpphase)	)
 			{
 				tolerate=0;
 			}
@@ -1613,7 +1613,7 @@ BOOL AttemptValidCylinderPos(EERIE_CYLINDER * cyl,INTERACTIVE_OBJ * io,long flag
 		{
 			if ((flags & CFLAG_PLAYER) && (anything<0.f))
 			{
-				if (player.jumpphase)
+				if (playerCharacter.jumpphase)
 				{
 					io->_npcdata->climb_count=MAX_ALLOWED_PER_SECOND;
 					return FALSE;

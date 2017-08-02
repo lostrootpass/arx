@@ -196,10 +196,10 @@ void LaunchDummyParticle()
 		PARTICLE_DEF * pd=&particle[j];
 		pd->exist=TRUE;
 		pd->zdec=0;
-		float f=DEG2RAD(player.angle.b);
-		pd->ov.x		=	player.pos.x+EEsin(f)*100.f;
-		pd->ov.y		=	player.pos.y;
-		pd->ov.z		=	player.pos.z-EEcos(f)*100.f;
+		float f=DEG2RAD(playerCharacter.angle.b);
+		pd->ov.x		=	playerCharacter.pos.x+EEsin(f)*100.f;
+		pd->ov.y		=	playerCharacter.pos.y;
+		pd->ov.z		=	playerCharacter.pos.z-EEcos(f)*100.f;
 		pd->move.x		=	0.f;
 		pd->move.y		=	0.f;
 		pd->move.z		=	0.f;
@@ -1011,9 +1011,9 @@ void ManageTorch()
 	if (SHOW_TORCH) 
 	{
 		float rr=rnd();
-		el->pos.x = player.pos.x; 
-		el->pos.y=player.pos.y;
-		el->pos.z = player.pos.z; 
+		el->pos.x = playerCharacter.pos.x; 
+		el->pos.y=playerCharacter.pos.y;
+		el->pos.z = playerCharacter.pos.z; 
 		el->intensity=1.6f;
 		el->fallstart=280.f+rr*20.f;
 		el->fallend = el->fallstart + 280.f; 
@@ -1026,9 +1026,9 @@ void ManageTorch()
 	}
 	else if (cur_mr==3)
 	{		
-		el->pos.x = player.pos.x;
-		el->pos.y=player.pos.y;
-		el->pos.z = player.pos.z; 
+		el->pos.x = playerCharacter.pos.x;
+		el->pos.y=playerCharacter.pos.y;
+		el->pos.z = playerCharacter.pos.z; 
 		el->intensity=1.8f;
 		el->fallstart=480.f;
 		el->fallend = el->fallstart + 480.f; 
@@ -1058,9 +1058,9 @@ void ManageTorch()
 
 			if (count)
 			{
-				el->pos.x=player.pos.x;
-				el->pos.y=player.pos.y;
-				el->pos.z=player.pos.z;
+				el->pos.x=playerCharacter.pos.x;
+				el->pos.y=playerCharacter.pos.y;
+				el->pos.z=playerCharacter.pos.z;
 				el->fallstart=140.f+(float)count*0.333333f+rr*5.f;
 				el->fallend=220.f+(float)count*0.5f+rr*5.f;
 				el->intensity=1.6f;
@@ -1451,7 +1451,7 @@ void ARX_BOOMS_Add(EERIE_3D * poss,long type)
 //-----------------------------------------------------------------------------
 void Add3DBoom(EERIE_3D * position, EERIE_3DOBJ *pObj3DSphere)
 {
-	float dist=Distance3D(player.pos.x,player.pos.y-160.f,player.pos.z,position->x,position->y,position->z);
+	float dist=Distance3D(playerCharacter.pos.x,playerCharacter.pos.y-160.f,playerCharacter.pos.z,position->x,position->y,position->z);
 	EERIE_3D poss;
 	Vector_Copy(&poss,position);
 	ARX_SOUND_PlaySFX(SND_SPELL_FIRE_HIT, &poss);
@@ -1460,13 +1460,13 @@ void Add3DBoom(EERIE_3D * position, EERIE_3DOBJ *pObj3DSphere)
 	{
 		float onedist=1.f/dist;
 		EERIE_3D vect;
-		vect.x=(player.pos.x-position->x)*onedist; 
-		vect.y=(player.pos.y-160.f-position->y)*onedist; 
-		vect.z=(player.pos.z-position->z)*onedist;
+		vect.x=(playerCharacter.pos.x-position->x)*onedist; 
+		vect.y=(playerCharacter.pos.y-160.f-position->y)*onedist; 
+		vect.z=(playerCharacter.pos.z-position->z)*onedist;
 		float power=(300.f-dist)*DIV80;
-		player.physics.forces.x+=vect.x*power;
-		player.physics.forces.y+=vect.y*power;
-		player.physics.forces.z+=vect.z*power;
+		playerCharacter.physics.forces.x+=vect.x*power;
+		playerCharacter.physics.forces.y+=vect.y*power;
+		playerCharacter.physics.forces.z+=vect.z*power;
 	}
 
 	for (long i=0;i<inter.nbmax;i++)

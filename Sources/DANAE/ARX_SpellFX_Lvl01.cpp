@@ -601,8 +601,8 @@ void CMultiMagicMissile::Create(EERIE_3D aePos, EERIE_3D angle)
 
 		if (spells[spellinstance].caster == 0) // player
 		{
-			afBeta = player.angle.b;
-			afAlpha = player.angle.a;
+			afBeta = playerCharacter.angle.b;
+			afAlpha = playerCharacter.angle.a;
 			EERIE_3D vector;
 			vector.x = -EEsin(DEG2RAD(afBeta)) * EEcos(DEG2RAD(afAlpha)) * 60.f;
 			vector.y = EEsin(DEG2RAD(afAlpha)) * 60.f;
@@ -616,9 +616,9 @@ void CMultiMagicMissile::Create(EERIE_3D aePos, EERIE_3D angle)
 			}
 			else
 			{
-				aePos.x = player.pos.x - EEsin(DEG2RAD(afBeta)) + vector.x; 
-				aePos.y = player.pos.y + vector.y; //;
-				aePos.z = player.pos.z + EEcos(DEG2RAD(afBeta)) + vector.z; 
+				aePos.x = playerCharacter.pos.x - EEsin(DEG2RAD(afBeta)) + vector.x; 
+				aePos.y = playerCharacter.pos.y + vector.y; //;
+				aePos.z = playerCharacter.pos.z + EEcos(DEG2RAD(afBeta)) + vector.z; 
 			}
 		}
 		else

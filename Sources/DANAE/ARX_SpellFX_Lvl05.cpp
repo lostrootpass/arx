@@ -1051,8 +1051,8 @@ void CMultiPoisonProjectile::Create(EERIE_3D _eSrc, float _afBeta = 0)
 
 	if (spells[spellinstance].caster == 0) // player
 	{
-		afBeta = player.angle.b;
-		afAlpha = player.angle.a;
+		afBeta = playerCharacter.angle.b;
+		afAlpha = playerCharacter.angle.a;
 
 		if (spells[spellinstance].hand_group != -1)
 		{
@@ -1062,9 +1062,9 @@ void CMultiPoisonProjectile::Create(EERIE_3D _eSrc, float _afBeta = 0)
 		}
 		else
 		{
-			_eSrc.x = player.pos.x - EEsin(DEG2RAD(afBeta)) * 90;
-			_eSrc.y = player.pos.y;
-			_eSrc.z = player.pos.z + EEcos(DEG2RAD(afBeta)) * 90;
+			_eSrc.x = playerCharacter.pos.x - EEsin(DEG2RAD(afBeta)) * 90;
+			_eSrc.y = playerCharacter.pos.y;
+			_eSrc.z = playerCharacter.pos.z + EEcos(DEG2RAD(afBeta)) * 90;
 		}
 	}
 	else
@@ -1289,7 +1289,7 @@ void CRepelUndead::Update(unsigned long _ulTime)
 	eSrc.z = inter.iobj[spells[spellinstance].target]->pos.z;
 
 	if (spells[spellinstance].target == 0)
-		fBeta = player.angle.b;
+		fBeta = playerCharacter.angle.b;
 	else
 		fBeta = inter.iobj[spells[spellinstance].target]->angle.b;
 }

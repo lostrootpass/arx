@@ -345,8 +345,8 @@ void CFireBall::Update(unsigned long aulTime)
 	
 		if (spells[spellinstance].caster == 0)
 		{
-			SetAngle(player.angle.b);
-			afAlpha = player.angle.a;
+			SetAngle(playerCharacter.angle.b);
+			afAlpha = playerCharacter.angle.a;
 			long idx = GetGroupOriginByName(inter.iobj[spells[spellinstance].caster]->obj, "CHEST");
 
 			if (idx)
@@ -357,9 +357,9 @@ void CFireBall::Update(unsigned long aulTime)
 			}
 			else
 			{
-				eCurPos.x = player.pos.x - fBetaRadSin * 60;
-				eCurPos.y = player.pos.y;
-				eCurPos.z = player.pos.z + fBetaRadCos * 60;
+				eCurPos.x = playerCharacter.pos.x - fBetaRadSin * 60;
+				eCurPos.y = playerCharacter.pos.y;
+				eCurPos.z = playerCharacter.pos.z + fBetaRadCos * 60;
 			}
 		}
 		else
@@ -1070,9 +1070,9 @@ CCreateFood::~CCreateFood()
 //-----------------------------------------------------------------------------
 void CCreateFood::Create()
 {
-	eSrc.x = player.pos.x;
-	eSrc.y = player.pos.y;
-	eSrc.z = player.pos.z;
+	eSrc.x = playerCharacter.pos.x;
+	eSrc.y = playerCharacter.pos.y;
+	eSrc.z = playerCharacter.pos.z;
 
 	pPS->SetPos(eSrc);
 	CParticleParams cp;

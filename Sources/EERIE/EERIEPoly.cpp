@@ -339,13 +339,13 @@ long MakeTopObjString(INTERACTIVE_OBJ * io,char * dest, unsigned int destSize)
 	boxmax.y -= 5.f;
 	strcpy(dest, "");
 
-	if ((player.pos.x > boxmin.x)
-	        && (player.pos.x < boxmax.x)
-	        && (player.pos.z > boxmin.z)
-	        && (player.pos.z < boxmax.z))
+	if ((playerCharacter.pos.x > boxmin.x)
+	        && (playerCharacter.pos.x < boxmax.x)
+	        && (playerCharacter.pos.z > boxmin.z)
+	        && (playerCharacter.pos.z < boxmax.z))
 	{
 		{
-			if (EEfabs(player.pos.y + 160.f - boxmin.y) < 50.f)
+			if (EEfabs(playerCharacter.pos.y + 160.f - boxmin.y) < 50.f)
 				strcat(dest, " PLAYER");
 		}
 	}
@@ -3934,9 +3934,9 @@ lasuite:
 
 	if (fsh->sizez != ACTIVEBKG->Zsize) goto release;
 
-	player.pos.x = fsh->playerpos.x;
-	player.pos.y = fsh->playerpos.y;
-	player.pos.z = fsh->playerpos.z;
+	playerCharacter.pos.x = fsh->playerpos.x;
+	playerCharacter.pos.y = fsh->playerpos.y;
+	playerCharacter.pos.z = fsh->playerpos.z;
 	Mscenepos.x = fsh->Mscenepos.x;
 	Mscenepos.y = fsh->Mscenepos.y;
 	Mscenepos.z = fsh->Mscenepos.z;
@@ -4430,9 +4430,9 @@ BOOL FastSceneSave(char * partial_path, EERIE_MULTI3DSCENE * ms)
 	fsh->sizex = ACTIVEBKG->Xsize;
 	fsh->sizez = ACTIVEBKG->Zsize;
 	fsh->nb_textures = 0;
-	fsh->playerpos.x = player.pos.x;
-	fsh->playerpos.y = player.pos.y;
-	fsh->playerpos.z = player.pos.z;
+	fsh->playerpos.x = playerCharacter.pos.x;
+	fsh->playerpos.y = playerCharacter.pos.y;
+	fsh->playerpos.z = playerCharacter.pos.z;
 	fsh->Mscenepos.x = Mscenepos.x;
 	fsh->Mscenepos.y = Mscenepos.y;
 	fsh->Mscenepos.z = Mscenepos.z;

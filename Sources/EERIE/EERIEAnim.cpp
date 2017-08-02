@@ -191,9 +191,9 @@ void EERIE_ANIM_Get_Scale_Invisibility(INTERACTIVE_OBJ * io,float &invisibility,
 
 			if (num>=0)
 			{
-				if (player.Full_Skill_Intuition>spells[num].caster_level*10)
+				if (playerCharacter.Full_Skill_Intuition>spells[num].caster_level*10)
 				{
-					invisibility-=(float)player.Full_Skill_Intuition*DIV100+(float)spells[num].caster_level*DIV10;
+					invisibility-=(float)playerCharacter.Full_Skill_Intuition*DIV100+(float)spells[num].caster_level*DIV10;
 
 					if (invisibility<0.1f) invisibility=0.1f;
 					else if (invisibility>1.f) invisibility=1.f;

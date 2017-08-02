@@ -416,7 +416,7 @@ void ARX_MENU_Clicked_NEWQUEST()
 
 	ARX_PLAYER_Start_New_Quest();
 	Book_Mode = 0;
-	player.skin = 0;
+	playerCharacter.skin = 0;
 	ePlayerAngle.b = -25.f;
 	ARX_PLAYER_Restore_Skin();
 	ARXmenu.currentmode = AMCM_NEWQUEST;
@@ -687,9 +687,9 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			ARX_Allocate_Text(ITC.lpszULevel, _T("system_charsheet_player_lvl"));
 			ARX_Allocate_Text(ITC.lpszUXp, _T("system_charsheet_player_xp"));
 
-			ANIM_Set(&player.useanim, herowaitbook);
+			ANIM_Set(&playerCharacter.useanim, herowaitbook);
 
-			player.useanim.flags |= EA_LOOP;
+			playerCharacter.useanim.flags |= EA_LOOP;
 
 			ARXOldTimeMenu = ARXTimeMenu = ARX_TIME_Get();
 			ARXDiffTimeMenu = 0;
@@ -720,7 +720,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		{
 			long DONE = 0;
 
-			if ((player.Skill_Redistribute == 0) && (player.Attribute_Redistribute == 0))
+			if ((playerCharacter.Skill_Redistribute == 0) && (playerCharacter.Attribute_Redistribute == 0))
 				DONE = 1;
 
 			float ox, oy;
@@ -783,7 +783,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 				else if ((!(EERIEMouseButton & 1)) && (LastMouseClick & 1))
 				{
 					QUICK_MOD++;
-					int iSkin = player.skin;
+					int iSkin = playerCharacter.skin;
 					ARX_MENU_CLICKSOUND();
 
 					if (bQuickGenFirstClick)
@@ -798,7 +798,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 
 					ARX_CHECK_CHAR(iSkin);
-					player.skin = ARX_CLEAN_WARN_CAST_CHAR(iSkin);
+					playerCharacter.skin = ARX_CLEAN_WARN_CAST_CHAR(iSkin);
 
 				}
 				else;
@@ -826,11 +826,11 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 					SKIN_MOD++;
 					BOOKZOOM = 1;
 					ARX_MENU_CLICKSOUND();
-					player.skin++;
+					playerCharacter.skin++;
 
-					if (player.skin > 3)  player.skin = 0;
+					if (playerCharacter.skin > 3)  playerCharacter.skin = 0;
 
-					switch (player.skin)
+					switch (playerCharacter.skin)
 					{
 						case 0:
 							ePlayerAngle.b = -25.f;
@@ -880,7 +880,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 					else if (SKIN_MOD == -1)
 					{
 						ARX_PLAYER_MakeSpHero();
-						player.skin = 4;
+						playerCharacter.skin = 4;
 						ARX_PLAYER_Restore_Skin();
 						SKIN_MOD = 0;
 						SP_HEAD = 1;
@@ -889,7 +889,7 @@ BOOL ARX_Menu_Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 					{
 						if (SP_HEAD)
 						{
-							player.skin = 4;
+							playerCharacter.skin = 4;
 							ARX_PLAYER_Restore_Skin();
 							SP_HEAD = 0;
 						}

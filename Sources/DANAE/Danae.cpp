@@ -963,12 +963,12 @@ void InitializeDanae()
 	InitBkg(ACTIVEBKG,MAX_BKGX,MAX_BKGZ,BKG_SIZX,BKG_SIZZ);	
 	InitNodes(1);
 	
-	player.size.y=subj.size.y=-PLAYER_BASE_HEIGHT;
-	player.size.x=subj.size.x=PLAYER_BASE_RADIUS;
-	player.size.z=subj.size.z=PLAYER_BASE_RADIUS;
-	player.desiredangle.a=player.angle.a=subj.angle.a=3.f;
-	player.desiredangle.b=player.angle.b=subj.angle.b=268.f;
-	player.desiredangle.g=player.angle.g=subj.angle.g=0.f;
+	playerCharacter.size.y=subj.size.y=-PLAYER_BASE_HEIGHT;
+	playerCharacter.size.x=subj.size.x=PLAYER_BASE_RADIUS;
+	playerCharacter.size.z=subj.size.z=PLAYER_BASE_RADIUS;
+	playerCharacter.desiredangle.a=playerCharacter.angle.a=subj.angle.a=3.f;
+	playerCharacter.desiredangle.b=playerCharacter.angle.b=subj.angle.b=268.f;
+	playerCharacter.desiredangle.g=playerCharacter.angle.g=subj.angle.g=0.f;
 	subj.pos.x=900.f;
 	subj.pos.y=PLAYER_BASE_HEIGHT;
 	subj.pos.z=4340.f;	
@@ -1649,7 +1649,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	inter.init=0;
 	InitInter(10);	
 
-	memset(&player,0,sizeof(ARXCHARACTER));
+	memset(&playerCharacter,0,sizeof(ARXCHARACTER));
 	ARX_PLAYER_InitPlayer();
 	HERMES_InitDebug();
 
@@ -2850,7 +2850,7 @@ void PlayerLaunchArrow_Test(float aimratio,float poisonous,EERIE_3D * pos,EERIE_
 	float damages=
 		weapon_damages
 		*(1.f+
-		(float)(player.Full_Skill_Projectile + player.Full_Attribute_Dexterity )*DIV50);
+		(float)(playerCharacter.Full_Skill_Projectile + playerCharacter.Full_Attribute_Dexterity )*DIV50);
 
 	ARX_THROWN_OBJECT_Throw(ATO_TYPE_ARROW,
 										0, //source
@@ -2877,17 +2877,17 @@ void PlayerLaunchArrow(float aimratio,float poisonous)
 	if ((sp_max) && (poisonous<3.f))
 		poisonous=3.f;
 
-	position.x=player.pos.x;
-	position.y=player.pos.y+40.f;
-	position.z=player.pos.z;
+	position.x=playerCharacter.pos.x;
+	position.y=playerCharacter.pos.y+40.f;
+	position.z=playerCharacter.pos.z;
 
 	if (inter.iobj[0]->obj->fastaccess.left_attach>=0)
 	{
 		Vector_Copy(&position,&inter.iobj[0]->obj->vertexlist3[inter.iobj[0]->obj->fastaccess.left_attach].v);
 	}
 
-	anglea=DEG2RAD(player.angle.a);
-	angleb=DEG2RAD(player.angle.b);
+	anglea=DEG2RAD(playerCharacter.angle.a);
+	angleb=DEG2RAD(playerCharacter.angle.b);
 	vect.x=-EEsin(angleb)*EEcos(anglea);
 	vect.y= EEsin(anglea);
 	vect.z= EEcos(angleb)*EEcos(anglea);
@@ -2908,8 +2908,8 @@ void PlayerLaunchArrow(float aimratio,float poisonous)
 
 	EERIE_3D vv,v1,v2;
 	Vector_Init(&vv,0,0,1);	
-	float aa=player.angle.a;
-	float ab=90-player.angle.b;
+	float aa=playerCharacter.angle.a;
+	float ab=90-playerCharacter.angle.b;
 	Vector_RotateZ(&v1,&vv,aa);
 	VRotateY(&v1,ab);
 	Vector_Init(&vv,0,-1,0);
@@ -2927,7 +2927,7 @@ void PlayerLaunchArrow(float aimratio,float poisonous)
 	float damages=
 		weapon_damages
 		*(1.f+
-		(float)(player.Full_Skill_Projectile + player.Full_Attribute_Dexterity )*DIV50);
+		(float)(playerCharacter.Full_Skill_Projectile + playerCharacter.Full_Attribute_Dexterity )*DIV50);
 
 	ARX_THROWN_OBJECT_Throw(ATO_TYPE_ARROW,
 										0, //source
@@ -2943,21 +2943,21 @@ void PlayerLaunchArrow(float aimratio,float poisonous)
 	{
 		EERIE_3D angle;
 		EERIE_3D pos;
-		pos.x=player.pos.x;
-		pos.y=player.pos.y+40.f;
-		pos.z=player.pos.z;
-		angle.a=player.angle.a;
-		angle.b=player.angle.b+8;
-		angle.g=player.angle.g;
+		pos.x=playerCharacter.pos.x;
+		pos.y=playerCharacter.pos.y+40.f;
+		pos.z=playerCharacter.pos.z;
+		angle.a=playerCharacter.angle.a;
+		angle.b=playerCharacter.angle.b+8;
+		angle.g=playerCharacter.angle.g;
 		PlayerLaunchArrow_Test(aimratio,poisonous,&pos,&angle);
-		angle.a=player.angle.a;
-		angle.b=player.angle.b-8;		
+		angle.a=playerCharacter.angle.a;
+		angle.b=playerCharacter.angle.b-8;		
 		PlayerLaunchArrow_Test(aimratio,poisonous,&pos,&angle);
-		angle.a=player.angle.a;
-		angle.b=player.angle.b+4.f;		
+		angle.a=playerCharacter.angle.a;
+		angle.b=playerCharacter.angle.b+4.f;		
 		PlayerLaunchArrow_Test(aimratio,poisonous,&pos,&angle);
-		angle.a=player.angle.a;
-		angle.b=player.angle.b-4.f;		
+		angle.a=playerCharacter.angle.a;
+		angle.b=playerCharacter.angle.b-4.f;		
 		PlayerLaunchArrow_Test(aimratio,poisonous,&pos,&angle);
 	}
 }
@@ -2991,8 +2991,8 @@ HRESULT DANAE::FrameMove( FLOAT fTimeKey )
 				char leveltarget[256];
 				strcpy(leveltarget,"no");
 
-				ARX_CHECK_LONG( player.angle.b );
-				ARX_CHANGELEVEL_Change( levelname, leveltarget, ARX_CLEAN_WARN_CAST_LONG( player.angle.b ), 0 );
+				ARX_CHECK_LONG( playerCharacter.angle.b );
+				ARX_CHANGELEVEL_Change( levelname, leveltarget, ARX_CLEAN_WARN_CAST_LONG( playerCharacter.angle.b ), 0 );
 
 			}
 
@@ -3049,7 +3049,7 @@ void SetEditMode(long ed, const bool stop_sound)
 	LAST_JUMP_ENDTIME=0;
 
 	if (!DONT_ERASE_PLAYER)
-		player.life=0.1f;
+		playerCharacter.life=0.1f;
 
 	DeadTime=0;
 	ARX_GAME_Reset(1);
@@ -3515,8 +3515,8 @@ LPTHREAD_START_ROUTINE FirstFrameProc(char *pipo)
 
 	if (!LOAD_N_DONT_ERASE) 
 	{
-		player.life=player.maxlife;
-		player.mana=player.maxmana;
+		playerCharacter.life=playerCharacter.maxlife;
+		playerCharacter.mana=playerCharacter.maxmana;
 
 		if (!DONT_ERASE_PLAYER)
 		{
@@ -3562,13 +3562,13 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			trans.x=Mscenepos.x;
 			trans.y=Mscenepos.y;
 			trans.z=Mscenepos.z;
-			player.pos.x = loddpos.x+trans.x;
-			player.pos.y = loddpos.y+trans.y;
-			player.pos.z = loddpos.z+trans.z;
+			playerCharacter.pos.x = loddpos.x+trans.x;
+			playerCharacter.pos.y = loddpos.y+trans.y;
+			playerCharacter.pos.z = loddpos.z+trans.z;
 		}
 		else 
 		{
-			player.pos.y +=PLAYER_BASE_HEIGHT;
+			playerCharacter.pos.y +=PLAYER_BASE_HEIGHT;
 		}
 
 		PROGRESS_BAR_COUNT+=4.f;
@@ -3590,9 +3590,9 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 		if (!NO_PLAYER_POSITION_RESET)
 		{
-			player.pos.x = mse->pos.x+mse->point0.x;
-			player.pos.z = mse->pos.z+mse->point0.z;
-			player.pos.y = mse->pos.y+mse->point0.y;
+			playerCharacter.pos.x = mse->pos.x+mse->point0.x;
+			playerCharacter.pos.z = mse->pos.z+mse->point0.z;
+			playerCharacter.pos.y = mse->pos.y+mse->point0.y;
 		}						
 
 		EERIERemovePrecalcLights();
@@ -3616,11 +3616,11 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
 		{
 			if (LOADEDD) 
 			{
-				player.pos.x = loddpos.x+trans.x;
-				player.pos.y = loddpos.y+trans.y;
-				player.pos.z = loddpos.z+trans.z;
+				playerCharacter.pos.x = loddpos.x+trans.x;
+				playerCharacter.pos.y = loddpos.y+trans.y;
+				playerCharacter.pos.z = loddpos.z+trans.z;
 			}
-			else player.pos.y +=PLAYER_BASE_HEIGHT;
+			else playerCharacter.pos.y +=PLAYER_BASE_HEIGHT;
 		}
 
 		NO_PLAYER_POSITION_RESET=0;
@@ -3646,14 +3646,14 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	
 	_NB_++;
 	Kam=&subj;
-	map.pos.x = lastteleport.x=subj.pos.x=moveto.x=player.pos.x;
-				lastteleport.y=subj.pos.y=moveto.y=player.pos.y;
-	map.pos.z = lastteleport.z=subj.pos.z=moveto.z=player.pos.z;
+	map.pos.x = lastteleport.x=subj.pos.x=moveto.x=playerCharacter.pos.x;
+				lastteleport.y=subj.pos.y=moveto.y=playerCharacter.pos.y;
+	map.pos.z = lastteleport.z=subj.pos.z=moveto.z=playerCharacter.pos.z;
 	lastteleport.y+=PLAYER_BASE_HEIGHT;
 
-	subj.angle.a=player.angle.a;
-	subj.angle.b=player.angle.b;
-	subj.angle.g=player.angle.g;
+	subj.angle.a=playerCharacter.angle.a;
+	subj.angle.b=playerCharacter.angle.b;
+	subj.angle.g=playerCharacter.angle.g;
 		
 	RestoreLastLoadedLightning();
 	
@@ -3705,7 +3705,7 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	if (DONT_WANT_PLAYER_INZONE)
 	{
-		player.inzone=NULL;
+		playerCharacter.inzone=NULL;
 		DONT_WANT_PLAYER_INZONE=0;
 	}
 
@@ -3717,7 +3717,7 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
  PROGRESS_BAR_COUNT+=1.f;
  LoadLevelScreen();
 
-	player.desiredangle.a=player.angle.a=0.f;
+	playerCharacter.desiredangle.a=playerCharacter.angle.a=0.f;
 	ARX_PLAYER_RectifyPosition();
 
 	if (inter.iobj[0]) 
@@ -3725,7 +3725,7 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 	SendGameReadyMsg();
 	PLAYER_MOUSELOOK_ON=0;
-	player.Interface&=~INTER_NOTE;
+	playerCharacter.Interface&=~INTER_NOTE;
 
 	if (NO_TIME_INIT) 
 	{
@@ -3746,7 +3746,7 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	
 	if (WILL_RESTORE_PLAYER_POSITION_FLAG)
 	{
-		Vector_Copy(&player.pos,&WILL_RESTORE_PLAYER_POSITION);
+		Vector_Copy(&playerCharacter.pos,&WILL_RESTORE_PLAYER_POSITION);
 		Vector_Copy(&inter.iobj[0]->pos,&WILL_RESTORE_PLAYER_POSITION);
 		inter.iobj[0]->pos.y+=170.f;
 		INTERACTIVE_OBJ * io=inter.iobj[0];
@@ -3785,19 +3785,19 @@ long FirstFrameHandling(LPDIRECT3DDEVICE7 m_pd3dDevice)
  LoadLevelScreen();
 	LoadLevelScreen(NULL, -2);
 	
-	if (	(!CheckInPolyPrecis(player.pos.x,player.pos.y,player.pos.z))
+	if (	(!CheckInPolyPrecis(playerCharacter.pos.x,playerCharacter.pos.y,playerCharacter.pos.z))
 		&&	(LastValidPlayerPos.x!=0.f)
 		&&	(LastValidPlayerPos.y!=0.f)
 		&&	(LastValidPlayerPos.z!=0.f)	)
 	{
-		player.pos.x=LastValidPlayerPos.x;
-		player.pos.y=LastValidPlayerPos.y;
-		player.pos.z=LastValidPlayerPos.z;
+		playerCharacter.pos.x=LastValidPlayerPos.x;
+		playerCharacter.pos.y=LastValidPlayerPos.y;
+		playerCharacter.pos.z=LastValidPlayerPos.z;
 	}
 
-	LastValidPlayerPos.x=player.pos.x;
-	LastValidPlayerPos.y=player.pos.y;
-	LastValidPlayerPos.z=player.pos.z;
+	LastValidPlayerPos.x=playerCharacter.pos.x;
+	LastValidPlayerPos.y=playerCharacter.pos.y;
+	LastValidPlayerPos.z=playerCharacter.pos.z;
 	
 	return FFH_GOTO_FINISH;
 }
@@ -3814,11 +3814,11 @@ void ManageNONCombatModeAnimations()
 	ANIM_HANDLE ** alist=io->anims;
 
 	// FIRST SHIELD Management !
-	if (	(player.Current_Movement & PLAYER_LEAN_LEFT)			
-		||	(player.Current_Movement & PLAYER_LEAN_RIGHT)			)
+	if (	(playerCharacter.Current_Movement & PLAYER_LEAN_LEFT)			
+		||	(playerCharacter.Current_Movement & PLAYER_LEAN_RIGHT)			)
 	{
 	}
-	else if ((player.equiped[EQUIP_SLOT_SHIELD] != 0) && !BLOCK_PLAYER_CONTROLS)
+	else if ((playerCharacter.equiped[EQUIP_SLOT_SHIELD] != 0) && !BLOCK_PLAYER_CONTROLS)
 	{
 		if ( (useanim3->cur_anim==NULL)  ||
 			( (useanim3->cur_anim!=alist[ANIM_SHIELD_CYCLE])
@@ -3854,8 +3854,8 @@ long Player_Arrow_Count()
 {
 	long count=0;
 
-	if (player.bag)
-	for (int iNbBag=0; iNbBag<player.bag; iNbBag++) 
+	if (playerCharacter.bag)
+	for (int iNbBag=0; iNbBag<playerCharacter.bag; iNbBag++) 
 	for (long j=0;j<INVENTORY_Y;j++)
 	for (long i=0;i<INVENTORY_X;i++)
 	{
@@ -3884,8 +3884,8 @@ INTERACTIVE_OBJ * Player_Arrow_Count_Decrease()
 {
 	INTERACTIVE_OBJ * io = NULL;
 	
-	if (player.bag)
-	for (int iNbBag=0; iNbBag<player.bag; iNbBag++) 
+	if (playerCharacter.bag)
+	for (int iNbBag=0; iNbBag<playerCharacter.bag; iNbBag++) 
 	for (long j=0;j<INVENTORY_Y;j++)
 	for (long i=0;i<INVENTORY_X;i++)
 	{
@@ -3916,10 +3916,10 @@ bool StrikeAimtime()
 	STRIKE_AIMTIME=(float)ARXTime-(float)AimTime;
 	STRIKE_AIMTIME=STRIKE_AIMTIME*(1.f+(1.f-GLOBAL_SLOWDOWN));
 
-	if (STRIKE_AIMTIME>player.Full_AimTime) 
+	if (STRIKE_AIMTIME>playerCharacter.Full_AimTime) 
 		STRIKE_AIMTIME=1.f;
 	else 
-		STRIKE_AIMTIME=(float)STRIKE_AIMTIME/(float)player.Full_AimTime;
+		STRIKE_AIMTIME=(float)STRIKE_AIMTIME/(float)playerCharacter.Full_AimTime;
 
 	if (STRIKE_AIMTIME<0.1f) STRIKE_AIMTIME=0.1f;
 
@@ -3993,10 +3993,10 @@ void ManageCombatModeAnimations()
 						if (io->strikespeech)
 							strcpy(str,io->strikespeech);
 
-						if (player.equiped[EQUIP_SLOT_WEAPON]!=0)
+						if (playerCharacter.equiped[EQUIP_SLOT_WEAPON]!=0)
 						{
-							if (inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->strikespeech)
-								strcpy(str,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->strikespeech);
+							if (inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->strikespeech)
+								strcpy(str,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->strikespeech);
 						}
 
 						if (str[0]!=0)
@@ -4044,7 +4044,7 @@ void ManageCombatModeAnimations()
 
 									if (CheckAnythingInSphere(&sphere,0,0,&num))										
 									{
-										float dmgs=(player.Full_damages+1)*STRIKE_AIMTIME;
+										float dmgs=(playerCharacter.Full_damages+1)*STRIKE_AIMTIME;
 
 										if (FistParticles & 2) dmgs*=1.5f;
 
@@ -4088,7 +4088,7 @@ void ManageCombatModeAnimations()
 
 									if (CheckAnythingInSphere(&sphere,0,0,&num))									
 									{
-										float dmgs=(player.Full_damages+1)*STRIKE_AIMTIME;
+										float dmgs=(playerCharacter.Full_damages+1)*STRIKE_AIMTIME;
 
 										if (FistParticles & 2) dmgs*=1.5f;
 
@@ -4156,10 +4156,10 @@ void ManageCombatModeAnimations()
 						if (io->strikespeech)
 							strcpy(str,io->strikespeech);
 
-						if (player.equiped[EQUIP_SLOT_WEAPON]!=0)
+						if (playerCharacter.equiped[EQUIP_SLOT_WEAPON]!=0)
 						{
-							if (inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->strikespeech)
-								strcpy(str,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->strikespeech);
+							if (inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->strikespeech)
+								strcpy(str,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->strikespeech);
 						}
 
 						if (str[0]!=0)
@@ -4180,7 +4180,7 @@ void ManageCombatModeAnimations()
 						STRIKE_TIME=1;
 
 						if ((PlayerWeaponBlocked==-1) 
-						&& (ARX_EQUIPMENT_Strike_Check(io,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,0)))
+						&& (ARX_EQUIPMENT_Strike_Check(io,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,0)))
 						{
 							PlayerWeaponBlocked=useanim->ctime;
 							PlayerWeaponBlockTime = ARXTimeUL();
@@ -4200,7 +4200,7 @@ void ManageCombatModeAnimations()
 
 					if ((PlayerWeaponBlocked!=-1) 
 						&& (useanim->ctime<useanim->cur_anim->anims[useanim->altidx_cur]->anim_time*0.9f))							
-						ARX_EQUIPMENT_Strike_Check(io,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,1);
+						ARX_EQUIPMENT_Strike_Check(io,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,1);
 					
 				}
 			}
@@ -4244,10 +4244,10 @@ void ManageCombatModeAnimations()
 						if (io->strikespeech)
 							strcpy(str,io->strikespeech);
 
-						if (player.equiped[EQUIP_SLOT_WEAPON]!=0)
+						if (playerCharacter.equiped[EQUIP_SLOT_WEAPON]!=0)
 						{
-							if (inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->strikespeech)
-								strcpy(str,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->strikespeech);
+							if (inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->strikespeech)
+								strcpy(str,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->strikespeech);
 						}
 
 						if (str[0]!=0)
@@ -4268,7 +4268,7 @@ void ManageCombatModeAnimations()
 							STRIKE_TIME=1;
 
 							if ((PlayerWeaponBlocked==-1) 
-								&& (ARX_EQUIPMENT_Strike_Check(io,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,0)) )
+								&& (ARX_EQUIPMENT_Strike_Check(io,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,0)) )
 							{
 								PlayerWeaponBlocked=useanim->ctime;
 							PlayerWeaponBlockTime = ARXTimeUL();
@@ -4288,7 +4288,7 @@ void ManageCombatModeAnimations()
 
 						if ((PlayerWeaponBlocked!=-1) 
 							&& (useanim->ctime<useanim->cur_anim->anims[useanim->altidx_cur]->anim_time*0.9f))
-							ARX_EQUIPMENT_Strike_Check(io,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,1);
+							ARX_EQUIPMENT_Strike_Check(io,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,1);
 					
 				}
 			}
@@ -4335,10 +4335,10 @@ void ManageCombatModeAnimations()
 						if (io->strikespeech)
 							strcpy(str,io->strikespeech);
 
-						if (player.equiped[EQUIP_SLOT_WEAPON]!=0)
+						if (playerCharacter.equiped[EQUIP_SLOT_WEAPON]!=0)
 						{
-							if (inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->strikespeech)
-								strcpy(str,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]]->strikespeech);
+							if (inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->strikespeech)
+								strcpy(str,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]]->strikespeech);
 						}
 
 						if (str[0]!=0)
@@ -4359,7 +4359,7 @@ void ManageCombatModeAnimations()
 							STRIKE_TIME=1;
 
 							if ((PlayerWeaponBlocked==-1) 
-								&& (ARX_EQUIPMENT_Strike_Check(io,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,0)) )
+								&& (ARX_EQUIPMENT_Strike_Check(io,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,0)) )
 							{
 								PlayerWeaponBlocked=useanim->ctime;
 							PlayerWeaponBlockTime = ARXTimeUL();
@@ -4379,7 +4379,7 @@ void ManageCombatModeAnimations()
 
 						if ((PlayerWeaponBlocked!=-1) 
 							&& (useanim->ctime<useanim->cur_anim->anims[useanim->altidx_cur]->anim_time*0.9f))
-							ARX_EQUIPMENT_Strike_Check(io,inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,1);
+							ARX_EQUIPMENT_Strike_Check(io,inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]],STRIKE_AIMTIME,1);
 					
 				}
 			}			
@@ -4537,9 +4537,9 @@ void ManageCombatModeAnimationsEND()
 
 					AcquireLastAnim(io);
 
-					if (player.Interface & INTER_NO_STRIKE)
+					if (playerCharacter.Interface & INTER_NO_STRIKE)
 					{
-						player.Interface&=~INTER_NO_STRIKE;
+						playerCharacter.Interface&=~INTER_NO_STRIKE;
 						ANIM_Set(useanim,alist[ANIM_BARE_WAIT]);	
 						useanim->flags|=EA_LOOP;
 					}
@@ -4566,9 +4566,9 @@ void ManageCombatModeAnimationsEND()
 					{
 						AcquireLastAnim(io);
 
-						if (player.Interface & INTER_NO_STRIKE)
+						if (playerCharacter.Interface & INTER_NO_STRIKE)
 						{
-							player.Interface&=~INTER_NO_STRIKE;
+							playerCharacter.Interface&=~INTER_NO_STRIKE;
 							ANIM_Set(useanim,alist[ANIM_DAGGER_WAIT]);	
 							useanim->flags|=EA_LOOP;
 						}
@@ -4601,9 +4601,9 @@ void ManageCombatModeAnimationsEND()
 					{
 						AcquireLastAnim(io);
 
-						if (player.Interface & INTER_NO_STRIKE)
+						if (playerCharacter.Interface & INTER_NO_STRIKE)
 						{
-							player.Interface&=~INTER_NO_STRIKE;
+							playerCharacter.Interface&=~INTER_NO_STRIKE;
 							ANIM_Set(useanim,alist[ANIM_1H_WAIT]);	
 							useanim->flags|=EA_LOOP;
 						}
@@ -4636,9 +4636,9 @@ void ManageCombatModeAnimationsEND()
 					{
 						AcquireLastAnim(io);
 
-						if (player.Interface & INTER_NO_STRIKE)
+						if (playerCharacter.Interface & INTER_NO_STRIKE)
 						{
-							player.Interface&=~INTER_NO_STRIKE;
+							playerCharacter.Interface&=~INTER_NO_STRIKE;
 							ANIM_Set(useanim,alist[ANIM_2H_WAIT]);	
 							useanim->flags|=EA_LOOP;
 						}
@@ -4673,9 +4673,9 @@ void ManageCombatModeAnimationsEND()
 						{
 							AcquireLastAnim(io);
 
-							if (player.Interface & INTER_NO_STRIKE)
+							if (playerCharacter.Interface & INTER_NO_STRIKE)
 							{
-								player.Interface&=~INTER_NO_STRIKE;
+								playerCharacter.Interface&=~INTER_NO_STRIKE;
 								ANIM_Set(useanim,alist[ANIM_MISSILE_WAIT]);	
 								useanim->flags|=EA_LOOP;
 							}
@@ -4723,12 +4723,12 @@ void ManageCombatModeAnimationsEND()
 		{
 			AcquireLastAnim(io);
 			useanim->cur_anim=NULL;
-			player.doingmagic=0;
+			playerCharacter.doingmagic=0;
 
 			if (WILLRETURNTOCOMBATMODE)
 			{
-				player.Interface|=INTER_COMBATMODE;
-				player.Interface|=INTER_NO_STRIKE;
+				playerCharacter.Interface|=INTER_COMBATMODE;
+				playerCharacter.Interface|=INTER_NO_STRIKE;
 				
 				ARX_EQUIPMENT_LaunchPlayerReadyWeapon();
 				WILLRETURNTOCOMBATMODE=0;
@@ -5153,7 +5153,7 @@ void LaunchMoulinex()
 
 void DANAE_StartNewQuest()
 {
-	player.Interface = INTER_LIFE_MANA | INTER_MINIBACK | INTER_MINIBOOK;
+	playerCharacter.Interface = INTER_LIFE_MANA | INTER_MINIBACK | INTER_MINIBOOK;
 	PROGRESS_BAR_TOTAL = 108;
 	OLD_PROGRESS_BAR_COUNT=PROGRESS_BAR_COUNT=0;
 	LoadLevelScreen(GDevice,1);
@@ -5171,7 +5171,7 @@ void DANAE_StartNewQuest()
 	BLOCK_PLAYER_CONTROLS = 0;
 	FADEDURATION=0;
 	FADEDIR=0;
-	player.Interface = INTER_LIFE_MANA | INTER_MINIBACK | INTER_MINIBOOK;
+	playerCharacter.Interface = INTER_LIFE_MANA | INTER_MINIBACK | INTER_MINIBOOK;
 }
 
 BOOL DANAE_ManageSplashThings()
@@ -6097,19 +6097,19 @@ void DANAE_RenderCheckSpeechControlledCinematic()
 
 void DANAE_RenderCheckPlayerDead()
 {
-	if(player.life <= 0)
+	if(playerCharacter.life <= 0)
 	{
 		DeadTime += ARX_CLEAN_WARN_CAST_LONG(FrameDiff);
-		float mdist = EEfabs(player.physics.cyl.height) - 60;
+		float mdist = EEfabs(playerCharacter.physics.cyl.height) - 60;
 		DeadCameraDistance += (float)FrameDiff*DIV80*((mdist - DeadCameraDistance) / mdist)*2.f;
 
 		if(DeadCameraDistance>mdist) DeadCameraDistance = mdist;
 
 		EERIE_3D targetpos;
 
-		targetpos.x = player.pos.x;
-		targetpos.y = player.pos.y;
-		targetpos.z = player.pos.z;
+		targetpos.x = playerCharacter.pos.x;
+		targetpos.y = playerCharacter.pos.y;
+		targetpos.z = playerCharacter.pos.z;
 
 		long id = inter.iobj[0]->obj->fastaccess.view_attach;
 		long id2 = GetActionPointIdx(inter.iobj[0]->obj, "Chest2Leggings");
@@ -6334,10 +6334,10 @@ void DANAE_RenderManageConversation()
 		}
 		else
 		{
-			targetpos.x = player.pos.x;
-			targetpos.y = player.pos.y;
-			targetpos.z = player.pos.z;
-			float t = DEG2RAD(player.angle.b);
+			targetpos.x = playerCharacter.pos.x;
+			targetpos.y = playerCharacter.pos.y;
+			targetpos.z = playerCharacter.pos.z;
+			float t = DEG2RAD(playerCharacter.angle.b);
 			sourcepos.x = targetpos.x + (float)EEsin(t)*100.f;
 			sourcepos.y = targetpos.y;
 			sourcepos.z = targetpos.z - (float)EEcos(t)*100.f;
@@ -6426,9 +6426,9 @@ HRESULT DANAE::Render()
 
 			if(!USE_OLD_MOUSE_SYSTEM)
 			{
-				current.depthcolor.r=0.f;
-				current.depthcolor.g=0.f;
-				current.depthcolor.b=1.f;
+				gCurrentMod.depthcolor.r=0.f;
+				gCurrentMod.depthcolor.g=0.f;
+				gCurrentMod.depthcolor.b=1.f;
 			}
 		}
 	}
@@ -6436,7 +6436,7 @@ HRESULT DANAE::Render()
 	//BUMP
 	if(pMenuConfig->bBumpMapping)
 	{
-		e3dPosBump=player.pos;
+		e3dPosBump=playerCharacter.pos;
 	}
 	
 	// Sets our Global Device to Current Device
@@ -6648,7 +6648,7 @@ HRESULT DANAE::Render()
 				ARX_MOUSE_OVER|=ARX_MOUSE_OVER_INVENTORY;
 		}
 		
-		if (	(player.Interface & INTER_COMBATMODE)
+		if (	(playerCharacter.Interface & INTER_COMBATMODE)
 			||	(PLAYER_MOUSELOOK_ON) )
 		{
 			FlyingOverIO = NULL; // Avoid to check with those modes
@@ -6693,11 +6693,11 @@ HRESULT DANAE::Render()
 		if (ffh== FFH_GOTO_FINISH) return DANAE_NoRenderEnd();
 	}
 
-	if (CheckInPolyPrecis(player.pos.x,player.pos.y,player.pos.z))
+	if (CheckInPolyPrecis(playerCharacter.pos.x,playerCharacter.pos.y,playerCharacter.pos.z))
 	{
-		LastValidPlayerPos.x=player.pos.x;
-		LastValidPlayerPos.y=player.pos.y;
-		LastValidPlayerPos.z=player.pos.z;
+		LastValidPlayerPos.x=playerCharacter.pos.x;
+		LastValidPlayerPos.y=playerCharacter.pos.y;
+		LastValidPlayerPos.z=playerCharacter.pos.z;
 	}
 
 	if ((!FINAL_RELEASE) && (ARXmenu.currentmode == AMCM_OFF))
@@ -6805,9 +6805,9 @@ HRESULT DANAE::Render()
 	// SUBJECTIVE VIEW UPDATE START  *********************************************************
 	{
 		// Clear screen & Z buffers
-		if (desired.flags & GMOD_DCOLOR)
+		if (gDesiredMod.flags & GMOD_DCOLOR)
 		{
-			long DCOLOR=EERIERGB(current.depthcolor.r,current.depthcolor.g,current.depthcolor.b);
+			long DCOLOR=EERIERGB(gCurrentMod.depthcolor.r,gCurrentMod.depthcolor.g,gCurrentMod.depthcolor.b);
 			m_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER,DCOLOR, 1.0f, 0L );
 		}
 		else
@@ -6859,7 +6859,7 @@ HRESULT DANAE::Render()
 		long tFrameDiff;
 		F2L(Original_framedelay,&tFrameDiff);
 	
-		if ((player.Interface & INTER_COMBATMODE) && (STRIKE_TIME))// need some precision for weapon...
+		if ((playerCharacter.Interface & INTER_COMBATMODE) && (STRIKE_TIME))// need some precision for weapon...
 		{
 			float restore=ACTIVECAM->use_focal;
 
@@ -6887,7 +6887,7 @@ HRESULT DANAE::Render()
 
 					                  , inter.iobj[0], 0, 4);
 
-					if ((player.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
+					if ((playerCharacter.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
 				ManageCombatModeAnimations();
 		
 				if (inter.iobj[0]->animlayer[1].cur_anim!=NULL)
@@ -6923,7 +6923,7 @@ HRESULT DANAE::Render()
 					0,4);
 
 
-				if ((player.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
+				if ((playerCharacter.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
 				ManageCombatModeAnimations();
 		
 			if (inter.iobj[0]->animlayer[1].cur_anim!=NULL)
@@ -6964,14 +6964,14 @@ HRESULT DANAE::Render()
 	}
 	else if (EXTERNALVIEW)
 	{
-		float t=DEG2RAD(player.angle.b);
+		float t=DEG2RAD(playerCharacter.angle.b);
 		EERIE_3D tt;
 
 		for (long l=0;l<250;l+=10)
 		{
-			tt.x=player.pos.x+(float)EEsin(t)*(float)l;
-			tt.y=player.pos.y-50.f;
-			tt.z=player.pos.z-(float)EEcos(t)*(float)l;
+			tt.x=playerCharacter.pos.x+(float)EEsin(t)*(float)l;
+			tt.y=playerCharacter.pos.y-50.f;
+			tt.z=playerCharacter.pos.z-(float)EEcos(t)*(float)l;
 			EERIEPOLY * ep =EECheckInPoly(&tt);
 
 			if (ep)
@@ -6983,16 +6983,16 @@ HRESULT DANAE::Render()
 			else break;
 		}
 
-		subj.d_angle.a=player.angle.a+30.f;
-		subj.d_angle.b=player.angle.b;
-		subj.d_angle.g=player.angle.g;
+		subj.d_angle.a=playerCharacter.angle.a+30.f;
+		subj.d_angle.b=playerCharacter.angle.b;
+		subj.d_angle.g=playerCharacter.angle.g;
 		EXTERNALVIEW=1;
 	}
 	else	
 	{
-		subj.angle.a=player.angle.a;
-		subj.angle.b=player.angle.b;
-		subj.angle.g=player.angle.g; 
+		subj.angle.a=playerCharacter.angle.a;
+		subj.angle.b=playerCharacter.angle.b;
+		subj.angle.g=playerCharacter.angle.g; 
 		EXTERNALVIEW=0;
 		long id;
 
@@ -7007,9 +7007,9 @@ HRESULT DANAE::Render()
 				subj.pos.z=inter.iobj[0]->obj->vertexlist3[id].v.z;
 
 				EERIE_3D vect;
-				vect.x=subj.pos.x-player.pos.x;
+				vect.x=subj.pos.x-playerCharacter.pos.x;
 				vect.y=0;
-				vect.z=subj.pos.z-player.pos.z;
+				vect.z=subj.pos.z-playerCharacter.pos.z;
 				float len=Vector_Magnitude(&vect);
 
 				if (len>46.f)
@@ -7017,15 +7017,15 @@ HRESULT DANAE::Render()
 					float div=46.f/len;
 					vect.x*=div;
 					vect.z*=div;
-					subj.pos.x=player.pos.x+vect.x;
-					subj.pos.z=player.pos.z+vect.z;
+					subj.pos.x=playerCharacter.pos.x+vect.x;
+					subj.pos.z=playerCharacter.pos.z+vect.z;
 				}
 			}
 			else 
 			{
-				subj.pos.x=player.pos.x;
-				subj.pos.y=player.pos.y;
-				subj.pos.z=player.pos.z;
+				subj.pos.x=playerCharacter.pos.x;
+				subj.pos.y=playerCharacter.pos.y;
+				subj.pos.z=playerCharacter.pos.z;
 				subj.pos.y+=PLAYER_BASE_HEIGHT;
 			}
 	}
@@ -7101,7 +7101,7 @@ HRESULT DANAE::Render()
 	INTERTRANSPOLYSPOS=TRANSPOLYSPOS=0;
 
 	// Check For Hiding/unHiding Player Gore
-	if ((EXTERNALVIEW) || (player.life<=0)) 
+	if ((EXTERNALVIEW) || (playerCharacter.life<=0)) 
 	{
 		ARX_INTERACTIVE_Show_Hide_1st(inter.iobj[0],0);
 	}
@@ -7151,9 +7151,9 @@ HRESULT DANAE::Render()
 		if (FRAME_COUNT<=0)
 				PrecalcIOLighting(&ACTIVECAM->pos, ACTIVECAM->cdepth * 0.6f);
 
-		ACTIVECAM->fadecolor.r=current.depthcolor.r;
-		ACTIVECAM->fadecolor.g=current.depthcolor.g;
-		ACTIVECAM->fadecolor.b=current.depthcolor.b;
+		ACTIVECAM->fadecolor.r=gCurrentMod.depthcolor.r;
+		ACTIVECAM->fadecolor.g=gCurrentMod.depthcolor.g;
+		ACTIVECAM->fadecolor.b=gCurrentMod.depthcolor.b;
 		
 		if (uw_mode)
 		{
@@ -7239,8 +7239,8 @@ HRESULT DANAE::Render()
 		ManageTorch();
 
 		// Renders Magical Flares
-		if (	!((player.Interface & INTER_MAP )
-			&&  (!(player.Interface & INTER_COMBATMODE)))
+		if (	!((playerCharacter.Interface & INTER_MAP )
+			&&  (!(playerCharacter.Interface & INTER_COMBATMODE)))
 			&&	flarenum
 			)
 		{
@@ -7344,8 +7344,8 @@ HRESULT DANAE::Render()
 		DrawAllInterface();
 		DrawAllInterfaceFinish();
 
-		if (	(player.Interface & INTER_MAP )
-			&&  (!(player.Interface & INTER_COMBATMODE))
+		if (	(playerCharacter.Interface & INTER_MAP )
+			&&  (!(playerCharacter.Interface & INTER_COMBATMODE))
 			&&	flarenum
 			)
 		{
@@ -7393,7 +7393,7 @@ m_pd3dDevice->Clear( 0, NULL, D3DCLEAR_ZBUFFER,0, 1.0f, 0L );
 	}
 
 	if (SHOW_INGAME_MINIMAP && ((PLAY_LOADED_CINEMATIC == 0) && (!CINEMASCOPE) && (!BLOCK_PLAYER_CONTROLS) && (ARXmenu.currentmode == AMCM_OFF))
-		&& (!(player.Interface & INTER_MAP )	))
+		&& (!(playerCharacter.Interface & INTER_MAP )	))
 	{
 			long	SHOWLEVEL = ARX_LEVELS_GetRealNum(CURRENTLEVEL);
 
@@ -7597,8 +7597,8 @@ void DANAE::GoFor2DFX()
 					specialEE_RTP(&lv,&ltvv);
 					el->temp-=temp_increase;
 
-					if (!(player.Interface & INTER_COMBATMODE)
-						&& (player.Interface & INTER_MAP))
+					if (!(playerCharacter.Interface & INTER_COMBATMODE)
+						&& (playerCharacter.Interface & INTER_MAP))
 						continue;
 
 					LAST_ZVAL=ltvv.sz;
@@ -7916,7 +7916,7 @@ HRESULT DANAEGL::Render()
 				ARX_MOUSE_OVER |= ARX_MOUSE_OVER_INVENTORY;
 		}
 
-		if((player.Interface & INTER_COMBATMODE)
+		if((playerCharacter.Interface & INTER_COMBATMODE)
 			|| (PLAYER_MOUSELOOK_ON))
 		{
 			FlyingOverIO = NULL; // Avoid to check with those modes
@@ -7961,11 +7961,11 @@ HRESULT DANAEGL::Render()
 		if(ffh == FFH_GOTO_FINISH) return DANAE_NoRenderEnd();
 	}
 
-	if(CheckInPolyPrecis(player.pos.x, player.pos.y, player.pos.z))
+	if(CheckInPolyPrecis(playerCharacter.pos.x, playerCharacter.pos.y, playerCharacter.pos.z))
 	{
-		LastValidPlayerPos.x = player.pos.x;
-		LastValidPlayerPos.y = player.pos.y;
-		LastValidPlayerPos.z = player.pos.z;
+		LastValidPlayerPos.x = playerCharacter.pos.x;
+		LastValidPlayerPos.y = playerCharacter.pos.y;
+		LastValidPlayerPos.z = playerCharacter.pos.z;
 	}
 
 	if((!FINAL_RELEASE) && (ARXmenu.currentmode == AMCM_OFF))
@@ -8095,7 +8095,7 @@ HRESULT DANAEGL::Render()
 		long tFrameDiff;
 		F2L(Original_framedelay, &tFrameDiff);
 
-		if((player.Interface & INTER_COMBATMODE) && (STRIKE_TIME))// need some precision for weapon...
+		if((playerCharacter.Interface & INTER_COMBATMODE) && (STRIKE_TIME))// need some precision for weapon...
 		{
 			float restore = ACTIVECAM->use_focal;
 
@@ -8122,7 +8122,7 @@ HRESULT DANAEGL::Render()
 					ARX_CLEAN_WARN_CAST_ULONG(iCalc),
 					inter.iobj[0], 4);
 
-				if((player.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
+				if((playerCharacter.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
 					ManageCombatModeAnimations();
 
 				if(inter.iobj[0]->animlayer[1].cur_anim != NULL)
@@ -8157,7 +8157,7 @@ HRESULT DANAEGL::Render()
 				4);
 
 
-			if((player.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
+			if((playerCharacter.Interface & INTER_COMBATMODE) && (inter.iobj[0]->animlayer[1].cur_anim != NULL))
 				ManageCombatModeAnimations();
 
 			if(inter.iobj[0]->animlayer[1].cur_anim != NULL)
@@ -8199,14 +8199,14 @@ HRESULT DANAEGL::Render()
 	}
 	else if(EXTERNALVIEW)
 	{
-		float t = DEG2RAD(player.angle.b);
+		float t = DEG2RAD(playerCharacter.angle.b);
 		EERIE_3D tt;
 
 		for(long l = 0; l<250; l += 10)
 		{
-			tt.x = player.pos.x + (float)EEsin(t)*(float)l;
-			tt.y = player.pos.y - 50.f;
-			tt.z = player.pos.z - (float)EEcos(t)*(float)l;
+			tt.x = playerCharacter.pos.x + (float)EEsin(t)*(float)l;
+			tt.y = playerCharacter.pos.y - 50.f;
+			tt.z = playerCharacter.pos.z - (float)EEcos(t)*(float)l;
 			EERIEPOLY * ep = EECheckInPoly(&tt);
 
 			if(ep)
@@ -8218,16 +8218,16 @@ HRESULT DANAEGL::Render()
 			else break;
 		}
 
-		subj.d_angle.a = player.angle.a + 30.f;
-		subj.d_angle.b = player.angle.b;
-		subj.d_angle.g = player.angle.g;
+		subj.d_angle.a = playerCharacter.angle.a + 30.f;
+		subj.d_angle.b = playerCharacter.angle.b;
+		subj.d_angle.g = playerCharacter.angle.g;
 		EXTERNALVIEW = 1;
 	}
 	else
 	{
-		subj.angle.a = player.angle.a;
-		subj.angle.b = player.angle.b;
-		subj.angle.g = player.angle.g;
+		subj.angle.a = playerCharacter.angle.a;
+		subj.angle.b = playerCharacter.angle.b;
+		subj.angle.g = playerCharacter.angle.g;
 		EXTERNALVIEW = 0;
 		long id;
 
@@ -8242,9 +8242,9 @@ HRESULT DANAEGL::Render()
 				subj.pos.z = inter.iobj[0]->obj->vertexlist3[id].v.z;
 
 				EERIE_3D vect;
-				vect.x = subj.pos.x - player.pos.x;
+				vect.x = subj.pos.x - playerCharacter.pos.x;
 				vect.y = 0;
-				vect.z = subj.pos.z - player.pos.z;
+				vect.z = subj.pos.z - playerCharacter.pos.z;
 				float len = Vector_Magnitude(&vect);
 
 				if(len>46.f)
@@ -8252,15 +8252,15 @@ HRESULT DANAEGL::Render()
 					float div = 46.f / len;
 					vect.x *= div;
 					vect.z *= div;
-					subj.pos.x = player.pos.x + vect.x;
-					subj.pos.z = player.pos.z + vect.z;
+					subj.pos.x = playerCharacter.pos.x + vect.x;
+					subj.pos.z = playerCharacter.pos.z + vect.z;
 				}
 			}
 			else
 			{
-				subj.pos.x = player.pos.x;
-				subj.pos.y = player.pos.y;
-				subj.pos.z = player.pos.z;
+				subj.pos.x = playerCharacter.pos.x;
+				subj.pos.y = playerCharacter.pos.y;
+				subj.pos.z = playerCharacter.pos.z;
 				subj.pos.y += PLAYER_BASE_HEIGHT;
 			}
 		}
@@ -8334,7 +8334,7 @@ HRESULT DANAEGL::Render()
 	INTERTRANSPOLYSPOS = TRANSPOLYSPOS = 0;
 
 	// Check For Hiding/unHiding Player Gore
-	if((EXTERNALVIEW) || (player.life <= 0))
+	if((EXTERNALVIEW) || (playerCharacter.life <= 0))
 	{
 		ARX_INTERACTIVE_Show_Hide_1st(inter.iobj[0], 0);
 	}
@@ -8382,9 +8382,9 @@ HRESULT DANAEGL::Render()
 		if (FRAME_COUNT <= 0)
 			PrecalcIOLighting(&ACTIVECAM->pos, ACTIVECAM->cdepth * 0.6f);
 
-		ACTIVECAM->fadecolor.r = current.depthcolor.r;
-		ACTIVECAM->fadecolor.g = current.depthcolor.g;
-		ACTIVECAM->fadecolor.b = current.depthcolor.b;
+		ACTIVECAM->fadecolor.r = gCurrentMod.depthcolor.r;
+		ACTIVECAM->fadecolor.g = gCurrentMod.depthcolor.g;
+		ACTIVECAM->fadecolor.b = gCurrentMod.depthcolor.b;
 
 		if (uw_mode)
 		{
@@ -8462,8 +8462,8 @@ HRESULT DANAEGL::Render()
 		ManageTorch();
 
 		// Renders Magical Flares
-		if (!((player.Interface & INTER_MAP)
-			&& (!(player.Interface & INTER_COMBATMODE)))
+		if (!((playerCharacter.Interface & INTER_MAP)
+			&& (!(playerCharacter.Interface & INTER_COMBATMODE)))
 			&& flarenum
 			)
 		{
@@ -8567,8 +8567,8 @@ finish:; //----------------------------------------------------------------
 			DrawAllInterface();
 			DrawAllInterfaceFinish();
 
-			if ((player.Interface & INTER_MAP)
-				&& (!(player.Interface & INTER_COMBATMODE))
+			if ((playerCharacter.Interface & INTER_MAP)
+				&& (!(playerCharacter.Interface & INTER_COMBATMODE))
 				&& flarenum
 				)
 			{
@@ -8616,7 +8616,7 @@ finish:; //----------------------------------------------------------------
 	}
 
 	if (SHOW_INGAME_MINIMAP && ((PLAY_LOADED_CINEMATIC == 0) && (!CINEMASCOPE) && (!BLOCK_PLAYER_CONTROLS) && (ARXmenu.currentmode == AMCM_OFF))
-		&& (!(player.Interface & INTER_MAP)))
+		&& (!(playerCharacter.Interface & INTER_MAP)))
 	{
 		long	SHOWLEVEL = ARX_LEVELS_GetRealNum(CURRENTLEVEL);
 
@@ -8825,8 +8825,8 @@ void DANAEGL::GoFor2DFX()
 					specialEE_RTP(&lv, &ltvv);
 					el->temp -= temp_increase;
 
-					if (!(player.Interface & INTER_COMBATMODE)
-						&& (player.Interface & INTER_MAP))
+					if (!(playerCharacter.Interface & INTER_COMBATMODE)
+						&& (playerCharacter.Interface & INTER_MAP))
 						continue;
 
 					LAST_ZVAL = ltvv.sz;
@@ -9108,7 +9108,7 @@ void ShowTestText()
 	sprintf(tex,"Level : %s",LastLoadedScene);	
 	danaeApp.OutputText( 0, 32, tex );
 
-	sprintf(tex,"Position : %5.0f %5.0f %5.0f",player.pos.x,player.pos.y,player.pos.z);
+	sprintf(tex,"Position : %5.0f %5.0f %5.0f",playerCharacter.pos.x,playerCharacter.pos.y,playerCharacter.pos.z);
 	danaeApp.OutputText( 0, 48, tex );
 	
 	sprintf(tex,"Last Failed Sequence : %s",LAST_FAILED_SEQUENCE);
@@ -9148,21 +9148,21 @@ void ShowInfoText(long COR)
 	danaeApp.OutputText( 70, 32, tex );
 
 	float poss=-666.66f;
-	EERIEPOLY * ep=CheckInPolyPrecis(player.pos.x,player.pos.y,player.pos.z);
+	EERIEPOLY * ep=CheckInPolyPrecis(playerCharacter.pos.x,playerCharacter.pos.y,playerCharacter.pos.z);
 	float tempo=0.f;
 
-	if ((ep) && (GetTruePolyY(ep,&player.pos,&tempo)))
+	if ((ep) && (GetTruePolyY(ep,&playerCharacter.pos,&tempo)))
 		poss=tempo;
 
-	sprintf(tex,"Position  x:%7.0f y:%7.0f [%7.0f] z:%6.0f a%3.0f b%3.0f FOK %3.0f",player.pos.x,player.pos.y+player.size.y,poss,player.pos.z,player.angle.a,player.angle.b,ACTIVECAM->focal);
+	sprintf(tex,"Position  x:%7.0f y:%7.0f [%7.0f] z:%6.0f a%3.0f b%3.0f FOK %3.0f",playerCharacter.pos.x,playerCharacter.pos.y+playerCharacter.size.y,poss,playerCharacter.pos.z,playerCharacter.angle.a,playerCharacter.angle.b,ACTIVECAM->focal);
 	danaeApp.OutputText( 70, 48, tex );
-	sprintf(tex,"AnchorPos x:%6.0f y:%6.0f z:%6.0f TIME %ds Part %d - %d  Lkey %d SSM %d",player.pos.x-Mscenepos.x,player.pos.y+player.size.y-Mscenepos.y,player.pos.z-Mscenepos.z
-		,GAT,ParticleCount,player.doingmagic,danaeApp.kbd.lastkey,SnapShotMode);
+	sprintf(tex,"AnchorPos x:%6.0f y:%6.0f z:%6.0f TIME %ds Part %d - %d  Lkey %d SSM %d",playerCharacter.pos.x-Mscenepos.x,playerCharacter.pos.y+playerCharacter.size.y-Mscenepos.y,playerCharacter.pos.z-Mscenepos.z
+		,GAT,ParticleCount,playerCharacter.doingmagic,danaeApp.kbd.lastkey,SnapShotMode);
 	danaeApp.OutputText( 70, 64, tex );
 
-	if (player.onfirmground==0) danaeApp.OutputText( 200, 280, "OFFGRND" );
+	if (playerCharacter.onfirmground==0) danaeApp.OutputText( 200, 280, "OFFGRND" );
 
-	sprintf(tex,"Jump %f cinema %f %d %d - Pathfind %d(%s)",player.jumplastposition,CINEMA_DECAL,DANAEMouse.x,DANAEMouse.y,EERIE_PATHFINDER_Get_Queued_Number(), PATHFINDER_WORKING ? "Working" : "Idled");
+	sprintf(tex,"Jump %f cinema %f %d %d - Pathfind %d(%s)",playerCharacter.jumplastposition,CINEMA_DECAL,DANAEMouse.x,DANAEMouse.y,EERIE_PATHFINDER_Get_Queued_Number(), PATHFINDER_WORKING ? "Working" : "Idled");
 	danaeApp.OutputText( 70, 80, tex );
 	INTERACTIVE_OBJ * io=ARX_SCRIPT_Get_IO_Max_Events();
 	
@@ -9188,14 +9188,14 @@ void ShowInfoText(long COR)
 	}
 
 	float slope=0.f;
-	ep=CheckInPoly(player.pos.x,player.pos.y-10.f,player.pos.z);
+	ep=CheckInPoly(playerCharacter.pos.x,playerCharacter.pos.y-10.f,playerCharacter.pos.z);
 
 	if (ep)
 	{
 		slope=ep->norm.y;	
 	}
 
-	sprintf(tex,"Velocity %3.0f %3.0f %3.0f Slope %3.3f",player.physics.velocity.x,player.physics.velocity.y,player.physics.velocity.z,slope);
+	sprintf(tex,"Velocity %3.0f %3.0f %3.0f Slope %3.3f",playerCharacter.physics.velocity.x,playerCharacter.physics.velocity.y,playerCharacter.physics.velocity.z,slope);
 	danaeApp.OutputText( 70, 128, tex );
 
 	sprintf(tex, "TSU_TEST %d - nblights %d - nb %d", TSU_TEST, TSU_TEST_NB_LIGHT, TSU_TEST_NB);
@@ -9227,8 +9227,8 @@ void ShowInfoText(long COR)
 					io->move.y,io->move.z,io->_npcdata->moveproblem,io->_npcdata->pathfind.listpos,io->_npcdata->pathfind.listnb,
 					io->_npcdata->pathfind.truetarget,io->_npcdata->behavior);
 				danaeApp.OutputText( 170, 420, tex );
-			sprintf(tex,"Life %4.0f/%4.0f Mana %4.0f/%4.0f Poisoned %3.1f Hunger %4.1f",player.life,player.maxlife,
-					player.mana,player.maxmana,player.poison,player.hunger);		
+			sprintf(tex,"Life %4.0f/%4.0f Mana %4.0f/%4.0f Poisoned %3.1f Hunger %4.1f",playerCharacter.life,playerCharacter.maxlife,
+					playerCharacter.mana,playerCharacter.maxmana,playerCharacter.poison,playerCharacter.hunger);		
 				danaeApp.OutputText( 170, 320, tex );
 				
 		  }
@@ -9272,7 +9272,7 @@ void ShowInfoText(long COR)
 	  }
 	}
 
-	long zap=IsAnyPolyThere(player.pos.x,player.pos.z);
+	long zap=IsAnyPolyThere(playerCharacter.pos.x,playerCharacter.pos.z);
 	sprintf(tex,"POLY %d LASTLOCK %d",zap,LAST_LOCK_SUCCESSFULL);		
 	danaeApp.OutputText( 270, 220, tex );
 
@@ -9408,7 +9408,7 @@ HRESULT DANAE::InitDeviceObjects()
 
 	if (USE_D3DFOG)
 	{
-		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_FOGCOLOR, D3DRGB(current.depthcolor.r,current.depthcolor.g,current.depthcolor.b));
+		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_FOGCOLOR, D3DRGB(gCurrentMod.depthcolor.r,gCurrentMod.depthcolor.g,gCurrentMod.depthcolor.b));
 		float zval = 1.f;
 		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_LINEAR );
 		m_pd3dDevice->SetRenderState( D3DRENDERSTATE_FOGTABLEDENSITY, *((LPDWORD) (&zval)));

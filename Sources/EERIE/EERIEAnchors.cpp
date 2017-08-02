@@ -410,7 +410,7 @@ BOOL ANCHOR_AttemptValidCylinderPos(EERIE_CYLINDER * cyl, INTERACTIVE_OBJ * io, 
 		{
 			if ((flags & CFLAG_PLAYER) && (anything < 0.f))
 			{
-				if (player.jumpphase)
+				if (playerCharacter.jumpphase)
 				{
 					io->_npcdata->climb_count = MAX_ALLOWED_PER_SECOND;
 					return FALSE;

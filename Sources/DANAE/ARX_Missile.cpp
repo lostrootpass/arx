@@ -216,7 +216,7 @@ void ARX_MISSILES_Update()
 					ep = GetMinPoly(dest.x, dest.y, dest.z);
 					epp = GetMaxPoly(dest.x, dest.y, dest.z);
 
-					if (Distance3D(player.pos.x, player.pos.y, player.pos.z, pos.x, pos.y, pos.z) < 200.0F)
+					if (Distance3D(playerCharacter.pos.x, playerCharacter.pos.y, playerCharacter.pos.z, pos.x, pos.y, pos.z) < 200.0F)
 					{
 						ARX_MISSILES_Kill(i);
 						ARX_BOOMS_Add(&pos);

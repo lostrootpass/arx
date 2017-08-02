@@ -656,7 +656,7 @@ void ARXMenu_NewQuest()
 	bFade = true;			//active le fade
 	iFadeAction = AMCM_NEWQUEST;	//action a la fin du fade
 	bQuickGenFirstClick = true;
-	player.gold = 0;
+	playerCharacter.gold = 0;
 	ARX_PLAYER_MakeFreshHero();
 }
 

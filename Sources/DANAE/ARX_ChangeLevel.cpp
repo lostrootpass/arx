@@ -458,14 +458,14 @@ void ARX_CHANGELEVEL_Change(char * level, char * target, long angle, long confir
 			if (inter.iobj[t])
 				if (GetItemWorldPosition(inter.iobj[t], &pos))
 				{
-					moveto.x = player.pos.x = pos.x;
-					moveto.y = player.pos.y = pos.y + PLAYER_BASE_HEIGHT;
-					moveto.z = player.pos.z = pos.z;
+					moveto.x = playerCharacter.pos.x = pos.x;
+					moveto.y = playerCharacter.pos.y = pos.y + PLAYER_BASE_HEIGHT;
+					moveto.z = playerCharacter.pos.z = pos.z;
 					NO_PLAYER_POSITION_RESET = 1;
 				}
 		}
 
-		player.desiredangle.b = player.angle.b = (float)angle;
+		playerCharacter.desiredangle.b = playerCharacter.angle.b = (float)angle;
 		return; // nothing more to do :)
 	}
 
@@ -496,9 +496,9 @@ void ARX_CHANGELEVEL_Change(char * level, char * target, long angle, long confir
 		if (inter.iobj[t])
 			if (GetItemWorldPosition(inter.iobj[t], &pos))
 			{
-				moveto.x = player.pos.x = pos.x;
-				moveto.y = player.pos.y = pos.y + PLAYER_BASE_HEIGHT;
-				moveto.z = player.pos.z = pos.z;
+				moveto.x = playerCharacter.pos.x = pos.x;
+				moveto.y = playerCharacter.pos.y = pos.y + PLAYER_BASE_HEIGHT;
+				moveto.z = playerCharacter.pos.z = pos.z;
 				NO_PLAYER_POSITION_RESET = 1;
 				Vector_Copy(&WILL_RESTORE_PLAYER_POSITION, &moveto);
 				WILL_RESTORE_PLAYER_POSITION_FLAG = 1;
@@ -506,7 +506,7 @@ void ARX_CHANGELEVEL_Change(char * level, char * target, long angle, long confir
 	}
 
 	CURRENTLEVEL = NEW_LEVEL;
-	player.desiredangle.b = player.angle.b = (float)angle;
+	playerCharacter.desiredangle.b = playerCharacter.angle.b = (float)angle;
 	DONT_WANT_PLAYER_INZONE = 1;
 	ARX_PLAYER_RectifyPosition();
 	JUST_RELOADED = 1;
@@ -600,7 +600,7 @@ bool IsPlayerEquipedWith(INTERACTIVE_OBJ * io)
 	{
 		for (long i = 0; i < MAX_EQUIPED; i++)
 		{
-			if (player.equiped[i] == num)
+			if (playerCharacter.equiped[i] == num)
 			{
 				return true;
 			}
@@ -610,8 +610,8 @@ bool IsPlayerEquipedWith(INTERACTIVE_OBJ * io)
 	return false;
 }
 extern GLOBAL_MODS stacked;
-extern GLOBAL_MODS current;
-extern GLOBAL_MODS desired;
+extern GLOBAL_MODS gCurrentMod;
+extern GLOBAL_MODS gDesiredMod;
 //--------------------------------------------------------------------------------------------
 long ARX_CHANGELEVEL_Push_Index(ARX_CHANGELEVEL_INDEX * asi, long num)
 {
@@ -625,8 +625,8 @@ long ARX_CHANGELEVEL_Push_Index(ARX_CHANGELEVEL_INDEX * asi, long num)
 	asi->nb_lights				= 0;
 
 	memcpy(&asi->gmods_stacked, &stacked, sizeof(GLOBAL_MODS));
-	memcpy(&asi->gmods_desired, &desired, sizeof(GLOBAL_MODS));
-	memcpy(&asi->gmods_current, &current, sizeof(GLOBAL_MODS));
+	memcpy(&asi->gmods_desired, &gDesiredMod, sizeof(GLOBAL_MODS));
+	memcpy(&asi->gmods_current, &gCurrentMod, sizeof(GLOBAL_MODS));
 
 	for (long i = 1; i < inter.nbmax; i++)
 	{
@@ -898,21 +898,21 @@ retry:
 
 	memset(asp, 0, sizeof(ARX_CHANGELEVEL_PLAYER));
 
-	asp->AimTime					= player.AimTime;
-	asp->angle.a					= player.angle.a;
-	asp->angle.b					= player.angle.b;
-	asp->angle.g					= player.angle.g;
-	asp->armor_class				= player.armor_class;
-	asp->Attribute_Constitution		= player.Attribute_Constitution;
-	asp->Attribute_Dexterity		= player.Attribute_Dexterity;
-	asp->Attribute_Mind				= player.Attribute_Mind;
-	asp->Attribute_Strength			= player.Attribute_Strength;
-	asp->Critical_Hit				= player.Critical_Hit;
-	asp->Current_Movement			= player.Current_Movement;
-	asp->damages					= player.damages;
-	asp->doingmagic					= player.doingmagic;
-	asp->Interface					= player.Interface;
-	asp->playerflags				= player.playerflags;
+	asp->AimTime					= playerCharacter.AimTime;
+	asp->angle.a					= playerCharacter.angle.a;
+	asp->angle.b					= playerCharacter.angle.b;
+	asp->angle.g					= playerCharacter.angle.g;
+	asp->armor_class				= playerCharacter.armor_class;
+	asp->Attribute_Constitution		= playerCharacter.Attribute_Constitution;
+	asp->Attribute_Dexterity		= playerCharacter.Attribute_Dexterity;
+	asp->Attribute_Mind				= playerCharacter.Attribute_Mind;
+	asp->Attribute_Strength			= playerCharacter.Attribute_Strength;
+	asp->Critical_Hit				= playerCharacter.Critical_Hit;
+	asp->Current_Movement			= playerCharacter.Current_Movement;
+	asp->damages					= playerCharacter.damages;
+	asp->doingmagic					= playerCharacter.doingmagic;
+	asp->Interface					= playerCharacter.Interface;
+	asp->playerflags				= playerCharacter.playerflags;
 
 	if (TELEPORT_TO_LEVEL[0])
 		strcpy(asp->TELEPORT_TO_LEVEL, TELEPORT_TO_LEVEL);
@@ -926,11 +926,11 @@ retry:
 
 	asp->TELEPORT_TO_ANGLE			= TELEPORT_TO_ANGLE;
 	asp->CHANGE_LEVEL_ICON			= CHANGE_LEVEL_ICON;
-	asp->bag						= player.bag;
-	FillIOIdent(asp->equipsecondaryIO,	player.equipsecondaryIO);
-	FillIOIdent(asp->equipshieldIO,		player.equipshieldIO);
-	FillIOIdent(asp->leftIO,			player.leftIO);
-	FillIOIdent(asp->rightIO,			player.rightIO);
+	asp->bag						= playerCharacter.bag;
+	FillIOIdent(asp->equipsecondaryIO,	playerCharacter.equipsecondaryIO);
+	FillIOIdent(asp->equipshieldIO,		playerCharacter.equipshieldIO);
+	FillIOIdent(asp->leftIO,			playerCharacter.leftIO);
+	FillIOIdent(asp->rightIO,			playerCharacter.rightIO);
 	FillIOIdent(asp->curtorch,			CURRENT_TORCH);
 
 	memcpy(&asp->precast, &Precast, sizeof(PRECAST_STRUCT)*MAX_PRECAST);
@@ -949,35 +949,35 @@ retry:
 	for (long i = 0; i < MAX_MINIMAPS; i++)
 		asp->minimap[i].tc = 0;
 
-	asp->falling				= player.falling;
-	asp->gold					= player.gold;
+	asp->falling				= playerCharacter.falling;
+	asp->gold					= playerCharacter.gold;
 	asp->invisibility			= inter.iobj[0]->invisibility;
 
-	if (player.inzone)
+	if (playerCharacter.inzone)
 	{
 		ARX_PATH * ap = (ARX_PATH *)asp->inzone;
 		strcpy(asp->inzone, ap->name);
 	}
 
-	asp->jumpphase				= player.jumpphase;
-	asp->jumpstarttime			= player.jumpstarttime;
-	asp->Last_Movement			= player.Last_Movement;
-	asp->level					= player.level;
-	asp->life					= player.life;
-	asp->mana					= player.mana;
-	asp->maxlife				= player.maxlife;
-	asp->maxmana				= player.maxmana;
+	asp->jumpphase				= playerCharacter.jumpphase;
+	asp->jumpstarttime			= playerCharacter.jumpstarttime;
+	asp->Last_Movement			= playerCharacter.Last_Movement;
+	asp->level					= playerCharacter.level;
+	asp->life					= playerCharacter.life;
+	asp->mana					= playerCharacter.mana;
+	asp->maxlife				= playerCharacter.maxlife;
+	asp->maxmana				= playerCharacter.maxmana;
 	asp->misc_flags = 0;
 
-	if (player.onfirmground)
+	if (playerCharacter.onfirmground)
 		asp->misc_flags |= 1;
 
 	if (WILLRETURNTOCOMBATMODE)
 		asp->misc_flags |= 2;
 
-	memcpy(&asp->physics, &player.physics, sizeof(IO_PHYSICS));
-	asp->poison					= player.poison;
-	asp->hunger					= player.hunger;
+	memcpy(&asp->physics, &playerCharacter.physics, sizeof(IO_PHYSICS));
+	asp->poison					= playerCharacter.poison;
+	asp->hunger					= playerCharacter.hunger;
 
 	asp->sp_flags = 0;
 
@@ -1003,29 +1003,29 @@ retry:
 		asp->sp_flags |= SP_WEP;
 
 
-	asp->pos.x					= player.pos.x;
-	asp->pos.y					= player.pos.y;
-	asp->pos.z					= player.pos.z;
-	asp->resist_magic			= player.resist_magic;
-	asp->resist_poison			= player.resist_poison;
-	asp->Attribute_Redistribute	= player.Attribute_Redistribute;
-	asp->Skill_Redistribute		= player.Skill_Redistribute;
-	asp->rune_flags				= player.rune_flags;
-	asp->size.x					= player.size.x;
-	asp->size.y					= player.size.y;
-	asp->size.z					= player.size.z;
-	asp->Skill_Stealth			= player.Skill_Stealth;
-	asp->Skill_Mecanism			= player.Skill_Mecanism;
-	asp->Skill_Intuition		= player.Skill_Intuition;
-	asp->Skill_Etheral_Link		= player.Skill_Etheral_Link;
-	asp->Skill_Object_Knowledge	= player.Skill_Object_Knowledge;
-	asp->Skill_Casting			= player.Skill_Casting;
-	asp->Skill_Projectile		= player.Skill_Projectile;
-	asp->Skill_Close_Combat		= player.Skill_Close_Combat;
-	asp->Skill_Defense			= player.Skill_Defense;
-	asp->skin					= player.skin;
+	asp->pos.x					= playerCharacter.pos.x;
+	asp->pos.y					= playerCharacter.pos.y;
+	asp->pos.z					= playerCharacter.pos.z;
+	asp->resist_magic			= playerCharacter.resist_magic;
+	asp->resist_poison			= playerCharacter.resist_poison;
+	asp->Attribute_Redistribute	= playerCharacter.Attribute_Redistribute;
+	asp->Skill_Redistribute		= playerCharacter.Skill_Redistribute;
+	asp->rune_flags				= playerCharacter.rune_flags;
+	asp->size.x					= playerCharacter.size.x;
+	asp->size.y					= playerCharacter.size.y;
+	asp->size.z					= playerCharacter.size.z;
+	asp->Skill_Stealth			= playerCharacter.Skill_Stealth;
+	asp->Skill_Mecanism			= playerCharacter.Skill_Mecanism;
+	asp->Skill_Intuition		= playerCharacter.Skill_Intuition;
+	asp->Skill_Etheral_Link		= playerCharacter.Skill_Etheral_Link;
+	asp->Skill_Object_Knowledge	= playerCharacter.Skill_Object_Knowledge;
+	asp->Skill_Casting			= playerCharacter.Skill_Casting;
+	asp->Skill_Projectile		= playerCharacter.Skill_Projectile;
+	asp->Skill_Close_Combat		= playerCharacter.Skill_Close_Combat;
+	asp->Skill_Defense			= playerCharacter.Skill_Defense;
+	asp->skin					= playerCharacter.skin;
 
-	asp->xp						= player.xp;
+	asp->xp						= playerCharacter.xp;
 	asp->nb_PlayerQuest			= nb_PlayerQuest;
 	asp->keyring_nb				= Keyring_Number;
 	asp->Global_Magic_Mode		= GLOBAL_MAGIC_MODE;
@@ -1047,9 +1047,9 @@ retry:
 
 	for (long k = 0; k < MAX_EQUIPED; k++)
 	{
-		if (ValidIONum(player.equiped[k])
-		        &&	(player.equiped[k] > 0))
-			FillIOIdent(asp->equiped[k], inter.iobj[player.equiped[k]]);
+		if (ValidIONum(playerCharacter.equiped[k])
+		        &&	(playerCharacter.equiped[k] > 0))
+			FillIOIdent(asp->equiped[k], inter.iobj[playerCharacter.equiped[k]]);
 		else
 			strcpy(asp->equiped[k], "");
 	}
@@ -2093,8 +2093,8 @@ long ARX_CHANGELEVEL_Pop_Level(ARX_CHANGELEVEL_INDEX * asi, long num, long First
 
 
 	memcpy(&stacked, &asi->gmods_stacked, sizeof(GLOBAL_MODS));
-	memcpy(&desired, &asi->gmods_desired, sizeof(GLOBAL_MODS));
-	memcpy(&current, &asi->gmods_current, sizeof(GLOBAL_MODS));
+	memcpy(&gDesiredMod, &asi->gmods_desired, sizeof(GLOBAL_MODS));
+	memcpy(&gCurrentMod, &asi->gmods_current, sizeof(GLOBAL_MODS));
 	NO_GMOD_RESET = 1;
 	ARX_TIME_Force_Time_Restore(ARX_CHANGELEVEL_DesiredTime);//asi.time);
 	FORCE_TIME_RESTORE = ARX_CHANGELEVEL_DesiredTime;
@@ -2131,25 +2131,25 @@ long ARX_CHANGELEVEL_Pop_Player(ARX_CHANGELEVEL_INDEX * asi, ARX_CHANGELEVEL_PLA
 	memcpy(asp, dat, sizeof(ARX_CHANGELEVEL_PLAYER));
 	//free(compressed);
 
-	player.AimTime					= asp->AimTime;
-	player.desiredangle.a = player.angle.a = asp->angle.a;
-	player.desiredangle.b = player.angle.b = asp->angle.b;
-	player.angle.g					= asp->angle.g;
+	playerCharacter.AimTime					= asp->AimTime;
+	playerCharacter.desiredangle.a = playerCharacter.angle.a = asp->angle.a;
+	playerCharacter.desiredangle.b = playerCharacter.angle.b = asp->angle.b;
+	playerCharacter.angle.g					= asp->angle.g;
 
 
 	ARX_CHECK_UCHAR(asp->armor_class);
-	player.armor_class				= ARX_CLEAN_WARN_CAST_UCHAR(asp->armor_class);
+	playerCharacter.armor_class				= ARX_CLEAN_WARN_CAST_UCHAR(asp->armor_class);
 
 
-	player.Attribute_Constitution	= asp->Attribute_Constitution;
-	player.Attribute_Dexterity		= asp->Attribute_Dexterity;
-	player.Attribute_Mind			= asp->Attribute_Mind;
-	player.Attribute_Strength		= asp->Attribute_Strength;
-	player.Critical_Hit				= asp->Critical_Hit;
-	player.Current_Movement			= asp->Current_Movement;
-	player.damages					= asp->damages;
-	player.doingmagic				= asp->doingmagic;
-	player.playerflags				= asp->playerflags;
+	playerCharacter.Attribute_Constitution	= asp->Attribute_Constitution;
+	playerCharacter.Attribute_Dexterity		= asp->Attribute_Dexterity;
+	playerCharacter.Attribute_Mind			= asp->Attribute_Mind;
+	playerCharacter.Attribute_Strength		= asp->Attribute_Strength;
+	playerCharacter.Critical_Hit				= asp->Critical_Hit;
+	playerCharacter.Current_Movement			= asp->Current_Movement;
+	playerCharacter.damages					= asp->damages;
+	playerCharacter.doingmagic				= asp->doingmagic;
+	playerCharacter.playerflags				= asp->playerflags;
 
 	if (asp->TELEPORT_TO_LEVEL[0]) strcpy(TELEPORT_TO_LEVEL, asp->TELEPORT_TO_LEVEL);
 	else memset(TELEPORT_TO_LEVEL, 0, 64);
@@ -2159,45 +2159,45 @@ long ARX_CHANGELEVEL_Pop_Player(ARX_CHANGELEVEL_INDEX * asi, ARX_CHANGELEVEL_PLA
 
 	TELEPORT_TO_ANGLE = asp->TELEPORT_TO_ANGLE;
 	CHANGE_LEVEL_ICON = asp->CHANGE_LEVEL_ICON;
-	player.bag = asp->bag;
+	playerCharacter.bag = asp->bag;
 	memcpy(&Precast, &asp->precast, sizeof(PRECAST_STRUCT)*MAX_PRECAST);
-	player.Interface				= asp->Interface;
-	player.Interface &= ~INTER_MAP;
-	player.falling					= asp->falling;
-	player.gold						= asp->gold;
+	playerCharacter.Interface				= asp->Interface;
+	playerCharacter.Interface &= ~INTER_MAP;
+	playerCharacter.falling					= asp->falling;
+	playerCharacter.gold						= asp->gold;
 	inter.iobj[0]->invisibility		= asp->invisibility;
 	ARX_PATH * ap = ARX_PATH_GetAddressByName(asp->inzone);
-	player.inzone = ap;
-	player.jumpphase				= asp->jumpphase;
-	player.jumpstarttime			= asp->jumpstarttime;
-	player.Last_Movement			= asp->Last_Movement;
+	playerCharacter.inzone = ap;
+	playerCharacter.jumpphase				= asp->jumpphase;
+	playerCharacter.jumpstarttime			= asp->jumpstarttime;
+	playerCharacter.Last_Movement			= asp->Last_Movement;
 
 
 	ARX_CHECK_UCHAR(asp->level);
-	player.level					= ARX_CLEAN_WARN_CAST_UCHAR(asp->level);
+	playerCharacter.level					= ARX_CLEAN_WARN_CAST_UCHAR(asp->level);
 
 
-	player.life						= asp->life;
-	player.mana						= asp->mana;
-	player.maxlife					= asp->maxlife;
-	player.maxmana					= asp->maxmana;
+	playerCharacter.life						= asp->life;
+	playerCharacter.mana						= asp->mana;
+	playerCharacter.maxlife					= asp->maxlife;
+	playerCharacter.maxmana					= asp->maxmana;
 
 	if (asp->misc_flags & 1)
-		player.onfirmground = 1;
+		playerCharacter.onfirmground = 1;
 	else
-		player.onfirmground = 0;
+		playerCharacter.onfirmground = 0;
 
 	if (asp->misc_flags & 2)
 		WILLRETURNTOCOMBATMODE = 1;
 	else
 		WILLRETURNTOCOMBATMODE = 0;
 
-	memcpy(&player.physics, &asp->physics, sizeof(IO_PHYSICS));
-	player.poison					= asp->poison;
-	player.hunger					= asp->hunger;
-	player.pos.x					= asp->pos.x;
-	player.pos.y					= asp->pos.y;
-	player.pos.z					= asp->pos.z;
+	memcpy(&playerCharacter.physics, &asp->physics, sizeof(IO_PHYSICS));
+	playerCharacter.poison					= asp->poison;
+	playerCharacter.hunger					= asp->hunger;
+	playerCharacter.pos.x					= asp->pos.x;
+	playerCharacter.pos.y					= asp->pos.y;
+	playerCharacter.pos.z					= asp->pos.z;
 
 	if (asp->sp_flags & SP_ARM1)
 		sp_arm = 1;
@@ -2248,7 +2248,7 @@ long ARX_CHANGELEVEL_Pop_Player(ARX_CHANGELEVEL_INDEX * asi, ARX_CHANGELEVEL_PLA
 
 	if (inter.iobj[0])
 	{
-		Vector_Copy(&inter.iobj[0]->pos, &player.pos);
+		Vector_Copy(&inter.iobj[0]->pos, &playerCharacter.pos);
 		inter.iobj[0]->pos.y += 170.f;
 	}
 
@@ -2258,38 +2258,38 @@ long ARX_CHANGELEVEL_Pop_Player(ARX_CHANGELEVEL_INDEX * asi, ARX_CHANGELEVEL_PLA
 
 	ARX_CHECK_UCHAR(asp->resist_magic);
 	ARX_CHECK_UCHAR(asp->resist_poison);
-	player.resist_magic				= ARX_CLEAN_WARN_CAST_UCHAR(asp->resist_magic);
-	player.resist_poison			= ARX_CLEAN_WARN_CAST_UCHAR(asp->resist_poison);
+	playerCharacter.resist_magic				= ARX_CLEAN_WARN_CAST_UCHAR(asp->resist_magic);
+	playerCharacter.resist_poison			= ARX_CLEAN_WARN_CAST_UCHAR(asp->resist_poison);
 
 
 
 	ARX_CHECK_UCHAR(asp->Attribute_Redistribute);
 	ARX_CHECK_UCHAR(asp->Skill_Redistribute);
 
-	player.Attribute_Redistribute	= ARX_CLEAN_WARN_CAST_UCHAR(asp->Attribute_Redistribute);
-	player.Skill_Redistribute		= ARX_CLEAN_WARN_CAST_UCHAR(asp->Skill_Redistribute);
+	playerCharacter.Attribute_Redistribute	= ARX_CLEAN_WARN_CAST_UCHAR(asp->Attribute_Redistribute);
+	playerCharacter.Skill_Redistribute		= ARX_CLEAN_WARN_CAST_UCHAR(asp->Skill_Redistribute);
 
 
-	player.rune_flags				= asp->rune_flags;
-	player.size.x					= asp->size.x;
-	player.size.y					= asp->size.y;
-	player.size.z					= asp->size.z;
-	player.Skill_Stealth			= asp->Skill_Stealth;
-	player.Skill_Mecanism			= asp->Skill_Mecanism;
-	player.Skill_Intuition			= asp->Skill_Intuition;
-	player.Skill_Etheral_Link		= asp->Skill_Etheral_Link;
-	player.Skill_Object_Knowledge	= asp->Skill_Object_Knowledge;
-	player.Skill_Casting			= asp->Skill_Casting;
-	player.Skill_Projectile			= asp->Skill_Projectile;
-	player.Skill_Close_Combat		= asp->Skill_Close_Combat;
-	player.Skill_Defense			= asp->Skill_Defense;
+	playerCharacter.rune_flags				= asp->rune_flags;
+	playerCharacter.size.x					= asp->size.x;
+	playerCharacter.size.y					= asp->size.y;
+	playerCharacter.size.z					= asp->size.z;
+	playerCharacter.Skill_Stealth			= asp->Skill_Stealth;
+	playerCharacter.Skill_Mecanism			= asp->Skill_Mecanism;
+	playerCharacter.Skill_Intuition			= asp->Skill_Intuition;
+	playerCharacter.Skill_Etheral_Link		= asp->Skill_Etheral_Link;
+	playerCharacter.Skill_Object_Knowledge	= asp->Skill_Object_Knowledge;
+	playerCharacter.Skill_Casting			= asp->Skill_Casting;
+	playerCharacter.Skill_Projectile			= asp->Skill_Projectile;
+	playerCharacter.Skill_Close_Combat		= asp->Skill_Close_Combat;
+	playerCharacter.Skill_Defense			= asp->Skill_Defense;
 
 
 	ARX_CHECK_CHAR(asp->skin);
-	player.skin						= ARX_CLEAN_WARN_CAST_CHAR(asp->skin);
+	playerCharacter.skin						= ARX_CLEAN_WARN_CAST_CHAR(asp->skin);
 
 
-	player.xp						= asp->xp;
+	playerCharacter.xp						= asp->xp;
 	GLOBAL_MAGIC_MODE				= asp->Global_Magic_Mode;
 
 	ARX_MINIMAP_PurgeTC();
@@ -3879,10 +3879,10 @@ long ARX_CHANGELEVEL_PopLevel(long instance, long reloadflag)
 	LogData("Before Misc Code");
 
 	// Restoring Player equipment...
-	player.equipsecondaryIO = ConvertToValidIO(asp.equipsecondaryIO);
-	player.equipshieldIO = ConvertToValidIO(asp.equipshieldIO);
-	player.leftIO = ConvertToValidIO(asp.leftIO);
-	player.rightIO = ConvertToValidIO(asp.rightIO);
+	playerCharacter.equipsecondaryIO = ConvertToValidIO(asp.equipsecondaryIO);
+	playerCharacter.equipshieldIO = ConvertToValidIO(asp.equipshieldIO);
+	playerCharacter.leftIO = ConvertToValidIO(asp.leftIO);
+	playerCharacter.rightIO = ConvertToValidIO(asp.rightIO);
 	CURRENT_TORCH = ConvertToValidIO(asp.curtorch);
 	PROGRESS_BAR_COUNT += 1.f;
 	LoadLevelScreen();
@@ -3899,11 +3899,11 @@ long ARX_CHANGELEVEL_PopLevel(long instance, long reloadflag)
 
 	for (long i = 0; i < MAX_EQUIPED; i++)
 	{
-		player.equiped[i] = (short)GetInterNum(ConvertToValidIO(asp.equiped[i]));
+		playerCharacter.equiped[i] = (short)GetInterNum(ConvertToValidIO(asp.equiped[i]));
 
-		if ((player.equiped[i] > 0) && (ValidIONum(player.equiped[i])))
-			inter.iobj[player.equiped[i]]->level = (short)instance;
-		else player.equiped[i] = 0;
+		if ((playerCharacter.equiped[i] > 0) && (ValidIONum(playerCharacter.equiped[i])))
+			inter.iobj[playerCharacter.equiped[i]]->level = (short)instance;
+		else playerCharacter.equiped[i] = 0;
 	}
 
 	PROGRESS_BAR_COUNT += 2.f;
@@ -3983,7 +3983,7 @@ long ARX_CHANGELEVEL_PopLevel(long instance, long reloadflag)
 
 	ARX_INTERACTIVE_HideGore(inter.iobj[0], 1);
 	TRUE_PLAYER_MOUSELOOK_ON = 0;
-	player.Interface &= ~INTER_COMBATMODE;
+	playerCharacter.Interface &= ~INTER_COMBATMODE;
 	PROGRESS_BAR_COUNT += 1.f;
 	LoadLevelScreen();
 	LogData("After  Final Inits");
@@ -4354,7 +4354,7 @@ long ARX_CHANGELEVEL_Load(long instance)
 
 	STARTED_A_GAME = 1;
 	BLOCK_PLAYER_CONTROLS = 0;
-	player.Interface &= ~INTER_COMBATMODE;
+	playerCharacter.Interface &= ~INTER_COMBATMODE;
 
 	if (inter.iobj[0]) inter.iobj[0]->animlayer[1].cur_anim = NULL;
 

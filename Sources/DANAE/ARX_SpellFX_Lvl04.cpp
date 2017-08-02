@@ -142,8 +142,8 @@ float CBless::Render(LPDIRECT3DDEVICE7 _pD3DDevice)
 	D3DTLVERTEX v3[4];
 
 	float ff = ((float)spells[spellinstance].caster_level + 10) * 6.f;
-	float fBetaRadCos = (float) cos(DEG2RAD(MAKEANGLE(player.angle.b))) * ff;
-	float fBetaRadSin = (float) sin(DEG2RAD(MAKEANGLE(player.angle.b))) * ff;
+	float fBetaRadCos = (float) cos(DEG2RAD(MAKEANGLE(playerCharacter.angle.b))) * ff;
+	float fBetaRadSin = (float) sin(DEG2RAD(MAKEANGLE(playerCharacter.angle.b))) * ff;
 
 	unsigned long color = D3DRGB(1, 1, 1);
 
@@ -305,9 +305,9 @@ float CDispellField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	EERIE_3D stitescale;
 	EERIE_RGB stitecolor;
 
-	x = player.pos.x;
-	y = player.pos.y + 80;
-	z = player.pos.z;
+	x = playerCharacter.pos.x;
+	y = playerCharacter.pos.y + 80;
+	z = playerCharacter.pos.z;
 
 	stiteangle.b = (float) ulCurrentTime * fOneOnDuration * 120;
 	stiteangle.a = 0;
@@ -336,7 +336,7 @@ float CDispellField::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 	DrawEERIEObjEx(m_pd3dDevice, ssol, &stiteangle, &stitepos, &stitescale, &stitecolor);
 
-	y = player.pos.y + 20;
+	y = playerCharacter.pos.y + 20;
 	stitepos.y = y;
 	stitecolor.r = 1;
 	stitecolor.g = 1;
@@ -602,9 +602,9 @@ float CTelekinesis::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	EERIE_3D stitescale;
 	EERIE_RGB stitecolor;
 
-	x = player.pos.x;
-	y = player.pos.y + 80;
-	z = player.pos.z;
+	x = playerCharacter.pos.x;
+	y = playerCharacter.pos.y + 80;
+	z = playerCharacter.pos.z;
 
 	stiteangle.b = (float) ulCurrentTime * fOneOnDuration * 120; //+=(float)FrameDiff*0.1f;
 	stiteangle.a = 0;//abs(cos (DEG2RAD(tPos[i].x)))*10;
@@ -636,7 +636,7 @@ float CTelekinesis::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
  
 
-	y = player.pos.y + 20;
+	y = playerCharacter.pos.y + 20;
 	stitepos.y = y;//player.pos.y+60.f-mov;
 	stitecolor.r = 1;
 	stitecolor.g = 1;

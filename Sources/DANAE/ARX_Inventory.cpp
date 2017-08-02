@@ -210,7 +210,7 @@ INTERACTIVE_OBJ * GetInventoryObj(EERIE_S2D * pos)
 	int iPosY = ARX_CLEAN_WARN_CAST_INT(fSizY);
 
 
-	if (player.Interface & INTER_INVENTORY)
+	if (playerCharacter.Interface & INTER_INVENTORY)
 	{
 		tx = pos->x - iPosX; //-4
 		ty = pos->y - iPosY; //-2
@@ -237,16 +237,16 @@ INTERACTIVE_OBJ * GetInventoryObj(EERIE_S2D * pos)
 			return NULL;
 		}
 	}
-	else if (player.Interface & INTER_INVENTORYALL)
+	else if (playerCharacter.Interface & INTER_INVENTORYALL)
 	{
 
-		float fBag	= (player.bag - 1) * INTERFACE_RATIO(-121);
+		float fBag	= (playerCharacter.bag - 1) * INTERFACE_RATIO(-121);
 		ARX_CHECK_INT(fBag);
 
 		int iY = ARX_CLEAN_WARN_CAST_INT(fBag);
 
 
-		for (int i = 0; i < player.bag; i++)
+		for (int i = 0; i < playerCharacter.bag; i++)
 		{
 			tx = pos->x - iPosX;
 			ty = pos->y - iPosY - iY;
@@ -331,10 +331,10 @@ void PutInFrontOfPlayer(INTERACTIVE_OBJ * io, long flag)
 {
 	if (io == NULL) return;
 
-	float t = DEG2RAD(player.angle.b);
-	io->pos.x = player.pos.x - (float)EEsin(t) * 80.f;
-	io->pos.z = player.pos.z + (float)EEcos(t) * 80.f;
-	io->pos.y = player.pos.y + 20.f; 
+	float t = DEG2RAD(playerCharacter.angle.b);
+	io->pos.x = playerCharacter.pos.x - (float)EEsin(t) * 80.f;
+	io->pos.z = playerCharacter.pos.z + (float)EEcos(t) * 80.f;
+	io->pos.y = playerCharacter.pos.y + 20.f; 
 	io->velocity.y = 0.3f;
 	io->velocity.x = 0; 
 	io->velocity.z = 0; 
@@ -577,9 +577,9 @@ bool FastInsert(INTERACTIVE_OBJ * _pIO, long _uiNumBag)
 void OptmizeInventory(unsigned int _uiNumBag)
 {
 
-	ARX_CHECK_NOT_NEG(player.bag);
+	ARX_CHECK_NOT_NEG(playerCharacter.bag);
 
-	if (_uiNumBag < ARX_CAST_USHORT(player.bag))
+	if (_uiNumBag < ARX_CAST_USHORT(playerCharacter.bag))
 	{
 
 		vector<INTERACTIVE_OBJ *> vIO;
@@ -667,9 +667,9 @@ BOOL CanBePutInInventory(INTERACTIVE_OBJ * io)
 		i = sInventoryX;
 
 		// first try to stack -------------------------------------------------
-		if (player.bag)
+		if (playerCharacter.bag)
 		{
-			for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+			for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			{
 
 				INTERACTIVE_OBJ * ioo = inventory[iNbBag][i][j].io;
@@ -721,9 +721,9 @@ BOOL CanBePutInInventory(INTERACTIVE_OBJ * io)
 		}
 
 
-		if (player.bag)
+		if (playerCharacter.bag)
 		{
-			for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+			for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			{
 				if (inventory[iNbBag][i][j].io == NULL)
 				{
@@ -757,8 +757,8 @@ BOOL CanBePutInInventory(INTERACTIVE_OBJ * io)
 	}
 
 
-	if (player.bag)
-		for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	if (playerCharacter.bag)
+		for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (i = 0; i <= INVENTORY_X - sx; i++)
 				for (j = 0; j <= INVENTORY_Y - sy; j++)			
 				{
@@ -811,8 +811,8 @@ BOOL CanBePutInInventory(INTERACTIVE_OBJ * io)
 				}
 
 
-	if (player.bag)
-		for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	if (playerCharacter.bag)
+		for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (i = 0; i <= INVENTORY_X - sx; i++)
 				for (j = 0; j <= INVENTORY_Y - sy; j++)
 				{
@@ -1091,7 +1091,7 @@ BOOL PutInInventory()
 		ARX_CHECK_LONG(fcos);
 		long	cos		=	ARX_CLEAN_WARN_CAST_LONG(fcos);
 		cos				*=	DRAGINTER->_itemdata->count;
-		fcos	=	cos + cos * ((float)player.Full_Skill_Intuition) * 0.005f;
+		fcos	=	cos + cos * ((float)playerCharacter.Full_Skill_Intuition) * 0.005f;
 		ARX_CHECK_LONG(fcos);
 		cos				=	ARX_CLEAN_WARN_CAST_LONG(fcos);
 
@@ -1164,7 +1164,7 @@ BOOL PutInInventory()
 			ARX_CHECK_LONG(fcos);
 			long cos		=	ARX_CLEAN_WARN_CAST_LONG(fcos);
 			cos *= DRAGINTER->_itemdata->count;
-			fcos	=	cos + cos * ((float)player.Full_Skill_Intuition) * 0.005f;
+			fcos	=	cos + cos * ((float)playerCharacter.Full_Skill_Intuition) * 0.005f;
 			ARX_CHECK_LONG(fcos);
 			cos				=	ARX_CLEAN_WARN_CAST_LONG(fcos);
 
@@ -1243,7 +1243,7 @@ BOOL PutInInventory()
 
 			if (io->ioflags & IO_SHOP) // SHOP
 			{
-				player.gold += cos;
+				playerCharacter.gold += cos;
 				ARX_SOUND_PlayInterface(SND_GOLD);
 			}
 
@@ -1255,7 +1255,7 @@ BOOL PutInInventory()
 		}
 	}
 
-	if (!(player.Interface & INTER_INVENTORY) && !(player.Interface & INTER_INVENTORYALL))
+	if (!(playerCharacter.Interface & INTER_INVENTORY) && !(playerCharacter.Interface & INTER_INVENTORYALL))
 		return FALSE;
 
 	if (InventoryY != 0) return FALSE;
@@ -1274,7 +1274,7 @@ BOOL PutInInventory()
 	short iPosY = ARX_CLEAN_WARN_CAST_SHORT(fSizY);
 
 
-	if (player.Interface & INTER_INVENTORY)
+	if (playerCharacter.Interface & INTER_INVENTORY)
 	{
 
 		tx = DANAEMouse.x - iPosX;
@@ -1292,7 +1292,7 @@ BOOL PutInInventory()
 		bool bOk = false;
 
 
-		float fBag	= (player.bag - 1) * INTERFACE_RATIO(-121);
+		float fBag	= (playerCharacter.bag - 1) * INTERFACE_RATIO(-121);
 		ARX_CHECK_SHORT(fBag);
 
 		short iY = ARX_CLEAN_WARN_CAST_SHORT(fBag);
@@ -1300,10 +1300,10 @@ BOOL PutInInventory()
 
 
 		//We must enter the for-loop to initialyze tx/ty
-		ARX_CHECK(0 < player.bag);
+		ARX_CHECK(0 < playerCharacter.bag);
 
 
-		for (int i = 0; i < player.bag; i++)
+		for (int i = 0; i < playerCharacter.bag; i++)
 		{
 			tx = DANAEMouse.x - iPosX;
 			ty = DANAEMouse.y - iPosY - iY; 
@@ -1488,7 +1488,7 @@ BOOL InPlayerInventoryPos(EERIE_S2D * pos)
 
 	short tx, ty;
 
-	if (player.Interface & INTER_INVENTORY)
+	if (playerCharacter.Interface & INTER_INVENTORY)
 	{
 		tx = pos->x - iPosX;
 		ty = pos->y - iPosY;//-2;
@@ -1507,10 +1507,10 @@ BOOL InPlayerInventoryPos(EERIE_S2D * pos)
 		}
 	}
 	
-	else if (player.Interface & INTER_INVENTORYALL)
+	else if (playerCharacter.Interface & INTER_INVENTORYALL)
 	{
 
-		float fBag	= (player.bag - 1) * INTERFACE_RATIO(-121);
+		float fBag	= (playerCharacter.bag - 1) * INTERFACE_RATIO(-121);
 		ARX_CHECK_SHORT(fBag);
 
 		short iY = ARX_CLEAN_WARN_CAST_SHORT(fBag);
@@ -1523,7 +1523,7 @@ BOOL InPlayerInventoryPos(EERIE_S2D * pos)
 		            (pos->y <= DANAESIZY)))
 			return true;
 
-		for (int i = 0; i < player.bag; i++)
+		for (int i = 0; i < playerCharacter.bag; i++)
 		{
 			tx = pos->x - iPosX;
 			ty = pos->y - iPosY - iY;
@@ -1630,7 +1630,7 @@ INTERACTIVE_OBJ * GetFromInventory(EERIE_S2D * pos)
 				if (SecondaryInventory->slot[tx][ty].io == NULL)
 					return NULL;
 
-				if (((player.Interface & INTER_STEAL) && (!ARX_PLAYER_CanStealItem(SecondaryInventory->slot[tx][ty].io))))
+				if (((playerCharacter.Interface & INTER_STEAL) && (!ARX_PLAYER_CanStealItem(SecondaryInventory->slot[tx][ty].io))))
 					return NULL;
 
 				io = SecondaryInventory->slot[tx][ty].io;
@@ -1666,9 +1666,9 @@ BOOL GetItemWorldPosition(INTERACTIVE_OBJ * io, EERIE_3D * pos)
 	if (DRAGINTER == io)
 	{
 		// Set position to approximate center of player.
-		pos->x = player.pos.x;
-		pos->y = player.pos.y + 80.f; 
-		pos->z = player.pos.z;
+		pos->x = playerCharacter.pos.x;
+		pos->y = playerCharacter.pos.y + 80.f; 
+		pos->z = playerCharacter.pos.z;
 		return TRUE;
 	}
 
@@ -1679,22 +1679,22 @@ BOOL GetItemWorldPosition(INTERACTIVE_OBJ * io, EERIE_3D * pos)
 		if (IsEquipedByPlayer(io))
 		{
 			// in player inventory
-			pos->x = player.pos.x;
-			pos->y = player.pos.y + 80.f; 
-			pos->z = player.pos.z;
+			pos->x = playerCharacter.pos.x;
+			pos->y = playerCharacter.pos.y + 80.f; 
+			pos->z = playerCharacter.pos.z;
 			return TRUE;
 		}
 
 		// Is it in any player inventory ?
-		for (long iNbBag = 0; iNbBag < player.bag; iNbBag++)
+		for (long iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (long j = 0; j < INVENTORY_Y; j++)
 				for (long i = 0; i < INVENTORY_X; i++)
 				{
 					if (inventory[iNbBag][i][j].io == io)
 					{
-						pos->x = player.pos.x;
-						pos->y = player.pos.y + 80.f; 
-						pos->z = player.pos.z;
+						pos->x = playerCharacter.pos.x;
+						pos->y = playerCharacter.pos.y + 80.f; 
+						pos->z = playerCharacter.pos.z;
 						return TRUE;
 					}
 				}
@@ -1754,8 +1754,8 @@ BOOL GetItemWorldPositionSound(INTERACTIVE_OBJ * io, EERIE_3D * pos)
 			return TRUE;
 		}
 
-		if (player.bag)
-			for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+		if (playerCharacter.bag)
+			for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 				for (j = 0; j < INVENTORY_Y; j++)
 					for (i = 0; i < INVENTORY_X; i++)
 					{
@@ -1811,7 +1811,7 @@ void RemoveFromAllInventories(INTERACTIVE_OBJ * io)
 	long removed_count = 0;
 
 	// Seek IO in Player Inventory/ies
-	for (iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	for (iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 		for (j = 0; j < INVENTORY_Y; j++)
 			for (i = 0; i < INVENTORY_X; i++)
 			{
@@ -1851,8 +1851,8 @@ void RemoveFromAllInventories(INTERACTIVE_OBJ * io)
 //*************************************************************************************
 void CheckForInventoryReplaceMe(INTERACTIVE_OBJ * io, INTERACTIVE_OBJ * old)
 {
-	if (player.bag)
-		for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	if (playerCharacter.bag)
+		for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (long j = 0; j < INVENTORY_Y; j++)
 				for (long i = 0; i < INVENTORY_X; i++)
 				{
@@ -1900,8 +1900,8 @@ void ReplaceInAllInventories(INTERACTIVE_OBJ * io, INTERACTIVE_OBJ * ioo)
 	long ion = GetInterNum(io);
 	long ioon = GetInterNum(ioo);
 
-	if (player.bag)
-		for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	if (playerCharacter.bag)
+		for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (j = 0; j < INVENTORY_Y; j++)
 				for (i = 0; i < INVENTORY_X; i++)
 				{
@@ -1961,18 +1961,18 @@ BOOL TakeFromInventory(EERIE_S2D * pos)
 						long cos = ARX_INTERACTIVE_GetPrice(io, ioo);
 
 
-						float fcos	= cos - cos * ((float)player.Full_Skill_Intuition) * 0.005f;
+						float fcos	= cos - cos * ((float)playerCharacter.Full_Skill_Intuition) * 0.005f;
 						ARX_CHECK_LONG(fcos);
 						cos			= ARX_CLEAN_WARN_CAST_LONG(fcos);
 
 
-						if (player.gold < cos)
+						if (playerCharacter.gold < cos)
 						{
 							return FALSE;
 						}
 
 						ARX_SOUND_PlayInterface(SND_GOLD);
-						player.gold -= cos;
+						playerCharacter.gold -= cos;
 
 						if (io->_itemdata->count > 1) // Multi-obj
 						{
@@ -2097,8 +2097,8 @@ BOOL TakeFromInventory(EERIE_S2D * pos)
 		}
 	}
 
-	if (player.bag)
-		for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	if (playerCharacter.bag)
+		for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (j = 0; j < INVENTORY_Y; j++)
 				for (i = 0; i < INVENTORY_X; i++)
 				{
@@ -2131,7 +2131,7 @@ BOOL TakeFromInventory(EERIE_S2D * pos)
 //-----------------------------------------------------------------------------
 BOOL IsInPlayerInventory(INTERACTIVE_OBJ * io)
 {
-	for (long iNbBag = 0; iNbBag < player.bag; iNbBag ++)
+	for (long iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag ++)
 		for (long j = 0; j < INVENTORY_Y; j++)
 			for (long i = 0; i < INVENTORY_X; i++)
 			{
@@ -2165,8 +2165,8 @@ BOOL IsInSecondaryInventory(INTERACTIVE_OBJ * io)
 //-----------------------------------------------------------------------------
 void SendInventoryObjectCommand(char * _lpszText, long _lCommand)
 {
-	if (player.bag)
-		for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	if (playerCharacter.bag)
+		for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (long j = 0; j < INVENTORY_Y; j++)
 				for (long i = 0; i < INVENTORY_X; i++)
 				{
@@ -2196,8 +2196,8 @@ INTERACTIVE_OBJ * ARX_INVENTORY_GetTorchLowestDurability()
 {
 	INTERACTIVE_OBJ * io = NULL;
 
-	if (player.bag)
-		for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	if (playerCharacter.bag)
+		for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (long j = 0; j < INVENTORY_Y; j++)
 				for (long i = 0; i < INVENTORY_X; i++)
 				{
@@ -2230,7 +2230,7 @@ void ARX_INVENTORY_IdentifyIO(INTERACTIVE_OBJ * _pIO)
 	{
 		if ((_pIO) && (_pIO->ioflags & IO_ITEM) && _pIO->_itemdata->equipitem)
 		{
-			if (player.Full_Skill_Object_Knowledge + player.Full_Attribute_Mind
+			if (playerCharacter.Full_Skill_Object_Knowledge + playerCharacter.Full_Attribute_Mind
 			        >= _pIO->_itemdata->equipitem->elements[IO_EQUIPITEM_ELEMENT_Identify_Value].value)
 			{
 				SendIOScriptEvent(_pIO, SM_IDENTIFY, "");
@@ -2244,8 +2244,8 @@ void ARX_INVENTORY_IdentifyAll()
 {
 	INTERACTIVE_OBJ * io = NULL;
 
-	if (player.bag)
-		for (int iNbBag = 0; iNbBag < player.bag; iNbBag++)
+	if (playerCharacter.bag)
+		for (int iNbBag = 0; iNbBag < playerCharacter.bag; iNbBag++)
 			for (long j = 0; j < INVENTORY_Y; j++)
 				for (long i = 0; i < INVENTORY_X; i++)
 				{
@@ -2253,7 +2253,7 @@ void ARX_INVENTORY_IdentifyAll()
 
 					if ((io) && (io->ioflags & IO_ITEM) && io->_itemdata->equipitem)
 					{
-						if (player.Full_Skill_Object_Knowledge + player.Full_Attribute_Mind
+						if (playerCharacter.Full_Skill_Object_Knowledge + playerCharacter.Full_Attribute_Mind
 						        >= io->_itemdata->equipitem->elements[IO_EQUIPITEM_ELEMENT_Identify_Value].value)
 						{
 							SendIOScriptEvent(io, SM_IDENTIFY, "");
@@ -2297,7 +2297,7 @@ void ARX_INVENTORY_OpenClose(INTERACTIVE_OBJ * _io)
 			}
 		}
 
-		if (player.Interface & INTER_COMBATMODE)
+		if (playerCharacter.Interface & INTER_COMBATMODE)
 		{
 			ARX_INTERFACE_Combat_Mode(0);
 		}
@@ -2316,7 +2316,7 @@ void ARX_INVENTORY_OpenClose(INTERACTIVE_OBJ * _io)
 		if (DRAGGING) DRAGGING = 0;
 	}
 
-	if (player.Interface & INTER_INVENTORYALL)
+	if (playerCharacter.Interface & INTER_INVENTORYALL)
 	{
 		ARX_SOUND_PlayInterface(SND_BACKPACK, 0.9F + 0.2F * rnd());
 		bInventoryClosing = true;

@@ -275,7 +275,7 @@ void CSpellFx::Update(float _fParam)
 //-----------------------------------------------------------------------------
 void Draw3DLineTex(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D s, EERIE_3D e, float fSize, int color)
 {
-	float fBeta = MAKEANGLE(player.angle.b);
+	float fBeta = MAKEANGLE(playerCharacter.angle.b);
 	float zz = fSize; // size
 	float xx = (float)(fSize * cos(DEG2RAD(fBeta)));
 
@@ -354,7 +354,7 @@ void Draw3DLineTex(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D s, EERIE_3D e, float
 //-----------------------------------------------------------------------------
 void Draw3DLineTex(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D s, EERIE_3D e, int color, float fStartSize, float fEndSize)
 {
-	float fBeta = MAKEANGLE(player.angle.b);
+	float fBeta = MAKEANGLE(playerCharacter.angle.b);
 	float xxs = (float)(fStartSize * cos(DEG2RAD(fBeta)));
 	float xxe = (float)(fEndSize * cos(DEG2RAD(fBeta)));
 	float zzs = fStartSize;
@@ -436,7 +436,7 @@ void Draw3DLineTex(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D s, EERIE_3D e, int c
 //-----------------------------------------------------------------------------
 void Draw3DLineTex2(LPDIRECT3DDEVICE7 m_pd3dDevice, EERIE_3D s, EERIE_3D e, float fSize, int color, int color2)
 {
-	float fBeta = MAKEANGLE(player.angle.b);
+	float fBeta = MAKEANGLE(playerCharacter.angle.b);
 	float zz = fSize; 
 	float xx = (float)(fSize * cos(DEG2RAD(fBeta)));
 

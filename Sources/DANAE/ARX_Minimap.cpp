@@ -180,18 +180,18 @@ void ARX_MINIMAP_ValidatePlayerPos()
 {
 	if (BLOCK_PLAYER_CONTROLS) return;
 
-	float dist = Distance2D(AM_LASTPOS_x, AM_LASTPOS_z, player.pos.x, player.pos.z);
+	float dist = Distance2D(AM_LASTPOS_x, AM_LASTPOS_z, playerCharacter.pos.x, playerCharacter.pos.z);
 	float req;
 
-	if ((player.Interface & INTER_MAP) && (!(player.Interface & INTER_COMBATMODE)) && (Book_Mode == 2))
+	if ((playerCharacter.Interface & INTER_MAP) && (!(playerCharacter.Interface & INTER_COMBATMODE)) && (Book_Mode == 2))
 		req = 20.f;
 	else req = 80.f;
 
 	if (dist > req)
 	{
-		AM_LASTPOS_x = player.pos.x;
-		AM_LASTPOS_z = player.pos.z;
-		ARX_MINIMAP_ValidatePos(&player.pos);
+		AM_LASTPOS_x = playerCharacter.pos.x;
+		AM_LASTPOS_z = playerCharacter.pos.z;
+		ARX_MINIMAP_ValidatePos(&playerCharacter.pos);
 	}
 }
 
@@ -376,10 +376,10 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 			ofy = mini_offset_y[CURRENTLEVEL];
 			ofy2 = minimap[SHOWLEVEL].yratio;
 		
-			px = startx + ((player.pos.x + ofx - ofx2) * DIV100 * casex
+			px = startx + ((playerCharacter.pos.x + ofx - ofx2) * DIV100 * casex
 			               + mini_offset_x[CURRENTLEVEL] * ratiooo * mod_x) / mod_x ; //DIV100*2;
 			py = starty + ((mapmaxy[SHOWLEVEL] - ofy - ofy2) * DIV100 * casey
-			               - (player.pos.z + ofy - ofy2) * DIV100 * casey + mini_offset_y[CURRENTLEVEL] * ratiooo * mod_z) / mod_z ;    //DIV100*2;
+			               - (playerCharacter.pos.z + ofy - ofy2) * DIV100 * casey + mini_offset_y[CURRENTLEVEL] * ratiooo * mod_z) / mod_z ;    //DIV100*2;
 
 			if (flag == 1)
 			{
@@ -753,7 +753,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 				float rx3 = val * DIV2;
 				float ry3 = val;
 
-				float angle = DEG2RAD(player.angle.b);
+				float angle = DEG2RAD(playerCharacter.angle.b);
 				float ca = EEcos(angle);
 				float sa = EEsin(angle);
 
@@ -795,7 +795,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 						if (!(inter.iobj[lnpc]->show == SHOW_FLAG_HIDDEN))
 							if (inter.iobj[lnpc]->_npcdata->fDetect >= 0)
 							{
-								if (player.Full_Skill_Etheral_Link >= inter.iobj[lnpc]->_npcdata->fDetect)
+								if (playerCharacter.Full_Skill_Etheral_Link >= inter.iobj[lnpc]->_npcdata->fDetect)
 								{
 									float fpx;
 									float fpy;
@@ -816,7 +816,7 @@ void ARX_MINIMAP_Show(LPDIRECT3DDEVICE7 m_pd3dDevice, long SHOWLEVEL, long flag,
 
 									}
 
-									float d = Distance2D(player.pos.x, player.pos.z, inter.iobj[lnpc]->pos.x, inter.iobj[lnpc]->pos.z);
+									float d = Distance2D(playerCharacter.pos.x, playerCharacter.pos.z, inter.iobj[lnpc]->pos.x, inter.iobj[lnpc]->pos.z);
 
 		
 									if ((d <= 800) && (fabs(inter.iobj[0]->pos.y - inter.iobj[lnpc]->pos.y) < 250.f))

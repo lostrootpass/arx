@@ -501,9 +501,9 @@ float CSlowDown::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	EERIE_3D stitescale;
 	EERIE_RGB stitecolor;
 
-	x = player.pos.x;
-	y = player.pos.y + 80;
-	z = player.pos.z;
+	x = playerCharacter.pos.x;
+	y = playerCharacter.pos.y + 80;
+	z = playerCharacter.pos.z;
 
 	stiteangle.b = (float) ulCurrentTime * fOneOnDuration * 120; 
 	stiteangle.a = 0;
@@ -531,7 +531,7 @@ float CSlowDown::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 	stitescale.z = 2;
 	g_pRenderApp->renderer->SetAlphaBlend(true);
 
-	y = player.pos.y + 20;
+	y = playerCharacter.pos.y + 20;
 	stitepos.y = y;
 	stitecolor.r = 1;
 	stitecolor.g = 1;

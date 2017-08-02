@@ -448,9 +448,9 @@ void GetChestPos(long num, EERIE_3D * p)
 {
 	if (num == 0)
 	{
-		p->x = player.pos.x;
-		p->y = player.pos.y + 70.f;
-		p->z = player.pos.z;
+		p->x = playerCharacter.pos.x;
+		p->y = playerCharacter.pos.y + 70.f;
+		p->z = playerCharacter.pos.z;
 		return;
 	}
 
@@ -527,13 +527,13 @@ float CLightning::Render(LPDIRECT3DDEVICE7 m_pd3dDevice)
 			}
 			else
 			{
-				spells[spellinstance].caster_pos.x = player.pos.x;
-				spells[spellinstance].caster_pos.y = player.pos.y;
-				spells[spellinstance].caster_pos.z = player.pos.z;
+				spells[spellinstance].caster_pos.x = playerCharacter.pos.x;
+				spells[spellinstance].caster_pos.y = playerCharacter.pos.y;
+				spells[spellinstance].caster_pos.z = playerCharacter.pos.z;
 			}
 
-			falpha = -player.angle.a;
-			fBeta = player.angle.b;
+			falpha = -playerCharacter.angle.a;
+			fBeta = playerCharacter.angle.b;
 		}
 		// IO source
 		else

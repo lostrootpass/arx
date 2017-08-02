@@ -45,8 +45,8 @@ typedef struct // Warning !!! used for save
 #define GMOD_REVERB		8
 
 //-----------------------------------------------------------------------------
-extern GLOBAL_MODS current;
-extern GLOBAL_MODS desired;
+extern GLOBAL_MODS gCurrentMod;
+extern GLOBAL_MODS gDesiredMod;
 
 //-----------------------------------------------------------------------------
 void ARX_GLOBALMODS_Reset();

@@ -235,7 +235,7 @@ ARX_PATH * ARX_PATH_CheckPlayerInZone()
 		{
 			if ((ARXpaths[i]) && (ARXpaths[i]->height != 0))
 			{
-				if (ARX_PATH_IsPosInZone(ARXpaths[i], player.pos.x, player.pos.y + 160.f, player.pos.z))
+				if (ARX_PATH_IsPosInZone(ARXpaths[i], playerCharacter.pos.x, playerCharacter.pos.y + 160.f, playerCharacter.pos.z))
 					return ARXpaths[i];
 			}
 		}
@@ -391,7 +391,7 @@ void ARX_PATH_UpdateAllZoneInOutInside()
 	if (inter.iobj[0])
 	{
 		ARX_PATH * p = ARX_PATH_CheckPlayerInZone();
-		ARX_PATH * op = (ARX_PATH *)player.inzone;
+		ARX_PATH * op = (ARX_PATH *)playerCharacter.inzone;
 
 		if ((op == NULL) && (p == NULL)) goto suite; // Not in a zone
 
@@ -429,8 +429,8 @@ void ARX_PATH_UpdateAllZoneInOutInside()
 
 			if (p->flags & PATH_FARCLIP)
 			{
-				desired.flags |= GMOD_ZCLIP;
-				desired.zclip = p->farclip;
+				gDesiredMod.flags |= GMOD_ZCLIP;
+				gDesiredMod.zclip = p->farclip;
 			}
 
 			if (p->flags & PATH_REVERB)
@@ -439,10 +439,10 @@ void ARX_PATH_UpdateAllZoneInOutInside()
 
 			if (p->flags & PATH_RGB)
 			{
-				desired.flags |= GMOD_DCOLOR;
-				desired.depthcolor.r = p->rgb.r;
-				desired.depthcolor.g = p->rgb.g;
-				desired.depthcolor.b = p->rgb.b;
+				gDesiredMod.flags |= GMOD_DCOLOR;
+				gDesiredMod.depthcolor.r = p->rgb.r;
+				gDesiredMod.depthcolor.g = p->rgb.g;
+				gDesiredMod.depthcolor.b = p->rgb.b;
 			}
 
 			if (p->controled[0] != 0)
@@ -490,7 +490,7 @@ void ARX_PATH_UpdateAllZoneInOutInside()
 			}
 		}
 
-		player.inzone = (void *)p;
+		playerCharacter.inzone = (void *)p;
 	}
 
 	
@@ -1234,10 +1234,10 @@ long ARX_THROWN_OBJECT_Throw(long type, long source, EERIE_3D * position, EERIE_
 		}
 
 		if ((source == 0)
-		        &&	(player.equiped[EQUIP_SLOT_WEAPON] != 0)
-		        &&	(ValidIONum(player.equiped[EQUIP_SLOT_WEAPON])))
+		        &&	(playerCharacter.equiped[EQUIP_SLOT_WEAPON] != 0)
+		        &&	(ValidIONum(playerCharacter.equiped[EQUIP_SLOT_WEAPON])))
 		{
-			INTERACTIVE_OBJ * tio = inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]];
+			INTERACTIVE_OBJ * tio = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]];
 
 			if (tio->ioflags & IO_FIERY)
 				Thrown[num].flags |= ATO_FIERY;
@@ -1277,7 +1277,7 @@ float ARX_THROWN_ComputeDamages(long thrownum, long source, long target)
 	{
 		attack	=	Thrown[thrownum].damages;
 
-		if (rnd() * 100 <= (float)(player.Full_Attribute_Dexterity - 9) * 2.f + (float)((player.Full_Skill_Projectile) * DIV5))
+		if (rnd() * 100 <= (float)(playerCharacter.Full_Attribute_Dexterity - 9) * 2.f + (float)((playerCharacter.Full_Skill_Projectile) * DIV5))
 		{
 			if (SendIOScriptEvent(io_source, SM_CRITICAL, "BOW", NULL) != REFUSE)
 				critical = TRUE;
@@ -1287,7 +1287,7 @@ float ARX_THROWN_ComputeDamages(long thrownum, long source, long target)
 
 		if (io_target->_npcdata->npcflags & NPCFLAG_BACKSTAB)
 		{
-			if (rnd() * 100.f <= player.Full_Skill_Stealth)
+			if (rnd() * 100.f <= playerCharacter.Full_Skill_Stealth)
 			{
 				if (SendIOScriptEvent(io_source, SM_BACKSTAB, "BOW", NULL) != REFUSE)
 					backstab = 1.5f;
@@ -1308,8 +1308,8 @@ float ARX_THROWN_ComputeDamages(long thrownum, long source, long target)
 
 	if (target == 0)
 	{
-		ac		=	player.Full_armor_class;
-		absorb	=	player.Full_Skill_Defense * DIV2;
+		ac		=	playerCharacter.Full_armor_class;
+		absorb	=	playerCharacter.Full_Skill_Defense * DIV2;
 	}
 	else
 	{
@@ -1330,9 +1330,9 @@ float ARX_THROWN_ComputeDamages(long thrownum, long source, long target)
 
 	if (io_target == inter.iobj[0])
 	{
-		if (player.equiped[EQUIP_SLOT_ARMOR] > 0)
+		if (playerCharacter.equiped[EQUIP_SLOT_ARMOR] > 0)
 		{
-			INTERACTIVE_OBJ * io	=	inter.iobj[player.equiped[EQUIP_SLOT_ARMOR]];
+			INTERACTIVE_OBJ * io	=	inter.iobj[playerCharacter.equiped[EQUIP_SLOT_ARMOR]];
 
 			if ((io) && (io->armormaterial))
 			{

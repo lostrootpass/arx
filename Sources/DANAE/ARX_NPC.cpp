@@ -3876,7 +3876,7 @@ INTERACTIVE_OBJ * ARX_NPC_GetFirstNPCInSight(INTERACTIVE_OBJ * ioo)
 			orgn.y = ioo->pos.y - 90.f;
 			orgn.z = ioo->pos.z;
 
-			if (ioo == inter.iobj[0])	orgn.y = player.pos.y + 90.f;
+			if (ioo == inter.iobj[0])	orgn.y = playerCharacter.pos.y + 90.f;
 		}
 		else
 			GetVertexPos(ioo, ioo->obj->fastaccess.head_group_origin, &orgn);
@@ -3889,7 +3889,7 @@ INTERACTIVE_OBJ * ARX_NPC_GetFirstNPCInSight(INTERACTIVE_OBJ * ioo)
 			dest.y = io->pos.y - 90.f;
 			dest.z = io->pos.z;
 
-			if (io == inter.iobj[0])	dest.y = player.pos.y + 90.f;
+			if (io == inter.iobj[0])	dest.y = playerCharacter.pos.y + 90.f;
 		}
 		else
 			GetVertexPos(io, io->obj->fastaccess.head_group_origin, &dest);
@@ -4042,29 +4042,29 @@ extern long GLOBAL_Player_Room;
 void CheckNPCEx(INTERACTIVE_OBJ * io)
 {
 	// Distance Between Player and IO
-	float dist = Distance3D(io->pos.x, io->pos.y, io->pos.z, player.pos.x, player.pos.y - PLAYER_BASE_HEIGHT, player.pos.z);
+	float dist = Distance3D(io->pos.x, io->pos.y, io->pos.z, playerCharacter.pos.x, playerCharacter.pos.y - PLAYER_BASE_HEIGHT, playerCharacter.pos.z);
 
 	// Start as not visible
 	long Visible = 0;
 
 	// Check visibility only if player is visible, not too far and not dead
-	if ((!(inter.iobj[0]->invisibility > 0.f)) && (dist < 2000.f) && (player.life > 0))
+	if ((!(inter.iobj[0]->invisibility > 0.f)) && (dist < 2000.f) && (playerCharacter.life > 0))
 	{
 		// checks for near contact +/- 15 cm --> force visibility
 		if (io->room_flags & 1)
 			UpdateIORoom(io);
 
 		if (GLOBAL_Player_Room == -1)
-			GLOBAL_Player_Room = ARX_PORTALS_GetRoomNumForPosition(&player.pos, 1);
+			GLOBAL_Player_Room = ARX_PORTALS_GetRoomNumForPosition(&playerCharacter.pos, 1);
 
-		float fdist = SP_GetRoomDist(&io->pos, &player.pos, io->room, GLOBAL_Player_Room);
+		float fdist = SP_GetRoomDist(&io->pos, &playerCharacter.pos, io->room, GLOBAL_Player_Room);
 
 		// Use Portal Room Distance for Extra Visibility Clipping.
 		if ((GLOBAL_Player_Room > -1) && (io->room > -1) && (fdist > 2000.f))
 		{
 		}
 		else if ((dist < GetIORadius(io) + GetIORadius(inter.iobj[0]) + 15.f)
-		         && (EEfabs(player.pos.y - io->pos.y) < 200.f))
+		         && (EEfabs(playerCharacter.pos.y - io->pos.y) < 200.f))
 		{
 			Visible = 1;
 		}
@@ -4087,9 +4087,9 @@ void CheckNPCEx(INTERACTIVE_OBJ * io)
 				orgn.z = io->pos.z;
 			}
 
-			dest.x = player.pos.x;
-			dest.y = player.pos.y + 90.f;
-			dest.z = player.pos.z;
+			dest.x = playerCharacter.pos.x;
+			dest.y = playerCharacter.pos.y + 90.f;
+			dest.z = playerCharacter.pos.z;
 
 			// Check for Field of vision angle
 			float aa = GetAngle(orgn.x, orgn.z, dest.x, dest.z);
@@ -4185,11 +4185,11 @@ void ARX_NPC_NeedStepSound(INTERACTIVE_OBJ * io, EERIE_3D * pos, const float vol
 	if (io && io->stepmaterial)
 		strcpy(step_material, io->stepmaterial);
 
-	if ((io == inter.iobj[0]) && (player.equiped[EQUIP_SLOT_LEGGINGS] > 0))
+	if ((io == inter.iobj[0]) && (playerCharacter.equiped[EQUIP_SLOT_LEGGINGS] > 0))
 	{
-		if (ValidIONum(player.equiped[EQUIP_SLOT_LEGGINGS]))
+		if (ValidIONum(playerCharacter.equiped[EQUIP_SLOT_LEGGINGS]))
 		{
-			INTERACTIVE_OBJ * ioo = inter.iobj[player.equiped[EQUIP_SLOT_LEGGINGS]];
+			INTERACTIVE_OBJ * ioo = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_LEGGINGS]];
 
 			if (ioo->stepmaterial)
 				strcpy(step_material, ioo->stepmaterial);
@@ -4295,9 +4295,9 @@ void ManageIgnition(INTERACTIVE_OBJ * io)
 	// Torch Management
 	INTERACTIVE_OBJ * plw = NULL;
 
-	if ((player.equiped[EQUIP_SLOT_WEAPON] != 0)
-	        &&	(ValidIONum(player.equiped[EQUIP_SLOT_WEAPON])))
-		plw = inter.iobj[player.equiped[EQUIP_SLOT_WEAPON]];
+	if ((playerCharacter.equiped[EQUIP_SLOT_WEAPON] != 0)
+	        &&	(ValidIONum(playerCharacter.equiped[EQUIP_SLOT_WEAPON])))
+		plw = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_WEAPON]];
 
 	if ((io->ioflags & IO_FIERY)
 	        &&	(!(io->type_flags & OBJECT_TYPE_BOW))
@@ -4523,7 +4523,7 @@ void ManageIgnition_2(INTERACTIVE_OBJ * io)
 		if (io->obj && (io->obj->fastaccess.fire >= 0))
 		{
 			if (io == DRAGINTER)
-				Vector_Copy(&position, &player.pos);
+				Vector_Copy(&position, &playerCharacter.pos);
 			else
 			{
 				Vector_Copy(&position, &io->obj->vertexlist3[io->obj->fastaccess.fire].v);

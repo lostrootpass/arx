@@ -172,9 +172,9 @@ static	void	Cedric_GetScale(float & scale, float & invisibility, INTERACTIVE_OBJ
 
 			if (num >= 0)
 			{
-				if (player.Full_Skill_Intuition > spells[num].caster_level * 10)
+				if (playerCharacter.Full_Skill_Intuition > spells[num].caster_level * 10)
 				{
-					invisibility -= (float)player.Full_Skill_Intuition * DIV100 + (float)spells[num].caster_level * DIV10;
+					invisibility -= (float)playerCharacter.Full_Skill_Intuition * DIV100 + (float)spells[num].caster_level * DIV10;
 
 					if (invisibility < 0.1f) invisibility = 0.1f;
 					else if (invisibility > 1.f) invisibility = 1.f;
@@ -297,7 +297,7 @@ static	void	Cedric_AnimCalcTranslation(INTERACTIVE_OBJ * io, ANIM_USE * animuse,
 
 				float temp = DEG2RAD(MAKEANGLE(180.f - io->angle.b));
 
-				if (io == inter.iobj[0]) temp = DEG2RAD(MAKEANGLE(180.f - player.angle.b));
+				if (io == inter.iobj[0]) temp = DEG2RAD(MAKEANGLE(180.f - playerCharacter.angle.b));
 
 				_YRotatePoint(&ftr, &ftr2, (float)EEcos(temp), (float)EEsin(temp));
 
@@ -594,7 +594,7 @@ int		Cedric_TransformVerts(INTERACTIVE_OBJ * io, EERIE_3DOBJ * eobj, EERIE_C_DAT
 	if ((io)
 	        &&	(io->ioflags & IO_NPC)
 	        &&	(io->_npcdata->behavior & BEHAVIOUR_FIGHT)
-	        &&	(EEDistance3D(&io->pos, &player.pos) < 240.f))
+	        &&	(EEDistance3D(&io->pos, &playerCharacter.pos) < 240.f))
 		return true;
 
 	if ((io != inter.iobj[0])
@@ -1697,28 +1697,28 @@ void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERI
 	{
 		if (use_io == inter.iobj[0])
 		{
-			if ((player.equiped[EQUIP_SLOT_HELMET] != 0)
-			        && ValidIONum(player.equiped[EQUIP_SLOT_HELMET]))
+			if ((playerCharacter.equiped[EQUIP_SLOT_HELMET] != 0)
+			        && ValidIONum(playerCharacter.equiped[EQUIP_SLOT_HELMET]))
 			{
-				INTERACTIVE_OBJ * tio = inter.iobj[player.equiped[EQUIP_SLOT_HELMET]];
+				INTERACTIVE_OBJ * tio = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_HELMET]];
 
 				if (tio->halo.flags & HALO_ACTIVE)
 					hio_helmet = tio;
 			}
 
-			if ((player.equiped[EQUIP_SLOT_ARMOR] != 0)
-			        &&	ValidIONum(player.equiped[EQUIP_SLOT_ARMOR]))
+			if ((playerCharacter.equiped[EQUIP_SLOT_ARMOR] != 0)
+			        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_ARMOR]))
 			{
-				INTERACTIVE_OBJ * tio = inter.iobj[player.equiped[EQUIP_SLOT_ARMOR]];
+				INTERACTIVE_OBJ * tio = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_ARMOR]];
 
 				if (tio->halo.flags & HALO_ACTIVE)
 					hio_armor = tio;
 			}
 
-			if ((player.equiped[EQUIP_SLOT_LEGGINGS] != 0)
-			        &&	ValidIONum(player.equiped[EQUIP_SLOT_LEGGINGS]))
+			if ((playerCharacter.equiped[EQUIP_SLOT_LEGGINGS] != 0)
+			        &&	ValidIONum(playerCharacter.equiped[EQUIP_SLOT_LEGGINGS]))
 			{
-				INTERACTIVE_OBJ * tio = inter.iobj[player.equiped[EQUIP_SLOT_LEGGINGS]];
+				INTERACTIVE_OBJ * tio = inter.iobj[playerCharacter.equiped[EQUIP_SLOT_LEGGINGS]];
 
 				if (tio->halo.flags & HALO_ACTIVE)
 					hio_leggings = tio;

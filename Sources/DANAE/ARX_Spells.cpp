@@ -125,7 +125,7 @@ void EERIE_OBJECT_SetBHMode()
 	else
 	{
 		BH_MODE=1;
-		MakeCoolFx(&player.pos);
+		MakeCoolFx(&playerCharacter.pos);
 		MakeSpCol();
 		strcpy(sp_max_ch,"!!!_Super-Deformed_!!!");
 		sp_max_nb=strlen(sp_max_ch);
@@ -1971,19 +1971,19 @@ void ARX_SPELLS_AnalyseSYMBOL()
 			if (cur_mr == 1)
 			{
 				cur_mr = 2;
-				MakeCoolFx(&player.pos);
+				MakeCoolFx(&playerCharacter.pos);
 			}
 
 			if (cur_mx == 1)
 			{
 				cur_mx = 2;
-				MakeCoolFx(&player.pos);
+				MakeCoolFx(&playerCharacter.pos);
 			}
 
 			if (cur_rf == 1)
 			{
 				cur_rf = 2;
-				MakeCoolFx(&player.pos);
+				MakeCoolFx(&playerCharacter.pos);
 			}
 
 				if (cur_sm==1) cur_sm++;
@@ -2050,7 +2050,7 @@ void ARX_SPELLS_AnalyseSYMBOL()
 			if (cur_mr == 2)
 			{
 				cur_mr = 3;
-				MakeCoolFx(&player.pos);
+				MakeCoolFx(&playerCharacter.pos);
 				ApplyCurMr();
 			}
 
@@ -2067,7 +2067,7 @@ void ARX_SPELLS_AnalyseSYMBOL()
 			if (cur_rf == 2)
 		{
 				cur_rf = 3;
-				MakeCoolFx(&player.pos);
+				MakeCoolFx(&playerCharacter.pos);
 				ApplySPRf();
 		}
 
@@ -2087,13 +2087,13 @@ void ARX_SPELLS_AnalyseSYMBOL()
 		break;
 		case 828282: 
 		{
-			player.skin++;
+			playerCharacter.skin++;
 
-			if ((player.skin==4) && (rnd()<0.9f))
-				player.skin++;
+			if ((playerCharacter.skin==4) && (rnd()<0.9f))
+				playerCharacter.skin++;
 
-			if (player.skin>5)
-				player.skin=0;
+			if (playerCharacter.skin>5)
+				playerCharacter.skin=0;
 
 			ARX_EQUIPMENT_RecreatePlayerMesh();
 			 goto failed; 
@@ -2713,10 +2713,10 @@ BOOL ARX_SPELLS_AnalyseSPELL()
 
 	ARX_SPELLS_Fizzle(-1);
 
-	if (player.SpellToMemorize.bSpell)
+	if (playerCharacter.SpellToMemorize.bSpell)
 	{
 		CurrSpellSymbol=0;
-		player.SpellToMemorize.bSpell = false;
+		playerCharacter.SpellToMemorize.bSpell = false;
 	}
 
 	return -1;
@@ -2752,11 +2752,11 @@ void ARX_SPELLS_ManageMagic()
 
 	snip++;
 
-	if ((!(player.Current_Movement & PLAYER_CROUCH)) && (!BLOCK_PLAYER_CONTROLS && 
+	if ((!(playerCharacter.Current_Movement & PLAYER_CROUCH)) && (!BLOCK_PLAYER_CONTROLS && 
 		(ARX_IMPULSE_Pressed(CONTROLS_CUST_MAGICMODE))) && (!PLAYER_PARALYSED))
 	{
 		
-		if (player.Interface & INTER_COMBATMODE)
+		if (playerCharacter.Interface & INTER_COMBATMODE)
 		{
 			WILLRETURNTOCOMBATMODE=1;
 
@@ -2774,9 +2774,9 @@ void ARX_SPELLS_ManageMagic()
 			TRUE_PLAYER_MOUSELOOK_ON &= ~1;
 		}
 
-		if (player.doingmagic!=2)
+		if (playerCharacter.doingmagic!=2)
 		{
-			player.doingmagic=2;
+			playerCharacter.doingmagic=2;
 
 			if (inter.iobj[0]->anims[ANIM_CAST_START])
 			{
@@ -2847,9 +2847,9 @@ void ARX_SPELLS_ManageMagic()
 
 		if (PIPOrgb>2) PIPOrgb=0;
 
-		if (player.doingmagic!=0)//==2) 
+		if (playerCharacter.doingmagic!=0)//==2) 
 		{
-			player.doingmagic=0;//1
+			playerCharacter.doingmagic=0;//1
 
 			if (inter.iobj[0]->anims[ANIM_CAST_END])
 			{
@@ -2905,11 +2905,11 @@ void ARX_SPELLS_ManageMagic()
 
 		if (WILLRETURNTOCOMBATMODE)
 		{
-			player.Interface|=INTER_COMBATMODE;
-			player.Interface|=INTER_NO_STRIKE;
+			playerCharacter.Interface|=INTER_COMBATMODE;
+			playerCharacter.Interface|=INTER_NO_STRIKE;
 
 			ARX_EQUIPMENT_LaunchPlayerReadyWeapon();
-			player.doingmagic=0;
+			playerCharacter.doingmagic=0;
 			WILLRETURNTOCOMBATMODE=0;
 
 			if(INTERNATIONAL_MODE)
@@ -2947,7 +2947,7 @@ long CanPayMana(long num,float cost, bool _bSound = true)
 
 	if (spells[num].caster==0) 
 	{
-		if (player.mana<cost)
+		if (playerCharacter.mana<cost)
 		{
 			ARX_SPELLS_FizzleNoMana(num);
 
@@ -2963,7 +2963,7 @@ long CanPayMana(long num,float cost, bool _bSound = true)
 			return 0;
 		}
 
-		player.mana -= cost;
+		playerCharacter.mana -= cost;
 		return 1;
 	}
 	else if (spells[num].caster<inter.nbmax)
@@ -2995,7 +2995,7 @@ void ARX_SPELLS_ResetRecognition()
 
 	for (int i=0;i<6;i++)
 	{
-		player.SpellToMemorize.iSpellSymbols[i] = 255;
+		playerCharacter.SpellToMemorize.iSpellSymbols[i] = 255;
 	}
 
 	CurrSpellSymbol=0;
@@ -3456,7 +3456,7 @@ long PrecastCheckCanPayMana(long num, float cost, bool _bSound = true)
 
 	if (Precast[num].flags & SPELLCAST_FLAG_NOMANA) return 1;
 
-		if (player.mana>=cost)
+		if (playerCharacter.mana>=cost)
 		{
 			return 1;
 		}
@@ -3503,7 +3503,7 @@ void ARX_SPELLS_Precast_Check()
 		{
 			ANIM_USE *ause1 = &inter.iobj[0]->animlayer[1];
 			
-			if (player.Interface & INTER_COMBATMODE)
+			if (playerCharacter.Interface & INTER_COMBATMODE)
 			{
 				WILLRETURNTOCOMBATMODE=1;
 				ARX_INTERFACE_Combat_Mode(0);
@@ -3583,7 +3583,7 @@ extern long FINAL_RELEASE;
 float ARX_SPELLS_GetManaCost(long _lNumSpell,long lNumSpellTab)
 {
 	float Player_Magic_Level;
-	Player_Magic_Level = (float) player.Full_Skill_Casting + player.Full_Attribute_Mind;
+	Player_Magic_Level = (float) playerCharacter.Full_Skill_Casting + playerCharacter.Full_Attribute_Mind;
 	Player_Magic_Level= __max(1,Player_Magic_Level*DIV10);
 	Player_Magic_Level= __min(10,Player_Magic_Level);
 
@@ -3843,7 +3843,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 		{
 			if ( SpellSymbol[i] != 255 )
 			{
-				if ( !( player.rune_flags & ( 1 << SpellSymbol[i] ) ) )
+				if ( !( playerCharacter.rune_flags & ( 1 << SpellSymbol[i] ) ) )
 				{
 					ARX_SOUND_PlaySpeech( "player_cantcast" );
 					CurrSpellSymbol = 0;
@@ -3861,17 +3861,17 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 	{
 		ARX_SPELLS_ResetRecognition();
 
-		if ( player.SpellToMemorize.bSpell )
+		if ( playerCharacter.SpellToMemorize.bSpell )
 		{
 			CurrSpellSymbol					= 0;
-			player.SpellToMemorize.bSpell	= false;
+			playerCharacter.SpellToMemorize.bSpell	= false;
 		}
 
 		ARX_PLAYER_ComputePlayerFullStats();
 
 		if ( level == -1 )
 		{
-			Player_Magic_Level = (float) player.Full_Skill_Casting + player.Full_Attribute_Mind;
+			Player_Magic_Level = (float) playerCharacter.Full_Skill_Casting + playerCharacter.Full_Attribute_Mind;
 			Player_Magic_Level = __max( 1, Player_Magic_Level * DIV10 );
 			Player_Magic_Level = __min( 10, Player_Magic_Level );
 		}
@@ -4042,13 +4042,13 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 		// Player source
 		spells[i].caster_level = Player_Magic_Level;	// Level of caster
 
-		spells[i].caster_pos.x = player.pos.x;
-		spells[i].caster_pos.y = player.pos.y;
-		spells[i].caster_pos.z = player.pos.z;
+		spells[i].caster_pos.x = playerCharacter.pos.x;
+		spells[i].caster_pos.y = playerCharacter.pos.y;
+		spells[i].caster_pos.z = playerCharacter.pos.z;
 
-		spells[i].caster_angle.x = player.angle.x;
-		spells[i].caster_angle.y = player.angle.y;
-		spells[i].caster_angle.z = player.angle.z;		
+		spells[i].caster_angle.x = playerCharacter.angle.x;
+		spells[i].caster_angle.y = playerCharacter.angle.y;
+		spells[i].caster_angle.z = playerCharacter.angle.z;		
 		
 	}
 	else
@@ -4075,9 +4075,9 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 	{
 		if (source==0) // no target... player spell targeted by sight
 		{
-			spells[i].target_pos.x=player.pos.x-EEsin(DEG2RAD(player.angle.b))*60.f;
-			spells[i].target_pos.y=player.pos.y+EEsin(DEG2RAD(player.angle.a))*60.f;
-			spells[i].target_pos.z=player.pos.z+EEcos(DEG2RAD(player.angle.b))*60.f;
+			spells[i].target_pos.x=playerCharacter.pos.x-EEsin(DEG2RAD(playerCharacter.angle.b))*60.f;
+			spells[i].target_pos.y=playerCharacter.pos.y+EEsin(DEG2RAD(playerCharacter.angle.a))*60.f;
+			spells[i].target_pos.z=playerCharacter.pos.z+EEcos(DEG2RAD(playerCharacter.angle.b))*60.f;
 
 			spells[i].target_angle.a=0.f;
 			spells[i].target_angle.b=0.f;
@@ -4097,13 +4097,13 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 	// player target
 	else if (target==0) 
 	{
-		spells[i].target_pos.x=player.pos.x;
-		spells[i].target_pos.y=player.pos.x;
-		spells[i].target_pos.z=player.pos.z;
+		spells[i].target_pos.x=playerCharacter.pos.x;
+		spells[i].target_pos.y=playerCharacter.pos.x;
+		spells[i].target_pos.z=playerCharacter.pos.z;
 
-		spells[i].target_angle.a=player.angle.a;
-		spells[i].target_angle.b=player.angle.b;
-		spells[i].target_angle.g=player.angle.g;
+		spells[i].target_angle.a=playerCharacter.angle.a;
+		spells[i].target_angle.b=playerCharacter.angle.b;
+		spells[i].target_angle.g=playerCharacter.angle.g;
 	}
 	// IO target
 	else 
@@ -4399,7 +4399,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 						}
 					}
 
-				if ((CURRENT_TORCH) && (EEDistance3D(&target,&player.pos)<pDoze->GetPerimetre()))
+				if ((CURRENT_TORCH) && (EEDistance3D(&target,&playerCharacter.pos)<pDoze->GetPerimetre()))
 				{
 					ARX_PLAYER_ClickedOnTorch(CURRENT_TORCH);
 				}
@@ -4904,7 +4904,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				CFireBall * cf=(CFireBall *)pCSpellFx;
 
 				if (spells[i].caster==0)
-					cf->Create(target,MAKEANGLE(player.angle.b),player.angle.a,spells[i].caster_level);
+					cf->Create(target,MAKEANGLE(playerCharacter.angle.b),playerCharacter.angle.a,spells[i].caster_level);
 				else
 				{
 					float angle;
@@ -4968,7 +4968,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			CSpellFx *pCSpellFx = NULL;
 
 			if ((spells[i].caster==0) || (spells[i].target==0))
-				player.hunger=100;
+				playerCharacter.hunger=100;
 		
 			pCSpellFx = new CCreateFood(GDevice);
 
@@ -5007,11 +5007,11 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 				if (spells[i].caster==0)
 				{
-					target.x = player.pos.x - EEsin(DEG2RAD(MAKEANGLE(player.angle.b)))*150.0f;
-					target.y = player.pos.y+160;
-					target.z = player.pos.z + EEcos(DEG2RAD(MAKEANGLE(player.angle.b)))*150.0f;
+					target.x = playerCharacter.pos.x - EEsin(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*150.0f;
+					target.y = playerCharacter.pos.y+160;
+					target.z = playerCharacter.pos.z + EEcos(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*150.0f;
 					CIceProjectile *pIP = (CIceProjectile*)pCSpellFx;
-					pIP->Create(target, MAKEANGLE(player.angle.b), spells[i].caster_level);
+					pIP->Create(target, MAKEANGLE(playerCharacter.angle.b), spells[i].caster_level);
 				}
 				else
 				{
@@ -5075,7 +5075,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				target.x = inter.iobj[spells[i].caster]->pos.x;
 				target.y = inter.iobj[spells[i].caster]->pos.y;
 				target.z = inter.iobj[spells[i].caster]->pos.z;
-				pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+				pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 				pCSpellFx->SetDuration(20000);
 				spells[i].pSpellFx = pCSpellFx;
 				spells[i].tolive = pCSpellFx->GetDuration();
@@ -5416,7 +5416,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				}
 
 				target.z=spells[i].target_pos.z;
-				pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+				pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 				pCSpellFx->SetDuration(spells[i].tolive);
 				spells[i].pSpellFx = pCSpellFx;
 				spells[i].tolive = pCSpellFx->GetDuration();
@@ -5501,12 +5501,12 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				if (	(spells[i].caster==0)
 					||	(spells[i].target==0)	)
 				{
-					target.x=player.pos.x;
-					target.y=player.pos.y+150.f;
-					target.z=player.pos.z;
+					target.x=playerCharacter.pos.x;
+					target.y=playerCharacter.pos.y+150.f;
+					target.z=playerCharacter.pos.z;
 					spells[i].target = 0; 
 					spells[i].tolive = 200000000;
-					player.levitate=1;
+					playerCharacter.levitate=1;
 				}
 				else
 				{
@@ -5539,9 +5539,9 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 			if (spells[i].target==0) 
 			{
-				player.poison-=cure;
+				playerCharacter.poison-=cure;
 
-				if (player.poison<0.f) player.poison=0;
+				if (playerCharacter.poison<0.f) playerCharacter.poison=0;
 
 				ARX_SOUND_PlaySFX(SND_SPELL_CURE_POISON);
 			}
@@ -5617,11 +5617,11 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			if (pCSpellFx != NULL)
 			{
 				EERIE_3D target;
-				target.x=player.pos.x;
-				target.y=player.pos.y;
-				target.z=player.pos.z;
+				target.x=playerCharacter.pos.x;
+				target.y=playerCharacter.pos.y;
+				target.z=playerCharacter.pos.z;
 				pCSpellFx->spellinstance=i;
-				pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+				pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 				pCSpellFx->SetDuration(spells[i].tolive);
 				spells[i].pSpellFx = pCSpellFx;
 				spells[i].tolive = pCSpellFx->GetDuration();
@@ -5656,7 +5656,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				pCSpellFx->SetDuration((unsigned long) (8000));
 				float ang;
 
-				if (spells[i].caster==0) ang=player.angle.b;
+				if (spells[i].caster==0) ang=playerCharacter.angle.b;
 				else ang=inter.iobj[spells[i].caster]->angle.b;
 
 				pCSpellFx->Create(target, MAKEANGLE(ang));
@@ -5688,10 +5688,10 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 			if (spells[i].caster==0)
 			{
-				target.x=player.pos.x - EEsin(DEG2RAD(MAKEANGLE(player.angle.b)))*300.f;
-				target.y = player.pos.y + 170.f; 
-				target.z=player.pos.z + EEcos(DEG2RAD(MAKEANGLE(player.angle.b)))*300.f;
-				beta=MAKEANGLE(player.angle.b);
+				target.x=playerCharacter.pos.x - EEsin(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*300.f;
+				target.y = playerCharacter.pos.y + 170.f; 
+				target.z=playerCharacter.pos.z + EEcos(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*300.f;
+				beta=MAKEANGLE(playerCharacter.angle.b);
 				
 			}
 			else
@@ -5792,9 +5792,9 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			if (ValidIONum(spells[i].target))
 			{
 				if (	(spells[i].target==0)
-					&& (spells[i].caster_level<=player.level)	)
+					&& (spells[i].caster_level<=playerCharacter.level)	)
 				{
-					float mul=player.resist_magic;
+					float mul=playerCharacter.resist_magic;
 
 					if (rnd()*100.f<mul)
 					{
@@ -5864,9 +5864,9 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 			if (spells[i].caster==0)
 			{
-				target.x = inter.iobj[0]->pos.x - EEsin(DEG2RAD(MAKEANGLE(player.angle.b)))*250.f;
+				target.x = inter.iobj[0]->pos.x - EEsin(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*250.f;
 				target.y = inter.iobj[0]->pos.y;
-				target.z = inter.iobj[0]->pos.z + EEcos(DEG2RAD(MAKEANGLE(player.angle.b)))*250.f;
+				target.z = inter.iobj[0]->pos.z + EEcos(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*250.f;
 			}
 			else			
 			{
@@ -5971,10 +5971,10 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			{
 				pCSpellFx->spellinstance=i;
 				EERIE_3D target;
-				target.x=player.pos.x;
-				target.y=player.pos.y;
-				target.z=player.pos.z;
-				pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+				target.x=playerCharacter.pos.x;
+				target.y=playerCharacter.pos.y;
+				target.z=playerCharacter.pos.z;
+				pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 				pCSpellFx->SetDuration(spells[i].tolive);
 				spells[i].pSpellFx = pCSpellFx;
 				spells[i].tolive = pCSpellFx->GetDuration();
@@ -6065,7 +6065,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 					target.x=spells[i].target_pos.x;
 					target.y=spells[i].target_pos.y;
 					target.z=spells[i].target_pos.z;
-					pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+					pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 					pCSpellFx->SetDuration(spells[i].tolive);
 					spells[i].pSpellFx = pCSpellFx;
 					spells[i].tolive = pCSpellFx->GetDuration();
@@ -6112,12 +6112,12 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			spells[i].bDuration = true;
 			spells[i].fManaCostPerSecond = 3.2f;
 			eyeball.exist=1;
-			eyeball.pos.x=player.pos.x-(float)EEsin(DEG2RAD(MAKEANGLE(player.angle.b)))*200.f;
-			eyeball.pos.y=player.pos.y+50.f;
-			eyeball.pos.z=player.pos.z+(float)EEcos(DEG2RAD(MAKEANGLE(player.angle.b)))*200.f;
-			eyeball.angle.a=player.angle.a;
-			spells[i].v.y=eyeball.angle.b=player.angle.b;
-			eyeball.angle.g=player.angle.g;
+			eyeball.pos.x=playerCharacter.pos.x-(float)EEsin(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*200.f;
+			eyeball.pos.y=playerCharacter.pos.y+50.f;
+			eyeball.pos.z=playerCharacter.pos.z+(float)EEcos(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*200.f;
+			eyeball.angle.a=playerCharacter.angle.a;
+			spells[i].v.y=eyeball.angle.b=playerCharacter.angle.b;
+			eyeball.angle.g=playerCharacter.angle.g;
 			long j;
 
 			for (long n=0;n<12;n++)
@@ -6201,9 +6201,9 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 				if ( spells[i].caster == 0 )
 				{					
-					target.x = player.pos.x - EEsin(DEG2RAD(MAKEANGLE(player.angle.b)))*250.f;
-					target.y = player.pos.y + 170;
-					target.z = player.pos.z + EEcos(DEG2RAD(MAKEANGLE(player.angle.b)))*250.f;
+					target.x = playerCharacter.pos.x - EEsin(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*250.f;
+					target.y = playerCharacter.pos.y + 170;
+					target.z = playerCharacter.pos.z + EEcos(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*250.f;
 				}
 				else			
 				{
@@ -6305,9 +6305,9 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 				if ( spells[i].caster == 0 )						
 				{
-					target.x = player.pos.x - EEsin( DEG2RAD( MAKEANGLE( player.angle.b ) ) ) * 250.f;
-					target.y = player.pos.y + 170;
-					target.z = player.pos.z + EEcos( DEG2RAD( MAKEANGLE( player.angle.b ) ) ) * 250.f;
+					target.x = playerCharacter.pos.x - EEsin( DEG2RAD( MAKEANGLE( playerCharacter.angle.b ) ) ) * 250.f;
+					target.y = playerCharacter.pos.y + 170;
+					target.z = playerCharacter.pos.z + EEcos( DEG2RAD( MAKEANGLE( playerCharacter.angle.b ) ) ) * 250.f;
 				}
 				else			
 				{
@@ -6357,7 +6357,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 					gDamageInfo[spells[i].longinfo].pos.z	= target.z;
 				}
 
-				pCSpellFx->Create( target, MAKEANGLE( player.angle.b ) );
+				pCSpellFx->Create( target, MAKEANGLE( playerCharacter.angle.b ) );
 				pCSpellFx->SetDuration( spells[i].tolive );
 				spells[i].pSpellFx	= pCSpellFx;
 				spells[i].tolive	= pCSpellFx->GetDuration();
@@ -6389,7 +6389,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				target.x = 0;
 				target.y = 0;
 				target.z = -500;
-				pL->Create(source, target, MAKEANGLE(player.angle.b));
+				pL->Create(source, target, MAKEANGLE(playerCharacter.angle.b));
 				pL->SetDuration((long)(500*spells[i].caster_level));
 				pL->lSrc = 0;
 					
@@ -6424,10 +6424,10 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			{
 				pCSpellFx->spellinstance=i;
 				EERIE_3D target;
-				target.x=player.pos.x;
-				target.y=player.pos.y;
-				target.z=player.pos.z;
-				pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+				target.x=playerCharacter.pos.x;
+				target.y=playerCharacter.pos.y;
+				target.z=playerCharacter.pos.z;
+				pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 				pCSpellFx->SetDuration(spells[i].tolive);
 				spells[i].pSpellFx = pCSpellFx;
 				spells[i].tolive = pCSpellFx->GetDuration();
@@ -6765,10 +6765,10 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 			if (spells[i].caster==0)
 			{
-				target.x=player.pos.x - EEsin(DEG2RAD(MAKEANGLE(player.angle.b)))*300.f;
-				target.y = player.pos.y + 170.f; 
-				target.z=player.pos.z + EEcos(DEG2RAD(MAKEANGLE(player.angle.b)))*300.f;
-				beta=MAKEANGLE(player.angle.b);
+				target.x=playerCharacter.pos.x - EEsin(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*300.f;
+				target.y = playerCharacter.pos.y + 170.f; 
+				target.z=playerCharacter.pos.z + EEcos(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*300.f;
+				beta=MAKEANGLE(playerCharacter.angle.b);
 				
 			}
 			else
@@ -6809,7 +6809,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				pCSpellFx->spellinstance=i;
 				CSummonCreature *pSummon = (CSummonCreature*) pCSpellFx;
 					
-				pSummon->Create(target, MAKEANGLE(player.angle.b));
+				pSummon->Create(target, MAKEANGLE(playerCharacter.angle.b));
 					pSummon->SetDuration(2000, 500, 1500);
 					pSummon->SetColorBorder(1, 0, 0);
 					pSummon->SetColorRays1(0.93f, 0.93f, 0.63f);
@@ -6884,7 +6884,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				pCSpellFx->spellinstance=i;
 				CSummonCreature *pSummon = (CSummonCreature*) pCSpellFx;
 					
-				pSummon->Create(target, MAKEANGLE(player.angle.b));
+				pSummon->Create(target, MAKEANGLE(playerCharacter.angle.b));
 				pSummon->SetDuration(2000, 500, 1500);
 				pSummon->SetColorBorder(1, 0, 0);
 				pSummon->SetColorRays1(0.93f, 0.93f, 0.63f);
@@ -6941,10 +6941,10 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			{
 				pCSpellFx->spellinstance=i;
 				EERIE_3D target;
-				target.x=player.pos.x;
-				target.y=player.pos.y;
-				target.z=player.pos.z;
-				pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+				target.x=playerCharacter.pos.x;
+				target.y=playerCharacter.pos.y;
+				target.z=playerCharacter.pos.z;
+				pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 				pCSpellFx->SetDuration(spells[i].tolive);
 				spells[i].pSpellFx = pCSpellFx;
 				spells[i].tolive = pCSpellFx->GetDuration();
@@ -7085,10 +7085,10 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 
 				if (spells[i].caster==0)
 				{
-					target.x=player.pos.x  - EEsin(DEG2RAD(MAKEANGLE(player.angle.b)))*500.f;
-					target.y=player.pos.y  + 150.f;
-					target.z=player.pos.z  + EEcos(DEG2RAD(MAKEANGLE(player.angle.b)))*500.f;
-					beta=player.angle.b;
+					target.x=playerCharacter.pos.x  - EEsin(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*500.f;
+					target.y=playerCharacter.pos.y  + 150.f;
+					target.z=playerCharacter.pos.z  + EEcos(DEG2RAD(MAKEANGLE(playerCharacter.angle.b)))*500.f;
+					beta=playerCharacter.angle.b;
 				}
 				else
 				{
@@ -7100,7 +7100,7 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 				}
 
 				pCSpellFx->SetDuration((long)(500*spells[i].caster_level));
-				pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+				pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 			
 				spells[i].pSpellFx = pCSpellFx;
 				spells[i].tolive = pCSpellFx->GetDuration();
@@ -7174,10 +7174,10 @@ long ARX_SPELLS_Launch( const long& typ, const long& source, const long& flagss,
 			{
 				pCSpellFx->spellinstance=i;
 				EERIE_3D target;
-				target.x=player.pos.x;
-				target.y=player.pos.y;
-				target.z=player.pos.z;
-				pCSpellFx->Create(target, MAKEANGLE(player.angle.b));
+				target.x=playerCharacter.pos.x;
+				target.y=playerCharacter.pos.y;
+				target.z=playerCharacter.pos.z;
+				pCSpellFx->Create(target, MAKEANGLE(playerCharacter.angle.b));
 				pCSpellFx->SetDuration(spells[i].tolive);
 				spells[i].pSpellFx = pCSpellFx;
 			}
@@ -7783,7 +7783,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 					ARX_SPELLS_RemoveSpellOn(spells[i].target,i);					
 
 					if (spells[i].target==0)
-						player.levitate=0;
+						playerCharacter.levitate=0;
 				}
 				break;
 				//----------------------------------------------------------------------------------
@@ -8050,7 +8050,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 							if (ii==0) 
 							{
 								if (!BLOCK_PLAYER_CONTROLS)
-									player.life=min(player.life+gain,player.Full_maxlife);									
+									playerCharacter.life=min(playerCharacter.life+gain,playerCharacter.Full_maxlife);									
 							}
 							else inter.iobj[ii]->_npcdata->life=min(inter.iobj[ii]->_npcdata->life+gain,inter.iobj[ii]->_npcdata->maxlife);
 						}
@@ -8104,10 +8104,10 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 					if (spells[i].caster==0)
 					{
-								cabalpos.x = player.pos.x; 
-						cabalpos.y=player.pos.y+60.f-mov;
-								cabalpos.z = player.pos.z; 
-						refpos=player.pos.y+60.f;							
+								cabalpos.x = playerCharacter.pos.x; 
+						cabalpos.y=playerCharacter.pos.y+60.f-mov;
+								cabalpos.z = playerCharacter.pos.z; 
+						refpos=playerCharacter.pos.y+60.f;							
 					}
 					else
 					{							
@@ -8288,7 +8288,7 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 							Vector_Init(&angle);
 
 							if (spells[i].target==0)
-								angle.b=player.angle.b;	
+								angle.b=playerCharacter.angle.b;	
 							else 
 								angle.b=inter.iobj[spells[i].target]->angle.b;
 
@@ -8413,10 +8413,10 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 				if (spells[i].target==0)
 				{
-					target.x=player.pos.x;
-					target.y=player.pos.y+150.f;
-					target.z=player.pos.z;
-					player.levitate=1;
+					target.x=playerCharacter.pos.x;
+					target.y=playerCharacter.pos.y+150.f;
+					target.z=playerCharacter.pos.z;
+					playerCharacter.levitate=1;
 				}
 				else
 				{
@@ -9176,14 +9176,14 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 						pos.x=lastteleport.x;
 						pos.y=lastteleport.y;
 						pos.z=lastteleport.z;							
-						lastteleport.x=player.pos.x;
-						lastteleport.y=player.pos.y;
-						lastteleport.z=player.pos.z;
-						player.pos.x=pos.x;
-						player.pos.y=pos.y;
-						player.pos.z=pos.z;
+						lastteleport.x=playerCharacter.pos.x;
+						lastteleport.y=playerCharacter.pos.y;
+						lastteleport.z=playerCharacter.pos.z;
+						playerCharacter.pos.x=pos.x;
+						playerCharacter.pos.y=pos.y;
+						playerCharacter.pos.z=pos.z;
 						LASTTELEPORT=32.f;
-						ARX_SOUND_PlaySFX(SND_SPELL_TELEPORTED, &player.pos);
+						ARX_SOUND_PlaySFX(SND_SPELL_TELEPORTED, &playerCharacter.pos);
 					}
 					else LASTTELEPORT=TELEPORT;
 
@@ -9242,10 +9242,10 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 						if (spells[i].caster==0)
 						{
-								cabalpos.x = player.pos.x; 
-							cabalpos.y=player.pos.y+60.f-mov;
-								cabalpos.z = player.pos.z; 
-							refpos=player.pos.y+60.f;							
+								cabalpos.x = playerCharacter.pos.x; 
+							cabalpos.y=playerCharacter.pos.y+60.f-mov;
+								cabalpos.z = playerCharacter.pos.z; 
+							refpos=playerCharacter.pos.y+60.f;							
 						}
 						else
 						{							
@@ -9340,10 +9340,10 @@ void ARX_SPELLS_Update(LPDIRECT3DDEVICE7 m_pd3dDevice)
 
 						if (spells[i].caster==0)
 						{
-								cabalpos.x = player.pos.x; 
-							cabalpos.y=player.pos.y+60.f-mov;
-								cabalpos.z = player.pos.z; 
-							refpos=player.pos.y+60.f;							
+								cabalpos.x = playerCharacter.pos.x; 
+							cabalpos.y=playerCharacter.pos.y+60.f-mov;
+								cabalpos.z = playerCharacter.pos.z; 
+							refpos=playerCharacter.pos.y+60.f;							
 						}
 						else
 						{							
@@ -9526,8 +9526,8 @@ void ApplySPWep()
 		if (ioo!=NULL)
 		{			
 			sp_wep=1;
-			MakeCoolFx(&player.pos);
-			MakeCoolFx(&player.pos);
+			MakeCoolFx(&playerCharacter.pos);
+			MakeCoolFx(&playerCharacter.pos);
 			ioo->scriptload=1;
 			MakeTemporaryIOIdent(ioo);
 			SendInitScriptEvent(ioo);
@@ -9608,8 +9608,8 @@ void ApplySPBow()
 
 		if (ioo!=NULL)
 		{			
-			MakeCoolFx(&player.pos);
-			MakeCoolFx(&player.pos);
+			MakeCoolFx(&playerCharacter.pos);
+			MakeCoolFx(&playerCharacter.pos);
 			ioo->scriptload=1;
 			MakeTemporaryIOIdent(ioo);
 			SendInitScriptEvent(ioo);
@@ -9655,8 +9655,8 @@ void ApplySPArm()
 	if (ioo!=NULL)
 	{			
 		sp_wep=1;
-		MakeCoolFx(&player.pos);
-		MakeCoolFx(&player.pos);
+		MakeCoolFx(&playerCharacter.pos);
+		MakeCoolFx(&playerCharacter.pos);
 		ioo->scriptload=1;
 		MakeTemporaryIOIdent(ioo);
 		SendInitScriptEvent(ioo);
@@ -9757,7 +9757,7 @@ void ApplySPuw()
 	uw_mode_pos=0;
 	uw_mode=~uw_mode;
 	ARX_SOUND_PlayCinematic("menestrel_uw2.wav");
-	MakeCoolFx(&player.pos);
+	MakeCoolFx(&playerCharacter.pos);
 
 	if (uw_mode)
 	{
@@ -9769,7 +9769,7 @@ void ApplySPuw()
 }
 void ApplySPMax()
 {
-	MakeCoolFx(&player.pos);
+	MakeCoolFx(&playerCharacter.pos);
 	sp_max=~sp_max;
 
 	if (sp_max)
@@ -9779,7 +9779,7 @@ void ApplySPMax()
 		sp_max_nb=strlen(sp_max_ch);
 		sp_max_start=ARX_TIME_Get();
 
-			player.skin=4;
+			playerCharacter.skin=4;
 
 			ARX_EQUIPMENT_RecreatePlayerMesh();
 		
@@ -9787,10 +9787,10 @@ void ApplySPMax()
 		_TCHAR UText[512];
 		MultiByteToWideChar(CP_ACP, 0, "!!!!!!! FanTomAciE !!!!!!!", -1, UText, 256);
 		ARX_SPEECH_Add(NULL, UText);		
-		player.Attribute_Redistribute+=10;
-		player.Skill_Redistribute+=50;
-		player.level=__max(player.level,10);
-		player.xp=GetXPforLevel(10);
+		playerCharacter.Attribute_Redistribute+=10;
+		playerCharacter.Skill_Redistribute+=50;
+		playerCharacter.level=__max(playerCharacter.level,10);
+		playerCharacter.xp=GetXPforLevel(10);
 	}
 	else
 	{
@@ -9799,9 +9799,9 @@ void ApplySPMax()
 		if (tcm)
 		{
 			D3DTextr_KillTexture(tcm);
-			player.heads[0]=MakeTCFromFile("Graph\\Obj3D\\Textures\\npc_human_base_hero_head.bmp");	
-			player.heads[1]=MakeTCFromFile("Graph\\Obj3D\\Textures\\npc_human_base_hero2_head.bmp");	
-			player.heads[2]=MakeTCFromFile("Graph\\Obj3D\\Textures\\npc_human_base_hero3_head.bmp");	
+			playerCharacter.heads[0]=MakeTCFromFile("Graph\\Obj3D\\Textures\\npc_human_base_hero_head.bmp");	
+			playerCharacter.heads[1]=MakeTCFromFile("Graph\\Obj3D\\Textures\\npc_human_base_hero2_head.bmp");	
+			playerCharacter.heads[2]=MakeTCFromFile("Graph\\Obj3D\\Textures\\npc_human_base_hero3_head.bmp");	
 			ARX_EQUIPMENT_RecreatePlayerMesh();
 		}
 	}	

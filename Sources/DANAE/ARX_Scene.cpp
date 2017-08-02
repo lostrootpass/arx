@@ -4317,7 +4317,7 @@ void ARX_SCENE_Render(LPDIRECT3DDEVICE7 pd3dDevice, long flag, long param)
 
 	if (EDITMODE) FRAME_COUNT=0;
 
-	if ((player.Interface & INTER_MAP ) &&  (!(player.Interface & INTER_COMBATMODE))) 
+	if ((playerCharacter.Interface & INTER_MAP ) &&  (!(playerCharacter.Interface & INTER_COMBATMODE))) 
 		FRAME_COUNT=0;
 
 	if (D3DTRANSFORM) 

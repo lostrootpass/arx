@@ -329,7 +329,7 @@ typedef struct
 #define FLAG_YOK			(1<<(RUNE_YOK))
 
 //-----------------------------------------------------------------------------
-extern ARXCHARACTER player;
+extern ARXCHARACTER playerCharacter;
 extern ARX_NECKLACE necklace;
 extern EERIE_3DOBJ * hero;
 extern ANIM_HANDLE * heroanim;
