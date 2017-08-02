@@ -708,7 +708,7 @@ long TVVcount = 0;
 EERIE_3D TVCONTROLEDplayerpos;
 long TVCONTROLED = 0;
 HTREEITEM hfix = NULL;
-HTREEITEM hitem = NULL;
+HTREEITEM hTreeItemRoot = NULL;
 HTREEITEM hnpc = NULL;
 HTREEITEM hroot = NULL;
 HTREEITEM hcam = NULL;
@@ -1038,7 +1038,7 @@ void AddIOTVItem(HWND tvhwnd, INTERACTIVE_OBJ * io, char * name, long type)
 
 		if (io->ioflags & IO_FIX) tis.hParent = hfix;
 
-		if (io->ioflags & IO_ITEM) tis.hParent = hitem;
+		if (io->ioflags & IO_ITEM) tis.hParent = hTreeItemRoot;
 
 		if (io->ioflags & IO_CAMERA) tis.hParent = hcam;
 
@@ -1146,7 +1146,7 @@ void FillInterTreeView(HWND tvhwnd)
 	tis.item.cchTextMax = strlen(tvv[TVVcount]->text);
 	tis.item.cChildren = 1;
 	hti = TreeView_InsertItem(tvhwnd, &tis);
-	hitem = hti;
+	hTreeItemRoot = hti;
 	tvv[TVVcount]->hti = hti;
 	TVVcount++;
 

@@ -181,7 +181,7 @@ static char SpellMoves[MAX_POINTS];
 long SpellSymbol[MAX_SPELL_SYMBOLS];
 long CurrSpellSymbol=0;
 
-Scan spell[MAX_SLOT + 1];
+Scan spellScans[MAX_SLOT + 1];
 
 long lMaxSymbolDrawSizeX;
 long lMaxSymbolDrawSizeY;
@@ -3176,49 +3176,49 @@ void ARX_SPELLS_Analyse()
 			{
 				case AUP:
 					strcat( chaine, "UP \n " );
-					spell[CurrSlot].SlotDir = 0;
+					spellScans[CurrSlot].SlotDir = 0;
 					strcat( SpellMoves, "8" ); //uses PAD values
 					break;
 
 				case ADOWN:
 					strcat( chaine, "DOWN \n " );
-					spell[CurrSlot].SlotDir = 4;
+					spellScans[CurrSlot].SlotDir = 4;
 					strcat( SpellMoves, "2" );
 					break;
 
 				case ALEFT:
 					strcat( chaine, "LEFT \n " );
-					spell[CurrSlot].SlotDir = 6;
+					spellScans[CurrSlot].SlotDir = 6;
 					strcat( SpellMoves, "4" );
 					break;
 
 				case ARIGHT:
 					strcat( chaine, "RIGHT \n " );
-					spell[CurrSlot].SlotDir = 2;
+					spellScans[CurrSlot].SlotDir = 2;
 					strcat( SpellMoves, "6" );
 					break;
 
 				case AUPRIGHT:
 					strcat( chaine, "UP-RIGHT \n " );
-					spell[CurrSlot].SlotDir = 1;
+					spellScans[CurrSlot].SlotDir = 1;
 					strcat( SpellMoves, "9" );
 					break;
 
 				case ADOWNRIGHT:
 					strcat( chaine, "DOWN-RIGHT \n " );
-					spell[CurrSlot].SlotDir = 3;
+					spellScans[CurrSlot].SlotDir = 3;
 					strcat( SpellMoves, "3" );
 					break;
 
 				case AUPLEFT:
 					strcat( chaine, "UP-LEFT \n " );
-					spell[CurrSlot].SlotDir = 7;
+					spellScans[CurrSlot].SlotDir = 7;
 					strcat( SpellMoves, "7" );
 					break;
 
 				case ADOWNLEFT:
 					strcat( chaine, "DOWN-LEFT \n " );
-					spell[CurrSlot].SlotDir = 5;
+					spellScans[CurrSlot].SlotDir = 5;
 					strcat( SpellMoves, "1" );
 					break;
 			}

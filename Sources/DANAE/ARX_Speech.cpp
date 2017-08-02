@@ -635,20 +635,20 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 
 	for (int i = 0 ; i < MAX_ASPEECH ; i++)
 	{
-		ARX_SPEECH * speech = &aspeech[i];
+		ARX_SPEECH * speechItem = &aspeech[i];
 
-		if (speech->exist)
+		if (speechItem->exist)
 		{
-			if (speech->text != NULL)
+			if (speechItem->text != NULL)
 			{
-				if ((ARX_CONVERSATION) && (speech->io))
+				if ((ARX_CONVERSATION) && (speechItem->io))
 				{
 					long ok = 0;
 
 					for (long j = 0 ; j < main_conversation.actors_nb ; j++)
 					{
 						if (main_conversation.actors[j] >= 0)
-							if (speech->io == inter.iobj[main_conversation.actors[j]])
+							if (speechItem->io == inter.iobj[main_conversation.actors[j]])
 							{
 								ok = 1;
 							}
@@ -669,16 +669,16 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 
 #ifdef ARX_OPENGL
 						char text[256];
-						wcstombs(text, speech->text, _tcslen(speech->text));
-						g_pRenderApp->renderer->MeasureText(text, _tcslen(speech->text), (int*)&sSize.cx, (int*)&sSize.cy);
+						wcstombs(text, speechItem->text, _tcslen(speechItem->text));
+						g_pRenderApp->renderer->MeasureText(text, _tcslen(speechItem->text), (int*)&sSize.cx, (int*)&sSize.cy);
 #else
 						if (SUCCEEDED(danaeApp.m_pddsRenderTarget->GetDC(&hDC)))
 						{
 							SelectObject(hDC, InBookFont);
 
 							GetTextExtentPoint32W(hDC,
-							                      speech->text,
-							                      _tcslen(speech->text),
+							                      speechItem->text,
+							                      _tcslen(speechItem->text),
 							                      &sSize);
 							danaeApp.m_pddsRenderTarget->ReleaseDC(hDC);
 						}
@@ -693,8 +693,8 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 						float fZoneClippHeight	=	ARX_CLEAN_WARN_CAST_FLOAT(sSize.cy * 3);
 						float fStartYY			=	100 * Yratio;
 						float fStartY			=	ARX_CLEAN_WARN_CAST_FLOAT(((int)fStartYY - (int)fZoneClippHeight) >> 1);
-						float fDepY				=	((float)DANAESIZY) - fStartYY + fStartY - speech->fDeltaY + sSize.cy;
-						float fZoneClippY		=	fDepY + speech->fDeltaY;
+						float fDepY				=	((float)DANAESIZY) - fStartYY + fStartY - speechItem->fDeltaY + sSize.cy;
+						float fZoneClippY		=	fDepY + speechItem->fDeltaY;
 
 
 						float fAdd = fZoneClippY + fZoneClippHeight ;
@@ -719,7 +719,7 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 						                    0,
 						                    -10.f + (float)DANAESIZX,
 						                    0,		//taille recalculée
-						                    speech->text,
+						                    speechItem->text,
 						                    RGB(255, 255, 255),
 						                    hRgn);
 
@@ -761,29 +761,29 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 
 						iTaille += (int)fZoneClippHeight;
 
-						if (((int)speech->fDeltaY) <= iTaille)
+						if (((int)speechItem->fDeltaY) <= iTaille)
 						{
 							//vitesse du scroll
 							float fDTime;
 
-							if (speech->sample > 0)
+							if (speechItem->sample > 0)
 							{
-								fDTime				= ((float)iTaille * (float)FrameDiff) / (float)ARX_SOUND_GetDuration(speech->sample);    //speech->duration;
+								fDTime				= ((float)iTaille * (float)FrameDiff) / (float)ARX_SOUND_GetDuration(speechItem->sample);    //speech->duration;
 								float fTimeOneLine	= ((float)sSize.cy) * fDTime;
 
-								if (((float)speech->iTimeScroll) >= fTimeOneLine)
+								if (((float)speechItem->iTimeScroll) >= fTimeOneLine)
 								{
-									float fResteLine	 = (float)sSize.cy - speech->fPixelScroll;
+									float fResteLine	 = (float)sSize.cy - speechItem->fPixelScroll;
  
-									float fTimePlus		 = ((float)fResteLine * (float)FrameDiff) / (float)ARX_SOUND_GetDuration(speech->sample);
+									float fTimePlus		 = ((float)fResteLine * (float)FrameDiff) / (float)ARX_SOUND_GetDuration(speechItem->sample);
 									fDTime				-= fTimePlus;
-									speech->fPixelScroll = 0.f;
-									speech->iTimeScroll	 = 0;
+									speechItem->fPixelScroll = 0.f;
+									speechItem->iTimeScroll	 = 0;
 								}
 
 
-								ARX_CHECK_INT(speech->iTimeScroll + FrameDiff);
-								speech->iTimeScroll	+= ARX_CLEAN_WARN_CAST_INT(FrameDiff);
+								ARX_CHECK_INT(speechItem->iTimeScroll + FrameDiff);
+								speechItem->iTimeScroll	+= ARX_CLEAN_WARN_CAST_INT(FrameDiff);
 
 
 							}
@@ -792,8 +792,8 @@ void ARX_SPEECH_Update(LPDIRECT3DDEVICE7 pd3dDevice)
 								fDTime = ((float)iTaille * (float)FrameDiff) / 4000.f;
 							}
 
-							speech->fDeltaY			+= fDTime;
-							speech->fPixelScroll	+= fDTime;
+							speechItem->fDeltaY			+= fDTime;
+							speechItem->fPixelScroll	+= fDTime;
 						}
 					}
 				}
