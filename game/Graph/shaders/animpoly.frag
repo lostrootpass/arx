@@ -46,15 +46,19 @@ void main()
 	
 	vec3 lightContribution = inColor.rgb;
 
+    //35 corresponds to Arx constant NPC_ITEMS__AMBIENT_VALUE_255
+    lightContribution += vec3((35.0 / 255.0));
+
     int lightCount = 0;
     const int MAX_LIGHTS = 4;
 	for(int i = 0; i < numLights; ++i)
     {
         Light l = lights[i];
-        float lightDist = distance(l.pos.xyz, fragPos);
+        vec3 lightPos = l.pos.xyz;
+        float lightDist = distance(lightPos, fragPos);
         if(lightDist < l.fallend)
         {
-            float d = dot((l.pos.xyz - fragPos), normal) * 0.5/lightDist;
+            float d = dot((lightPos - fragPos), normal) * 0.5/lightDist;
 
             if(d >= 0.0)
             {
@@ -83,6 +87,4 @@ void main()
     lightContribution.b = min(1.0, lightContribution.b);
     
     color = vec4(lightContribution * fragColor, inColor.a);
-
-    color = vec4(fragColor, inColor.a);
 }

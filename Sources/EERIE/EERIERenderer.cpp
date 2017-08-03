@@ -21,6 +21,10 @@
 
 extern INTERACTIVE_OBJ * DESTROYED_DURING_RENDERING;
 extern long USE_CEDRIC_ANIM;
+extern long LAST_LLIGHT_COUNT;
+
+static const int BLOCK_BINDING_LIGHT_DATA = 1;
+static const int BLOCK_BINDING_BONE_DATA = 2;
 
 void PrepareAnim(EERIE_3DOBJ * eobj, ANIM_USE * eanim, unsigned long time, INTERACTIVE_OBJ * io);
 
@@ -213,8 +217,8 @@ void EERIERendererGL::DrawCinematic(float x, float y, float sx, float sy, float 
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData), &lightData, GL_DYNAMIC_DRAW);
 
 	GLuint block = glGetUniformBlockIndex(program, "LightData");
-	glUniformBlockBinding(program, block, 1);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightBuffer);
+	glUniformBlockBinding(program, block, BLOCK_BINDING_LIGHT_DATA);
+	glBindBufferBase(GL_UNIFORM_BUFFER, BLOCK_BINDING_LIGHT_DATA, lightBuffer);
 
 	_drawQuad(program, startX, startY, dX, dY);
 
@@ -474,8 +478,8 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, EERIE_3D* 
 	//Lights. TODO: don't update for every object.
 	{
 		std::vector<LightData> lightData;
-		addLights(lightData, llights, MAX_LLIGHTS);
-		addLights(lightData, IO_PDL, MAX_LLIGHTS);
+		addLights(lightData, IO_PDL, TOTIOPDL);
+		addLights(lightData, PDL, TOTPDL);
 
 		UpdateLights(lightData);
 	}
@@ -527,8 +531,8 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, EERIE_3D* 
 	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
 
 	GLuint block = glGetUniformBlockIndex(program, "BoneData");
-	glUniformBlockBinding(program, block, 1);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 1, eobj->glBoneBuffer);
+	glUniformBlockBinding(program, block, BLOCK_BINDING_BONE_DATA);
+	glBindBufferBase(GL_UNIFORM_BUFFER, BLOCK_BINDING_BONE_DATA, eobj->glBoneBuffer);
 
 	glUniform1i(glGetUniformLocation(program, "numBones"), eobj->c_data->nb_bones);
 
@@ -1028,8 +1032,8 @@ void EERIERendererGL::UpdateLights(const std::vector<LightData>& lightData)
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(LightData) * lightData.size(), lightData.data(), GL_DYNAMIC_DRAW);
 
 			GLuint block = glGetUniformBlockIndex(program, "LightData");
-			glUniformBlockBinding(program, block, 1);
-			glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightBuffer);
+			glUniformBlockBinding(program, block, BLOCK_BINDING_LIGHT_DATA);
+			glBindBufferBase(GL_UNIFORM_BUFFER, BLOCK_BINDING_LIGHT_DATA, lightBuffer);
 		}
 
 		glUniform1i(glGetUniformLocation(program, "numLights"), lightData.size());

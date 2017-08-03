@@ -102,10 +102,8 @@ mat4 MatrixFromQuat(vec4 quat)
     return m;
 }
 
-vec3 animate(vec3 start, int boneId)
+void animate(in int boneId, inout mat3 matrix, inout vec3 transvec)
 {
-	vec3 outVec = start;
-
     int boneNum = boneId;
     const int TREE_MAX_SIZE = 32;
     int tree[TREE_MAX_SIZE];
@@ -119,21 +117,18 @@ vec3 animate(vec3 start, int boneId)
     } while(boneNum > -1 && treeSize < TREE_MAX_SIZE);
 
     vec4 quat = bones[0].quat;
-    vec3 transVec = bones[0].translate.xyz;
+    transvec = bones[0].translate.xyz;
     for(int i = treeSize-1; i >= 0; --i)
     {
-        transVec += TransformVertexQuat(quat, bones[tree[i]].translate.xyz);
+        transvec += TransformVertexQuat(quat, bones[tree[i]].translate.xyz);
         quat = QuatMultiply(quat, bones[tree[i]].quat);
     }
-    outVec *= transpose(mat3(MatrixFromQuat(quat)));
-    outVec += transVec;
-	
-	return outVec;
+	matrix = transpose(mat3(MatrixFromQuat(quat)));
+
 }
 
 void main()
 {
-    outPos = pos;
     uv = inUV;
     texId = inTexId;
     norm = inNorm;
@@ -145,8 +140,17 @@ void main()
 
     if(boneId > -1 && boneId < numBones)
     {    
-		adjPos = animate(adjPos, boneId);
+		mat3 animatrix;
+		vec3 transvec;
+
+		animate(boneId, animatrix, transvec);
+		adjPos *= animatrix;
+		adjPos += transvec;
+
+		norm = inNorm * animatrix;
     }
 
-    gl_Position = proj * view * model * vec4(adjPos, 1.0);
+	vec4 modelVertex = (model * vec4(adjPos, 1.0));
+	outPos = modelVertex.xyz;
+    gl_Position = proj * view * modelVertex;
 }
