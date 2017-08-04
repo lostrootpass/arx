@@ -2499,12 +2499,12 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 							D3DTLVERTEX in2;
 							memcpy(&in2,&in,sizeof(D3DTLVERTEX));
 							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::One, EERIEBlendType::One);
-							EERIEDrawRotatedSprite(pd3dDevice,&in,siz,tc,color,temp,rott);
+							g_pRenderApp->renderer->AddParticle(&in,siz,tc,color,temp,rott);
 							g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
-							EERIEDrawRotatedSprite(pd3dDevice,&in2,siz,tc,0xFFFFFFFF,temp,rott);
+							g_pRenderApp->renderer->AddParticle(&in2,siz,tc,0xFFFFFFFF,temp,rott);
 						}
 						else
-							EERIEDrawRotatedSprite(pd3dDevice,&in,siz,tc,color,temp,rott);
+							g_pRenderApp->renderer->AddParticle(&in,siz,tc,color,temp,rott);
 					}					
 				}
 				else if (part->type & PARTICLE_2D) 
@@ -2573,6 +2573,8 @@ void ARX_PARTICLES_Render(LPDIRECT3DDEVICE7 pd3dDevice,EERIE_CAMERA * cam)
 			}
 		}	
 	}
+
+	g_pRenderApp->renderer->FlushParticles();
 
 #ifndef ARX_OPENGL
 	GDevice->SetRenderState(D3DRENDERSTATE_FOGCOLOR,ulBKGColor);

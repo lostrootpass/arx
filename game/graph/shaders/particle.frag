@@ -7,14 +7,14 @@ layout(location = 2) in vec4 inColor;
 
 out vec4 color;
 
-uniform sampler2D texsampler;
+uniform sampler2D texsampler[8];
 
 void main()
 {
    vec3 c = inColor.rgb;
    
-   if(texId != -1)
-        c = texture( texsampler, uv ).rgb;
+   if(texId != -1 && texId < 8)
+        c = texture( texsampler[texId], uv ).rgb;
 
    if(length(c) < 0.25)
    {

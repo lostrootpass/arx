@@ -18,6 +18,7 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>
 
+#define BASICFOCAL 350.f
 
 extern INTERACTIVE_OBJ * DESTROYED_DURING_RENDERING;
 extern long USE_CEDRIC_ANIM;
@@ -26,6 +27,7 @@ extern long LAST_LLIGHT_COUNT;
 static const int BLOCK_BINDING_LIGHT_DATA = 1;
 static const int BLOCK_BINDING_BONE_DATA = 2;
 
+extern void ComputeSingleFogVertex(D3DTLVERTEX*);
 void PrepareAnim(EERIE_3DOBJ * eobj, ANIM_USE * eanim, unsigned long time, INTERACTIVE_OBJ * io);
 
 struct VtxAttrib
@@ -170,6 +172,66 @@ EERIERendererGL::~EERIERendererGL()
 	glDeleteVertexArrays(1, &quadVAO);
 }
 
+void EERIERendererGL::AddParticle(D3DTLVERTEX *in, float siz, TextureContainer * tex, D3DCOLOR col, float Zpos, float rot)
+{
+	D3DTLVERTEX out;
+	float tt;
+
+	D3DTLVERTEX incopy;
+	memcpy(&incopy, in, sizeof(D3DTLVERTEX));
+
+	EERIETreatPoint2(in, &out);
+
+	if ((out.sz > 0.f) && (out.sz < 1000.f))
+	{
+		float use_focal = BASICFOCAL*Xratio;
+
+		float t = siz * (((out.sz / in->sz) + 1.f) * use_focal * 0.01f);
+
+		if (t <= 0.f) t = 0.00000001f;
+
+		if (Zpos <= 1.f)
+		{
+			out.sz = Zpos;
+			out.rhw = 1.f - out.sz;
+		}
+		else
+		{
+			out.rhw *= (1.f / 3000.f);
+		}
+
+		ComputeSingleFogVertex(&out);
+
+		EERIEParticle particle;
+		particle.vtx[0] = D3DTLVERTEX(D3DVECTOR(0, 0, out.sz), out.rhw, col, out.specular, 0.f, 0.f);
+		particle.vtx[1] = D3DTLVERTEX(D3DVECTOR(0, 0, out.sz), out.rhw, col, out.specular, 1.f, 0.f);
+		particle.vtx[2] = D3DTLVERTEX(D3DVECTOR(0, 0, out.sz), out.rhw, col, out.specular, 1.f, 1.f);
+		particle.vtx[3] = D3DTLVERTEX(D3DVECTOR(0, 0, out.sz), out.rhw, col, out.specular, 0.f, 1.f);
+
+
+		SPRmaxs.x = out.sx + t;
+		SPRmins.x = out.sx - t;
+
+		SPRmaxs.y = out.sy + t;
+		SPRmins.y = out.sy - t;
+
+		SPRmaxs.z = SPRmins.z = out.sz;
+
+		for (long i = 0; i < 4; i++)
+		{
+			tt = DEG2RAD(MAKEANGLE(rot + 90.f*i + 45 + 90));
+
+			particle.vtx[i].sx = incopy.sx;
+			particle.vtx[i].sy = EEcos(tt)*t + incopy.sy;
+			particle.vtx[i].sz = EEsin(tt)*t + incopy.sz;
+			particle.vtx[i].rhw = incopy.rhw;
+		}
+
+		particle.tex = tex;
+		_particles.push_back(particle);
+	}
+	else SPRmaxs.x = -1;
+}
 
 void EERIERendererGL::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
 {
@@ -1006,6 +1068,143 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 	glDisable(GL_BLEND);
 }
 
+void EERIERendererGL::FlushParticles()
+{
+	if (!_particles.size()) return;
+
+	std::vector<GLfloat> vtx;
+	vtx.reserve(_particles.size() * 4);
+
+	std::vector<GLshort> idx;
+	idx.reserve(_particles.size() * 5);
+
+	static GLuint glVtxBuffer = -1;
+	static GLuint glAttribBuffer = -1;
+	static GLuint glIdxBuffer = -1;
+
+	if (quadVAO == -1)
+	{
+		glGenVertexArrays(1, &quadVAO);
+	}
+
+	glBindVertexArray(quadVAO);
+
+	//TODO: only update vertex buffers when necessary, not every tick.
+	{
+		//LEAK
+		if (glVtxBuffer == -1)
+			glGenBuffers(1, &glVtxBuffer);
+	}
+
+	GLuint program = EERIEGetGLProgramID("particle");
+	glUseProgram(program);
+
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(EERIE_PRIM_RESTART_IDX);
+
+	glm::mat4 modelMatrix = glm::mat4();
+	modelMatrix[1][1] *= -1; //flip the Y-axis
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
+
+	glm::mat4 p = glm::mat4();
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &_view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &_projection[0][0]);
+
+	std::vector<VtxAttrib> vtxAttribs;
+
+	if (glAttribBuffer == -1)
+	{
+		glGenBuffers(1, &glAttribBuffer);
+	}
+
+	std::vector<int> bindMap;
+
+	unsigned short index = 0;
+	unsigned int texId = 0;
+	for (const EERIEParticle& particle : _particles)
+	{
+		if (particle.tex)
+		{
+			std::vector<int>::iterator it = 
+				std::find(bindMap.begin(), bindMap.end(), particle.tex->textureID);
+
+			if (it == bindMap.end())
+			{
+				texId = bindMap.size();
+
+				char buf[32] = { '\0' };
+				snprintf(buf, 32, "texsampler[%d]", texId);
+
+				GLuint uniformLocation = glGetUniformLocation(program, buf);
+				glActiveTexture(GL_TEXTURE0 + texId);
+				glBindTexture(GL_TEXTURE_2D, particle.tex->textureID);
+				glUniform1i(uniformLocation, 0 + texId);
+
+				bindMap.push_back(particle.tex->textureID);
+			}
+			else
+				texId = (int)(it - bindMap.begin());
+		}
+
+		VtxAttrib attrib;
+
+		for (size_t i = 0; i < 4; ++i)
+		{
+			idx.push_back(index++);
+
+			vtx.push_back(particle.vtx[i].sx);
+			vtx.push_back(particle.vtx[i].sy);
+			vtx.push_back(particle.vtx[i].sz);
+			vtx.push_back(particle.vtx[i].rhw);
+
+			attrib.uv.x = particle.vtx[i].tu;
+			attrib.uv.y = particle.vtx[i].tv;
+
+			attrib.texId = (particle.tex ? texId : -1);
+
+			attrib.color = unpackARGB(particle.vtx[i].color);
+
+			vtxAttribs.push_back(attrib);
+		}
+
+		idx.push_back(EERIE_PRIM_RESTART_IDX);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, glAttribBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtxAttribs[0]) * vtxAttribs.size(), vtxAttribs.data(), GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glVtxBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vtx[0]) * vtx.size(), vtx.data(), GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, glVtxBuffer);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, glAttribBuffer);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, uv));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, texId));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
+
+	if (glIdxBuffer == -1)
+	{
+		glGenBuffers(1, &glIdxBuffer);
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glIdxBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * idx.size(), idx.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glIdxBuffer);
+
+	glDrawElements(GL_TRIANGLE_FAN, idx.size() - 1, GL_UNSIGNED_SHORT, 0);
+
+	_particles.clear();
+}
+
 void EERIERendererGL::MeasureText(char* text, int size, int* width, int* height)
 {
 	EERIEFont* f = _getFont(size);
@@ -1310,6 +1509,67 @@ GLenum EERIERendererGL::_toGLType(EERIEPrimType type)
 /************************************************************/
 /*							D3D								*/
 /************************************************************/
+
+
+void EERIERendererD3D7::AddParticle(D3DTLVERTEX *in, float siz, TextureContainer * tex, D3DCOLOR col, float Zpos, float rot)
+{
+	D3DTLVERTEX out;
+	float tt;
+
+	D3DTLVERTEX incopy;
+	memcpy(&incopy, in, sizeof(D3DTLVERTEX));
+
+	EERIETreatPoint2(in, &out);
+
+	if ((out.sz > 0.f) && (out.sz < 1000.f))
+	{
+		float use_focal = BASICFOCAL*Xratio;
+
+		float t = siz * ((out.rhw - 1.f) * use_focal * 0.001f);
+
+		if (t <= 0.f) t = 0.00000001f;
+
+		if (Zpos <= 1.f)
+		{
+			out.sz = Zpos;
+			out.rhw = 1.f - out.sz;
+		}
+		else
+		{
+			out.rhw *= (1.f / 3000.f);
+		}
+
+		ComputeSingleFogVertex(&out);
+
+		D3DTLVERTEX v[4];
+		v[0] = D3DTLVERTEX(D3DVECTOR(0, 0, out.sz), out.rhw, col, out.specular, 0.f, 0.f);
+		v[1] = D3DTLVERTEX(D3DVECTOR(0, 0, out.sz), out.rhw, col, out.specular, 1.f, 0.f);
+		v[2] = D3DTLVERTEX(D3DVECTOR(0, 0, out.sz), out.rhw, col, out.specular, 1.f, 1.f);
+		v[3] = D3DTLVERTEX(D3DVECTOR(0, 0, out.sz), out.rhw, col, out.specular, 0.f, 1.f);
+
+
+		SPRmaxs.x = out.sx + t;
+		SPRmins.x = out.sx - t;
+
+		SPRmaxs.y = out.sy + t;
+		SPRmins.y = out.sy - t;
+
+		SPRmaxs.z = SPRmins.z = out.sz;
+
+		for (long i = 0; i < 4; i++)
+		{
+			tt = DEG2RAD(MAKEANGLE(rot + 90.f*i + 45 + 90));
+			v[i].sx = EEsin(tt)*t + out.sx;
+			v[i].sy = EEcos(tt)*t + out.sy;
+		}
+
+		SETTC(GDevice, tex);
+		DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX | D3DFVF_DIFFUSE,
+			v, 4, 0);
+	}
+	else SPRmaxs.x = -1;
+}
+
 
 void EERIERendererD3D7::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
 {
