@@ -2430,15 +2430,22 @@ void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERI
 
 
 /* Render object */
-void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE_C_DATA * obj, INTERACTIVE_OBJ * io, EERIE_3D * pos, EERIE_3D & ftr, float invisibility)
+void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE_C_DATA * obj, INTERACTIVE_OBJ * io, EERIE_3D * pos, EERIE_3D & ftr, float invisibility, EERIE_3D* angle)
 {
 	if (bRenderInterList)
 	{
 #ifdef ARX_OPENGL
-		//if (io == inter.iobj[0]) return;
+		EERIE_3D combinedAngle;
+		memcpy(&combinedAngle, &ftr, sizeof(EERIE_3D));
+		if (angle)
+		{
+			combinedAngle.x += angle->x;
+			combinedAngle.y += angle->y;
+			combinedAngle.z += angle->z;
+		}
 
 		g_pRenderApp->renderer->SetCull(EERIECull::CCW);
-		g_pRenderApp->renderer->DrawObj(eobj, io , 0, &ftr);
+		g_pRenderApp->renderer->DrawObj(eobj, io , pos, &combinedAngle);
 		g_pRenderApp->renderer->SetCull(EERIECull::None);
 #else
 		Cedric_RenderObject2(pd3dDevice,
@@ -3003,7 +3010,7 @@ void	Cedric_AnimateDrawEntity(LPDIRECT3DDEVICE7 pd3dDevice,
 
 			if (!Cedric_ApplyLighting(eobj, obj, io, pos, typ)) return;
 
-			Cedric_RenderObject(pd3dDevice, eobj, obj, io, pos, ftr, invisibility);
+			Cedric_RenderObject(pd3dDevice, eobj, obj, io, pos, ftr, invisibility, angle);
 
 			if (io)
 			{

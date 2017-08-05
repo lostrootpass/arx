@@ -343,37 +343,20 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, EERIE_3D* 
 	//Bone translation accounts for world position, but we need to invert the Y-axis
 	//because of the move from D3D to OpenGL maths.
 	modelMatrix[1][1] *= -1;
-
-	if (io)
-	{
-		modelMatrix = glm::translate(modelMatrix, eerieToGLM(&io->pos));
-	}
 	
 	if (pos)
 	{
 		modelMatrix = glm::translate(modelMatrix, eerieToGLM(pos));
+	}
+	else if (io)
+	{
+		modelMatrix = glm::translate(modelMatrix, eerieToGLM(&io->pos));
 	}
 
 	{
 		glm::vec3 a = glm::vec3(0.0f);
 		if (angle)
 			a += eerieToGLM(angle);
-
-		if (io)
-		{
-			glm::vec3 temp = eerieToGLM(&io->angle);
-
-			//Logic borrowed from RenderInter, should be elsewhere.
-			if (io != inter.iobj[0])
-			{
-				if (io->ioflags & IO_NPC)
-					temp.y = MAKEANGLE(180.f - io->angle.y);
-				else
-					temp.y = MAKEANGLE(270.f - io->angle.y);
-			}
-
-			a += temp;
-		}
 
 		if (eobj)
 			a += eerieToGLM(&eobj->angle);
