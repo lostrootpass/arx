@@ -1025,24 +1025,21 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 	const float glyphScreenSize = (vHeightPx * Yratio) / 1.33f;
 	const float glyphScale = glyphScreenSize / (float)font->fontSize;
 
-	//TODO: batch!
+	std::vector<GLfloat> uvArray;
+	std::vector<GLfloat> vtxArray;
+	std::vector<GLushort> idxArray;
+
+	unsigned short index = 0;
+	
 	while (*c)
 	{
 		idx = (int)*c - font->info.fontstart;
 
 		stbtt_GetPackedQuad(font->fontData, font->bitmapWidth, font->bitmapHeight, idx, &offsetX, &offsetY, &quad, 0);
 
-		const float uvs[] = {
-			quad.s1, quad.t0,	//Top Right
-			quad.s0, quad.t0,	//Top Left
-			quad.s1, quad.t1,	//Bot Right
-			quad.s0, quad.t1	//Bot Left
-		};
-
 		float adv = font->fontData[idx].xadvance * glyphScale;
 		float yStart = (font->fontData[idx].yoff*glyphScale) + lineOffsetY;
 		float yEnd = (font->fontData[idx].yoff2 - font->fontData[idx].yoff) * glyphScale;
-
 
 		if (*c == '\n')
 		{
@@ -1052,11 +1049,66 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 			continue;
 		}
 
-		_drawQuad(program, (x + lineOffsetX) / (float)DANAESIZX, ((y + glyphScreenSize) + yStart) / (float)DANAESIZY, adv / (float)DANAESIZX, yEnd / (float)DANAESIZY, uvs);
 
+		uvArray.push_back(quad.s1); uvArray.push_back(quad.t0); //Top right
+		uvArray.push_back(quad.s0); uvArray.push_back(quad.t0); //Top left
+		uvArray.push_back(quad.s1); uvArray.push_back(quad.t1); //Bot right
+		uvArray.push_back(quad.s0); uvArray.push_back(quad.t1); //Bot left
+
+		float x1 = (x + lineOffsetX);
+		float y1 = ((y + glyphScreenSize) + yStart);
+		float x2 = x1 + adv;
+		float y2 = y1 + yEnd;
+
+		vtxArray.push_back(x2); vtxArray.push_back(y1); vtxArray.push_back(0.0f); //Top right
+		vtxArray.push_back(x1); vtxArray.push_back(y1); vtxArray.push_back(0.0f); //Top left
+		vtxArray.push_back(x2); vtxArray.push_back(y2); vtxArray.push_back(0.0f); //Bot right
+		vtxArray.push_back(x1); vtxArray.push_back(y2); vtxArray.push_back(0.0f); //Bot left
+
+		idxArray.push_back(index + 0); idxArray.push_back(index + 1); idxArray.push_back(index + 2);
+		idxArray.push_back(index + 1); idxArray.push_back(index + 3); idxArray.push_back(index + 2);
+		index += 4;
+		
 		lineOffsetX += adv;
 		++c;
 	}
+
+	static GLuint vertexBuffer = -1;
+	static GLuint uvBuffer = -1;
+	static GLuint idxBuffer = -1;
+
+	if (vertexBuffer == -1)
+	{
+		glGenBuffers(1, &vertexBuffer);
+	}
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vtxArray.size(), vtxArray.data(), GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	if (uvBuffer == -1)
+	{
+		glGenBuffers(1, &uvBuffer);
+	}
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * uvArray.size(), uvArray.data(), GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	if (idxBuffer == -1)
+	{
+		glGenBuffers(1, &idxBuffer);
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLushort) * idxArray.size(), idxArray.data(), GL_DYNAMIC_DRAW);
+
+	glm::mat4 proj = glm::ortho(0.0f, (float)DANAESIZX, (float)DANAESIZY, 0.0f, -1.0f, 1.0f);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
+
+	glDrawElements(GL_TRIANGLES, idxArray.size(), GL_UNSIGNED_SHORT, 0);
 
 	glDisable(GL_BLEND);
 }
