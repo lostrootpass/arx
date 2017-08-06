@@ -345,7 +345,7 @@ long ARX_UNICODE_DrawTextInRect(float x, float y,
 {
 #ifdef ARX_OPENGL
 	char text[256];
-	wcstombs(text, _lpszUText, wcslen(_lpszUText) + 1);
+	wcstombs(text, _lpszUText, min(256, wcslen(_lpszUText) + 1));
 	int w, h;
 	int size = GetSizeForHFont(font);
 	g_pRenderApp->renderer->MeasureText(text, size, &w, &h);

@@ -73,7 +73,17 @@ struct EERIEFont
 		char* c = text;
 		while (*c)
 		{
-			*width += (int)fontData[(int)*c++ - info.fontstart].xadvance;
+			if (*c == '\n')
+			{
+				*width = 0;
+				*height += fontSize;
+			}
+			else
+			{
+				*width += (int)fontData[(int)*c - info.fontstart].xadvance;
+			}
+
+			++c;
 		}
 	}
 };

@@ -999,7 +999,7 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 	glUseProgram(program);
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 	EERIEFont* font = _getFont(vHeightPx);
 
@@ -1017,7 +1017,7 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 
 	char* c = text;
 
-	float offset = 0.0f;
+	float lineOffsetX = 0.0f, lineOffsetY = 0.0f;
 	int idx;
 
 	//TODO: the 1.33f factor is a magic number based on Windows point scale divisions i.e. 96/72.
@@ -1040,11 +1040,21 @@ void EERIERendererGL::DrawText(char* text, float x, float y, long col, int vHeig
 		};
 
 		float adv = font->fontData[idx].xadvance * glyphScale;
-		float yStart = (font->fontData[idx].yoff*glyphScale);
+		float yStart = (font->fontData[idx].yoff*glyphScale) + lineOffsetY;
 		float yEnd = (font->fontData[idx].yoff2 - font->fontData[idx].yoff) * glyphScale;
-		_drawQuad(program, (x + offset) / (float)DANAESIZX, ((y + glyphScreenSize) + yStart) / (float)DANAESIZY, adv / (float)DANAESIZX, yEnd / (float)DANAESIZY, uvs);
 
-		offset += adv;
+
+		if (*c == '\n')
+		{
+			lineOffsetX = 0.0f;
+			lineOffsetY += (yEnd - yStart);
+			++c;
+			continue;
+		}
+
+		_drawQuad(program, (x + lineOffsetX) / (float)DANAESIZX, ((y + glyphScreenSize) + yStart) / (float)DANAESIZY, adv / (float)DANAESIZX, yEnd / (float)DANAESIZY, uvs);
+
+		lineOffsetX += adv;
 		++c;
 	}
 

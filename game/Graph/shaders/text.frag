@@ -11,5 +11,9 @@ uniform vec3 fontColor;
 void main()
 {
     float texel = texture( texsampler, uv ).r;
-    color = vec4(fontColor * texel, texel);
+    
+    //Saturation while maintaining AA
+    texel *= 2.0 - texel;
+
+    color = vec4(fontColor, texel);
 }
