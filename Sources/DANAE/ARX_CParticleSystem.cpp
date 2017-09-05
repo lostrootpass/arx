@@ -652,7 +652,7 @@ void CParticleSystem::Render(LPDIRECT3DDEVICE7 _lpD3DDevice, EERIEBlendType _iSR
 					fRot = (-fParticleRotation) * p->ulTime + p->fRotStart;
 
 				if ((tex_tab[inumtex] && tex_tab[inumtex]->m_pddsSurface))
-					EERIEDrawRotatedSprite(_lpD3DDevice, &p3pos, p->fSize, tex_tab[inumtex], p->ulColor, 2, fRot);
+					g_pRenderApp->renderer->AddParticle(&p3pos, p->fSize, tex_tab[inumtex], p->ulColor, 2, fRot);
 			}
 			else
 			{

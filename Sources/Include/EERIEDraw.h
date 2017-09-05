@@ -88,7 +88,6 @@ void EERIEOBJECT_Quadify(EERIE_3DOBJ * obj);
 void EERIE_DRAW_SetTextureZMAP(long num, TextureContainer * Z_map);
 
 void EERIEDrawSprite(LPDIRECT3DDEVICE7 pd3dDevice, D3DTLVERTEX * in, float siz, TextureContainer * tex, D3DCOLOR col, float Zpos);
-void EERIEDrawRotatedSprite(LPDIRECT3DDEVICE7 pd3dDevice, D3DTLVERTEX * in, float siz, TextureContainer * tex, D3DCOLOR col, float Zpos, float rot);
 
 void SETTEXTURE0(LPDIRECT3DDEVICE7 pd3dDevice, IDirectDrawSurface7 * tex);
 

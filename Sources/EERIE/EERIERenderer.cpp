@@ -529,7 +529,7 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, EERIE_3D* 
 		UpdateLights(lightData);
 	}
 
-	for (auto& pair : texMapBindings)
+	for (std::pair<const short, short>& pair : texMapBindings)
 	{
 		if (pair.first == -1) continue;
 
