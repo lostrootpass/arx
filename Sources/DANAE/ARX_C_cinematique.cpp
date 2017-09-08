@@ -259,7 +259,7 @@ HRESULT CINEMATIQUE::OneTimeSceneReInit()
 	LeftButton = RightButton = FALSE;
 
 #ifndef ARX_OPENGL
-	DeleteAllBitmap(GDevice);
+	DeleteAllBitmap();
 #endif
 	DeleteAllSound();
 

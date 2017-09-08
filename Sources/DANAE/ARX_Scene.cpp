@@ -4874,12 +4874,13 @@ if (HALOCUR>0)
 		{
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::Zero, EERIEBlendType::OneMinusSrcColor);
 			vert[2].color =0xFF000000;
-			g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 );//>>> DO NOT USE EERIE_USEVB FOR HALO <<<
+			g_pRenderApp->renderer->AddPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 );//>>> DO NOT USE EERIE_USEVB FOR HALO <<<
 			g_pRenderApp->renderer->SetBlendFunc(EERIEBlendType::SrcColor, EERIEBlendType::One);
 		}
-		else g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 );//>>> DO NOT USE EERIE_USEVB FOR HALO <<<
+		else g_pRenderApp->renderer->AddPrim(EERIEPrimType::TriangleFan, D3DFVF_TLVERTEX| D3DFVF_DIFFUSE , vert, 4,  0, 0 );//>>> DO NOT USE EERIE_USEVB FOR HALO <<<
 	}
 
+	g_pRenderApp->renderer->FlushPrims();
 		 HALOCUR = 0; 
 	g_pRenderApp->renderer->SetAlphaBlend(false);			
 }

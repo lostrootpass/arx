@@ -2431,6 +2431,14 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 {
 	if (bRenderInterList)
 	{
+		Cedric_RenderObject2(pd3dDevice,
+			eobj,
+			obj,
+			io,
+			pos,
+			ftr,
+			invisibility);
+
 #ifdef ARX_OPENGL
 		EERIE_3D combinedAngle;
 		memcpy(&combinedAngle, &ftr, sizeof(EERIE_3D));
@@ -2444,14 +2452,6 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 		g_pRenderApp->renderer->SetCull(EERIECull::CCW);
 		g_pRenderApp->renderer->DrawObj(eobj, io , pos, &combinedAngle);
 		g_pRenderApp->renderer->SetCull(EERIECull::None);
-#else
-		Cedric_RenderObject2(pd3dDevice,
-		                     eobj,
-		                     obj,
-		                     io,
-		                     pos,
-		                     ftr,
-		                     invisibility);
 #endif
 		return;
 	}
