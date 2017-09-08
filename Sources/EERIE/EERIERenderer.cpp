@@ -30,15 +30,6 @@ static const int BLOCK_BINDING_BONE_DATA = 2;
 extern void ComputeSingleFogVertex(D3DTLVERTEX*);
 void PrepareAnim(EERIE_3DOBJ * eobj, ANIM_USE * eanim, unsigned long time, INTERACTIVE_OBJ * io);
 
-struct VtxAttrib
-{
-	glm::vec4 color;
-	glm::vec3 normal;
-	glm::vec2 uv;
-	GLint texId;
-	GLint boneId;
-};
-
 struct Bone
 {
 	glm::mat4 rotate;
@@ -233,13 +224,46 @@ void EERIERendererGL::AddParticle(D3DTLVERTEX *in, float siz, TextureContainer *
 	else SPRmaxs.x = -1;
 }
 
-void EERIERendererGL::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
+void EERIERendererGL::AddPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, 
+	LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags)
+{
+	D3DTLVERTEX* vertices = static_cast<D3DTLVERTEX*>(lpvVertices);
+
+	for (DWORD i = 0; i < dwVertexCount; ++i)
+	{
+		D3DTLVERTEX vtx = vertices[i];
+		VtxAttrib attrib;
+
+		attrib.texId = eerieFlags;
+
+		attrib.uv.s = vtx.tu;
+		attrib.uv.t = vtx.tv;
+
+		attrib.color = unpackARGB(vtx.color);
+
+		_primBatch.attrib.push_back(attrib);
+
+		/////
+
+		glm::vec3 pos;
+		pos.x = vtx.sx;
+		pos.y = vtx.sy;
+		pos.z = 0.0f;// vtx.sz;
+
+		_primBatch.vtx.push_back(pos);
+	}
+}
+
+void EERIERendererGL::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, 
+	EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io,
+	long typ)
 {
 	D3DCOLOR color = 0L;
 	EERIEDrawAnimQuat(0, eobj, eanim, angle, pos, time, io, color, typ);
 }
 
-void EERIERendererGL::DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND)
+void EERIERendererGL::DrawCinematic(float x, float y, float sx, float sy, 
+	float z, TextureContainer * tex, C_LIGHT* light, float LightRND)
 {
 	const float w = (float)DANAESIZX, h = (float)DANAESIZY;
 
@@ -266,10 +290,11 @@ void EERIERendererGL::DrawCinematic(float x, float y, float sx, float sy, float 
 	glUniform1i(glGetUniformLocation(program, "texsampler"), 0);
 
 	LightData lightData;
-	lightData.pos = glm::vec4(light->pos.x / (float)DANAESIZX, light->pos.y / (float)DANAESIZY, light->pos.z, light->intensite);
+	EERIE_3D pos = light->pos;
+	lightData.pos = glm::vec4(pos.x / w, pos.y / h, pos.z, light->intensite);
 	lightData.color = glm::vec4(light->r / 255.0f, light->g / 255.0f, light->b / 255.0f, LightRND);
-	lightData.fallstart = light->fallin / (float)DANAESIZX;
-	lightData.fallend = light->fallout / (float)DANAESIZX;
+	lightData.fallstart = light->fallin / w;
+	lightData.fallend = light->fallout / w;
 
 	static GLuint lightBuffer = -1;
 	if (lightBuffer == -1)
@@ -310,7 +335,8 @@ void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
 	glDisable(GL_BLEND);
 }
 
-void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, EERIE_3D* pos, EERIE_3D* angle, EERIE_MOD_INFO* modinfo, EERIEMATRIX* matrix)
+void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, 
+	EERIE_3D* pos, EERIE_3D* angle, EERIE_MOD_INFO* modinfo, EERIEMATRIX* matrix)
 {
 	bool useAlphaBlending = false;
 
@@ -598,18 +624,6 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, EERIE_3D* 
 
 void EERIERendererGL::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags /*= 0*/)
 {
-	GLuint program = EERIEGetGLProgramID("orthoprim");
-	glUseProgram(program);
-
-	static GLuint vtxBuffer = -1;
-	static GLuint attribBuffer = -1;
-
-	if (vtxBuffer == -1)
-	{
-		glGenBuffers(1, &vtxBuffer);
-		glGenBuffers(1, &attribBuffer);
-	}
-
 	std::vector<glm::vec3> vtxData;
 	std::vector<VtxAttrib> attribData;
 
@@ -639,38 +653,8 @@ void EERIERendererGL::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, L
 		vtxData.push_back(pos);
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, vtxBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * dwVertexCount, vtxData.data(), GL_DYNAMIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vtxBuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, attribBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VtxAttrib) * dwVertexCount, attribData.data(), GL_DYNAMIC_DRAW);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, uv));
-
-	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, texId));
-
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
-
-	if (eerieFlags)
-	{
-		//TODO: store uniforms instead of looking up every frame
-		GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, eerieFlags);
-		glUniform1i(uniformLocation, 0);
-	}
-
-	glm::mat4 proj = glm::ortho(0.0f, (float)DANAESIZX, (float)DANAESIZY, 0.0f, -1.0f, 1.0f);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
-
-	glDrawArrays(_toGLType(primType), 0, dwVertexCount);
+	_drawPrimInternal(primType, (size_t)dwVertexCount, vtxData, attribData,
+		eerieFlags);
 }
 
 void EERIERendererGL::DrawQuad(float x, float y, float sx, float sy, float z, TextureContainer * tex, const float* uvs, unsigned long color)
@@ -1250,6 +1234,14 @@ void EERIERendererGL::FlushParticles()
 	_particles.clear();
 }
 
+void EERIERendererGL::FlushPrims()
+{
+	_drawPrimInternal(EERIEPrimType::TriangleList,
+		_primBatch.vtx.size(), _primBatch.vtx, _primBatch.attrib);
+
+	_primBatch.clear();
+}
+
 void EERIERendererGL::MeasureText(char* text, int size, int* width, int* height)
 {
 	EERIEFont* f = _getFont(size);
@@ -1361,6 +1353,56 @@ void EERIERendererGL::SetZWrite(bool enableZWrite)
 		glEnable(GL_DEPTH_TEST);
 	else
 		glDisable(GL_DEPTH_TEST);
+}
+
+void EERIERendererGL::_drawPrimInternal(EERIEPrimType type, size_t count,
+	const std::vector<glm::vec3>& vtx, const std::vector<VtxAttrib>& attr,
+	long flags)
+{
+	GLuint program = EERIEGetGLProgramID("orthoprim");
+	glUseProgram(program);
+
+	static GLuint vtxBuffer = -1;
+	static GLuint attribBuffer = -1;
+
+	if (vtxBuffer == -1)
+	{
+		glGenBuffers(1, &vtxBuffer);
+		glGenBuffers(1, &attribBuffer);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, vtxBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * count, vtx.data(), GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vtxBuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, attribBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VtxAttrib) * count, attr.data(), GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, uv));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, texId));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, color));
+
+	if (flags)
+	{
+		//TODO: store uniforms instead of looking up every frame
+		GLuint uniformLocation = glGetUniformLocation(program, "texsampler");
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, flags);
+		glUniform1i(uniformLocation, 0);
+	}
+
+	glm::mat4 proj = glm::ortho(0.0f, (float)DANAESIZX, (float)DANAESIZY, 0.0f, -1.0f, 1.0f);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &proj[0][0]);
+
+	glDrawArrays(_toGLType(type), 0, count);
 }
 
 void EERIERendererGL::_drawQuad(GLuint program, float x, float y, float sx, float sy, const float* uvs)
@@ -1615,6 +1657,11 @@ void EERIERendererD3D7::AddParticle(D3DTLVERTEX *in, float siz, TextureContainer
 	else SPRmaxs.x = -1;
 }
 
+
+void EERIERendererD3D7::AddPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags)
+{
+	DrawPrim(primType, dwVertexTypeDesc, lpvVertices, dwVertexCount, dwFlags, eerieFlags);
+}
 
 void EERIERendererD3D7::DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ)
 {

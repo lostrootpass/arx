@@ -35,6 +35,15 @@ struct LightData
 	float ___pad[1];
 };
 
+struct VtxAttrib
+{
+	glm::vec4 color;
+	glm::vec3 normal;
+	glm::vec2 uv;
+	GLint texId;
+	GLint boneId;
+};
+
 struct EERIEFont
 {
 	stbtt_fontinfo info;
@@ -94,6 +103,18 @@ struct EERIEParticle
 	TextureContainer* tex;
 };
 
+struct EERIEPrimBatch
+{
+	std::vector<glm::vec3> vtx;
+	std::vector<VtxAttrib> attrib;
+
+	void clear()
+	{
+		vtx.clear();
+		attrib.clear();
+	}
+};
+
 class EERIERenderer
 {
 protected:
@@ -104,6 +125,7 @@ public:
 	virtual ~EERIERenderer() = 0;
 
 	virtual void AddParticle(D3DTLVERTEX *in, float siz, TextureContainer * tex, D3DCOLOR col, float Zpos, float rot) {};
+	virtual void AddPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags = 0) {};
 	virtual void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) {};
 	virtual void DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND) {};
 	virtual void DrawFade(const EERIE_RGB& color, float visibility) {};
@@ -115,6 +137,7 @@ public:
 	virtual void DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer * tex) {};
 	virtual void DrawText(char* text, float x, float y, long col = 0xFFFFFF, int vHeightPx = 24) {};
 	virtual void FlushParticles() { };
+	virtual void FlushPrims() {};
 
 	virtual void MeasureText(char* text, int size, int* width, int* height) {};
 
@@ -146,6 +169,7 @@ public:
 
 
 	void AddParticle(D3DTLVERTEX *in, float siz, TextureContainer * tex, D3DCOLOR col, float Zpos, float rot) override;
+	void AddPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags = 0) override;
 	void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) override;
 	void DrawCinematic(float x, float y, float sx, float sy, float z, TextureContainer * tex, C_LIGHT* light, float LightRND) override;
 	void DrawFade(const EERIE_RGB& color, float visibility) override;
@@ -157,6 +181,7 @@ public:
 	void DrawSprite(float x, float y, float sx, float sy, D3DCOLOR col, TextureContainer* tex) override;
 	void DrawText(char* text, float x, float y, long col = 0xFFFFFF, int vHeightPx = 24) override;
 	void FlushParticles() override;
+	void FlushPrims() override;
 
 	void MeasureText(char* text, int size, int* width, int* height) override;
 
@@ -173,6 +198,7 @@ public:
 	void SetZWrite(bool enableZWrite) override;
 
 private:
+	EERIEPrimBatch _primBatch;
 
 	//TODO: move/remove
 	std::unordered_map<void*, std::unordered_map<short, short> > _texMapBindings;
@@ -181,7 +207,12 @@ private:
 
 	std::vector<EERIEParticle> _particles;
 
-	void _drawQuad(GLuint program, float x, float y, float sx, float sy, const float* uvs = 0);
+	void _drawPrimInternal(EERIEPrimType type, size_t count,
+		const std::vector<glm::vec3>& vtx, const std::vector<VtxAttrib>& attr,
+		long flags = 0);
+
+	void _drawQuad(GLuint program, float x, float y, float sx, float sy, 
+		const float* uvs = 0);
 
 	EERIEFont* _getFont(int size);
 
@@ -202,6 +233,7 @@ public:
 	~EERIERendererD3D7() {};
 
 	void AddParticle(D3DTLVERTEX *in, float siz, TextureContainer * tex, D3DCOLOR col, float Zpos, float rot) override;
+	void AddPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags = 0) override;
 	void DrawAnimQuat(EERIE_3DOBJ * eobj, ANIM_USE * eanim, EERIE_3D * angle, EERIE_3D  * pos, unsigned long time, INTERACTIVE_OBJ * io, long typ) override;
 	void DrawFade(const EERIE_RGB& color, float visibility) override;
 	void DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags = 0) override;

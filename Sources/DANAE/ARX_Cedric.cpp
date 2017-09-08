@@ -1645,15 +1645,11 @@ bool ARX_DrawPrimitive_SoftClippZ(D3DTLVERTEX * _pVertex1, D3DTLVERTEX * _pVerte
 			return false;
 	}
 
-#ifdef ARX_OPENGL
-	g_pRenderApp->renderer->DrawRotatedSprite(pD3DPointAdd, iNbTotVertex, 0);
-#else
-	g_pRenderApp->renderer->DrawPrim(EERIEPrimType::TriangleList,
+	g_pRenderApp->renderer->AddPrim(EERIEPrimType::TriangleList,
 	              D3DFVF_TLVERTEX,
 	              pD3DPointAdd,
 					iNbTotVertex,
 					0, (bSoftRender?EERIE_USEVB:0)  );
-#endif
 	return true;
 }
 long FORCE_FRONT_DRAW = 0;
@@ -1661,7 +1657,8 @@ long FORCE_FRONT_DRAW = 0;
 //-----------------------------------------------------------------------------
 extern long IN_BOOK_DRAW;
 /* Render object */
-void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE_C_DATA * obj, INTERACTIVE_OBJ * io, EERIE_3D * pos, EERIE_3D & ftr, float invisibility)
+void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, 
+	EERIE_C_DATA * obj, INTERACTIVE_OBJ * io, EERIE_3D * pos, EERIE_3D & ftr, float invisibility)
 {
 	float		MAX_ZEDE = 0.f;
 

@@ -273,7 +273,7 @@ void ARXDRAW_DrawInterShadows(LPDIRECT3DDEVICE7 pd3dDevice)
 		
 		}
 
-	g_pRenderApp->renderer->FlushParticles();
+	g_pRenderApp->renderer->FlushPrims();
 	g_pRenderApp->renderer->SetAlphaBlend(false);
 	g_pRenderApp->renderer->SetZWrite(true);
 	SetZBias(pd3dDevice,0);
