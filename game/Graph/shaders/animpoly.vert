@@ -14,6 +14,7 @@ layout(location = 2) out int texId;
 layout(location = 3) out vec3 norm;
 layout(location = 4) out vec4 outColor;
 
+uniform mat4 angle;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
@@ -124,7 +125,6 @@ void animate(in int boneId, inout mat3 matrix, inout vec3 transvec)
         quat = QuatMultiply(quat, bones[tree[i]].quat);
     }
 	matrix = transpose(mat3(MatrixFromQuat(quat)));
-
 }
 
 void main()
@@ -147,7 +147,7 @@ void main()
 		adjPos *= animatrix;
 		adjPos += transvec;
 
-		norm = inNorm * animatrix;
+		norm = inNorm * animatrix * transpose(mat3(angle));
     }
 
 	vec4 modelVertex = (model * vec4(adjPos, 1.0));

@@ -870,7 +870,9 @@ bool	Cedric_ApplyLighting(EERIE_3DOBJ * eobj, EERIE_C_DATA * obj, INTERACTIVE_OB
 
 	}
 
+#ifndef ARX_OPENGL
 	if (FRAME_COUNT > 0) return true;
+#endif
 
 	if (Project.improve)
 	{
@@ -1759,6 +1761,7 @@ void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj,
 		}
 	}
 
+#ifndef ARX_OPENGL
 	{
 		bool bPassInTANDL;
 		bool bBumpOnIO;
@@ -2423,6 +2426,7 @@ void	Cedric_RenderObject2(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj,
 
 		}
 	}
+#endif
 }
 
 
@@ -2449,7 +2453,9 @@ void	Cedric_RenderObject(LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj, EERIE
 			combinedAngle.z += angle->z;
 		}
 
-		g_pRenderApp->renderer->SetCull(EERIECull::CCW);
+		if(io == inter.iobj[0])
+			g_pRenderApp->renderer->SetCull(EERIECull::CCW);
+
 		g_pRenderApp->renderer->DrawObj(eobj, io , pos, &combinedAngle);
 		g_pRenderApp->renderer->SetCull(EERIECull::None);
 #endif

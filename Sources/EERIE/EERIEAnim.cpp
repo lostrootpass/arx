@@ -1934,7 +1934,9 @@ void DrawEERIEInter2( LPDIRECT3DDEVICE7 pd3dDevice, EERIE_3DOBJ * eobj,
 	
 	
 	// Precalc local lights for this object then interpolate
+#ifndef ARX_OPENGL
 	if (FRAME_COUNT <= 0)
+#endif
 	{	
 		MakeCLight(io,&infra,angle,&pos,eobj,BIGMAT,BIGQUAT);
 	}

@@ -53,7 +53,7 @@ void addLights(std::vector<LightData>& data, EERIE_LIGHT** sources, size_t count
 		EERIE_LIGHT* light = sources[i];
 		LightData ld;
 
-		if (!light || !light->exist || !light->treat)
+		if (!light)
 		{
 			continue;
 		}
@@ -379,18 +379,19 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 		modelMatrix = glm::translate(modelMatrix, eerieToGLM(&io->pos));
 	}
 
-	{
-		glm::vec3 a = glm::vec3(0.0f);
-		if (angle)
-			a += eerieToGLM(angle);
+	glm::vec3 a = glm::vec3(0.0f);
+	if (angle)
+		a += eerieToGLM(angle);
 
-		if (eobj)
-			a += eerieToGLM(&eobj->angle);
+	if (eobj)
+		a += eerieToGLM(&eobj->angle);
 
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(a.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(a.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelMatrix = glm::rotate(modelMatrix, glm::radians(a.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	}
+	glm::mat4 rotMatrix = glm::mat4();
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(a.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(a.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(a.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	glUniformMatrix4fv(glGetUniformLocation(program, "angle"), 1, GL_FALSE, &rotMatrix[0][0]);
+	modelMatrix *= rotMatrix;
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &_view[0][0]);
@@ -438,7 +439,9 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 			Bone& b = boneBuffer[boneIdx];
 
 			MatrixFromQuat(&eerieMatrix, &bone.quatinit);
-			glm::vec3 scaleVec = eerieToGLM(&bone.scaleinit) +glm::vec3(1.0f, 1.0f, 1.0f);
+			glm::vec3 scaleVec = eerieToGLM(&bone.scaleinit);
+			scaleVec += glm::vec3(1.0f, 1.0f, 1.0f);
+
 			b.quat = eerieToGLM(&bone.quatinit);
 			b.rotate = glm::scale(eerieToGLM(&eerieMatrix), scaleVec);
 			b.translate = glm::vec4(eerieToGLM(&bone.transinit), 1.0);
@@ -447,7 +450,8 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 
 			//Match up the bone data to the vertex data
 			//Do this even if the model isn't animated on the first frame -
-			// it may end up being animated later, so this avoids redoing the attrib buffer
+			// it may end up being animated later, so this avoids redoing the
+			// attrib buffer
 			//TODO: can do this elsewhere, possibly earlier in the pipeline
 			if (boneCache)
 			{
@@ -493,7 +497,8 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 				attrib.uv.y = face.v[i];
 
 				attrib.texId = b;
-				attrib.normal = glm::vec3(vtxList[fv].norm.x, vtxList[fv].norm.y, -vtxList[fv].norm.z);
+				attrib.normal = glm::vec3(vtxList[fv].norm.x, 
+					vtxList[fv].norm.y, vtxList[fv].norm.z);
 
 				float alpha = (vtxList[fv].vert.color >> 24 & 0xFF) / 255.0f;
 				if (face.transval > 0.0f)
@@ -513,7 +518,8 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 					}
 				}
 
-				attrib.color = glm::vec4(unpackRGB(vtxList[fv].vert.color), alpha);
+				attrib.color = 
+					glm::vec4(unpackRGB(vtxList[fv].vert.color), alpha);
 
 				if (boneCache)
 					attrib.boneId = boneCache[fv];
@@ -549,8 +555,7 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 	//Lights. TODO: don't update for every object.
 	{
 		std::vector<LightData> lightData;
-		addLights(lightData, IO_PDL, TOTIOPDL);
-		addLights(lightData, PDL, TOTPDL);
+		addLights(lightData, llights, MAX_LLIGHTS);
 
 		UpdateLights(lightData);
 	}
@@ -622,7 +627,8 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 		glDisable(GL_BLEND);
 }
 
-void EERIERendererGL::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags /*= 0*/)
+void EERIERendererGL::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, 
+	LPVOID lpvVertices, DWORD dwVertexCount, DWORD dwFlags, long eerieFlags)
 {
 	std::vector<glm::vec3> vtxData;
 	std::vector<VtxAttrib> attribData;

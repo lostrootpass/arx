@@ -29,7 +29,7 @@ uniform int numLights;
 
 void main()
 {
-      vec3 fragColor = vec3(1.0, 0.0, 1.0);
+    vec3 fragColor = vec3(1.0, 0.0, 1.0);
     
     if(texId >= 0)
     {
@@ -50,33 +50,40 @@ void main()
     lightContribution += vec3((35.0 / 255.0));
 
     int lightCount = 0;
-    const int MAX_LIGHTS = 4;
 	for(int i = 0; i < numLights; ++i)
     {
         Light l = lights[i];
         vec3 lightPos = l.pos.xyz;
-        float lightDist = distance(lightPos, fragPos);
+		vec3 diff = lightPos - fragPos;
+		float lightDist = length(diff);
+        
         if(lightDist < l.fallend)
         {
-            float d = dot((lightPos - fragPos), normal) * 0.5/lightDist;
+			diff *= 1.0/lightDist;
+			
+			vec3 newnormal = vec3(normal.x, -normal.y, normal.z);
+			float d = dot(diff, newnormal);
 
-            if(d >= 0.0)
+            if(d > 0.0)
             {
-                float adj;
+                float adj = 0.0;
 				if(lightDist <= l.fallstart)
 				{
 					adj = d * l.precalc;
 				}
 				else
 				{
-					float falldiff = l.fallend - l.fallstart;
-					float falldiffmul = 1.0 / falldiff;
+					float falldiffmul = 1.0/(l.fallend - l.fallstart);
+					float p = (l.fallend - lightDist) * falldiffmul;
 					
-					adj = lightDist - l.fallstart;
-					adj = (falldiff - adj) * falldiffmul * l.precalc * d;
+					if(p <= 0.0)
+						adj = 0.0;
+					else
+						adj = d * p * l.precalc;
 				}
-
-                adj = min(1.0, adj);
+                
+                //adj can be >=1.0 here which is what generates
+                // the iridescence effect on some surfaces
                 lightContribution += (l.lightColor.rgb * adj);
             }
         }
