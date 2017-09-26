@@ -590,6 +590,10 @@ typedef struct
 	long				nbaction;
 	long				nbselections;
 	long				nbindices;
+	long				nbindicesalpha;
+	long				nbindicesalphaadd;
+	long				nbindicesalphasub;
+	long				nbindicesalphamul;
 	unsigned long		drawflags;
 
 	/* DO NOT MOVE/REARRANGE THESE GL BUFFER HANDLES */

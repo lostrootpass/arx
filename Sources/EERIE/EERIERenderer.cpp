@@ -338,8 +338,6 @@ void EERIERendererGL::DrawFade(const EERIE_RGB& color, float visibility)
 void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io, 
 	EERIE_3D* pos, EERIE_3D* angle, EERIE_MOD_INFO* modinfo, EERIEMATRIX* matrix)
 {
-	bool useAlphaBlending = false;
-
 	//TODO: legacy Arx data separates these data sets, they can be combined.
 
 	/* Vertices in bone space - this is what gets sent to the GPU */
@@ -398,6 +396,10 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &_projection[0][0]);
 
 	std::vector<GLuint> indices;
+	std::vector<GLuint> indicesAlpha;
+	std::vector<GLuint> indicesAlphaAdd;
+	std::vector<GLuint> indicesAlphaSub;
+	std::vector<GLuint> indicesAlphaMul;
 	std::vector<VtxAttrib> vtxAttribs;
 
 	std::unordered_map<short, short>& texMapBindings = _texMapBindings[eobj];
@@ -463,6 +465,7 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 		}
 	}
 
+	GLuint vtxid = 0;
 	if (genVertices)
 	{
 		short binding = 0;
@@ -489,8 +492,6 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 				vtx.push_back(vtxArray[fv].y);
 				vtx.push_back(vtxArray[fv].z);
 
-				indices.push_back(fv);
-
 				VtxAttrib attrib;
 
 				attrib.uv.x = face.u[i];
@@ -501,21 +502,46 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 					vtxList[fv].norm.y, vtxList[fv].norm.z);
 
 				float alpha = (vtxList[fv].vert.color >> 24 & 0xFF) / 255.0f;
-				if (face.transval > 0.0f)
+				if (face.facetype & POLY_TRANS)
 				{
-					if (!useAlphaBlending)
-					{
-						useAlphaBlending = true;
-					}
+					alpha = face.transval;
 
-					if (face.transval > 1.0f)
+					if (face.transval >= 2.f)
 					{
-						alpha = face.transval - 1.0f;
+						//MULTIPLICATIVE
+						alpha *= DIV2;
+						alpha += 0.5f;
+						indicesAlphaMul.push_back(vtxid);
 					}
 					else
 					{
-						alpha = face.transval;
+						if (face.transval >= 1.f)
+						{
+							//ADDITIVE
+							alpha -= 1.f;
+							indicesAlphaAdd.push_back(vtxid);
+						}
+						else
+						{
+							if (face.transval > 0.f)
+							{
+								//NORMAL TRANS
+								alpha = 1.f - face.transval;
+								indicesAlpha.push_back(vtxid);
+							}
+							else
+							{
+								//SUBTRACTIVE
+								alpha = 1.f - face.transval;
+								indicesAlphaSub.push_back(vtxid);
+							}
+						}
 					}
+
+				}
+				else
+				{
+					indices.push_back(vtxid);
 				}
 
 				attrib.color = 
@@ -527,6 +553,8 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 					attrib.boneId = -1;
 
 				vtxAttribs.push_back(attrib);
+
+				++vtxid;
 			}
 		}
 
@@ -536,11 +564,20 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 		glBindBuffer(GL_ARRAY_BUFFER, eobj->glAttribBuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vtxAttribs[0]) * vtxAttribs.size(), vtxAttribs.data(), GL_STATIC_DRAW);
 
-		//TODO: the vertex duplication above is messing with the index buffer.
+		
+		eobj->nbindices = indices.size();
+		eobj->nbindicesalpha = indicesAlpha.size();
+		eobj->nbindicesalphaadd = indicesAlphaAdd.size();
+		eobj->nbindicesalphasub = indicesAlphaSub.size();
+		eobj->nbindicesalphamul = indicesAlphaMul.size();
+
+		indices.insert(indices.end(), indicesAlpha.begin(), indicesAlpha.end());
+		indices.insert(indices.end(), indicesAlphaAdd.begin(), indicesAlphaAdd.end());
+		indices.insert(indices.end(), indicesAlphaSub.begin(), indicesAlphaSub.end());
+		indices.insert(indices.end(), indicesAlphaMul.begin(), indicesAlphaMul.end());
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), indices.data(), GL_STATIC_DRAW);
-
-		eobj->nbindices = (long)indices.size();
 	}
 
 	if (boneBuffer)
@@ -615,16 +652,56 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 	glEnableVertexAttribArray(5);
 	glVertexAttribIPointer(5, 1, GL_INT, sizeof(VtxAttrib), (void*)offsetof(VtxAttrib, boneId));
 
-	if (useAlphaBlending)
+	size_t offset = 0;
+	size_t size = sizeof(indices[0]);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eobj->glIdxBuffer);
+	glDrawElements(GL_TRIANGLES, eobj->nbindices, GL_UNSIGNED_INT, 0);
+	offset += (size_t)(eobj->nbindices * size);
+
+	if (eobj->nbindicesalpha > 0 || eobj->nbindicesalphaadd > 0 
+		|| eobj->nbindicesalphasub > 0 || eobj->nbindicesalphamul > 0)
 	{
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
-	}
+		SetCull(EERIECull::None);
 
-	glDrawArrays(GL_TRIANGLES, 0, eobj->nbfaces * 3);
+		if (eobj->nbindicesalpha > 0)
+		{
+			glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
 
-	if(useAlphaBlending)
+			glDrawElements(GL_TRIANGLES, eobj->nbindicesalpha,
+				GL_UNSIGNED_INT, (void*)offset);
+			offset += (size_t)(eobj->nbindicesalpha * size);
+		}
+
+		if (eobj->nbindicesalphaadd > 0)
+		{
+			glBlendFunc(GL_ONE, GL_ONE);
+
+			glDrawElements(GL_TRIANGLES, eobj->nbindicesalphaadd,
+				GL_UNSIGNED_INT, (void*)offset);
+			offset += (size_t)(eobj->nbindicesalphaadd * size);
+		}
+
+		if (eobj->nbindicesalphasub > 0)
+		{
+			glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
+
+			glDrawElements(GL_TRIANGLES, eobj->nbindicesalphasub,
+				GL_UNSIGNED_INT, (void*)offset);
+			offset += (size_t)(eobj->nbindicesalphasub * size);
+		}
+
+		if (eobj->nbindicesalphamul > 0)
+		{
+			glBlendFunc(GL_ONE, GL_ONE);
+
+			glDrawElements(GL_TRIANGLES, eobj->nbindicesalphamul,
+				GL_UNSIGNED_INT, (void*)offset);
+		}
+
 		glDisable(GL_BLEND);
+	}
 }
 
 void EERIERendererGL::DrawPrim(EERIEPrimType primType, DWORD dwVertexTypeDesc, 
