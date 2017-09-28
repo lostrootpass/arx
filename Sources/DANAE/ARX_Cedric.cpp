@@ -1539,13 +1539,11 @@ bool ARX_DrawPrimitive_SoftClippZ(D3DTLVERTEX * _pVertex1, D3DTLVERTEX * _pVerte
 {
 	int iClipp = 0;
 
-#ifndef ARX_OPENGL
 	if (_pVertex1->sz < (SOFTNEARCLIPPZ + _fAddZ)) iClipp |= 1;
 
 	if (_pVertex2->sz < (SOFTNEARCLIPPZ + _fAddZ)) iClipp |= 2;
 
 	if (_pVertex3->sz < (SOFTNEARCLIPPZ + _fAddZ)) iClipp |= 4;
-#endif
 
 	D3DTLVERTEX D3DClippZ1, D3DClippZ2;
 	D3DTLVERTEX pD3DPointAdd[6];
