@@ -1308,10 +1308,6 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 		USE_D3DFOG=1; 
 	}
 
-#ifdef ARX_OPENGL
-	ARX_SOUND_INIT = 0;
-#endif
-
 	CalcFPS(true);
 	HERMES_Memory_Security_On(32000);
 	
@@ -1640,11 +1636,7 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	lastteleport.z=0.f;
 	////////////////////
 
-#ifdef ARX_OPENGL
-	Project.soundmode = 0;// "ARX_SOUND_OFF;"
-#else
 	Project.soundmode = ARX_SOUND_ON;
-#endif
 
 	inter.init=0;
 	InitInter(10);	
@@ -1785,6 +1777,15 @@ INT WINAPI WinMain( HINSTANCE _hInstance, HINSTANCE, LPSTR strCmdLine, INT )
 	{
 		sprintf(szPath, "%s\\cfg_default.ini", Project.workingdir);
 	}
+
+	Dbg_str("Sound Init");
+
+	if (	(Project.soundmode != 0)
+		&&	ARX_SOUND_INIT	)
+		ARX_SOUND_Init(MAIN_PROGRAM_HANDLE);
+	
+	Dbg_str("Sound Init Success");
+
 
 	pMenuConfig = new CMenuConfig(szPath);
 	pMenuConfig->ReadAll();
