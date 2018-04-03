@@ -33,6 +33,7 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\PropSheets\SDL.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -93,7 +94,7 @@
       <AdditionalDependencies>ArxCommon_debug.lib;implode.lib;Mercury_Debug.lib;Minos_Debug.lib;HERMES_debug.LIB;EERIE_debug.LIB;eaxguid.lib;dinput.lib;zlib.lib;jpeglib.lib;wsock32.lib;dxguid.lib;dsound.lib;winmm.lib;comctl32.lib;ddraw.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../game/arx.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)\Lib\x86;..\DX\Lib;..\lib\otherlibs;..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28August 2007%29\Lib\x86;..\DX\Lib;..\lib\otherlibs;..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/DANAE.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -148,7 +149,7 @@
       <AdditionalDependencies>implode.lib;ArxCommon_Release.lib;Mercury_Release.lib;Minos_release.lib;HERMES_release.LIB;EERIE_release.LIB;eaxguid.lib;dinput.lib;zlib.lib;jpeglib.lib;wsock32.lib;dxguid.lib;dsound.lib;winmm.lib;comctl32.lib;ddraw.lib;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../game/arx.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)\Lib\x86;..\DX\Lib;..\lib\otherlibs;..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28August 2007%29\Lib\x86;..\DX\Lib;..\lib\otherlibs;..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Release/DANAE.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
