@@ -394,6 +394,8 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, &modelMatrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, &_view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, &_projection[0][0]);
+	
+	glUniform1i(glGetUniformLocation(program, "useLights"), 1);
 
 	std::vector<GLuint> indices;
 	std::vector<GLuint> indicesAlpha;
@@ -659,11 +661,49 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 	glDrawElements(GL_TRIANGLES, eobj->nbindices, GL_UNSIGNED_INT, 0);
 	offset += (size_t)(eobj->nbindices * size);
 
-	if (eobj->nbindicesalpha > 0 || eobj->nbindicesalphaadd > 0 
+	if (eobj->nbindicesalpha > 0 || eobj->nbindicesalphaadd > 0
 		|| eobj->nbindicesalphasub > 0 || eobj->nbindicesalphamul > 0)
 	{
+		glUniform1i(glGetUniformLocation(program, "useLights"), 0);
+
+		//Depth pre-pass for translucent objects
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		size_t prepassOffset = offset;
+
 		glEnable(GL_BLEND);
+
 		SetCull(EERIECull::None);
+
+		if (eobj->nbindicesalpha > 0)
+		{
+			glDrawElements(GL_TRIANGLES, eobj->nbindicesalpha,
+				GL_UNSIGNED_INT, (void*)prepassOffset);
+			prepassOffset += (size_t)(eobj->nbindicesalpha * size);
+		}
+
+		if (eobj->nbindicesalphaadd > 0)
+		{
+			glDrawElements(GL_TRIANGLES, eobj->nbindicesalphaadd,
+				GL_UNSIGNED_INT, (void*)prepassOffset);
+			prepassOffset += (size_t)(eobj->nbindicesalphaadd * size);
+		}
+
+		if (eobj->nbindicesalphasub > 0)
+		{
+			glDrawElements(GL_TRIANGLES, eobj->nbindicesalphasub,
+				GL_UNSIGNED_INT, (void*)prepassOffset);
+			prepassOffset += (size_t)(eobj->nbindicesalphasub * size);
+		}
+
+		if (eobj->nbindicesalphamul > 0)
+		{
+			glDrawElements(GL_TRIANGLES, eobj->nbindicesalphamul,
+				GL_UNSIGNED_INT, (void*)prepassOffset);
+		}
+
+		//Now actually draw
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		glDepthFunc(GL_EQUAL);
 
 		if (eobj->nbindicesalpha > 0)
 		{
@@ -701,6 +741,7 @@ void EERIERendererGL::DrawObj(EERIE_3DOBJ* eobj, INTERACTIVE_OBJ* io,
 		}
 
 		glDisable(GL_BLEND);
+		glDepthFunc(GL_LEQUAL);
 	}
 }
 

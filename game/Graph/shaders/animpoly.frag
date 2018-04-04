@@ -26,6 +26,7 @@ layout(std140) uniform LightData
 };
 
 uniform int numLights;
+uniform int useLights;
 
 void main()
 {
@@ -43,55 +44,57 @@ void main()
     }
 
     vec3 base = fragColor;
-	
-	vec3 lightContribution = inColor.rgb;
+	vec3 lightContribution = vec3(1.0);
 
-    //35 corresponds to Arx constant NPC_ITEMS__AMBIENT_VALUE_255
-    lightContribution += vec3((35.0 / 255.0));
+	if(useLights == 1)
+	{
+		//35 corresponds to Arx constant NPC_ITEMS__AMBIENT_VALUE_255
+		lightContribution = inColor.rgb + vec3((35.0 / 255.0));
 
-    int lightCount = 0;
-	for(int i = 0; i < numLights; ++i)
-    {
-        Light l = lights[i];
-        vec3 lightPos = l.pos.xyz;
-		vec3 diff = lightPos - fragPos;
-		float lightDist = length(diff);
-        
-        if(lightDist < l.fallend)
-        {
-			diff *= 1.0/lightDist;
+		int lightCount = 0;
+		for(int i = 0; i < numLights; ++i)
+		{
+			Light l = lights[i];
+			vec3 lightPos = l.pos.xyz;
+			vec3 diff = lightPos - fragPos;
+			float lightDist = length(diff);
 			
-			vec3 newnormal = vec3(normal.x, -normal.y, normal.z);
-			float d = dot(diff, newnormal);
+			if(lightDist < l.fallend)
+			{
+				diff *= 1.0/lightDist;
+				
+				vec3 newnormal = vec3(normal.x, -normal.y, normal.z);
+				float d = dot(diff, newnormal);
 
-            if(d > 0.0)
-            {
-                float adj = 0.0;
-				if(lightDist <= l.fallstart)
+				if(d > 0.0)
 				{
-					adj = d * l.precalc;
-				}
-				else
-				{
-					float falldiffmul = 1.0/(l.fallend - l.fallstart);
-					float p = (l.fallend - lightDist) * falldiffmul;
-					
-					if(p <= 0.0)
-						adj = 0.0;
+					float adj = 0.0;
+					if(lightDist <= l.fallstart)
+					{
+						adj = d * l.precalc;
+					}
 					else
-						adj = d * p * l.precalc;
+					{
+						float falldiffmul = 1.0/(l.fallend - l.fallstart);
+						float p = (l.fallend - lightDist) * falldiffmul;
+						
+						if(p <= 0.0)
+							adj = 0.0;
+						else
+							adj = d * p * l.precalc;
+					}
+					
+					//adj can be >=1.0 here which is what generates
+					// the iridescence effect on some surfaces
+					lightContribution += (l.lightColor.rgb * adj);
 				}
-                
-                //adj can be >=1.0 here which is what generates
-                // the iridescence effect on some surfaces
-                lightContribution += (l.lightColor.rgb * adj);
-            }
-        }
-    }
+			}
+		}
 
-    lightContribution.r = min(1.0, lightContribution.r);
-    lightContribution.g = min(1.0, lightContribution.g);
-    lightContribution.b = min(1.0, lightContribution.b);
-    
-    color = vec4(lightContribution * fragColor, inColor.a);
+		lightContribution.r = min(1.0, lightContribution.r);
+		lightContribution.g = min(1.0, lightContribution.g);
+		lightContribution.b = min(1.0, lightContribution.b);
+	}
+
+	color = vec4(lightContribution * fragColor, inColor.a);
 }
