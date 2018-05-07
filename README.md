@@ -1,6 +1,5 @@
 # Arx Fatalis
 
-
 [Video](https://vimeo.com/pmurdoch/arx)
 
 ## Overview
